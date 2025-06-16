@@ -238,12 +238,7 @@ export function TestDefinitionCards() {
               <Plus className="h-6 w-6 text-primary" />
             </div>
             <p className="text-muted-foreground text-center mb-4">Create a new test definition</p>
-            <Button asChild>
-              <Link href="/tests/new">
-                <Plus className="mr-2 h-4 w-4" />
-                New Test
-              </Link>
-            </Button>
+
           </div>
         </Card>
       </div>

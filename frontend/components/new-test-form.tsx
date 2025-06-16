@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2 } from "lucide-react"
 
@@ -11,16 +11,29 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function NewTestForm() {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [testDefinitions, setTestDefinitions] = useState<{ id: string; name: string }[]>([])
+  const [selectedTestDefId, setSelectedTestDefId] = useState<string>("")
+
   const [formData, setFormData] = useState({
     name: "",
     image: "",
     commands: [""],
   })
+
+  useEffect(() => {
+    const fetchDefs = async () => {
+      const res = await fetch("http://localhost:3001/api/test-definitions")
+      const defs = await res.json()
+      setTestDefinitions(defs)
+    }
+    fetchDefs()
+  }, [])
 
   const addCommand = () => {
     setFormData((prev) => ({
@@ -48,22 +61,20 @@ export function NewTestForm() {
     setIsSubmitting(true)
 
     try {
-      // In a real app, this would call the API
-      const response = await fetch("/api/run-test", {
+      const response = await fetch("http://localhost:3001/api/test-runs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          test_definition_id: selectedTestDefId,
           name: formData.name,
           image: formData.image,
-          command: formData.commands.filter(Boolean),
+          commands: formData.commands.filter(Boolean),
         }),
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to create test")
-      }
+      if (!response.ok) throw new Error("Failed to create test")
 
       const data = await response.json()
 
@@ -72,7 +83,7 @@ export function NewTestForm() {
         description: `Test ID: ${data.id}`,
       })
 
-      router.push(`/tests/${data.id}`)
+      router.push('/')
     } catch (error) {
       toast({
         title: "Error creating test",
@@ -94,6 +105,22 @@ export function NewTestForm() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="test-def">Test Definition</Label>
+            <Select onValueChange={setSelectedTestDefId}>
+              <SelectTrigger id="test-def">
+                <SelectValue placeholder="Select a test definition" />
+              </SelectTrigger>
+              <SelectContent>
+                {testDefinitions.map((def) => (
+                  <SelectItem key={def.id} value={def.id}>
+                    {def.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="name">Test Name</Label>
             <Input
@@ -151,9 +178,7 @@ export function NewTestForm() {
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="outline" type="button" onClick={() => router.push("/")}>
-            Cancel
-          </Button>
+          <Button variant="outline" type="button" onClick={() => router.push("/")}>Cancel</Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Creating..." : "Create Test"}
           </Button>

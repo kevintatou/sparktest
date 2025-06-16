@@ -27,7 +27,7 @@ export function TestRunsList() {
   useEffect(() => {
     loadTestRuns()
 
-    // Subscribe to real-time updates if available
+    // Subscribe to real-time updates
     const subscription = subscribeToTestRuns((payload) => {
       console.log("Real-time update:", payload)
 
@@ -40,10 +40,9 @@ export function TestRunsList() {
       }
     })
 
-    // Set up a refresh interval as a fallback for real-time updates
     const refreshInterval = setInterval(() => {
       loadTestRuns()
-    }, 10000) // Refresh every 10 seconds
+    }, 10000)
 
     return () => {
       if (subscription?.unsubscribe) {

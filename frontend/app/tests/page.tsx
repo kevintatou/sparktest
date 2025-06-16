@@ -12,6 +12,7 @@ import { getTestDefinitions, deleteTestDefinition, initializeStorage } from "@/l
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { TestDefinition } from "@/lib/types"
+import { Navbar } from "@/components/ui/navbar"
 
 export default function TestsPage() {
   const { toast } = useToast()
@@ -66,13 +67,7 @@ export default function TestsPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between py-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold">⚡ SparkTest</span>
-          </div>
-        </div>
-      </header>
+      <Navbar />
       <main className="flex-1">
         <div className="container py-6">
           <div className="flex items-center gap-2 mb-6">
@@ -108,12 +103,7 @@ export default function TestsPage() {
                 />
               </svg>
             </div>
-            <Button asChild className="shadow-sm">
-              <Link href="/tests/new">
-                <Plus className="mr-2 h-4 w-4" />
-                New Test
-              </Link>
-            </Button>
+
           </div>
 
           {filteredDefinitions.length === 0 ? (
