@@ -1,237 +1,203 @@
-# SparkTest MVP
+Got it! You want a **fully-polished OSS README** that reflects the **final vision for the open-source project**, not the SaaS version — and **Test Suites should be included** because they *are* part of the OSS roadmap.
 
-A modern Kubernetes-native testing platform for running and managing test suites.
-
-## Features
-
-- 🚀 **Test Definitions**: Create reusable test configurations
-- 📊 **Test Runs**: Execute and monitor test execution
-- 🔄 **Real-time Updates**: Live status updates and logs
-- 📈 **Analytics**: Test success rates and performance metrics
-- 🔗 **Webhooks**: Integrate with Slack, Teams, Discord
-- 🎯 **Test Suites**: Group related tests together
-- ☁️ **Flexible Backend**: Works with localStorage or Rust API
-
-## 🚨 **QUICK SWITCH TO RUST API**
-
-When your Rust API is ready, update **ONE FILE**:
-
-### File: `lib/api-service.ts`
-```typescript
-// Change this line from:
-const USE_RUST_API = false
-
-// To:
-const USE_RUST_API = true
-```
-
-### Environment Variable:
-```bash
-NEXT_PUBLIC_RUST_API_URL=http://your-rust-api:8080/api
-```
-
-**That's it!** The app will automatically switch to your Rust API.
+Here's your corrected and focused **README.md**, aligned with that:
 
 ---
 
-## Backend Configuration
+````markdown
+# ⚡ SparkTest OSS
 
-### Current Status: localStorage Active
+**SparkTest** is a lightweight, developer-focused test orchestrator for Kubernetes. Define tests as Docker containers, run them as Kubernetes Jobs, and view results with a clean UI — no YAML editing required.
 
-The app is currently configured to use localStorage with sample data. This works immediately without any setup and includes comprehensive sample data for testing.
+---
 
-### Switching to Rust API
+## ✨ Features
 
-#### 🦀 **Switch to Rust API (When Ready)**
+- 🧪 **Test Definitions** – Reusable test configs with Docker image + command
+- 🚀 **Test Runs** – Launch containerized tests as Kubernetes Jobs
+- 🎯 **Test Suites** – Group related tests and trigger them together
+- ⚙️ **Executors** – Predefined test runners (e.g. K6, Postman, Playwright)
+- 📂 **Git-Backed Definitions** – Auto-register tests from GitHub push events
+- 🧾 **Run History** – View past test results, duration, and status
+- 🦀 **Rust Backend** – Fast API layer with Kubernetes + PostgreSQL
+- 💾 **Local Mock Mode** – Works out of the box using localStorage
 
-**Step 1:** Update the configuration flag
-- **File:** `lib/api-service.ts`
-- **Line 2:** Change `const USE_RUST_API = false` to `const USE_RUST_API = true`
+---
 
-**Step 2:** Set your API URL
+## 🛠 Architecture
+
+| Layer        | Tech                                 |
+|--------------|--------------------------------------|
+| Frontend     | Next.js 14 (App Router) + Tailwind + shadcn/ui |
+| Backend      | Rust + Axum + SQLx + Kubernetes client |
+| Database     | PostgreSQL (optional, used with Rust backend) |
+| Dev Mode     | localStorage-based mock API          |
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone & Install
 ```bash
-NEXT_PUBLIC_RUST_API_URL=http://your-rust-api:8080/api
-```
-
-**Step 3:** Deploy
-```bash
-npm run build
-# Deploy to your platform
-```
-
-### Expected Rust API Endpoints
-
-When you implement your Rust API, it should provide these endpoints:
-
-```
-GET    /api/health                    # Health check
-GET    /api/test-definitions          # List test definitions
-GET    /api/test-definitions/:id      # Get specific test definition
-POST   /api/test-definitions          # Create test definition
-PUT    /api/test-definitions/:id      # Update test definition
-DELETE /api/test-definitions/:id      # Delete test definition
-
-GET    /api/test-runs                 # List test runs
-GET    /api/test-runs/:id             # Get specific test run
-POST   /api/test-runs                 # Create test run
-PUT    /api/test-runs/:id             # Update test run
-DELETE /api/test-runs/:id             # Delete test run
-
-GET    /api/kubernetes/info           # Kubernetes cluster info
-GET    /api/kubernetes/logs/:testId   # Get test logs
-GET    /api/webhooks                  # List webhooks
-GET    /api/test-suites               # List test suites
-```
-
-### Real-time Updates
-
-- **localStorage**: Uses periodic refresh (every 5 seconds)
-- **Rust API**: Ready for WebSocket implementation (currently falls back to periodic refresh)
-
-## Quick Start
-
-### Local Development
-
-1. Clone and install:
-```bash
-git clone <your-repo>
-cd sparktest-mvp
+git clone https://github.com/your-org/sparktest
+cd sparktest
 npm install
-```
+````
 
-2. Start development server:
+### 2. Start Dev Server
+
 ```bash
 npm run dev
 ```
 
-3. Open http://localhost:3000
+* Visit: [http://localhost:3000](http://localhost:3000)
+* Works instantly using mock data
 
-The app will automatically populate with sample test data for demonstration.
+---
 
-### Production Deployment
+## 🔄 Switch to Rust API
 
-1. Choose your backend (localStorage or Rust API)
-2. Set appropriate environment variables if using Rust API
-3. Deploy to Vercel:
-```bash
-npm run build
-# Deploy to your preferred platform
-```
+When your backend is ready:
 
-## Sample Data
+### Step 1 — Edit `lib/api-service.ts`:
 
-The application includes comprehensive sample data for immediate testing:
-
-### Test Definitions
-- **API Integration Tests**: Node.js API testing with authentication
-- **Frontend Unit Tests**: React component testing with Jest
-- **E2E Tests**: Full user journey testing with Playwright
-- **Security Scan**: OWASP ZAP vulnerability scanning
-- **Performance Tests**: Load testing with K6
-- **Database Migration Tests**: Schema and data integrity testing
-
-### Test Runs
-- Recent test executions with realistic logs
-- Various statuses: completed, running, failed
-- Performance metrics and artifacts
-- Detailed execution logs
-
-### Test Suites
-- **Full CI Pipeline**: Complete testing workflow
-- **Pre-Deployment Validation**: Essential pre-prod tests
-- **Security Audit Suite**: Comprehensive security testing
-
-### Webhooks
-- Slack team notifications
-- Microsoft Teams alerts
-- Discord development channel
-
-## Architecture
-
-- **Frontend**: Next.js 14 with React Server Components
-- **Backend Options**: 
-  - localStorage (development/demo with rich sample data)
-  - Rust API (production backend)
-- **Fallback**: localStorage for offline/demo usage
-- **Styling**: Tailwind CSS with shadcn/ui components
-- **Deployment**: Vercel-ready with environment variable support
-
-## Development
-
-### Adding New Features
-
-1. Update types in `lib/types.ts`
-2. Add API methods in `lib/api-service.ts`
-3. Create UI components in `components/`
-4. Add pages in `app/`
-
-### Testing Different Backends
-
-You can easily switch between backends by updating the configuration in `lib/api-service.ts`:
-
-```typescript
-// For localStorage (development/demo)
-const USE_RUST_API = false
-
-// For Rust API (production)
+```ts
 const USE_RUST_API = true
-// Add NEXT_PUBLIC_RUST_API_URL environment variable
 ```
 
-### Rust API Development
+### Step 2 — Set the API URL:
 
-When developing your Rust API, ensure it:
+```bash
+NEXT_PUBLIC_RUST_API_URL=http://localhost:3001/api
+```
 
-1. **Implements all required endpoints** (see list above)
-2. **Returns JSON responses** matching the TypeScript types
-3. **Handles CORS** for frontend requests
-4. **Provides health check** at `/api/health`
-5. **Supports WebSockets** for real-time updates (optional)
+---
 
-### Database Schema
+## 🔧 Rust Backend Endpoints
 
-For your Rust API backend, you'll need these main entities:
+| Method | Path                        | Description              |
+| ------ | --------------------------- | ------------------------ |
+| GET    | `/api/health`               | Health check             |
+| GET    | `/api/test-definitions`     | List test definitions    |
+| GET    | `/api/test-definitions/:id` | Get a test definition    |
+| POST   | `/api/test-definitions`     | Create a test definition |
+| PUT    | `/api/test-definitions/:id` | Update a test definition |
+| DELETE | `/api/test-definitions/:id` | Delete a test definition |
+| GET    | `/api/test-runs`            | List test runs           |
+| GET    | `/api/test-runs/:id`        | Get a test run           |
+| POST   | `/api/test-runs`            | Create a test run        |
+| GET    | `/api/test-suites`          | List test suites         |
+
+> Note: Logs, WebSockets, and auth are **not part of the OSS scope**.
+
+---
+
+## 📂 Git Integration (OSS)
+
+* SparkTest can listen to GitHub webhooks (push events)
+* It scans `/tests/*.json` in public repos and registers test definitions
+* Perfect for Git-backed config without CRDs or YAML
+
+---
+
+## 🧱 Database Schema (Rust)
 
 ```sql
--- Test Definitions
 CREATE TABLE test_definitions (
-  id TEXT PRIMARY KEY,
+  id UUID PRIMARY KEY,
   name TEXT NOT NULL,
-  description TEXT NOT NULL,
+  description TEXT,
   image TEXT NOT NULL,
   commands TEXT[] NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  executor_id TEXT,
-  variables JSONB,
-  labels TEXT[]
+  created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Test Runs
 CREATE TABLE test_runs (
-  id TEXT PRIMARY KEY,
+  id UUID PRIMARY KEY,
   name TEXT NOT NULL,
   image TEXT NOT NULL,
   command TEXT[] NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('running', 'completed', 'failed')),
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  test_definition_id TEXT REFERENCES test_definitions(id),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  test_definition_id UUID REFERENCES test_definitions(id),
   duration INTEGER,
   logs TEXT[]
 );
+
+CREATE TABLE test_suites (
+  id UUID PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE test_suite_members (
+  suite_id UUID REFERENCES test_suites(id),
+  test_definition_id UUID REFERENCES test_definitions(id),
+  PRIMARY KEY (suite_id, test_definition_id)
+);
 ```
 
-## Contributing
+---
 
-1. Fork the repository
+## 📦 Sample Executors
+
+```json
+[
+  {
+    "id": "k6",
+    "image": "grafana/k6",
+    "command": ["run", "/scripts/loadtest.js"],
+    "fileTypes": ["js"],
+    "description": "Load testing with K6"
+  },
+  {
+    "id": "postman",
+    "image": "postman/newman",
+    "command": ["run", "/collections/api.json"],
+    "fileTypes": ["json"],
+    "description": "Postman collections"
+  }
+]
+```
+
+---
+
+## 🧪 Sample Use Cases
+
+* Load testing a microservice with K6
+* Running a Postman API collection
+* Triggering Playwright tests in CI
+* Executing DB migrations in a container
+* Grouping tests into Suites for staging/pre-prod checks
+
+---
+
+## 💻 Development Notes
+
+* `lib/types.ts` – shared types
+* `lib/api-service.ts` – handles backend switch
+* `components/` – shared UI
+* `app/` – Next.js App Router pages
+
+---
+
+## 👐 Contributing
+
+1. Fork this repo
 2. Create a feature branch
-3. Make your changes
-4. Test with both localStorage and Rust API configurations
-5. Submit a pull request
+3. Test with both `USE_RUST_API=true` and `false`
+4. Submit a pull request!
 
-## License
+---
 
-MIT License - see LICENSE file for details
+## 📄 License
+
+MIT — see `LICENSE`
+
 ```
 
-```typescriptreact file="supabase/schema.sql" isDeleted="true"
-...deleted...
+---
+
+Let me know if you want this copy pasted into your repo now or customized for your org's GitHub link.
+```
