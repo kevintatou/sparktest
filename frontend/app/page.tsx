@@ -11,27 +11,26 @@ import { Navbar } from "@/components/ui/navbar"
 export default function Dashboard() {
   return (
     <ClientLayout>
-      <div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
-      <Navbar />
-      <main className="flex-1">
-        <div className="container py-6">
-          <div className="grid gap-8">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground">Manage your Kubernetes test definitions and monitor test runs</p>
+        <div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
+          <main className="flex-1">
+            <div className="container py-6">
+              <div className="grid gap-8">
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                  <p className="text-muted-foreground">Manage your Kubernetes test definitions and monitor test runs</p>
+                </div>
+
+                <Suspense fallback={<TestDefinitionsSkeleton />}>
+                  <TestDefinitionsList />
+                </Suspense>
+
+                <Suspense fallback={<TestRunsSkeleton />}>
+                  <TestRunsList />
+                </Suspense>
+              </div>
             </div>
-
-            <Suspense fallback={<TestDefinitionsSkeleton />}>
-              <TestDefinitionsList />
-            </Suspense>
-
-            <Suspense fallback={<TestRunsSkeleton />}>
-              <TestRunsList />
-            </Suspense>
-          </div>
+          </main>
         </div>
-      </main>
-    </div>
     </ClientLayout >
   )
 }
