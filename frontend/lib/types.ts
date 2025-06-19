@@ -1,4 +1,4 @@
-export interface TestDefinition {
+export interface Definition {
   id: string
   name: string
   description: string
@@ -10,14 +10,14 @@ export interface TestDefinition {
   labels?: string[]
 }
 
-export interface Test {
+export interface Run {
   id: string
   name: string
   image: string
   command: string[]
   status: "running" | "completed" | "failed"
   createdAt: string
-  testDefinitionId?: string
+  definitionId?: string
   executorId?: string
   suiteId?: string
   variables?: Record<string, string>
@@ -26,4 +26,16 @@ export interface Test {
   retries?: number
   logs?: string[]
   k8sJobName?: string
+}
+
+
+export type Executor = {
+  id: string
+  name: string
+  image: string
+  description?: string
+  command?: string[]
+  supportedFileTypes?: string[]
+  env?: Record<string, string>
+  createdAt: string
 }

@@ -1,7 +1,7 @@
-import type { TestDefinition, Test } from "./types"
+import { Definition, Executor, Run } from "./types"
 
-// Sample test data
-const sampleTestDefinitions: TestDefinition[] = [
+// Sample Definitions
+export const sampleDefinitions: Definition[] = [
   {
     id: "api-integration-tests",
     name: "API Integration Tests",
@@ -88,7 +88,8 @@ const sampleTestDefinitions: TestDefinition[] = [
   },
 ]
 
-const sampleTestRuns: Test[] = [
+// Sample Runs
+export const sampleRuns: Run[] = [
   {
     id: "run-1",
     name: "API Integration Tests - Production Deploy",
@@ -96,7 +97,7 @@ const sampleTestRuns: Test[] = [
     command: ["npm install", "npm run test:api"],
     status: "completed",
     createdAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-    testDefinitionId: "api-integration-tests",
+    definitionId: "api-integration-tests",
     executorId: "kubernetes",
     variables: {
       API_URL: "https://api.example.com",
@@ -222,140 +223,28 @@ const sampleTestRuns: Test[] = [
   },
 ]
 
-// Simple localStorage-based storage service
-function getFromStorage<T>(key: string, defaultValue: T): T {
-  if (typeof window === "undefined") return defaultValue
-  try {
-    const item = localStorage.getItem(key)
-    return item ? JSON.parse(item) : defaultValue
-  } catch {
-    return defaultValue
-  }
-}
-
-function setToStorage<T>(key: string, value: T): void {
-  if (typeof window === "undefined") return
-  try {
-    localStorage.setItem(key, JSON.stringify(value))
-  } catch (error) {
-    console.error("Failed to save to localStorage:", error)
-  }
-}
-
-// Test Definitions
-export function getTestDefinitions(): TestDefinition[] {
-  return getFromStorage("sparktest_test_definitions", sampleTestDefinitions)
-}
-
-export function saveTestDefinition(testDefinition: TestDefinition): TestDefinition {
-  const definitions = getTestDefinitions()
-  const existingIndex = definitions.findIndex((d) => d.id === testDefinition.id)
-
-  if (existingIndex >= 0) {
-    definitions[existingIndex] = testDefinition
-  } else {
-    definitions.push(testDefinition)
-  }
-
-  setToStorage("sparktest_test_definitions", definitions)
-  return testDefinition
-}
-
-export function deleteTestDefinition(id: string): boolean {
-  const definitions = getTestDefinitions()
-  const filtered = definitions.filter((d) => d.id !== id)
-  setToStorage("sparktest_test_definitions", filtered)
-  return true
-}
-
-export function getTestDefinitionById(id: string): TestDefinition | undefined {
-  return getTestDefinitions().find((d) => d.id === id)
-}
-
-// Test Runs
-export function getTestRuns(): Test[] {
-  return getFromStorage("sparktest_test_runs", sampleTestRuns)
-}
-
-export function saveTestRun(testRun: Test): Test {
-  const runs = getTestRuns()
-  const existingIndex = runs.findIndex((r) => r.id === testRun.id)
-
-  if (existingIndex >= 0) {
-    runs[existingIndex] = testRun
-  } else {
-    runs.unshift(testRun) // Add to beginning for newest first
-  }
-
-  // Keep only the most recent 50 runs
-  const recentRuns = runs.slice(0, 50)
-  setToStorage("sparktest_test_runs", recentRuns)
-  return testRun
-}
-
-export function deleteTestRun(id: string): boolean {
-  const runs = getTestRuns()
-  const filtered = runs.filter((r) => r.id !== id)
-  setToStorage("sparktest_test_runs", filtered)
-  return true
-}
-
-export function getTestRunById(id: string): Test | undefined {
-  return getTestRuns().find((r) => r.id === id)
-}
-
-export function createTestRun(
-  testDefinitionId: string,
-  options?: { name?: string; image?: string; commands?: string[] },
-): Test {
-  const testDef = getTestDefinitionById(testDefinitionId)
-  if (!testDef) {
-    throw new Error("Test definition not found")
-  }
-
-  const testRun: Test = {
-    id: `test-${Date.now()}`,
-    name: options?.name || `${testDef.name} Run`,
-    image: options?.image || testDef.image,
-    command: options?.commands || testDef.commands,
-    status: "running",
-    createdAt: new Date().toISOString(),
-    testDefinitionId: testDef.id,
-    executorId: testDef.executorId,
-    variables: testDef.variables || {},
-    artifacts: [],
-    logs: [`> Starting test run: ${options?.name || testDef.name}`, "> Initializing..."],
-  }
-
-  return saveTestRun(testRun)
-}
-
-export function initializeStorage(): void {
-  // Initialize with sample data if empty
-  if (typeof window !== "undefined") {
-    const existingDefs = localStorage.getItem("sparktest_test_definitions")
-    const existingRuns = localStorage.getItem("sparktest_test_runs")
-
-    if (!existingDefs) {
-      setToStorage("sparktest_test_definitions", sampleTestDefinitions)
-    }
-
-    if (!existingRuns) {
-      setToStorage("sparktest_test_runs", sampleTestRuns)
-    }
-  }
-}
-
-// Export as object for compatibility
-export const storageService = {
-  getTestDefinitions,
-  saveTestDefinition,
-  deleteTestDefinition,
-  getTestDefinitionById,
-  getTestRuns,
-  saveTestRun,
-  deleteTestRun,
-  getTestRunById,
-  createTestRun,
-  initializeStorage,
-}
+// Sample Executors
+export const sampleExecutors: Executor[] = [
+  {
+    id: "kubernetes",
+    name: "Kubernetes Job",
+    image: "k8s-job-runner:latest",
+    description: "Run tests as Kubernetes Jobs with full isolation and cluster context.",
+    command: ["npm", "run", "test"],
+    supportedFileTypes: ["js", "json", "yaml"],
+    env: {
+      NODE_ENV: "test",
+    },
+    createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+  },
+  {
+    id: "docker",
+    name: "Docker Container",
+    image: "docker-runner:stable",
+    description: "Execute your test inside a Docker container locally or remotely.",
+    command: ["run-tests.sh"],
+    supportedFileTypes: ["sh", "py"],
+    env: {},
+    createdAt: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
+  },
+]

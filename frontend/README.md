@@ -1,45 +1,38 @@
-Got it! You want a **fully-polished OSS README** that reflects the **final vision for the open-source project**, not the SaaS version — and **Test Suites should be included** because they *are* part of the OSS roadmap.
-
-Here's your corrected and focused **README.md**, aligned with that:
-
----
-
 ````markdown
 # ⚡ SparkTest OSS
 
-**SparkTest** is a lightweight, developer-focused test orchestrator for Kubernetes. Define tests as Docker containers, run them as Kubernetes Jobs, and view results with a clean UI — no YAML editing required.
+**SparkTest** is a lightweight, developer-focused test orchestrator for Kubernetes. Define tests as Docker containers, run them as Kubernetes Jobs, and view results in a clean, modern UI — no YAML editing required.
 
 ---
 
 ## ✨ Features
 
 - 🧪 **Test Definitions** – Reusable test configs with Docker image + command
+- ⚙️ **Executors** – Predefined runners like K6, Postman, Playwright
 - 🚀 **Test Runs** – Launch containerized tests as Kubernetes Jobs
-- 🎯 **Test Suites** – Group related tests and trigger them together
-- ⚙️ **Executors** – Predefined test runners (e.g. K6, Postman, Playwright)
-- 📂 **Git-Backed Definitions** – Auto-register tests from GitHub push events
-- 🧾 **Run History** – View past test results, duration, and status
-- 🦀 **Rust Backend** – Fast API layer with Kubernetes + PostgreSQL
-- 💾 **Local Mock Mode** – Works out of the box using localStorage
+- 🧾 **Test Suites** – Group related tests and trigger them together
+- 📂 **Git-backed Definitions** – Auto-register tests from `/tests/*.json`
+- 💾 **Mock Mode** – Instant demo using localStorage
+- 🦀 **Rust Backend** – Fast API layer using Axum + Kubernetes + PostgreSQL
 
 ---
 
-## 🛠 Architecture
+## 🛠 Tech Stack
 
-| Layer        | Tech                                 |
-|--------------|--------------------------------------|
-| Frontend     | Next.js 14 (App Router) + Tailwind + shadcn/ui |
-| Backend      | Rust + Axum + SQLx + Kubernetes client |
-| Database     | PostgreSQL (optional, used with Rust backend) |
-| Dev Mode     | localStorage-based mock API          |
+| Layer      | Tech                                      |
+|------------|-------------------------------------------|
+| Frontend   | Next.js 14 App Router, Tailwind, shadcn/ui |
+| Backend    | Rust (Axum, SQLx, Kubernetes)             |
+| Database   | PostgreSQL (optional in mock mode)        |
 
 ---
 
 ## 🚀 Quick Start
 
 ### 1. Clone & Install
+
 ```bash
-git clone https://github.com/your-org/sparktest
+git clone https://github.com/YOUR_ORG/sparktest
 cd sparktest
 npm install
 ````
@@ -50,97 +43,62 @@ npm install
 npm run dev
 ```
 
-* Visit: [http://localhost:3000](http://localhost:3000)
-* Works instantly using mock data
+SparkTest starts in **mock mode by default** (no backend required).
 
 ---
 
-## 🔄 Switch to Rust API
+## 🔧 Enable Rust Backend
 
-When your backend is ready:
-
-### Step 1 — Edit `lib/api-service.ts`:
-
-```ts
-const USE_RUST_API = true
-```
-
-### Step 2 — Set the API URL:
+1. Start the Rust backend (see `backend/` folder)
+2. Create `.env.local` in the root with:
 
 ```bash
+# .env.local
+NEXT_PUBLIC_USE_RUST_API=true
 NEXT_PUBLIC_RUST_API_URL=http://localhost:3001/api
 ```
 
----
+3. Restart the frontend:
 
-## 🔧 Rust Backend Endpoints
+```bash
+npm run dev
+```
 
-| Method | Path                        | Description              |
-| ------ | --------------------------- | ------------------------ |
-| GET    | `/api/health`               | Health check             |
-| GET    | `/api/test-definitions`     | List test definitions    |
-| GET    | `/api/test-definitions/:id` | Get a test definition    |
-| POST   | `/api/test-definitions`     | Create a test definition |
-| PUT    | `/api/test-definitions/:id` | Update a test definition |
-| DELETE | `/api/test-definitions/:id` | Delete a test definition |
-| GET    | `/api/test-runs`            | List test runs           |
-| GET    | `/api/test-runs/:id`        | Get a test run           |
-| POST   | `/api/test-runs`            | Create a test run        |
-| GET    | `/api/test-suites`          | List test suites         |
-
-> Note: Logs, WebSockets, and auth are **not part of the OSS scope**.
+Now all data is fetched from the real API.
 
 ---
 
-## 📂 Git Integration (OSS)
+## 🗂 Folder Structure
 
-* SparkTest can listen to GitHub webhooks (push events)
-* It scans `/tests/*.json` in public repos and registers test definitions
-* Perfect for Git-backed config without CRDs or YAML
-
----
-
-## 🧱 Database Schema (Rust)
-
-```sql
-CREATE TABLE test_definitions (
-  id UUID PRIMARY KEY,
-  name TEXT NOT NULL,
-  description TEXT,
-  image TEXT NOT NULL,
-  commands TEXT[] NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE TABLE test_runs (
-  id UUID PRIMARY KEY,
-  name TEXT NOT NULL,
-  image TEXT NOT NULL,
-  command TEXT[] NOT NULL,
-  status TEXT NOT NULL CHECK (status IN ('running', 'completed', 'failed')),
-  created_at TIMESTAMPTZ DEFAULT now(),
-  test_definition_id UUID REFERENCES test_definitions(id),
-  duration INTEGER,
-  logs TEXT[]
-);
-
-CREATE TABLE test_suites (
-  id UUID PRIMARY KEY,
-  name TEXT NOT NULL,
-  description TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE TABLE test_suite_members (
-  suite_id UUID REFERENCES test_suites(id),
-  test_definition_id UUID REFERENCES test_definitions(id),
-  PRIMARY KEY (suite_id, test_definition_id)
-);
+```
+lib/
+  └─ storage/                 # API & localStorage logic
+      └─ api-storage.ts
+      └─ local-storage.ts
+      └─ index.ts             # auto-selects storage strategy
+  └─ types.ts                 # shared types
+app/
+  └─ executors/               # all executor views
+  └─ definitions/             # test definitions views
+  └─ runs/                    # test runs views
+  └─ suites/                  # test suites views
+components/                   # shared UI
 ```
 
 ---
 
-## 📦 Sample Executors
+## 🧠 Concepts
+
+| Term           | Description                                       |
+| -------------- | ------------------------------------------------- |
+| **Executor**   | Defines a generic test runner (e.g., K6, Postman) |
+| **Definition** | Specific test config using an executor            |
+| **Run**        | A launched test job from a definition             |
+| **Suite**      | A group of definitions that can be run together   |
+
+---
+
+## 🧪 Sample Executors
 
 ```json
 [
@@ -156,38 +114,96 @@ CREATE TABLE test_suite_members (
     "image": "postman/newman",
     "command": ["run", "/collections/api.json"],
     "fileTypes": ["json"],
-    "description": "Postman collections"
+    "description": "Postman API tests"
   }
 ]
+
+```
+## 🧱 Database Schema (Rust) (Missing suites!!!!!!!!!)
+```sql
+CREATE TABLE
+  public.test_definitions (
+    id uuid NOT NULL DEFAULT gen_random_uuid (),
+    name text NOT NULL,
+    description text NULL,
+    image text NOT NULL,
+    commands text[] NOT NULL,
+    created_at timestamp with time zone NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+ALTER TABLE
+  public.test_definitions
+ADD
+  CONSTRAINT test_definitions_pkey PRIMARY KEY (id)
+```
+CREATE TABLE
+  public.test_executors (
+    id uuid NOT NULL,
+    name text NOT NULL,
+    description text NULL,
+    image text NOT NULL,
+    default_command text NOT NULL,
+    supported_file_types text[] NOT NULL,
+    environment_variables text[] NOT NULL DEFAULT ARRAY[]::text[],
+    icon text NULL
+  );
+
+ALTER TABLE
+  public.test_executors
+ADD
+  CONSTRAINT test_executors_pkey PRIMARY KEY (id)
+CREATE TABLE
+  public.test_runs (
+    id uuid NOT NULL DEFAULT gen_random_uuid (),
+    name text NOT NULL,
+    image text NOT NULL,
+    command text[] NOT NULL,
+    status text NOT NULL,
+    created_at timestamp with time zone NULL DEFAULT now(),
+    duration integer NULL,
+    logs text[] NULL,
+    test_definition_id uuid NULL
+  );
+
+ALTER TABLE
+  public.test_runs
+ADD
+  CONSTRAINT test_runs_pkey PRIMARY KEY (id)
+---
+
+## 🧾 API Endpoints (Rust)
+
+| Method | Path                        | Description              |
+| ------ | --------------------------- | ------------------------ |
+| GET    | `/api/test-definitions`     | List all definitions     |
+| POST   | `/api/test-definitions`     | Create new definition    |
+| PUT    | `/api/test-definitions/:id` | Update definition        |
+| DELETE | `/api/test-definitions/:id` | Delete definition        |
+| GET    | `/api/test-runs`            | List test runs           |
+| POST   | `/api/test-runs`            | Trigger a test run       |
+| GET    | `/api/test-suites`          | List test suites         |
+| GET    | `/api/executors`            | List available executors |
+
+---
+
+## ✅ `.env.local` Example
+
+```env
+# Enable Rust backend
+NEXT_PUBLIC_USE_RUST_API=true
+NEXT_PUBLIC_RUST_API_URL=http://localhost:3001/api
 ```
 
----
-
-## 🧪 Sample Use Cases
-
-* Load testing a microservice with K6
-* Running a Postman API collection
-* Triggering Playwright tests in CI
-* Executing DB migrations in a container
-* Grouping tests into Suites for staging/pre-prod checks
-
----
-
-## 💻 Development Notes
-
-* `lib/types.ts` – shared types
-* `lib/api-service.ts` – handles backend switch
-* `components/` – shared UI
-* `app/` – Next.js App Router pages
+If `NEXT_PUBLIC_USE_RUST_API=false`, the app falls back to local mock data (no backend required).
 
 ---
 
 ## 👐 Contributing
 
 1. Fork this repo
-2. Create a feature branch
-3. Test with both `USE_RUST_API=true` and `false`
-4. Submit a pull request!
+2. Create a new branch
+3. Test both mock + Rust API modes
+4. Submit a pull request
 
 ---
 
@@ -199,5 +215,5 @@ MIT — see `LICENSE`
 
 ---
 
-Let me know if you want this copy pasted into your repo now or customized for your org's GitHub link.
+Let me know if you want a short separate `CONTRIBUTING.md` or a `backend/README.md` too.
 ```

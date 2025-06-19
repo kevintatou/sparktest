@@ -37,3 +37,24 @@ export function formatDistanceToNow(dateString: string): string {
   const diffInDays = Math.floor(diffInHours / 24)
   return `${diffInDays} day${diffInDays === 1 ? "" : "s"} ago`
 }
+
+// lib/utils/storage.ts
+
+export function getFromStorage<T>(key: string, defaultValue: T): T {
+  if (typeof window === "undefined") return defaultValue
+  try {
+    const item = localStorage.getItem(key)
+    return item ? JSON.parse(item) : defaultValue
+  } catch {
+    return defaultValue
+  }
+}
+
+export function setToStorage<T>(key: string, value: T): void {
+  if (typeof window === "undefined") return
+  try {
+    localStorage.setItem(key, JSON.stringify(value))
+  } catch (error) {
+    console.error("Failed to save to localStorage:", error)
+  }
+}
