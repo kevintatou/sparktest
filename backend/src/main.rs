@@ -21,7 +21,7 @@ struct TestExecutor {
     id: Uuid,
     name: String,
     image: String,
-    default_command: String,
+    default_command: String,    
     supported_file_types: Vec<String>,
     environment_variables: Vec<String>,
     description: Option<String>,
