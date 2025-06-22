@@ -4,16 +4,15 @@ import { StorageService } from "./storage"
 const API_BASE = "/api"
 
 export class ApiStorageService implements StorageService {
-
-  // Executors
+  // Test Executors
   async getExecutors(): Promise<Executor[]> {
-    const res = await fetch(`${API_BASE}/executors`)
+    const res = await fetch(`${API_BASE}/test-executors`)
     if (!res.ok) throw new Error("Failed to fetch executors")
     return await res.json()
   }
 
   async saveExecutor(executor: Executor): Promise<Executor> {
-    const res = await fetch(`${API_BASE}/executors`, {
+    const res = await fetch(`${API_BASE}/test-executors`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(executor),
@@ -23,7 +22,7 @@ export class ApiStorageService implements StorageService {
   }
 
   async deleteExecutor(id: string): Promise<boolean> {
-    const res = await fetch(`${API_BASE}/executors/${id}`, { method: "DELETE" })
+    const res = await fetch(`${API_BASE}/test-executors/${id}`, { method: "DELETE" })
     return res.ok
   }
 
@@ -32,15 +31,15 @@ export class ApiStorageService implements StorageService {
     return list.find((e) => e.id === id)
   }
 
-  // Definitions
+  // Test Definitions
   async getDefinitions(): Promise<Definition[]> {
-    const res = await fetch(`${API_BASE}/definitions`)
+    const res = await fetch(`${API_BASE}/test-definitions`)
     if (!res.ok) throw new Error("Failed to fetch definitions")
     return await res.json()
   }
 
   async saveDefinition(def: Definition): Promise<Definition> {
-    const res = await fetch(`${API_BASE}/definitions`, {
+    const res = await fetch(`${API_BASE}/test-definitions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(def),
@@ -50,7 +49,7 @@ export class ApiStorageService implements StorageService {
   }
 
   async deleteDefinition(id: string): Promise<boolean> {
-    const res = await fetch(`${API_BASE}/definitions/${id}`, { method: "DELETE" })
+    const res = await fetch(`${API_BASE}/test-definitions/${id}`, { method: "DELETE" })
     return res.ok
   }
 
@@ -59,9 +58,9 @@ export class ApiStorageService implements StorageService {
     return list.find((d) => d.id === id)
   }
 
-  // Runs
+  // Test Runs
   async getRuns(): Promise<Run[]> {
-    const res = await fetch(`${API_BASE}/runs`)
+    const res = await fetch(`${API_BASE}/test-runs`)
     if (!res.ok) throw new Error("Failed to fetch runs")
     return await res.json()
   }
@@ -71,26 +70,62 @@ export class ApiStorageService implements StorageService {
     return list.find((r) => r.id === id)
   }
 
-  async saveRun(run: Run){
-    const res = await fetch(`${API_BASE}/runs`, {
+  async deleteRun(id: string): Promise<boolean> {
+    const res = await fetch(`${API_BASE}/test-runs/${id}`, { method: "DELETE" })
+    return res.ok
+  }
+
+  subscribeToRuns(callback: (payload: { eventType: string; new?: Run; old?: Run }) => void): () => void {
+    let previousRuns: Run[] = []
+
+    const interval = setInterval(async () => {
+      try {
+        const newRuns = await this.getRuns()
+
+        const newOnly = newRuns.filter(r => !previousRuns.some(p => p.id === r.id))
+        for (const run of newOnly) {
+          callback({ eventType: "INSERT", new: run })
+        }
+
+        for (const run of newRuns) {
+          const prev = previousRuns.find(p => p.id === run.id)
+          if (prev && JSON.stringify(prev) !== JSON.stringify(run)) {
+            callback({ eventType: "UPDATE", new: run })
+          }
+        }
+
+        const deleted = previousRuns.filter(r => !newRuns.some(n => n.id === r.id))
+        for (const run of deleted) {
+          callback({ eventType: "DELETE", old: run })
+        }
+
+        previousRuns = newRuns
+      } catch (err) {
+        console.error("subscribeToRuns error:", err)
+      }
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }
+
+  async createRun(
+    definitionId: string,
+    options?: { name?: string; image?: string; commands?: string[] }
+  ): Promise<Run> {
+    const payload = {
+      test_definition_id: definitionId,
+      ...options,
+    }
+    const res = await fetch(`${API_BASE}/test-runs`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(run),
+      body: JSON.stringify(payload),
     })
-
-    if (!res.ok) throw new Error("Failed to create run")
+    if (!res.ok) throw new Error("Failed to create test run")
     return await res.json()
   }
 
-  async deleteRun(): Promise<boolean> {
-    throw new Error("deleteRun is not supported in API mode")
-  }
-
-  async initializeRun(): Promise<Run> {
-    throw new Error("initializeRun is not supported in API mode")
-  }
-
   initialize(): void {
-    // no-op for API
+    // No-op for API mode
   }
 }

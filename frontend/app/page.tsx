@@ -1,12 +1,8 @@
 import { Suspense } from "react"
-import Link from "next/link"
-import { Zap, Code, Users, Webhook, Settings, Plus } from "lucide-react"
 import { TestDefinitionsList } from "@/components/test-definitions-list"
 import { TestRunsList } from "@/components/test-runs-list"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
 import ClientLayout from "./client-layout"
-import { Navbar } from "@/components/ui/navbar"
 
 export default function Dashboard() {
   return (

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
-import { fetchTestRuns, subscribeToTestRuns } from "@/lib/api-service"
+import { storage } from "@/lib/storage"
 
 export interface TestRun {
   id: string
@@ -28,7 +28,7 @@ export function TestRunsList() {
     loadTestRuns()
 
     // Subscribe to real-time updates
-    const subscription = subscribeToTestRuns((payload) => {
+    const subscription = storage.subscribeToRuns((payload) => {
       console.log("Real-time update:", payload)
 
       if (payload?.eventType === "INSERT") {

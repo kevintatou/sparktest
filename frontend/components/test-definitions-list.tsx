@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { fetchTestDefinitions, createTestRun, deleteTestDefinition, type TestDefinition } from "@/lib/api-service"
+import { storage} from "@/lib/storage"
+import { Definition } from "@/lib/types"
 
 export function TestDefinitionsList() {
-  const [testDefinitions, setTestDefinitions] = useState<TestDefinition[]>([])
+  const [testDefinitions, setTestDefinitions] = useState<Definition[]>([])
   const [loading, setLoading] = useState(true)
   const [runningTests, setRunningTests] = useState<string[]>([])
   const { toast } = useToast()
@@ -20,7 +21,7 @@ export function TestDefinitionsList() {
 
   const loadTestDefinitions = async () => {
     try {
-      const data = await fetchTestDefinitions()
+      const data = await storage.getDefinitions()
       setTestDefinitions(data)
     } catch (error) {
       toast({
@@ -37,7 +38,7 @@ export function TestDefinitionsList() {
     setRunningTests((prev) => [...prev, testId])
 
     try {
-      await createTestRun(testId)
+      await storage.createRun(testId)
       toast({
         title: "Test started",
         description: "Your test is now running in the background",
@@ -55,7 +56,7 @@ export function TestDefinitionsList() {
 
   const handleDeleteTest = async (testId: string) => {
     try {
-      await deleteTestDefinition(testId)
+      await storage.deleteDefinition(testId)
       setTestDefinitions((prev) => prev.filter((test) => test.id !== testId))
       toast({
         title: "Test definition deleted",

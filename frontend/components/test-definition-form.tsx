@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { saveTestDefinition } from "@/lib/storage-service"
+import { storage } from "@/lib/storage"
 
 export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
   const router = useRouter()
@@ -53,7 +53,7 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
 
     try {
       // Save to localStorage
-      saveTestDefinition({
+      storage.saveDefinition({
         ...formData,
         commands: formData.commands.filter(Boolean),
         createdAt: existingTest?.createdAt || new Date().toISOString(),

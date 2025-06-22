@@ -18,10 +18,13 @@ export interface StorageService {
   saveRun(run: Run): Promise<Run>
   deleteRun(id: string): Promise<boolean>
   getRunById(id: string): Promise<Run | undefined>
-  initializeRun(
+  createRun(
     definitionId: string,
     options?: { name?: string; image?: string; commands?: string[] }
   ): Promise<Run>
+  subscribeToRuns: (
+    callback: (payload: { eventType: string; new?: Run; old?: Run }) => void
+  ) => () => void;
 
   // Optional: setup
   initialize(): void

@@ -126,7 +126,7 @@ export const sampleRuns: Run[] = [
     command: ["npm install", "npm run test:unit"],
     status: "running",
     createdAt: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
-    testDefinitionId: "frontend-unit-tests",
+    definitionId: "frontend-unit-tests",
     executorId: "docker",
     variables: {
       NODE_ENV: "test",
@@ -149,7 +149,7 @@ export const sampleRuns: Run[] = [
     command: ["zap-baseline.py", "-t", "https://staging.example.com"],
     status: "failed",
     createdAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-    testDefinitionId: "security-scan",
+    definitionId: "security-scan",
     executorId: "docker",
     variables: {
       TARGET_URL: "https://staging.example.com",
@@ -174,7 +174,7 @@ export const sampleRuns: Run[] = [
     command: ["npm install", "npx playwright install", "npm run test:e2e"],
     status: "completed",
     createdAt: new Date(Date.now() - 10800000).toISOString(), // 3 hours ago
-    testDefinitionId: "e2e-tests",
+    definitionId: "e2e-tests",
     executorId: "kubernetes",
     variables: {
       BASE_URL: "https://staging.example.com",
@@ -201,7 +201,7 @@ export const sampleRuns: Run[] = [
     command: ["k6", "run", "--vus", "50", "--duration", "5m", "performance-test.js"],
     status: "completed",
     createdAt: new Date(Date.now() - 14400000).toISOString(), // 4 hours ago
-    testDefinitionId: "performance-tests",
+    definitionId: "performance-tests",
     executorId: "kubernetes",
     variables: {
       BASE_URL: "https://api.example.com",

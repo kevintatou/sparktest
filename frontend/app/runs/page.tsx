@@ -8,15 +8,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { getTestDefinitions, deleteTestDefinition, initializeStorage } from "@/lib/storage-service"
+import { storage } from "@/lib/storage"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
-import type { TestDefinition } from "@/lib/types"
+import type { Definition } from "@/lib/types"
 import { Navbar } from "@/components/ui/navbar"
 
 export default function TestsPage() {
   const { toast } = useToast()
-  const [testDefinitions, setTestDefinitions] = useState<TestDefinition[]>([])
+  const [definitions, setDefinitions] = useState<Definition[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const initializedRef = useRef(false)
@@ -24,23 +24,24 @@ export default function TestsPage() {
   // Load test definitions from localStorage
   useEffect(() => {
     if (!initializedRef.current) {
-      // Initialize storage on component mount
-      initializeStorage()
-
-      // Load test definitions from localStorage
-      setTestDefinitions(getTestDefinitions())
+      const load = async () => {
+        const defs = await storage.getDefinitions()
+        setDefinitions(defs)
+      }
+      load()
       initializedRef.current = true
     }
   }, [])
-
+  
   const handleDelete = (id: string) => {
     setIsDeleting(id)
 
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
-        deleteTestDefinition(id)
-        setTestDefinitions(getTestDefinitions())
-
+        await storage.deleteDefinition(id)
+        const defs = await storage.getDefinitions()
+        setDefinitions(defs)
+    
         toast({
           title: "Test definition deleted",
           description: "The test definition has been removed successfully.",
@@ -55,10 +56,11 @@ export default function TestsPage() {
         setIsDeleting(null)
       }
     }, 500)
+    
   }
 
   // Filter test definitions based on search query
-  const filteredDefinitions = testDefinitions.filter(
+  const filteredDefinitions = definitions.filter(
     (def) =>
       def.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       def.description.toLowerCase().includes(searchQuery.toLowerCase()) ||

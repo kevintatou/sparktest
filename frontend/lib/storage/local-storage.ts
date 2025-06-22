@@ -4,10 +4,6 @@ import type { Executor, Definition, Run } from "../types"
 import { sampleExecutors, sampleDefinitions, sampleRuns } from "../samples"
 
 export class LocalStorageService implements StorageService {
-
-  initializeRun(definitionId: string, options?: { name?: string; image?: string; commands?: string[] }): Promise<Run> {
-      throw new Error("Method not implemented.")
-  }
   async getExecutors(): Promise<Executor[]> {
     return getFromStorage("sparktest_executors", sampleExecutors)
   }
@@ -65,6 +61,7 @@ export class LocalStorageService implements StorageService {
   }
 
   async getRuns(): Promise<Run[]> {
+    console.log(getFromStorage("sparktest_runs", sampleRuns))
     return getFromStorage("sparktest_runs", sampleRuns)
   }
 
@@ -98,6 +95,7 @@ export class LocalStorageService implements StorageService {
   ): Promise<Run> {
     const def = await this.getDefinitionById(definitionId)
     if (!def) throw new Error("Definition not found")
+
     const run: Run = {
       id: `test-${Date.now()}`,
       name: options?.name || `${def.name} Run`,
@@ -111,8 +109,45 @@ export class LocalStorageService implements StorageService {
       artifacts: [],
       logs: ["> Starting test..."],
     }
+
     return this.saveRun(run)
   }
+  subscribeToRuns(callback: (payload: { eventType: string; new?: Run; old?: Run }) => void): () => void {
+    let previousRuns: Run[] = []
+  
+    const interval = setInterval(async () => {
+      try {
+        const newRuns = await this.getRuns()
+  
+        // INSERT
+        const inserted = newRuns.filter(r => !previousRuns.some(p => p.id === r.id))
+        for (const run of inserted) {
+          callback({ eventType: "INSERT", new: run })
+        }
+  
+        // UPDATE
+        for (const run of newRuns) {
+          const prev = previousRuns.find(p => p.id === run.id)
+          if (prev && JSON.stringify(prev) !== JSON.stringify(run)) {
+            callback({ eventType: "UPDATE", new: run })
+          }
+        }
+  
+        // DELETE
+        const deleted = previousRuns.filter(r => !newRuns.some(n => n.id === r.id))
+        for (const run of deleted) {
+          callback({ eventType: "DELETE", old: run })
+        }
+  
+        previousRuns = newRuns
+      } catch (err) {
+        console.error("Polling error in subscribeToRuns:", err)
+      }
+    }, 10000)
+  
+    return () => clearInterval(interval)
+  }
+  
 
   initialize(): void {
     if (typeof window === "undefined") return
