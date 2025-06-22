@@ -17,14 +17,15 @@ use tower_http::cors::{Any, CorsLayer};
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
-struct Executor {
+struct TestExecutor {
     id: Uuid,
     name: String,
     image: String,
-    command: Vec<String>,
+    default_command: String,
     supported_file_types: Vec<String>,
-    env_vars: Vec<String>,
+    environment_variables: Vec<String>,
     description: Option<String>,
+    icon: String
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
@@ -69,16 +70,16 @@ async fn health_handler() -> Json<&'static str> {
 
 // ---------------------- Executors ----------------------
 
-async fn get_executors(State(pool): State<PgPool>) -> Result<Json<Vec<Executor>>, StatusCode> {
-    let rows = sqlx::query_as::<_, Executor>("SELECT * FROM executors")
+async fn get_executors(State(pool): State<PgPool>) -> Result<Json<Vec<TestExecutor>>, StatusCode> {
+    let rows = sqlx::query_as::<_, TestExecutor>("SELECT * FROM test_executors")
         .fetch_all(&pool)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     Ok(Json(rows))
 }
 
-async fn get_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<Executor>, StatusCode> {
-    let row = sqlx::query_as::<_, Executor>("SELECT * FROM executors WHERE id = $1")
+async fn get_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<TestExecutor>, StatusCode> {
+    let row = sqlx::query_as::<_, TestExecutor>("SELECT * FROM test_executors WHERE id = $1")
         .bind(id)
         .fetch_one(&pool)
         .await
@@ -86,15 +87,16 @@ async fn get_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Resul
     Ok(Json(row))
 }
 
-async fn create_executor(State(pool): State<PgPool>, Json(body): Json<Executor>) -> Result<Json<&'static str>, StatusCode> {
-    sqlx::query("INSERT INTO executors (id, name, image, command, supported_file_types, env_vars, description) VALUES ($1, $2, $3, $4, $5, $6, $7)")
+async fn create_executor(State(pool): State<PgPool>, Json(body): Json<TestExecutor>) -> Result<Json<&'static str>, StatusCode> {
+    sqlx::query("INSERT INTO test_executors (id, name, image, command, supported_file_types, env_vars, description) VALUES ($1, $2, $3, $4, $5, $6, $7)")
         .bind(&body.id)
         .bind(&body.name)
         .bind(&body.image)
-        .bind(&body.command)
+        .bind(&body.default_command)
         .bind(&body.supported_file_types)
-        .bind(&body.env_vars)
+        .bind(&body.environment_variables)
         .bind(&body.description)
+        .bind(&body.icon)
         .execute(&pool)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -102,7 +104,7 @@ async fn create_executor(State(pool): State<PgPool>, Json(body): Json<Executor>)
 }
 
 async fn delete_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<&'static str>, StatusCode> {
-    sqlx::query("DELETE FROM executors WHERE id = $1")
+    sqlx::query("DELETE FROM test_executors WHERE id = $1")
         .bind(id)
         .execute(&pool)
         .await
@@ -232,8 +234,8 @@ async fn main() {
     let app = Router::new()
         .route("/", get(root_handler))
         .route("/api/health", get(health_handler))
-        .route("/api/executors", get(get_executors).post(create_executor))
-        .route("/api/executors/:id", get(get_executor).delete(delete_executor))
+        .route("/api/test-executors", get(get_executors).post(create_executor))
+        .route("/api/test-executors/:id", get(get_executor).delete(delete_executor))
         .route("/api/test-definitions", get(get_test_definitions).post(create_test_definition))
         .route("/api/test-definitions/:id", get(get_test_definition).put(update_test_definition).delete(delete_test_definition))
         .route("/api/test-runs", get(get_test_runs).post(create_test_run))
