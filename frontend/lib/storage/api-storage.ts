@@ -1,10 +1,10 @@
-import type { Executor, Definition, Run } from "../types"
+import type { Executor, Definition, Run, Suite } from "../types"
 import { StorageService } from "./storage"
 
 const API_BASE = "http://localhost:3001/api"
 
 export class ApiStorageService implements StorageService {
-  // Test Executors
+  // Executors
   async getExecutors(): Promise<Executor[]> {
     const res = await fetch(`${API_BASE}/test-executors`)
     if (!res.ok) throw new Error("Failed to fetch executors")
@@ -12,11 +12,17 @@ export class ApiStorageService implements StorageService {
   }
 
   async saveExecutor(executor: Executor): Promise<Executor> {
-    const res = await fetch(`${API_BASE}/test-executors`, {
-      method: "POST",
+    const method = executor.id ? "PATCH" : "POST"
+    const url = executor.id
+      ? `${API_BASE}/test-executors/${executor.id}`
+      : `${API_BASE}/test-executors`
+
+    const res = await fetch(url, {
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(executor),
     })
+
     if (!res.ok) throw new Error("Failed to save executor")
     return await res.json()
   }
@@ -31,7 +37,7 @@ export class ApiStorageService implements StorageService {
     return list.find((e) => e.id === id)
   }
 
-  // Test Definitions
+  // Definitions
   async getDefinitions(): Promise<Definition[]> {
     const res = await fetch(`${API_BASE}/test-definitions`)
     if (!res.ok) throw new Error("Failed to fetch definitions")
@@ -39,11 +45,17 @@ export class ApiStorageService implements StorageService {
   }
 
   async saveDefinition(def: Definition): Promise<Definition> {
-    const res = await fetch(`${API_BASE}/test-definitions`, {
-      method: "POST",
+    const method = def.id ? "PATCH" : "POST"
+    const url = def.id
+      ? `${API_BASE}/test-definitions/${def.id}`
+      : `${API_BASE}/test-definitions`
+
+    const res = await fetch(url, {
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(def),
     })
+
     if (!res.ok) throw new Error("Failed to save definition")
     return await res.json()
   }
@@ -58,10 +70,26 @@ export class ApiStorageService implements StorageService {
     return list.find((d) => d.id === id)
   }
 
-  // Test Runs
+  // Runs
   async getRuns(): Promise<Run[]> {
     const res = await fetch(`${API_BASE}/test-runs`)
     if (!res.ok) throw new Error("Failed to fetch runs")
+    return await res.json()
+  }
+
+  async saveRun(run: Run): Promise<Run> {
+    const method = run.id ? "PATCH" : "POST"
+    const url = run.id
+      ? `${API_BASE}/test-runs/${run.id}`
+      : `${API_BASE}/test-runs`
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(run),
+    })
+
+    if (!res.ok) throw new Error("Failed to save run")
     return await res.json()
   }
 
@@ -83,9 +111,7 @@ export class ApiStorageService implements StorageService {
         const newRuns = await this.getRuns()
 
         const newOnly = newRuns.filter(r => !previousRuns.some(p => p.id === r.id))
-        for (const run of newOnly) {
-          callback({ eventType: "INSERT", new: run })
-        }
+        for (const run of newOnly) callback({ eventType: "INSERT", new: run })
 
         for (const run of newRuns) {
           const prev = previousRuns.find(p => p.id === run.id)
@@ -95,9 +121,7 @@ export class ApiStorageService implements StorageService {
         }
 
         const deleted = previousRuns.filter(r => !newRuns.some(n => n.id === r.id))
-        for (const run of deleted) {
-          callback({ eventType: "DELETE", old: run })
-        }
+        for (const run of deleted) callback({ eventType: "DELETE", old: run })
 
         previousRuns = newRuns
       } catch (err) {
@@ -108,20 +132,37 @@ export class ApiStorageService implements StorageService {
     return () => clearInterval(interval)
   }
 
-  async createRun(
-    definitionId: string,
-    options?: { name?: string; image?: string; commands?: string[] }
-  ): Promise<Run> {
-    const payload = {
-      test_definition_id: definitionId,
-      ...options,
-    }
-    const res = await fetch(`${API_BASE}/test-runs`, {
-      method: "POST",
+  // Suites
+  async getSuites(): Promise<Suite[]> {
+    const res = await fetch(`${API_BASE}/test-suites`)
+    if (!res.ok) throw new Error("Failed to fetch suites")
+    return await res.json()
+  }
+
+  async saveSuite(suite: Suite): Promise<Suite> {
+    const method = suite.id ? "PATCH" : "POST"
+    const url = suite.id
+      ? `${API_BASE}/test-suites/${suite.id}`
+      : `${API_BASE}/test-suites`
+
+    const res = await fetch(url, {
+      method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(suite),
     })
-    if (!res.ok) throw new Error("Failed to create test run")
+
+    if (!res.ok) throw new Error("Failed to save suite")
+    return await res.json()
+  }
+
+  async deleteSuite(id: string): Promise<boolean> {
+    const res = await fetch(`${API_BASE}/test-suites/${id}`, { method: "DELETE" })
+    return res.ok
+  }
+
+  async getSuiteById(id: string): Promise<Suite | undefined> {
+    const res = await fetch(`${API_BASE}/test-suites/${id}`)
+    if (!res.ok) return undefined
     return await res.json()
   }
 

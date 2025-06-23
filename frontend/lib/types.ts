@@ -39,3 +39,11 @@ export type Executor = {
   env?: Record<string, string>
   createdAt: string
 }
+
+export type Suite = {
+  id: string
+  name: string
+  description?: string
+  test_definition_ids: string[] // references test definitions
+  created_at?: string
+}

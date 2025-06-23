@@ -10,14 +10,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
-import { updateTestRun, createTestRun, getKubernetesLogs } from "@/lib/api-service"
-import type { Test } from "@/lib/types"
+import { storage } from "@/lib/storage"
+import type { Run } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
 
-export function TestDetails({ test }: { test: Test }) {
+export function TestDetails({ run }: { run: Run }) {
   const { toast } = useToast()
   const [isRerunning, setIsRerunning] = useState(false)
-  const [activeTest, setActiveTest] = useState(test)
+  const [activeTest, setActiveTest] = useState(run)
   const [progress, setProgress] = useState(activeTest.status === "running" ? 20 : 100)
   const [logs, setLogs] = useState<string[]>([])
   const logsEndRef = useRef<HTMLDivElement>(null)
@@ -89,7 +89,7 @@ export function TestDetails({ test }: { test: Test }) {
               ...activeTest,
               status: newStatus,
             }
-            updateTestRun(updatedTest)
+            storage.updateTestRun(updatedTest)
 
             // Update local state
             setActiveTest(updatedTest)

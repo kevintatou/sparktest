@@ -21,7 +21,7 @@ import { useSidebar } from "@/components/ui/sidebar"
 const navigationItems = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "/",
     icon: BarChart3,
   },
   {
