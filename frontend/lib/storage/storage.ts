@@ -1,32 +1,30 @@
-import { Executor, Definition, Run, Suite } from "../types"
+import { Executor, Definition, Run } from "../types"
 
 export interface StorageService {
   // Executors
   getExecutors(): Promise<Executor[]>
-  getExecutorById(id: string): Promise<Executor | undefined>
-  saveExecutor(executor: Executor): Promise<Executor> // create or update (upsert)
+  saveExecutor(executor: Executor): Promise<Executor>
   deleteExecutor(id: string): Promise<boolean>
+  getExecutorById(id: string): Promise<Executor | undefined>
 
   // Definitions
   getDefinitions(): Promise<Definition[]>
-  getDefinitionById(id: string): Promise<Definition | undefined>
-  saveDefinition(definition: Definition): Promise<Definition> // create or update
+  saveDefinition(definition: Definition): Promise<Definition>
   deleteDefinition(id: string): Promise<boolean>
+  getDefinitionById(id: string): Promise<Definition | undefined>
 
   // Runs
   getRuns(): Promise<Run[]>
-  getRunById(id: string): Promise<Run | undefined>
-  saveRun(run: Run): Promise<Run> // update only (typically no "create" without logic)
+  saveRun(run: Run): Promise<Run>
   deleteRun(id: string): Promise<boolean>
-  subscribeToRuns(
+  getRunById(id: string): Promise<Run | undefined>
+  createRun(
+    definitionId: string,
+    options?: { name?: string; image?: string; commands?: string[] }
+  ): Promise<Run>
+  subscribeToRuns: (
     callback: (payload: { eventType: string; new?: Run; old?: Run }) => void
-  ): () => void
-
-  // Suites
-  getSuites(): Promise<Suite[]>
-  getSuiteById(id: string): Promise<Suite | undefined>
-  saveSuite(suite: Suite): Promise<Suite> // create or update
-  deleteSuite(id: string): Promise<boolean>
+  ) => () => void;
 
   // Optional: setup
   initialize(): void

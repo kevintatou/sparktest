@@ -1,101 +1,63 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, ResponsiveContainer, Area, AreaChart } from "recharts"
 
-const initialData = [
-  { name: "Mon", passed: 12, failed: 1 },
-  { name: "Tue", passed: 8, failed: 2 },
-  { name: "Wed", passed: 15, failed: 0 },
-  { name: "Thu", passed: 10, failed: 1 },
-  { name: "Fri", passed: 14, failed: 1 },
-  { name: "Sat", passed: 6, failed: 0 },
-  { name: "Sun", passed: 9, failed: 1 },
-]
+interface StatusChartProps {
+  data: Array<{ name: string; passed: number; failed: number }>
+  type?: "bar" | "ratio"
+}
 
-export function StatusChart() {
-  const [data, setData] = useState(initialData)
+export function StatusChart({ data, type = "bar" }: StatusChartProps) {
   const [isMounted, setIsMounted] = useState(false)
 
-  // Mark component as mounted to avoid hydration issues
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
-  // Simulate real-time data updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setData((prevData) => {
-        // Create a copy of the data
-        const newData = [...prevData]
-
-        // Randomly update one day's data
-        const randomIndex = Math.floor(Math.random() * newData.length)
-        const randomDay = newData[randomIndex]
-
-        // Small random change to passed tests
-        const passedChange = Math.floor(Math.random() * 3) - 1 // -1, 0, or 1
-        const newPassed = Math.max(5, randomDay.passed + passedChange)
-
-        // Small random change to failed tests
-        const failedChange = Math.floor(Math.random() * 2) // 0 or 1
-        const newFailed = Math.max(
-          0,
-          Math.min(3, randomDay.failed + (Math.random() > 0.7 ? failedChange : -failedChange)),
-        )
-
-        newData[randomIndex] = {
-          ...randomDay,
-          passed: newPassed,
-          failed: newFailed,
-        }
-
-        return newData
-      })
-    }, 5000) // Update every 5 seconds
-
-    return () => clearInterval(interval)
-  }, [])
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-background p-2 rounded-md border shadow-sm">
-          <p className="font-medium">{label}</p>
-          <p className="text-sm text-green-500">Passed: {payload[0].value}</p>
-          <p className="text-sm text-red-500">Failed: {payload[1].value}</p>
-        </div>
-      )
-    }
-    return null
-  }
-
-  // Don't render the chart during SSR to avoid hydration issues
   if (!isMounted) {
     return (
-      <div className="w-full h-full min-h-[120px] flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading chart...</div>
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="animate-pulse bg-muted rounded h-full w-full"></div>
       </div>
     )
   }
 
-  return (
-    <div className="w-full h-full min-h-[120px]">
-      <ResponsiveContainer width="100%" height="100%" minHeight={120}>
-        <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-          <XAxis
-            dataKey="name"
-            fontSize={12}
-            tickLine={false}
-            axisLine={false}
-            tick={{ fontSize: 10 }} // Smaller font for mobile
+  if (type === "ratio") {
+    // Show a simple success rate area chart
+    const ratioData = data.map((item) => ({
+      name: item.name,
+      ratio: Math.round((item.passed / (item.passed + item.failed)) * 100),
+    }))
+
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={ratioData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id="ratioGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <Area
+            type="monotone"
+            dataKey="ratio"
+            stroke="#22c55e"
+            strokeWidth={2}
+            fill="url(#ratioGradient)"
+            dot={false}
           />
-          <YAxis hide />
-          <Tooltip content={<CustomTooltip />} />
-          <Bar dataKey="passed" stackId="stack" fill="#22c55e" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="failed" stackId="stack" fill="#ef4444" radius={[4, 4, 0, 0]} />
-        </BarChart>
+        </AreaChart>
       </ResponsiveContainer>
-    </div>
+    )
+  }
+
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+        <Bar dataKey="passed" stackId="stack" fill="#22c55e" radius={[2, 2, 0, 0]} />
+        <Bar dataKey="failed" stackId="stack" fill="#ef4444" radius={[2, 2, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
   )
 }

@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { storage} from "@/lib/storage"
-import { Definition } from "@/lib/types"
+import { storage } from "@/lib/storage"
+import type { Definition } from "@/lib/types"
 
 export function TestDefinitionsList() {
   const [testDefinitions, setTestDefinitions] = useState<Definition[]>([])
@@ -86,7 +86,6 @@ export function TestDefinitionsList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Test Definitions</h2>
-
       </div>
 
       {testDefinitions.length === 0 ? (
@@ -150,7 +149,7 @@ export function TestDefinitionsList() {
                     </>
                   )}
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="text-blue-600 hover:text-blue-700">
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button

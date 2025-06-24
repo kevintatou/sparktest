@@ -28,7 +28,6 @@ export interface Run {
   k8sJobName?: string
 }
 
-
 export type Executor = {
   id: string
   name: string
@@ -40,10 +39,12 @@ export type Executor = {
   createdAt: string
 }
 
-export type Suite = {
+export interface TestSuite {
   id: string
   name: string
-  description?: string
-  test_definition_ids: string[] // references test definitions
-  created_at?: string
+  description: string
+  testDefinitionIds: string[]
+  createdAt: string
+  executionMode: "sequential" | "parallel"
+  labels?: string[]
 }

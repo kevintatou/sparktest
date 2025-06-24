@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { TestDetails } from "@/components/test-details"
-import { getTestRunById, initializeStorage } from "@/lib/storage-service"
+import { storage } from "@/lib/storage"
 import type { Test } from "@/lib/types"
 import { Navbar } from "@/components/ui/navbar"
 
@@ -15,11 +15,8 @@ export default function TestDetailsPage({ params }: { params: { id: string } }) 
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Initialize storage
-    initializeStorage()
-
     // Get the test from localStorage
-    const testData = getTestRunById(params.id)
+    const testData = storage.getRunById(params.id)
     setTest(testData || null)
     setLoading(false)
   }, [params.id])
