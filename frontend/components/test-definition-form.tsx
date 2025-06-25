@@ -64,7 +64,7 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
         description: `Test "${formData.name}" has been ${existingTest ? "updated" : "created"} successfully.`,
       })
 
-      router.push("/tests")
+      router.push("/definitions")
     } catch (error) {
       toast({
         title: `Error ${existingTest ? "updating" : "creating"} test definition`,
