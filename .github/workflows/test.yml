@@ -18,28 +18,38 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Enable Corepack and install pnpm
+      run: |
+        corepack enable
+        corepack prepare pnpm@latest --activate
+
     - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+        cache: 'pnpm'
+        cache-dependency-path: frontend/pnpm-lock.yaml
 
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install
+      working-directory: frontend
 
     - name: Run linter
-      run: npm run lint
+      run: pnpm lint
+      working-directory: frontend
 
     - name: Run type check
-      run: npm run type-check
+      run: pnpm type-check
+      working-directory: frontend
 
     - name: Run tests
-      run: npm run test:coverage
+      run: pnpm test:coverage
+      working-directory: frontend
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: ./coverage/lcov.info
+        file: ./frontend/coverage/lcov.info
         flags: unittests
         name: codecov-umbrella
 
@@ -48,4 +58,4 @@ jobs:
       uses: romeovs/lcov-reporter-action@v0.3.1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: ./coverage/lcov.info
+        lcov-file: ./frontend/coverage/lcov.info

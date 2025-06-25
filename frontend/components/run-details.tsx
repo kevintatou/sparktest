@@ -1,29 +1,20 @@
 "use client"
 
+import { Run } from "@/lib/types"
 import { useState } from "react"
 
 import type React from "react"
-;/ '',6RSaaacceeeefimmooprrrstttttu{{}}
 
-interface Test {
-  id?: string
-  createdAt?: string
-  podScheduled?: string
-  containerCreated?: string
-  containerStarted?: string
-  completed?: string
-  failed?: string
-}
 
 interface TestDetailsProps {
-  test: Test
+  run: Run
 }
 
-const TestDetails: React.FC<TestDetailsProps> = ({ test }) => {
-  const [activeTest, setActiveTest] = useState<Test>({
-    ...test,
+export const RunDetails: React.FC<TestDetailsProps> = ({ run: run }) => {
+  const [activeRun, setActiveTest] = useState<Run>({
+    ...run,
     // Ensure we always have a valid ISO string to avoid “Invalid time value”
-    createdAt: test.createdAt && !Number.isNaN(Date.parse(test.createdAt)) ? test.createdAt : new Date().toISOString(),
+    createdAt: run.createdAt && !Number.isNaN(Date.parse(run.createdAt)) ? run.createdAt : new Date().toISOString(),
   })
 
   // Utility: safely parse date or return "now"
@@ -45,40 +36,40 @@ const TestDetails: React.FC<TestDetailsProps> = ({ test }) => {
           <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Job ID</dt>
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              <p className="mt-1 font-mono text-sm">{activeTest.id ?? "unknown-id"}</p>
+              <p className="mt-1 font-mono text-sm">{activeRun.id ?? "unknown-id"}</p>
             </dd>
           </div>
           <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Job Created</dt>
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              {formatDate(safeDate(activeTest.createdAt).toISOString())}
+              {formatDate(safeDate(activeRun.createdAt).toISOString())}
             </dd>
           </div>
           <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Pod Scheduled</dt>
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              {activeTest.podScheduled ? formatDate(safeDate(activeTest.podScheduled).toISOString()) : "N/A"}
+              {activeRun.podScheduled ? formatDate(safeDate(activeRun.podScheduled).toISOString()) : "N/A"}
             </dd>
           </div>
           <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Container Created</dt>
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              {activeTest.containerCreated ? formatDate(safeDate(activeTest.containerCreated).toISOString()) : "N/A"}
+              {activeRun.containerCreated ? formatDate(safeDate(activeRun.containerCreated).toISOString()) : "N/A"}
             </dd>
           </div>
           <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Container Started</dt>
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              {activeTest.containerStarted ? formatDate(safeDate(activeTest.containerStarted).toISOString()) : "N/A"}
+              {activeRun.containerStarted ? formatDate(safeDate(activeRun.containerStarted).toISOString()) : "N/A"}
             </dd>
           </div>
           <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt className="text-sm font-medium text-gray-500">Completed / Failed</dt>
             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-              {activeTest.completed
-                ? formatDate(safeDate(activeTest.completed).toISOString())
-                : activeTest.failed
-                  ? formatDate(safeDate(activeTest.failed).toISOString())
+              {activeRun.completed
+                ? formatDate(safeDate(activeRun.completed).toISOString())
+                : activeRun.failed
+                  ? formatDate(safeDate(activeRun.failed).toISOString())
                   : "N/A"}
             </dd>
           </div>
@@ -88,4 +79,4 @@ const TestDetails: React.FC<TestDetailsProps> = ({ test }) => {
   )
 }
 
-export default TestDetails
+export default RunDetails

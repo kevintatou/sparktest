@@ -14,19 +14,28 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Enable Corepack and install pnpm
+      run: |
+        corepack enable
+        corepack prepare pnpm@latest --activate
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
+        cache: 'pnpm'
+        cache-dependency-path: frontend/pnpm-lock.yaml
 
     - name: Install dependencies
-      run: npm ci
+      run: pnpm install
+      working-directory: frontend
 
     - name: Build application
-      run: npm run build
+      run: pnpm build
+      working-directory: frontend
 
     - name: Run E2E tests
-      run: npm run test:e2e
+      run: pnpm test:e2e
+      working-directory: frontend
       env:
         CI: true

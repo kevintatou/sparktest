@@ -5,21 +5,23 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { TestDetails } from "@/components/test-details"
+import { RunDetails } from "@/components/run-details"
 import { storage } from "@/lib/storage"
-import type { Test } from "@/lib/types"
+import type { Run } from "@/lib/types"
 import { Navbar } from "@/components/ui/navbar"
 
 export default function TestDetailsPage({ params }: { params: { id: string } }) {
-  const [test, setTest] = useState<Test | null>(null)
+  const [run, setRun] = useState<Run | undefined>(undefined)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get the test from localStorage
-    const testData = storage.getRunById(params.id)
-    setTest(testData || null)
-    setLoading(false)
-  }, [params.id])
+  const loadDefinitionById = async () => {
+    setRun(await storage.getRunById(params.id))
+  }
+  loadDefinitionById()
+  setLoading(false)
+}, [params.id])
+
 
   if (loading) {
     return (
@@ -32,7 +34,7 @@ export default function TestDetailsPage({ params }: { params: { id: string } }) 
     )
   }
 
-  if (!test) {
+  if (!run) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30">
         <div className="text-center">
@@ -60,7 +62,7 @@ export default function TestDetailsPage({ params }: { params: { id: string } }) 
             </Button>
             <h1 className="text-2xl font-bold">Test Details</h1>
           </div>
-          <TestDetails test={test} />
+          <RunDetails test={run} />
         </div>
       </main>
     </div>
