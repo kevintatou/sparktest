@@ -6,21 +6,20 @@ import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { RunTestForm } from "@/components/run-test-form"
-import { getTestDefinitionById, initializeStorage } from "@/lib/storage-service"
-import type { TestDefinition } from "@/lib/types"
+import { storage  } from "@/lib/storage"
+import type { Definition } from "@/lib/types"
 import { Navbar } from "@/components/ui/navbar"
 
 export default function RunTestPage({ params }: { params: { id: string } }) {
-  const [testDefinition, setTestDefinition] = useState<TestDefinition | null>(null)
+  const [definition, setDefinition] = useState<Definition | undefined>(undefined)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    // Initialize storage
-    initializeStorage()
 
-    // Get the test definition from localStorage
-    const definition = getTestDefinitionById(params.id)
-    setTestDefinition(definition || null)
+  useEffect(() => {
+    const loadDefinitionById = async () => {
+      setDefinition(await storage.getDefinitionById(params.id))
+    }
+    loadDefinitionById()
     setLoading(false)
   }, [params.id])
 
@@ -35,7 +34,7 @@ export default function RunTestPage({ params }: { params: { id: string } }) {
     )
   }
 
-  if (!testDefinition) {
+  if (!definition) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30">
         <div className="text-center">
@@ -62,9 +61,9 @@ export default function RunTestPage({ params }: { params: { id: string } }) {
                   <span className="sr-only">Back</span>
                 </Link>
               </Button>
-              <h1 className="text-2xl font-bold">Run Test: {testDefinition.name}</h1>
+              <h1 className="text-2xl font-bold">Run Test: {definition.name}</h1>
             </div>
-            <RunTestForm testDefinition={testDefinition} />
+            <RunTestForm testDefinition={definition} />
           </div>
         </div>
       </main>

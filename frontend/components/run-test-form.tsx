@@ -12,17 +12,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/ui/use-toast"
-import { createTestRun } from "@/lib/storage-service"
-import type { TestDefinition } from "@/lib/types"
+import { storage } from "@/lib/storage"
+import type { Definition } from "@/lib/types"
 
-export function RunTestForm({ testDefinition }: { testDefinition: TestDefinition }) {
+export function RunTestForm({ def: definition }: { def: Definition }) {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
-    name: `${testDefinition.name} Run`,
-    image: testDefinition.image,
-    commands: [...testDefinition.commands],
+    name: `${definition.name} Run`,
+    image: definition.image,
+    commands: [...definition.commands],
     useCustomSettings: false,
   })
 
@@ -61,7 +61,7 @@ export function RunTestForm({ testDefinition }: { testDefinition: TestDefinition
           }
         : { name: formData.name }
 
-      const newRun = createTestRun(testDefinition.id, options)
+      const newRun = storage.createRun(definition.id, options)
 
       toast({
         title: "Test started successfully",
@@ -84,8 +84,8 @@ export function RunTestForm({ testDefinition }: { testDefinition: TestDefinition
     <form onSubmit={handleSubmit}>
       <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>Run Test: {testDefinition.name}</CardTitle>
-          <CardDescription>{testDefinition.description}</CardDescription>
+          <CardTitle>Run Test: {definition.name}</CardTitle>
+          <CardDescription>{definition.description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
@@ -166,12 +166,12 @@ export function RunTestForm({ testDefinition }: { testDefinition: TestDefinition
               <h3 className="font-medium">Default Settings</h3>
               <div className="space-y-2 text-sm">
                 <p>
-                  <span className="font-medium">Image:</span> {testDefinition.image}
+                  <span className="font-medium">Image:</span> {definition.image}
                 </p>
                 <div>
                   <span className="font-medium">Commands:</span>
                   <ul className="list-disc list-inside mt-1 space-y-1">
-                    {testDefinition.commands.map((cmd, i) => (
+                    {definition.commands.map((cmd, i) => (
                       <li key={i}>{cmd}</li>
                     ))}
                   </ul>

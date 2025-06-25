@@ -8,13 +8,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { getTestRuns, initializeStorage } from "@/lib/storage-service"
+import { storage } from "@/lib/storage"
 import { formatDistanceToNow } from "@/lib/utils"
-import type { Test } from "@/lib/types"
+import type { Run } from "@/lib/types"
 import { Navbar } from "@/components/ui/navbar"
 
 export default function ActiveTestsPage() {
-  const [tests, setTests] = useState<Test[]>([])
+  const [tests, setTests] = useState<Run[]>([])
   const [progressValues, setProgressValues] = useState<Record<string, number>>({})
   const initializedRef = useRef(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -22,8 +22,7 @@ export default function ActiveTestsPage() {
   // Load tests from localStorage
   useEffect(() => {
     if (!initializedRef.current) {
-      initializeStorage()
-      const allTests = getTestRuns()
+      const allTests = storage.getRuns()
       const runningTests = allTests.filter((test) => test.status === "running")
       setTests(runningTests)
       initializedRef.current = true
@@ -37,7 +36,7 @@ export default function ActiveTestsPage() {
 
       // Set up a refresh interval
       intervalRef.current = setInterval(() => {
-        const updatedTests = getTestRuns().filter((test) => test.status === "running")
+        const updatedTests = storage.getRuns().filter((test) => test.status === "running")
         setTests(updatedTests)
       }, 5000)
     }
