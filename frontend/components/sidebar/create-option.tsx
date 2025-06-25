@@ -1,25 +1,31 @@
-"use client"
-
+// components/sidebar/create-option.tsx
+import { cn } from "@/lib/utils"
+import type { CreateOption } from "@/lib/constants/navigation"
 import Link from "next/link"
-import { getTooltipClasses } from "@/lib/utils/navigation"
-import type { CreateOption } from "@/lib/types/navigation"
 
-interface CreateOptionProps {
+interface Props {
   option: CreateOption
   onClose: () => void
 }
 
-export function CreateOptionComponent({ option, onClose }: CreateOptionProps) {
+export function CreateOptionComponent({ option, onClose }: Props) {
   return (
     <div className="group relative">
       <Link
         href={option.href}
-        className="flex items-center justify-center w-10 h-10 rounded-md text-slate-500 hover:bg-blue-50 hover:text-blue-600 dark:text-slate-500 dark:hover:bg-blue-950 dark:hover:text-blue-400 transition-colors"
         onClick={onClose}
+        className={cn(
+          "flex items-center justify-center w-10 h-10 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-muted-foreground"
+        )}
+        aria-label={option.name}
       >
-        <option.icon className="h-4 w-4" />
+        <option.icon className="h-5 w-5" />
       </Link>
-      <div className={getTooltipClasses(false, true)}>{option.name}</div>
+
+      {/* Tooltip */}
+      <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-black px-2 py-1 text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
+        {option.name}
+      </div>
     </div>
   )
 }
