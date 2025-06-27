@@ -1,8 +1,7 @@
-import { expect } from "vitest"
+import { expect, vi } from "vitest"
 import * as matchers from "@testing-library/jest-dom/matchers"
 
 expect.extend(matchers)
-import { vi } from "vitest"
 
 // Mock Next.js router
 vi.mock("next/router", () => ({
