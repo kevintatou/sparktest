@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect, beforeEach, vi } from "vitest"
 import { render, screen, fireEvent } from "@testing-library/react"
 import { usePathname } from "next/navigation"
 import { SimpleSidebar } from "@/components/simple-sidebar"
