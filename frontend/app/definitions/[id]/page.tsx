@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Play, Edit, Clock, ImageIcon, Terminal } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -11,19 +11,18 @@ import { formatDistanceToNow } from "@/lib/utils"
 import { storage } from "@/lib/storage"
 import type { Definition } from "@/lib/types"
 
-export default function DefinitionDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function DefinitionDetailsPage({ params }: { params: { id: string } }) {
   const { toast } = useToast()
   const [definition, setDefinition] = useState<Definition | null>(null)
   const [isRunning, setIsRunning] = useState(false)
 
   useEffect(() => {
     const fetchDefinition = async () => {
-      const def = await storage.getDefinitionById(id)
+      const def = await storage.getDefinitionById(params.id)
       setDefinition(def || null)
     }
     fetchDefinition()
-  }, [id])
+  }, [params.id])
 
   const handleRunTest = async () => {
     if (!definition) return
