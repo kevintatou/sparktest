@@ -41,7 +41,7 @@ export default function RunTestPage({ params }: { params: { id: string } }) {
           <h1 className="text-2xl font-bold mb-2">Test definition not found</h1>
           <p className="text-muted-foreground mb-6">The test definition you are looking for does not exist.</p>
           <Button asChild className="shadow-sm">
-            <Link href="/tests">Go back to tests</Link>
+            <Link href="/runs">Go back to runs</Link>
           </Button>
         </div>
       </div>
@@ -56,14 +56,14 @@ export default function RunTestPage({ params }: { params: { id: string } }) {
           <div className="mx-auto max-w-2xl">
             <div className="flex items-center gap-2 mb-6">
               <Button variant="ghost" size="icon" asChild>
-                <Link href="/tests">
+                <Link href="/runs">
                   <ArrowLeft className="h-4 w-4" />
                   <span className="sr-only">Back</span>
                 </Link>
               </Button>
               <h1 className="text-2xl font-bold">Run Test: {definition.name}</h1>
             </div>
-            <RunTestForm testDefinition={definition} />
+            <RunTestForm def={definition} />
           </div>
         </div>
       </main>
