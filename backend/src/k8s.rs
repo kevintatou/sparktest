@@ -1,4 +1,4 @@
-use kube::{api::{Api, PostParams}, Client, ResourceExt};
+use kube::{api::{Api, PostParams}, Client};
 use k8s_openapi::api::batch::v1::Job;
 use k8s_openapi::api::core::v1::{Container, PodSpec, PodTemplateSpec};
 use k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;

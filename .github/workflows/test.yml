@@ -51,16 +51,68 @@ jobs:
       run: pnpm test:coverage
       working-directory: frontend
 
+    - name: Verify coverage file and show summary
+      run: |
+        echo "Coverage files generated:"
+        ls -la coverage/
+        echo "LCOV file size:"
+        wc -l coverage/lcov.info
+        echo "Coverage files included in LCOV:"
+        grep "^SF:" coverage/lcov.info
+        echo "Local coverage summary calculation:"
+        node -e "
+        const coverage = require('./coverage/coverage-final.json');
+        const files = Object.values(coverage);
+        let totalStatements = 0, coveredStatements = 0;
+        let totalBranches = 0, coveredBranches = 0;
+        let totalFunctions = 0, coveredFunctions = 0;
+        let totalLines = 0, coveredLines = 0;
+
+        files.forEach(file => {
+          if (file.s) {
+            totalStatements += Object.keys(file.s).length;
+            coveredStatements += Object.values(file.s).filter(v => v > 0).length;
+          }
+          if (file.b) {
+            Object.values(file.b).forEach(branches => {
+              branches.forEach(branch => {
+                totalBranches++;
+                if (branch > 0) coveredBranches++;
+              });
+            });
+          }
+          if (file.f) {
+            totalFunctions += Object.keys(file.f).length;
+            coveredFunctions += Object.values(file.f).filter(v => v > 0).length;
+          }
+          if (file.statementMap) {
+            totalLines += Object.keys(file.statementMap).length;
+            coveredLines += Object.keys(file.statementMap).filter(k => file.s && file.s[k] > 0).length;
+          }
+        });
+
+        console.log('Calculated Coverage Summary:');
+        console.log('Lines: ' + (coveredLines/totalLines*100).toFixed(2) + '%');
+        console.log('Statements: ' + (coveredStatements/totalStatements*100).toFixed(2) + '%');
+        console.log('Branches: ' + (coveredBranches/totalBranches*100).toFixed(2) + '%');
+        console.log('Functions: ' + (coveredFunctions/totalFunctions*100).toFixed(2) + '%');
+        "
+      working-directory: frontend
+
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./frontend/coverage/lcov.info
         flags: unittests
         name: codecov-umbrella
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false
+        verbose: true
 
     - name: Comment PR with coverage
       if: github.event_name == 'pull_request'
-      uses: romeovs/lcov-reporter-action@v0.3.1
+      uses: romeovs/lcov-reporter-action@v0.4.0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         lcov-file: ./frontend/coverage/lcov.info
+        delete-old-comments: true
