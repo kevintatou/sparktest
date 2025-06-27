@@ -40,7 +40,12 @@ describe("LocalStorageService", () => {
 
   describe("saveExecutor", () => {
     it("should save executor to localStorage", async () => {
-      const mockExecutor = { id: "1", name: "Test Executor" }
+      const mockExecutor = { 
+        id: "1", 
+        name: "Test Executor",
+        image: "test:latest",
+        createdAt: new Date().toISOString()
+      }
       localStorageMock.getItem.mockReturnValue("[]")
 
       await service.saveExecutor(mockExecutor)
