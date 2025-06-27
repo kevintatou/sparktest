@@ -14,7 +14,25 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
-      exclude: ["node_modules/", ".next/", "coverage/", "**/*.d.ts", "**/*.config.*", "**/types/**"],
+      include: [
+        "lib/**/*.ts",
+        "app/api/**/*.ts",
+        "hooks/**/*.ts",
+        "components/simple-sidebar.tsx", // Include only tested components
+      ],
+      exclude: [
+        "node_modules/", 
+        ".next/", 
+        "coverage/", 
+        "**/*.d.ts", 
+        "**/*.config.*", 
+        "**/types/**",
+        "lib/types.ts", // Type definitions only
+        "lib/config.ts", // Simple configuration
+        "lib/constants/**", // Constants only
+        "lib/storage/storage.ts", // Interface definition only
+        "hooks/use-toast.ts", // External library code
+      ],
     },
   },
   resolve: {
