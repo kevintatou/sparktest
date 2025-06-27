@@ -248,3 +248,189 @@ async fn main() {
     let listener = TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::{
+        body::{to_bytes, Body},
+        http::{Request, StatusCode},
+    };
+    use serde_json::{json, Value};
+    use tower::ServiceExt;
+    use http_body_util::BodyExt;
+
+    async fn create_test_app() -> Router {
+        // Create a mock app for testing without real database
+        Router::new()
+            .route("/", get(root_handler))
+            .route("/api/health", get(health_handler))
+    }
+
+    #[tokio::test]
+    async fn test_root_handler() {
+        let app = create_test_app().await;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let body_str = std::str::from_utf8(&body).unwrap();
+        assert_eq!(body_str, "✅ SparkTest Rust backend is running");
+    }
+
+    #[tokio::test]
+    async fn test_health_handler() {
+        let app = create_test_app().await;
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri("/api/health")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let body_str = std::str::from_utf8(&body).unwrap();
+        assert_eq!(body_str, r#""OK""#);
+    }
+
+    #[test]
+    fn test_test_executor_serialization() {
+        let executor = TestExecutor {
+            id: Uuid::new_v4(),
+            name: "Test Executor".to_string(),
+            image: "test:latest".to_string(),
+            default_command: "echo hello".to_string(),
+            supported_file_types: vec!["js".to_string(), "ts".to_string()],
+            environment_variables: vec!["NODE_ENV=test".to_string()],
+            description: Some("A test executor".to_string()),
+            icon: "code".to_string(),
+        };
+
+        let json = serde_json::to_string(&executor).unwrap();
+        assert!(json.contains("Test Executor"));
+        assert!(json.contains("test:latest"));
+        assert!(json.contains("echo hello"));
+
+        let deserialized: TestExecutor = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.name, executor.name);
+        assert_eq!(deserialized.image, executor.image);
+        assert_eq!(deserialized.default_command, executor.default_command);
+    }
+
+    #[test]
+    fn test_test_definition_serialization() {
+        let definition = TestDefinition {
+            id: Uuid::new_v4(),
+            name: "Test Definition".to_string(),
+            description: Some("A test definition".to_string()),
+            image: "nginx:latest".to_string(),
+            commands: vec!["echo".to_string(), "hello".to_string()],
+            created_at: Some(Utc::now()),
+        };
+
+        let json = serde_json::to_string(&definition).unwrap();
+        assert!(json.contains("Test Definition"));
+        assert!(json.contains("nginx:latest"));
+
+        let deserialized: TestDefinition = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.name, definition.name);
+        assert_eq!(deserialized.image, definition.image);
+        assert_eq!(deserialized.commands, definition.commands);
+    }
+
+    #[test]
+    fn test_test_run_serialization() {
+        let test_run = TestRun {
+            id: Uuid::new_v4(),
+            name: "Test Run".to_string(),
+            image: "ubuntu:latest".to_string(),
+            command: vec!["ls".to_string(), "-la".to_string()],
+            status: "running".to_string(),
+            created_at: Utc::now(),
+            duration: Some(30),
+            logs: Some(vec!["Starting test...".to_string()]),
+            test_definition_id: Some(Uuid::new_v4()),
+        };
+
+        let json = serde_json::to_string(&test_run).unwrap();
+        assert!(json.contains("Test Run"));
+        assert!(json.contains("ubuntu:latest"));
+        assert!(json.contains("running"));
+
+        let deserialized: TestRun = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.name, test_run.name);
+        assert_eq!(deserialized.image, test_run.image);
+        assert_eq!(deserialized.status, test_run.status);
+    }
+
+    #[test]
+    fn test_create_test_run_request_serialization() {
+        let request = CreateTestRunRequest {
+            test_definition_id: Uuid::new_v4(),
+            name: Some("Custom Run".to_string()),
+            image: Some("custom:latest".to_string()),
+            commands: Some(vec!["echo".to_string(), "test".to_string()]),
+        };
+
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("Custom Run"));
+        assert!(json.contains("custom:latest"));
+
+        let deserialized: CreateTestRunRequest = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.name, request.name);
+        assert_eq!(deserialized.image, request.image);
+        assert_eq!(deserialized.commands, request.commands);
+    }
+
+    #[test]
+    fn test_create_test_run_request_minimal() {
+        let request = CreateTestRunRequest {
+            test_definition_id: Uuid::new_v4(),
+            name: None,
+            image: None,
+            commands: None,
+        };
+
+        let json = serde_json::to_string(&request).unwrap();
+        let deserialized: CreateTestRunRequest = serde_json::from_str(&json).unwrap();
+        
+        assert_eq!(deserialized.test_definition_id, request.test_definition_id);
+        assert_eq!(deserialized.name, None);
+        assert_eq!(deserialized.image, None);
+        assert_eq!(deserialized.commands, None);
+    }
+
+    #[test]
+    fn test_uuid_generation() {
+        let id1 = Uuid::new_v4();
+        let id2 = Uuid::new_v4();
+        
+        assert_ne!(id1, id2);
+        assert!(id1.to_string().len() > 0);
+        assert!(id2.to_string().len() > 0);
+    }
+
+    #[test] 
+    fn test_status_codes() {
+        assert_eq!(StatusCode::OK.as_u16(), 200);
+        assert_eq!(StatusCode::CREATED.as_u16(), 201);
+        assert_eq!(StatusCode::NOT_FOUND.as_u16(), 404);
+        assert_eq!(StatusCode::INTERNAL_SERVER_ERROR.as_u16(), 500);
+    }
+}
