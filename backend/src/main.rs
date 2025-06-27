@@ -2,7 +2,7 @@ mod k8s;
 
 use axum::{
     extract::{Path, State},
-    routing::{delete, get, post, put},
+    routing::{get},
     Json, Router,
     http::StatusCode,
 };
@@ -256,9 +256,7 @@ mod tests {
         body::{to_bytes, Body},
         http::{Request, StatusCode},
     };
-    use serde_json::{json, Value};
     use tower::ServiceExt;
-    use http_body_util::BodyExt;
 
     async fn create_test_app() -> Router {
         // Create a mock app for testing without real database
