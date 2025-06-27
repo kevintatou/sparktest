@@ -123,7 +123,7 @@ export default function TestRunsPage() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Test Runs
           </h1>
-          <p className="text-muted-foreground mt-1">Monitor and manage your test executions</p>
+          <p className="text-muted-foreground mt-1">Monitor and manage your test runs</p>
         </div>
         <Button
           asChild

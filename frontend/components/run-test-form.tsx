@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2 } from "lucide-react"
 
@@ -19,40 +18,54 @@ export function RunTestForm({ def: definition }: { def: Definition }) {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formData, setFormData] = useState({
-    name: `${definition.name} Run`,
-    image: definition.image,
-    commands: [...definition.commands],
-    useCustomSettings: false,
-  })
+  const [formData, setFormData] = useState<{
+    name: string
+    image: string
+    commands: string[]
+    useCustomSettings: boolean
+  } | null>(null)
+
+  useEffect(() => {
+    if (!definition) return
+    setFormData({
+      name: `${definition.name} Run`,
+      image: definition.image,
+      commands: [...definition.commands],
+      useCustomSettings: false,
+    })
+  }, [definition])
 
   const addCommand = () => {
-    setFormData((prev) => ({
-      ...prev,
-      commands: [...prev.commands, ""],
-    }))
+    if (!formData) return
+    setFormData({
+      ...formData,
+      commands: [...formData.commands, ""],
+    })
   }
 
   const removeCommand = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      commands: prev.commands.filter((_, i) => i !== index),
-    }))
+    if (!formData) return
+    setFormData({
+      ...formData,
+      commands: formData.commands.filter((_, i) => i !== index),
+    })
   }
 
   const updateCommand = (index: number, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      commands: prev.commands.map((cmd, i) => (i === index ? value : cmd)),
-    }))
+    if (!formData) return
+    setFormData({
+      ...formData,
+      commands: formData.commands.map((cmd, i) => (i === index ? value : cmd)),
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!formData) return
+
     setIsSubmitting(true)
 
     try {
-      // Create a new test run in localStorage
       const options = formData.useCustomSettings
         ? {
             name: formData.name,
@@ -80,6 +93,14 @@ export function RunTestForm({ def: definition }: { def: Definition }) {
     }
   }
 
+  if (!formData) {
+    return (
+      <div className="text-center py-10 text-muted-foreground">
+        Loading test run form...
+      </div>
+    )
+  }
+
   return (
     <form onSubmit={handleSubmit}>
       <Card className="shadow-sm">
@@ -103,7 +124,9 @@ export function RunTestForm({ def: definition }: { def: Definition }) {
             <Switch
               id="custom-settings"
               checked={formData.useCustomSettings}
-              onCheckedChange={(checked) => setFormData({ ...formData, useCustomSettings: checked })}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, useCustomSettings: checked })
+              }
             />
             <Label htmlFor="custom-settings">Use custom settings for this run</Label>
           </div>
@@ -193,12 +216,12 @@ export function RunTestForm({ def: definition }: { def: Definition }) {
                   fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path
                     className="opacity-75"
                     fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                  />
                 </svg>
                 Starting...
               </>
