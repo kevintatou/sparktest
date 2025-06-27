@@ -18,7 +18,6 @@ export default defineConfig({
         "lib/**/*.ts",
         "app/api/**/*.ts",
         "hooks/**/*.ts",
-        "components/simple-sidebar.tsx", // Include only tested components
       ],
       exclude: [
         "node_modules/", 
