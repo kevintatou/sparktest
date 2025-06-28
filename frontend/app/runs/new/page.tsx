@@ -33,7 +33,7 @@ export default function NewRunPage() {
           <div className="mx-auto max-w-2xl">
             <div className="flex items-center gap-2 mb-6">
               <Button variant="ghost" size="icon" asChild>
-                <Link href="/tests">
+                <Link href="/runs">
                   <ArrowLeft className="h-4 w-4" />
                   <span className="sr-only">Back</span>
                 </Link>

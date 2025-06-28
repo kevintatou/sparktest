@@ -74,14 +74,25 @@ export function RunTestForm({ def: definition }: { def: Definition }) {
           }
         : { name: formData.name }
 
-      const newRun = storage.createRun(definition.id, options)
+      const newRun = await storage.createRun(definition.id, options)
+
+      if (!newRun || !newRun.id) {
+        console.error("createRun did not return a valid run object:", newRun)
+        toast({
+          title: "Error starting test",
+          description: "Failed to create test run: missing run ID.",
+          variant: "destructive",
+        })
+        setIsSubmitting(false)
+        return
+      }
 
       toast({
         title: "Test started successfully",
-        description: `Test "${newRun.name}" is now running.`,
+        description: `Test \"${newRun.name}\" is now running.`,
       })
 
-      router.push(`/tests/${newRun.id}`)
+      router.push(`/runs/${newRun.id}`)
     } catch (error) {
       toast({
         title: "Error starting test",
@@ -204,7 +215,7 @@ export function RunTestForm({ def: definition }: { def: Definition }) {
           )}
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="outline" type="button" onClick={() => router.push("/tests")}>
+          <Button variant="outline" type="button" onClick={() => router.push("/runs")}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting} className="shadow-sm">
