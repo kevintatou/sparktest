@@ -11,10 +11,14 @@ interface TestDetailsProps {
 }
 
 export const RunDetails: React.FC<TestDetailsProps> = ({ run: run }) => {
+  // Defensive: handle undefined run or createdAt
+  const safeCreatedAt = run?.createdAt && !Number.isNaN(Date.parse(run.createdAt))
+    ? run.createdAt
+    : new Date().toISOString();
+
   const [activeRun, setActiveTest] = useState<Run>({
     ...run,
-    // Ensure we always have a valid ISO string to avoid “Invalid time value”
-    createdAt: run.createdAt && !Number.isNaN(Date.parse(run.createdAt)) ? run.createdAt : new Date().toISOString(),
+    createdAt: safeCreatedAt,
   })
 
   // Utility: safely parse date or return "now"

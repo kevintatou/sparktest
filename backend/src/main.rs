@@ -176,7 +176,10 @@ async fn get_test_runs(State(pool): State<PgPool>) -> Result<Json<Vec<TestRun>>,
     Ok(Json(rows))
 }
 
-async fn create_test_run(State(pool): State<PgPool>, Json(payload): Json<CreateTestRunRequest>) -> Result<Json<&'static str>, StatusCode> {
+async fn create_test_run(
+    State(pool): State<PgPool>,
+    Json(payload): Json<CreateTestRunRequest>
+) -> Result<Json<TestRun>, StatusCode> {
     let def = sqlx::query_as::<_, TestDefinition>("SELECT * FROM test_definitions WHERE id = $1")
         .bind(payload.test_definition_id)
         .fetch_one(&pool)
@@ -210,7 +213,13 @@ async fn create_test_run(State(pool): State<PgPool>, Json(payload): Json<CreateT
         let _ = monitor_job_and_update_status(run_id, job_name, pool_clone).await;
     });
 
-    Ok(Json("Kubernetes job created"))
+    // Fetch and return the created run
+    let run: TestRun = sqlx::query_as::<_, TestRun>("SELECT * FROM test_runs WHERE id = $1")
+        .bind(run_id)
+        .fetch_one(&pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Json(run))
 }
 
 // ---------------------- Start App ----------------------

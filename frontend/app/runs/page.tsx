@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
-import type { TestRun } from "@/lib/types"
+import type { Run } from "@/lib/types"
+import { storage } from "@/lib/storage"
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -40,7 +41,7 @@ const getStatusColor = (status: string) => {
 
 export default function TestRunsPage() {
   const { toast } = useToast()
-  const [testRuns, setTestRuns] = useState<TestRun[]>([])
+  const [testRuns, setTestRuns] = useState<Run[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const initializedRef = useRef(false)
@@ -48,49 +49,11 @@ export default function TestRunsPage() {
   // Mock test runs data
   useEffect(() => {
     if (!initializedRef.current) {
-      const mockRuns: TestRun[] = [
-        {
-          id: "run-1",
-          name: "API Authentication Tests",
-          definitionId: "api-auth-def",
-          status: "completed",
-          startTime: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
-          endTime: new Date(Date.now() - 240000).toISOString(), // 4 minutes ago
-          duration: 60,
-          logs: "All tests passed successfully",
-        },
-        {
-          id: "run-2",
-          name: "Load Testing Suite",
-          definitionId: "load-test-def",
-          status: "running",
-          startTime: new Date(Date.now() - 120000).toISOString(), // 2 minutes ago
-          duration: 0,
-          logs: "Test in progress...",
-        },
-        {
-          id: "run-3",
-          name: "E2E User Journey",
-          definitionId: "e2e-def",
-          status: "failed",
-          startTime: new Date(Date.now() - 600000).toISOString(), // 10 minutes ago
-          endTime: new Date(Date.now() - 540000).toISOString(), // 9 minutes ago
-          duration: 45,
-          logs: "Test failed: Element not found",
-        },
-        {
-          id: "run-4",
-          name: "Database Migration Tests",
-          definitionId: "db-migration-def",
-          status: "completed",
-          startTime: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
-          endTime: new Date(Date.now() - 1740000).toISOString(), // 29 minutes ago
-          duration: 120,
-          logs: "Migration tests completed successfully",
-        },
-      ]
-      setTestRuns(mockRuns)
-      initializedRef.current = true
+      (async () => {
+        const runs = await storage.getRuns()
+        setTestRuns(runs)
+        initializedRef.current = true
+      })()
     }
   }, [])
 

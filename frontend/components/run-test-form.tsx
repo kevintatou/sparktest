@@ -76,9 +76,20 @@ export function RunTestForm({ def: definition }: { def: Definition }) {
 
       const newRun = await storage.createRun(definition.id, options)
 
+      if (!newRun || !newRun.id) {
+        console.error("createRun did not return a valid run object:", newRun)
+        toast({
+          title: "Error starting test",
+          description: "Failed to create test run: missing run ID.",
+          variant: "destructive",
+        })
+        setIsSubmitting(false)
+        return
+      }
+
       toast({
         title: "Test started successfully",
-        description: `Test "${newRun.name}" is now running.`,
+        description: `Test \"${newRun.name}\" is now running.`,
       })
 
       router.push(`/runs/${newRun.id}`)
