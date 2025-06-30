@@ -15,6 +15,12 @@ use std::{net::SocketAddr};
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
 use uuid::Uuid;
+use std::time::Duration;
+use tempfile::TempDir;
+use git2::Repository;
+use std::fs;
+use serde_json::Value;
+use log::{info, warn, error};
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
 struct TestExecutor {
@@ -222,11 +228,96 @@ async fn create_test_run(
     Ok(Json(run))
 }
 
+// --- GitHub Sync Task ---
+async fn start_github_sync(pool: PgPool) {
+    let repos = vec![
+        // Add your public repos here
+        "https://github.com/kevintatou/sparktest-demo-definitions.git",
+    ];
+
+    tokio::spawn(async move {
+        loop {
+            for repo_url in &repos {
+                if let Err(e) = sync_repo(repo_url, &pool).await {
+                    log::error!("Failed to sync repo {}: {:?}", repo_url, e);
+                }
+            }
+            tokio::time::sleep(Duration::from_secs(3600)).await; // 1 hour
+        }
+    });
+}
+
+async fn sync_repo(repo_url: &str, pool: &PgPool) -> Result<(), Box<dyn std::error::Error>> {
+    let tmp_dir = TempDir::new()?;
+    let repo_path = tmp_dir.path().join("repo");
+    log::info!("Cloning {} to {:?}", repo_url, repo_path);
+
+    // Clone the repo
+    Repository::clone(repo_url, &repo_path)?;
+
+    let tests_dir = repo_path.join("tests");
+    if !tests_dir.exists() {
+        log::warn!("No /tests directory in repo {}", repo_url);
+        return Ok(());
+    }
+
+    for entry in fs::read_dir(&tests_dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.extension().and_then(|s| s.to_str()) == Some("json") {
+            let file_content = fs::read_to_string(&path)?;
+            match serde_json::from_str::<Value>(&file_content) {
+                Ok(json) => {
+                    if let Err(e) = upsert_test_definition_from_json(json, pool).await {
+                        log::error!("Failed to upsert definition from {:?}: {:?}", path, e);
+                    } else {
+                        log::info!("Synced definition from {:?}", path);
+                    }
+                }
+                Err(e) => log::error!("Invalid JSON in {:?}: {:?}", path, e),
+            }
+        }
+    }
+    Ok(())
+}
+
+async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<(), sqlx::Error> {
+    // Extract fields (adjust as needed)
+    let name = json.get("name").and_then(|v| v.as_str()).unwrap_or("Unnamed");
+    let image = json.get("image").and_then(|v| v.as_str()).unwrap_or("ubuntu:latest");
+    let commands = json.get("commands").and_then(|v| v.as_array())
+        .map(|arr| arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect::<Vec<_>>())
+        .unwrap_or_else(|| vec!["echo Hello".to_string()]);
+    let description = json.get("description").and_then(|v| v.as_str());
+
+    // Upsert by name
+    let existing = sqlx::query!("SELECT id FROM test_definitions WHERE name = $1", name)
+        .fetch_optional(pool)
+        .await?;
+
+    if let Some(row) = existing {
+        sqlx::query!("UPDATE test_definitions SET image = $1, commands = $2, description = $3 WHERE id = $4",
+            image, &commands, description, row.id)
+            .execute(pool)
+            .await?;
+        log::info!("Updated test definition '{}'", name);
+    } else {
+        let id = uuid::Uuid::new_v4();
+        sqlx::query!("INSERT INTO test_definitions (id, name, image, commands, description) VALUES ($1, $2, $3, $4, $5)",
+            id, name, image, &commands, description)
+            .execute(pool)
+            .await?;
+        log::info!("Inserted new test definition '{}'", name);
+    }
+    Ok(())
+}
+
 // ---------------------- Start App ----------------------
 
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().ok();
+    env_logger::init(); // Initialize logger
 
     let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool = PgPoolOptions::new()
@@ -248,11 +339,14 @@ async fn main() {
         .route("/api/test-definitions", get(get_test_definitions).post(create_test_definition))
         .route("/api/test-definitions/:id", get(get_test_definition).put(update_test_definition).delete(delete_test_definition))
         .route("/api/test-runs", get(get_test_runs).post(create_test_run))
-        .with_state(pool)
+        .with_state(pool.clone()) // Clone pool for Axum
         .layer(cors);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
     println!("🚀 SparkTest backend running at http://{}", addr);
+
+    // Start GitHub sync task (clone pool)
+    start_github_sync(pool.clone()).await;
 
     let listener = TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();

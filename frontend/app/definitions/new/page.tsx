@@ -6,7 +6,6 @@ import ClientLayout from "@/app/client-layout"
 
 export default function NewDefinitionPage() {
   return (
-    <ClientLayout>
       <div className="flex min-h-screen flex-col">
         <main className="flex-1 space-y-6 p-6">
           <div className="flex items-center gap-4">
@@ -25,6 +24,5 @@ export default function NewDefinitionPage() {
           </div>
         </main>
       </div>
-    </ClientLayout>
   )
 }

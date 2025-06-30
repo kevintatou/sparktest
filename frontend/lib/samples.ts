@@ -86,6 +86,34 @@ export const sampleDefinitions: Definition[] = [
     },
     labels: ["database", "migration", "postgres"],
   },
+  {
+    id: "github-demo-1",
+    name: "GitHub PR Smoke Test",
+    description: "Runs smoke tests on every pull request using a definition synced from GitHub.",
+    image: "node:18-alpine",
+    commands: ["npm ci", "npm run test:smoke"],
+    createdAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+    executorId: "kubernetes",
+    variables: {
+      GITHUB_REPO: "github.com/example/repo",
+      PR_NUMBER: "123",
+    },
+    labels: ["github", "smoke", "pr"],
+  },
+  {
+    id: "github-demo-2",
+    name: "GitHub Nightly E2E",
+    description: "Nightly end-to-end tests auto-registered from a GitHub repo.",
+    image: "mcr.microsoft.com/playwright:v1.40.0-focal",
+    commands: ["npm ci", "npx playwright install", "npm run test:e2e"],
+    createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    executorId: "kubernetes",
+    variables: {
+      GITHUB_REPO: "github.com/example/repo",
+      SCHEDULE: "nightly",
+    },
+    labels: ["github", "e2e", "nightly"],
+  },
 ]
 
 // Sample Runs
