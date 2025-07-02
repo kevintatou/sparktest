@@ -142,13 +142,23 @@ export class ApiStorageService implements StorageService {
     try {
       const method = suite.id ? "PUT" : "POST"
       const url = suite.id ? `${API_BASE}/test-suites/${suite.id}` : `${API_BASE}/test-suites`
-      
+
+      // Convert camelCase to snake_case for backend compatibility
+      const suitePayload: any = {
+        ...suite,
+        execution_mode: suite.executionMode,
+        test_definition_ids: suite.testDefinitionIds,
+        labels: suite.labels,
+      }
+      delete suitePayload.executionMode
+      delete suitePayload.testDefinitionIds
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(suite),
+        body: JSON.stringify(suitePayload),
       })
-      
+
       if (!res.ok) throw new Error("Failed to save test suite")
       return await res.json()
     } catch (error) {
