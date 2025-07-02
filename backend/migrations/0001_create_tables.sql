@@ -1,5 +1,15 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+-- Create table for test definitions
+CREATE TABLE test_definitions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    description TEXT,
+    image TEXT NOT NULL,
+    commands TEXT[] NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create table for test executors
 CREATE TABLE test_executors (
     id UUID PRIMARY KEY,
@@ -12,17 +22,6 @@ CREATE TABLE test_executors (
     icon TEXT
 );
 
--- Create table for test definitions
-CREATE TABLE test_definitions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    description TEXT,
-    image TEXT NOT NULL,
-    commands TEXT[] NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    executor_id UUID REFERENCES test_executors(id) ON DELETE SET NULL
-);
-
 -- Create table for test runs
 CREATE TABLE test_runs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -33,6 +32,5 @@ CREATE TABLE test_runs (
     created_at TIMESTAMPTZ DEFAULT now(),
     duration INTEGER,
     logs TEXT[],
-    test_definition_id UUID REFERENCES test_definitions(id) ON DELETE SET NULL,
-    executor_id UUID REFERENCES test_executors(id) ON DELETE SET NULL
+    test_definition_id UUID REFERENCES test_definitions(id) ON DELETE SET NULL
 );

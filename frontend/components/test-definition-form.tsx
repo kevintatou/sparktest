@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2 } from "lucide-react"
 
@@ -14,47 +14,20 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@/lib/storage"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { Executor } from "@/lib/types"
 
 export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [tab, setTab] = useState("manual")
-  const [executors, setExecutors] = useState<Executor[]>([])
-  const [isLoadingExecutors, setIsLoadingExecutors] = useState(false)
   const [formData, setFormData] = useState({
     name: existingTest?.name || "",
     description: existingTest?.description || "",
     image: existingTest?.image || "",
     commands: existingTest?.commands || [""],
-    executorId: existingTest?.executorId || "",
   })
   const [githubUrl, setGithubUrl] = useState("")
   const [githubPath, setGithubPath] = useState("/tests")
-  
-  // Fetch executors on component mount
-  useEffect(() => {
-    const fetchExecutors = async () => {
-      setIsLoadingExecutors(true)
-      try {
-        const executorsList = await storage.getExecutors()
-        setExecutors(executorsList)
-      } catch (error) {
-        console.error("Error fetching executors:", error)
-        toast({
-          title: "Error fetching executors",
-          description: "Could not load available executors. Please try again.",
-          variant: "destructive",
-        })
-      } finally {
-        setIsLoadingExecutors(false)
-      }
-    }
-    
-    fetchExecutors()
-  }, [])
 
   const addCommand = () => {
     setFormData((prev) => ({
@@ -178,31 +151,6 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
                   rows={3}
                   className="transition-all focus-visible:ring-primary"
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="executor">Test Executor</Label>
-                <Select 
-                  value={formData.executorId} 
-                  onValueChange={(value) => setFormData({ ...formData, executorId: value })}
-                  disabled={isLoadingExecutors}
-                >
-                  <SelectTrigger id="executor" className="w-full">
-                    <SelectValue placeholder="Select an executor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {executors.map((executor) => (
-                      <SelectItem key={executor.id} value={executor.id}>
-                        {executor.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-muted-foreground">
-                  {isLoadingExecutors 
-                    ? "Loading executors..." 
-                    : "The executor that will run this test definition"}
-                </p>
               </div>
 
               <div className="space-y-2">

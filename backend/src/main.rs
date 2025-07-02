@@ -42,7 +42,6 @@ struct TestDefinition {
     image: String,
     commands: Vec<String>,
     created_at: Option<chrono::DateTime<chrono::Utc>>,
-    executor_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
@@ -56,7 +55,6 @@ struct TestRun {
     duration: Option<i32>,
     logs: Option<Vec<String>>,
     test_definition_id: Option<Uuid>,
-    executor_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -144,16 +142,15 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Tes
     let id = Uuid::new_v4();
     
     let result = sqlx::query_as::<_, TestDefinition>(
-        "INSERT INTO test_definitions (id, name, description, image, commands, executor_id) 
-         VALUES ($1, $2, $3, $4, $5, $6)
-         RETURNING id, name, description, image, commands, created_at, executor_id"
+        "INSERT INTO test_definitions (id, name, description, image, commands) 
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, name, description, image, commands, created_at"
     )
     .bind(id)
     .bind(&body.name)
     .bind(&body.description)
     .bind(&body.image)
     .bind(&body.commands)
-    .bind(&body.executor_id)
     .fetch_one(&pool)
     .await
     .map_err(|e| {
@@ -167,15 +164,14 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Tes
 async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<TestDefinition>, StatusCode> {
     let result = sqlx::query_as::<_, TestDefinition>(
         "UPDATE test_definitions 
-         SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5 
-         WHERE id = $6
-         RETURNING id, name, description, image, commands, created_at, executor_id"
+         SET name = $1, description = $2, image = $3, commands = $4 
+         WHERE id = $5
+         RETURNING id, name, description, image, commands, created_at"
     )
     .bind(&body.name)
     .bind(&body.description)
     .bind(&body.image)
     .bind(&body.commands)
-    .bind(&body.executor_id)
     .bind(id)
     .fetch_one(&pool)
     .await
