@@ -75,13 +75,18 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
     setIsSubmitting(true)
 
     try {
+      // Validate form data
+      if (formData.testDefinitionIds.length === 0) {
+        throw new Error("Please select at least one test definition")
+      }
+      
       const suiteData: TestSuite = {
         ...formData,
         createdAt: existingSuite?.createdAt || new Date().toISOString(),
       }
 
-      // For now, we'll just simulate saving since we don't have suite storage methods
-      // In a real app, you'd call storage.saveSuite(suiteData)
+      // Save the suite using the storage service
+      await storage.saveTestSuite(suiteData)
 
       toast({
         title: existingSuite ? "Suite updated" : "Suite created",
@@ -90,6 +95,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
 
       router.push("/suites")
     } catch (error) {
+      console.error("Error saving test suite:", error)
       toast({
         title: `Error ${existingSuite ? "updating" : "creating"} suite`,
         description: error instanceof Error ? error.message : "Unknown error occurred",

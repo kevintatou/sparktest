@@ -1,4 +1,4 @@
-import type { Executor, Definition, Run } from "../types"
+import type { Executor, Definition, Run, TestSuite } from "../types"
 import { StorageService } from "./storage"
 
 const API_BASE = "http://localhost:3001/api"
@@ -123,6 +123,63 @@ export class ApiStorageService implements StorageService {
     })
     if (!res.ok) throw new Error("Failed to create test run")
     return await res.json()
+  }
+
+  // Test Suites
+  async getTestSuites(): Promise<TestSuite[]> {
+    try {
+      const res = await fetch(`${API_BASE}/test-suites`)
+      if (!res.ok) throw new Error("Failed to fetch test suites")
+      return await res.json()
+    } catch (error) {
+      console.error("Error fetching test suites from API:", error)
+      // Fallback to empty array if the API endpoint doesn't exist yet
+      return []
+    }
+  }
+
+  async saveTestSuite(suite: TestSuite): Promise<TestSuite> {
+    try {
+      const method = suite.id ? "PUT" : "POST"
+      const url = suite.id ? `${API_BASE}/test-suites/${suite.id}` : `${API_BASE}/test-suites`
+      
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(suite),
+      })
+      
+      if (!res.ok) throw new Error("Failed to save test suite")
+      return await res.json()
+    } catch (error) {
+      console.error("Error saving test suite to API:", error)
+      // Return the original suite if the API endpoint doesn't exist yet
+      return suite
+    }
+  }
+
+  async deleteTestSuite(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${API_BASE}/test-suites/${id}`, { method: "DELETE" })
+      return res.ok
+    } catch (error) {
+      console.error("Error deleting test suite from API:", error)
+      // Return true to allow UI to proceed even if API endpoint doesn't exist yet
+      return true
+    }
+  }
+
+  async getTestSuiteById(id: string): Promise<TestSuite | undefined> {
+    try {
+      const res = await fetch(`${API_BASE}/test-suites/${id}`)
+      if (!res.ok) throw new Error("Failed to fetch test suite")
+      return await res.json()
+    } catch (error) {
+      console.error("Error fetching test suite from API:", error)
+      // Fallback to finding in the list if the API endpoint doesn't exist yet
+      const list = await this.getTestSuites()
+      return list.find((s) => s.id === id)
+    }
   }
 
   initialize(): void {

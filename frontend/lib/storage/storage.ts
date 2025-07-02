@@ -1,4 +1,4 @@
-import { Executor, Definition, Run } from "../types"
+import { Executor, Definition, Run, TestSuite } from "../types"
 
 export interface StorageService {
   // Executors
@@ -25,6 +25,12 @@ export interface StorageService {
   subscribeToRuns: (
     callback: (payload: { eventType: string; new?: Run; old?: Run }) => void
   ) => () => void;
+
+  // Test Suites
+  getTestSuites(): Promise<TestSuite[]>
+  saveTestSuite(suite: TestSuite): Promise<TestSuite>
+  deleteTestSuite(id: string): Promise<boolean>
+  getTestSuiteById(id: string): Promise<TestSuite | undefined>
 
   // Optional: setup
   initialize(): void

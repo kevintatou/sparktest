@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { TestSuite } from "@/lib/types"
+import { storage } from "@/lib/storage"
 
 export default function TestSuitesPage() {
   const { toast } = useToast()
@@ -21,55 +22,55 @@ export default function TestSuitesPage() {
   const initializedRef = useRef(false)
   const [selectedSuite, setSelectedSuite] = useState<TestSuite | null>(null)
 
-  // Mock test suites data
+  // Load test suites from storage
   useEffect(() => {
     if (!initializedRef.current) {
-      const mockSuites: TestSuite[] = [
-        {
-          id: "api-suite",
-          name: "API Test Suite",
-          description: "Complete API testing including auth, CRUD operations, and error handling",
-          testDefinitionIds: ["api-tests", "auth-tests", "error-handling-tests"],
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          executionMode: "sequential",
-          labels: ["api", "backend"],
-        },
-        {
-          id: "e2e-suite",
-          name: "End-to-End Suite",
-          description: "Full user journey testing across the application",
-          testDefinitionIds: ["login-tests", "dashboard-tests", "checkout-tests"],
-          createdAt: new Date(Date.now() - 172800000).toISOString(),
-          executionMode: "sequential",
-          labels: ["e2e", "frontend"],
-        },
-        {
-          id: "performance-suite",
-          name: "Performance Test Suite",
-          description: "Load testing and performance benchmarks",
-          testDefinitionIds: ["load-tests", "stress-tests", "spike-tests"],
-          createdAt: new Date(Date.now() - 259200000).toISOString(),
-          executionMode: "parallel",
-          labels: ["performance", "load"],
-        },
-      ]
-      setTestSuites(mockSuites)
-      initializedRef.current = true
+      const fetchTestSuites = async () => {
+        try {
+          const suites = await storage.getTestSuites()
+          setTestSuites(suites)
+        } catch (error) {
+          console.error("Error fetching test suites:", error)
+          toast({
+            title: "Error loading test suites",
+            description: "Failed to load test suites. Please try again.",
+            variant: "destructive",
+          })
+        } finally {
+          initializedRef.current = true
+        }
+      }
+      
+      fetchTestSuites()
     }
   }, [])
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     setIsDeleting(id)
 
-    setTimeout(() => {
-      setTestSuites((prev) => prev.filter((suite) => suite.id !== id))
-      setIsDeleting(null)
-
+    try {
+      const success = await storage.deleteTestSuite(id)
+      
+      if (success) {
+        setTestSuites((prev) => prev.filter((suite) => suite.id !== id))
+        
+        toast({
+          title: "Test suite deleted",
+          description: "The test suite has been removed successfully.",
+        })
+      } else {
+        throw new Error("Failed to delete test suite")
+      }
+    } catch (error) {
+      console.error("Error deleting test suite:", error)
       toast({
-        title: "Test suite deleted",
-        description: "The test suite has been removed successfully.",
+        title: "Error deleting test suite",
+        description: "Failed to delete the test suite. Please try again.",
+        variant: "destructive",
       })
-    }, 500)
+    } finally {
+      setIsDeleting(null)
+    }
   }
 
   const handleRun = (suite: TestSuite) => {
@@ -80,17 +81,42 @@ export default function TestSuitesPage() {
     setIsRunning(suite.id)
 
     try {
-      // Simulate running all tests in the suite
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Get all test definitions in the suite
+      const definitions = await Promise.all(
+        suite.testDefinitionIds.map(id => storage.getDefinitionById(id))
+      )
+      
+      // Filter out any undefined definitions
+      const validDefinitions = definitions.filter(def => def !== undefined)
+      
+      if (validDefinitions.length === 0) {
+        throw new Error("No valid test definitions found in suite")
+      }
+      
+      // Create runs for each definition based on execution mode
+      if (suite.executionMode === "sequential") {
+        // Run tests one after another
+        for (const def of validDefinitions) {
+          if (def) {
+            await storage.createRun(def.id)
+          }
+        }
+      } else {
+        // Run tests in parallel
+        await Promise.all(
+          validDefinitions.map(def => def && storage.createRun(def.id))
+        )
+      }
 
       toast({
         title: "Test suite started",
-        description: `Running ${suite.testDefinitionIds.length} tests in ${suite.executionMode} mode.`,
+        description: `Running ${validDefinitions.length} tests in ${suite.executionMode} mode.`,
       })
     } catch (error) {
+      console.error("Error running test suite:", error)
       toast({
         title: "Error starting test suite",
-        description: "Failed to start the test suite.",
+        description: "Failed to start the test suite. Please check if all test definitions exist.",
         variant: "destructive",
       })
     } finally {
