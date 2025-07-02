@@ -11,15 +11,31 @@ import ClientLayout from "@/app/client-layout"
 
 export default function ExecutorDetailsPage({ params }: { params: { id: string } }) {
     const [executor, setExecutor] = useState<Executor | null>(null)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const fetchExecutor = async () => {
-            const exec = await storage.getExecutorById(params.id)
-            setExecutor(exec || null)
+            try {
+                const exec = await storage.getExecutorById(params.id)
+                setExecutor(exec || null)
+            } catch (error) {
+                console.error('Error loading executor:', error)
+            } finally {
+                setLoading(false)
+            }
         }
 
         fetchExecutor()
     }, [params.id])
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+                <p className="mt-4 text-muted-foreground">Loading executor...</p>
+            </div>
+        )
+    }
 
     if (!executor) {
         return (

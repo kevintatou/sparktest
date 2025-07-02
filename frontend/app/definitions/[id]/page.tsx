@@ -15,11 +15,18 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
   const { toast } = useToast()
   const [definition, setDefinition] = useState<Definition | null>(null)
   const [isRunning, setIsRunning] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchDefinition = async () => {
-      const def = await storage.getDefinitionById(params.id)
-      setDefinition(def || null)
+      try {
+        const def = await storage.getDefinitionById(params.id)
+        setDefinition(def || null)
+      } catch (error) {
+        console.error('Error loading test definition:', error)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchDefinition()
   }, [params.id])
@@ -43,6 +50,17 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
     } finally {
       setIsRunning(false)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="container py-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+          <p className="mt-4 text-muted-foreground">Loading test definition...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!definition) {
