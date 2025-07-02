@@ -20,42 +20,74 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
   const [isRunning, setIsRunning] = useState(false)
 
   useEffect(() => {
-    // Mock data for now - in real app you'd fetch from storage
-    const mockSuite: TestSuite = {
-      id: id,
-      name: "API Test Suite",
-      description: "Complete API testing including auth, CRUD operations, and error handling",
-      testDefinitionIds: ["api-tests", "auth-tests", "error-handling-tests"],
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      executionMode: "sequential",
-      labels: ["api", "backend"],
+    const loadSuiteAndDefinitions = async () => {
+      try {
+        // Load the suite from storage
+        const loadedSuite = await storage.getTestSuiteById(id)
+        if (!loadedSuite) {
+          toast({
+            title: "Suite not found",
+            description: `Could not find suite with ID: ${id}`,
+            variant: "destructive",
+          })
+          return
+        }
+        
+        setSuite(loadedSuite)
+        
+        // Load the definitions for this suite
+        const allDefs = await storage.getDefinitions()
+        const suiteDefinitions = allDefs.filter((def) => 
+          loadedSuite.testDefinitionIds.includes(def.id)
+        )
+        setDefinitions(suiteDefinitions)
+      } catch (error) {
+        console.error("Error loading suite details:", error)
+        toast({
+          title: "Error loading suite",
+          description: "Failed to load suite details. Please try again.",
+          variant: "destructive",
+        })
+      }
     }
-    setSuite(mockSuite)
-
-    const loadDefinitions = async () => {
-      const allDefs = await storage.getDefinitions()
-      const suiteDefinitions = allDefs.filter((def) => mockSuite.testDefinitionIds.includes(def.id))
-      setDefinitions(suiteDefinitions)
-    }
-    loadDefinitions()
-  }, [id])
+    
+    loadSuiteAndDefinitions()
+  }, [id, toast])
 
   const handleRunSuite = async () => {
     if (!suite) return
 
     setIsRunning(true)
     try {
-      // Simulate running the suite
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Get all test definitions in the suite
+      const validDefinitions = definitions.filter(def => def !== undefined)
+      
+      if (validDefinitions.length === 0) {
+        throw new Error("No valid test definitions found in suite")
+      }
+      
+      // Create runs for each definition based on execution mode
+      if (suite.executionMode === "sequential") {
+        // Run tests one after another
+        for (const def of validDefinitions) {
+          await storage.createRun(def.id)
+        }
+      } else {
+        // Run tests in parallel
+        await Promise.all(
+          validDefinitions.map(def => storage.createRun(def.id))
+        )
+      }
 
       toast({
         title: "Test suite started",
-        description: `Running ${suite.testDefinitionIds.length} tests in ${suite.executionMode} mode.`,
+        description: `Running ${validDefinitions.length} tests in ${suite.executionMode} mode.`,
       })
     } catch (error) {
+      console.error("Error running test suite:", error)
       toast({
         title: "Error starting test suite",
-        description: "Failed to start the test suite.",
+        description: "Failed to start the test suite. Please check if all test definitions exist.",
         variant: "destructive",
       })
     } finally {

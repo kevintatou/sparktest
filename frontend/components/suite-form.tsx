@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@/lib/storage"
 import type { TestSuite, Definition } from "@/lib/types"
+import { Autocomplete } from "@/components/ui/autocomplete"
 
 interface SuiteFormProps {
   existingSuite?: TestSuite
@@ -75,13 +76,18 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
     setIsSubmitting(true)
 
     try {
+      // Validate form data
+      if (formData.testDefinitionIds.length === 0) {
+        throw new Error("Please select at least one test definition")
+      }
+      
       const suiteData: TestSuite = {
         ...formData,
         createdAt: existingSuite?.createdAt || new Date().toISOString(),
       }
 
-      // For now, we'll just simulate saving since we don't have suite storage methods
-      // In a real app, you'd call storage.saveSuite(suiteData)
+      // Save the suite using the storage service
+      await storage.saveTestSuite(suiteData)
 
       toast({
         title: existingSuite ? "Suite updated" : "Suite created",
@@ -90,6 +96,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
 
       router.push("/suites")
     } catch (error) {
+      console.error("Error saving test suite:", error)
       toast({
         title: `Error ${existingSuite ? "updating" : "creating"} suite`,
         description: error instanceof Error ? error.message : "Unknown error occurred",
@@ -112,7 +119,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="id">Suite ID</Label>
             <Input
               id="id"
@@ -124,7 +131,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
               className="transition-all focus-visible:ring-primary"
             />
             <p className="text-sm text-muted-foreground">A unique identifier for this suite (lowercase, no spaces)</p>
-          </div>
+          </div> */}
 
           <div className="space-y-2">
             <Label htmlFor="name">Suite Name</Label>
@@ -168,29 +175,25 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
 
           <div className="space-y-4">
             <Label>Test Definitions</Label>
-            <div className="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-4">
-              {definitions.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  No test definitions available. Create some definitions first.
-                </p>
-              ) : (
-                definitions.map((definition) => (
-                  <div key={definition.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={definition.id}
-                      checked={formData.testDefinitionIds.includes(definition.id)}
-                      onCheckedChange={() => toggleDefinition(definition.id)}
-                    />
-                    <Label htmlFor={definition.id} className="flex-1 cursor-pointer">
-                      <div>
-                        <p className="font-medium">{definition.name}</p>
-                        <p className="text-sm text-muted-foreground">{definition.description}</p>
-                      </div>
-                    </Label>
-                  </div>
-                ))
+            <Autocomplete
+              options={definitions}
+              getOptionLabel={(option) => option.name}
+              multiple
+              value={definitions.filter((d) => formData.testDefinitionIds.includes(d.id))}
+              onChange={(_, value) => setFormData((prev) => ({
+                ...prev,
+                testDefinitionIds: value.map((d) => d.id),
+              }))}
+              renderInput={(params) => (
+                <Input {...params} placeholder="Search and select test definitions..." />
               )}
-            </div>
+              renderOption={(props, option) => (
+                <li {...props} key={option.id} className="flex flex-col p-2">
+                  <span className="font-medium">{option.name}</span>
+                  <span className="text-xs text-muted-foreground">{option.description}</span>
+                </li>
+              )}
+            />
             <p className="text-sm text-muted-foreground">
               Selected {formData.testDefinitionIds.length} test definition(s)
             </p>

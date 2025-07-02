@@ -65,6 +65,17 @@ struct CreateTestRunRequest {
     commands: Option<Vec<String>>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
+struct TestSuite {
+    id: Uuid,
+    name: String,
+    description: Option<String>,
+    execution_mode: String, // "sequential" or "parallel"
+    labels: Vec<String>,
+    test_definition_ids: Vec<Uuid>,
+    created_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
 // Health check
 async fn root_handler() -> &'static str {
     "✅ SparkTest Rust backend is running"
@@ -312,6 +323,70 @@ async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<
     Ok(())
 }
 
+// ---------------------- Suites ----------------------
+
+async fn get_test_suites(State(pool): State<PgPool>) -> Result<Json<Vec<TestSuite>>, StatusCode> {
+    let rows = sqlx::query_as::<_, TestSuite>("SELECT * FROM test_suites")
+        .fetch_all(&pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Json(rows))
+}
+
+async fn get_test_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<TestSuite>, StatusCode> {
+    let row = sqlx::query_as::<_, TestSuite>("SELECT * FROM test_suites WHERE id = $1")
+        .bind(id)
+        .fetch_one(&pool)
+        .await
+        .map_err(|_| StatusCode::NOT_FOUND)?;
+    Ok(Json(row))
+}
+
+async fn create_test_suite(State(pool): State<PgPool>, Json(mut body): Json<TestSuite>) -> Result<Json<&'static str>, StatusCode> {
+    // Generate a new UUID for the suite if not provided
+    let suite_id = if body.id == Uuid::nil() {
+        Uuid::new_v4()
+    } else {
+        body.id
+    };
+    body.id = suite_id;
+    sqlx::query("INSERT INTO test_suites (id, name, description, execution_mode, labels, test_definition_ids, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)")
+        .bind(&body.id)
+        .bind(&body.name)
+        .bind(&body.description)
+        .bind(&body.execution_mode)
+        .bind(&body.labels)
+        .bind(&body.test_definition_ids)
+        .bind(body.created_at)
+        .execute(&pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Json("Suite created"))
+}
+
+async fn update_test_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestSuite>) -> Result<Json<&'static str>, StatusCode> {
+    sqlx::query("UPDATE test_suites SET name = $1, description = $2, execution_mode = $3, labels = $4, test_definition_ids = $5 WHERE id = $6")
+        .bind(&body.name)
+        .bind(&body.description)
+        .bind(&body.execution_mode)
+        .bind(&body.labels)
+        .bind(&body.test_definition_ids)
+        .bind(id)
+        .execute(&pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Json("Suite updated"))
+}
+
+async fn delete_test_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<&'static str>, StatusCode> {
+    sqlx::query("DELETE FROM test_suites WHERE id = $1")
+        .bind(id)
+        .execute(&pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    Ok(Json("Suite deleted"))
+}
+
 // ---------------------- Start App ----------------------
 
 #[tokio::main]
@@ -339,6 +414,8 @@ async fn main() {
         .route("/api/test-definitions", get(get_test_definitions).post(create_test_definition))
         .route("/api/test-definitions/:id", get(get_test_definition).put(update_test_definition).delete(delete_test_definition))
         .route("/api/test-runs", get(get_test_runs).post(create_test_run))
+        .route("/api/test-suites", get(get_test_suites).post(create_test_suite))
+        .route("/api/test-suites/:id", get(get_test_suite).put(update_test_suite).delete(delete_test_suite))
         .with_state(pool.clone()) // Clone pool for Axum
         .layer(cors);
 

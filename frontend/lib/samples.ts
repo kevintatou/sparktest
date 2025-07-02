@@ -1,4 +1,35 @@
-import { Definition, Executor, Run } from "./types"
+import { Definition, Executor, Run, TestSuite } from "./types"
+
+// Sample Test Suites
+export const sampleTestSuites: TestSuite[] = [
+  {
+    id: "api-suite",
+    name: "API Test Suite",
+    description: "Complete API testing including auth, CRUD operations, and error handling",
+    testDefinitionIds: ["api-integration-tests", "security-scan", "performance-tests"],
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    executionMode: "sequential",
+    labels: ["api", "backend"],
+  },
+  {
+    id: "e2e-suite",
+    name: "End-to-End Suite",
+    description: "Full user journey testing across the application",
+    testDefinitionIds: ["e2e-tests", "frontend-unit-tests"],
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+    executionMode: "sequential",
+    labels: ["e2e", "frontend"],
+  },
+  {
+    id: "performance-suite",
+    name: "Performance Test Suite",
+    description: "Load testing and performance benchmarks",
+    testDefinitionIds: ["performance-tests", "database-migration-tests"],
+    createdAt: new Date(Date.now() - 259200000).toISOString(),
+    executionMode: "parallel",
+    labels: ["performance", "load"],
+  },
+]
 
 // Sample Definitions
 export const sampleDefinitions: Definition[] = [
