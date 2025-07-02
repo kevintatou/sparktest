@@ -140,15 +140,12 @@ async fn get_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -
 }
 
 async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<TestDefinition>, StatusCode> {
-    // Generate a new UUID for the test definition
-    let id = Uuid::new_v4();
-    
     let result = sqlx::query_as::<_, TestDefinition>(
         "INSERT INTO test_definitions (id, name, description, image, commands, executor_id) 
          VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING id, name, description, image, commands, created_at, executor_id"
     )
-    .bind(id)
+    .bind(&body.id)
     .bind(&body.name)
     .bind(&body.description)
     .bind(&body.image)

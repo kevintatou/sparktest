@@ -53,14 +53,11 @@ export class ApiStorageService implements StorageService {
       }
       return def;
     } else {
-      // For new definitions, don't send an ID - let the backend generate it
-      const { id, ...defWithoutId } = def as any;
-      
       // Convert createdAt to backend format if needed
       const payload = {
-        ...defWithoutId,
+        ...def,
         // Ensure commands is an array of strings
-        commands: Array.isArray(defWithoutId.commands) ? defWithoutId.commands : [],
+        commands: Array.isArray(def.commands) ? def.commands : [],
       };
       
       const res = await fetch(`${API_BASE}/test-definitions`, {
