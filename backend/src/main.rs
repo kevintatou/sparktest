@@ -42,6 +42,7 @@ struct TestDefinition {
     image: String,
     commands: Vec<String>,
     created_at: Option<chrono::DateTime<chrono::Utc>>,
+    executor_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
@@ -55,6 +56,7 @@ struct TestRun {
     duration: Option<i32>,
     logs: Option<Vec<String>>,
     test_definition_id: Option<Uuid>,
+    executor_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -137,30 +139,52 @@ async fn get_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -
     Ok(Json(row))
 }
 
-async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<&'static str>, StatusCode> {
-    sqlx::query("INSERT INTO test_definitions (id, name, description, image, commands) VALUES ($1, $2, $3, $4, $5)")
-        .bind(&body.id)
-        .bind(&body.name)
-        .bind(&body.description)
-        .bind(&body.image)
-        .bind(&body.commands)
-        .execute(&pool)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    Ok(Json("Created test definition"))
+async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<TestDefinition>, StatusCode> {
+    // Generate a new UUID for the test definition
+    let id = Uuid::new_v4();
+    
+    let result = sqlx::query_as::<_, TestDefinition>(
+        "INSERT INTO test_definitions (id, name, description, image, commands, executor_id) 
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id, name, description, image, commands, created_at, executor_id"
+    )
+    .bind(id)
+    .bind(&body.name)
+    .bind(&body.description)
+    .bind(&body.image)
+    .bind(&body.commands)
+    .bind(&body.executor_id)
+    .fetch_one(&pool)
+    .await
+    .map_err(|e| {
+        eprintln!("Error creating test definition: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+    
+    Ok(Json(result))
 }
 
-async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<&'static str>, StatusCode> {
-    sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4 WHERE id = $5")
-        .bind(&body.name)
-        .bind(&body.description)
-        .bind(&body.image)
-        .bind(&body.commands)
-        .bind(id)
-        .execute(&pool)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    Ok(Json("Updated test definition"))
+async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<TestDefinition>, StatusCode> {
+    let result = sqlx::query_as::<_, TestDefinition>(
+        "UPDATE test_definitions 
+         SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5 
+         WHERE id = $6
+         RETURNING id, name, description, image, commands, created_at, executor_id"
+    )
+    .bind(&body.name)
+    .bind(&body.description)
+    .bind(&body.image)
+    .bind(&body.commands)
+    .bind(&body.executor_id)
+    .bind(id)
+    .fetch_one(&pool)
+    .await
+    .map_err(|e| {
+        eprintln!("Error updating test definition: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+    
+    Ok(Json(result))
 }
 
 async fn delete_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<&'static str>, StatusCode> {
@@ -198,16 +222,20 @@ async fn create_test_run(
     let command = payload.commands.unwrap_or_else(|| def.commands.clone());
     let job_name = format!("sparktest-job-{}", run_id.simple());
 
-    sqlx::query("INSERT INTO test_runs (id, name, image, command, status, created_at, test_definition_id, duration, logs) VALUES ($1, $2, $3, $4, 'running', $5, $6, NULL, NULL)")
+    sqlx::query("INSERT INTO test_runs (id, name, image, command, status, created_at, test_definition_id, duration, logs, executor_id) VALUES ($1, $2, $3, $4, 'running', $5, $6, NULL, NULL, $7)")
         .bind(run_id)
         .bind(&name)
         .bind(&image)
         .bind(&command)
         .bind(Utc::now())
         .bind(def.id)
+        .bind(&def.executor_id)
         .execute(&pool)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|e| {
+            eprintln!("Error creating test run: {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
 
     let client = Client::try_default().await.map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     create_k8s_job(&client, &job_name, &image, &command)

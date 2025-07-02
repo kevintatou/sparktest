@@ -39,13 +39,44 @@ export class ApiStorageService implements StorageService {
   }
 
   async saveDefinition(def: Definition): Promise<Definition> {
-    const res = await fetch(`${API_BASE}/test-definitions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(def),
-    })
-    if (!res.ok) throw new Error("Failed to save definition")
-    return await res.json()
+    // If the definition has an ID, it's an update
+    if (def.id) {
+      const res = await fetch(`${API_BASE}/test-definitions/${def.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(def),
+      })
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Error updating definition:", errorText);
+        throw new Error(`Failed to update definition: ${res.status} ${errorText}`);
+      }
+      return def;
+    } else {
+      // For new definitions, don't send an ID - let the backend generate it
+      const { id, ...defWithoutId } = def as any;
+      
+      // Convert createdAt to backend format if needed
+      const payload = {
+        ...defWithoutId,
+        // Ensure commands is an array of strings
+        commands: Array.isArray(defWithoutId.commands) ? defWithoutId.commands : [],
+      };
+      
+      const res = await fetch(`${API_BASE}/test-definitions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Error creating definition:", errorText);
+        throw new Error(`Failed to create definition: ${res.status} ${errorText}`);
+      }
+      
+      return await res.json();
+    }
   }
 
   async deleteDefinition(id: string): Promise<boolean> {
