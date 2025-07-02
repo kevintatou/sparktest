@@ -48,3 +48,8 @@ export interface TestSuite {
   executionMode: "sequential" | "parallel"
   labels?: string[]
 }
+
+// Type aliases for backward compatibility
+export type TestDefinition = Definition
+export type TestRun = Run
+export type Test = Run
