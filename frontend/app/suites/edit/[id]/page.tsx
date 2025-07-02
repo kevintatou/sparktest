@@ -6,23 +6,25 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SuiteForm } from "@/components/suite-form"
 import type { TestSuite } from "@/lib/types"
+import { storage } from "@/lib/storage"
 
 export default function EditSuitePage({ params }: { params: { id: string } }) {
   const { id } = params
   const [suite, setSuite] = useState<TestSuite | null>(null)
 
   useEffect(() => {
-    // TODO: replace with real fetch call
-    const mockSuite: TestSuite = {
-      id,
-      name: "API Test Suite",
-      description: "Complete API testing including auth, CRUD operations, and error handling",
-      testDefinitionIds: ["api-tests", "auth-tests", "error-handling-tests"],
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      executionMode: "sequential",
-      labels: ["api", "backend"],
+    const fetchSuite = async () => {
+      try {
+        const suite = await storage.getTestSuiteById(id)
+        if (suite) {
+          setSuite(suite)
+        }
+      } catch (error) {
+        console.error("Error fetching test suite:", error)
+      }
     }
-    setSuite(mockSuite)
+    
+    fetchSuite()
   }, [id])
 
   if (!suite) {

@@ -80,8 +80,8 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
         createdAt: existingSuite?.createdAt || new Date().toISOString(),
       }
 
-      // For now, we'll just simulate saving since we don't have suite storage methods
-      // In a real app, you'd call storage.saveSuite(suiteData)
+      // Save the test suite using the storage service
+      await storage.saveTestSuite(suiteData)
 
       toast({
         title: existingSuite ? "Suite updated" : "Suite created",

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { TestSuite } from "@/lib/types"
+import { storage } from "@/lib/storage"
 
 export default function TestSuitesPage() {
   const { toast } = useToast()
@@ -21,55 +22,46 @@ export default function TestSuitesPage() {
   const initializedRef = useRef(false)
   const [selectedSuite, setSelectedSuite] = useState<TestSuite | null>(null)
 
-  // Mock test suites data
+  // Fetch test suites from storage
   useEffect(() => {
-    if (!initializedRef.current) {
-      const mockSuites: TestSuite[] = [
-        {
-          id: "api-suite",
-          name: "API Test Suite",
-          description: "Complete API testing including auth, CRUD operations, and error handling",
-          testDefinitionIds: ["api-tests", "auth-tests", "error-handling-tests"],
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
-          executionMode: "sequential",
-          labels: ["api", "backend"],
-        },
-        {
-          id: "e2e-suite",
-          name: "End-to-End Suite",
-          description: "Full user journey testing across the application",
-          testDefinitionIds: ["login-tests", "dashboard-tests", "checkout-tests"],
-          createdAt: new Date(Date.now() - 172800000).toISOString(),
-          executionMode: "sequential",
-          labels: ["e2e", "frontend"],
-        },
-        {
-          id: "performance-suite",
-          name: "Performance Test Suite",
-          description: "Load testing and performance benchmarks",
-          testDefinitionIds: ["load-tests", "stress-tests", "spike-tests"],
-          createdAt: new Date(Date.now() - 259200000).toISOString(),
-          executionMode: "parallel",
-          labels: ["performance", "load"],
-        },
-      ]
-      setTestSuites(mockSuites)
-      initializedRef.current = true
+    const fetchTestSuites = async () => {
+      try {
+        const suites = await storage.getTestSuites()
+        setTestSuites(suites)
+      } catch (error) {
+        console.error("Error fetching test suites:", error)
+        toast({
+          title: "Error loading test suites",
+          description: "Failed to load test suites. Please try again.",
+          variant: "destructive",
+        })
+      }
     }
+    
+    fetchTestSuites()
   }, [])
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     setIsDeleting(id)
 
-    setTimeout(() => {
+    try {
+      await storage.deleteTestSuite(id)
       setTestSuites((prev) => prev.filter((suite) => suite.id !== id))
-      setIsDeleting(null)
-
+      
       toast({
         title: "Test suite deleted",
         description: "The test suite has been removed successfully.",
       })
-    }, 500)
+    } catch (error) {
+      console.error("Error deleting test suite:", error)
+      toast({
+        title: "Error deleting test suite",
+        description: "Failed to delete the test suite. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsDeleting(null)
+    }
   }
 
   const handleRun = (suite: TestSuite) => {

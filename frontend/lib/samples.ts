@@ -1,4 +1,4 @@
-import { Definition, Executor, Run } from "./types"
+import { Definition, Executor, Run, TestSuite } from "./types"
 
 // Sample Definitions
 export const sampleDefinitions: Definition[] = [
@@ -274,5 +274,36 @@ export const sampleExecutors: Executor[] = [
     supportedFileTypes: ["sh", "py"],
     env: {},
     createdAt: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
+  },
+]
+
+// Sample Test Suites
+export const sampleTestSuites: TestSuite[] = [
+  {
+    id: "api-test-suite",
+    name: "API Test Suite",
+    description: "Complete API testing including auth, CRUD operations, and error handling",
+    testDefinitionIds: ["api-integration-tests", "security-scan"],
+    createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    executionMode: "sequential",
+    labels: ["api", "backend"],
+  },
+  {
+    id: "frontend-test-suite",
+    name: "Frontend Test Suite",
+    description: "Comprehensive frontend testing including unit tests and E2E tests",
+    testDefinitionIds: ["frontend-unit-tests", "e2e-tests"],
+    createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+    executionMode: "parallel",
+    labels: ["frontend", "ui"],
+  },
+  {
+    id: "full-stack-test-suite",
+    name: "Full Stack Test Suite",
+    description: "Complete application testing including frontend, backend, and performance tests",
+    testDefinitionIds: ["api-integration-tests", "frontend-unit-tests", "e2e-tests", "performance-tests"],
+    createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
+    executionMode: "sequential",
+    labels: ["full-stack", "release"],
   },
 ]

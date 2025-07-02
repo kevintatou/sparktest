@@ -1,4 +1,4 @@
-import type { Executor, Definition, Run } from "../types"
+import type { Executor, Definition, Run, TestSuite } from "../types"
 import { StorageService } from "./storage"
 
 const API_BASE = "http://localhost:3001/api"
@@ -123,6 +123,39 @@ export class ApiStorageService implements StorageService {
     })
     if (!res.ok) throw new Error("Failed to create test run")
     return await res.json()
+  }
+
+  // Test Suites
+  async getTestSuites(): Promise<TestSuite[]> {
+    const res = await fetch(`${API_BASE}/test-suites`)
+    if (!res.ok) throw new Error("Failed to fetch test suites")
+    return await res.json()
+  }
+
+  async saveTestSuite(suite: TestSuite): Promise<TestSuite> {
+    const res = await fetch(`${API_BASE}/test-suites`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(suite),
+    })
+    if (!res.ok) throw new Error("Failed to save test suite")
+    return await res.json()
+  }
+
+  async deleteTestSuite(id: string): Promise<boolean> {
+    const res = await fetch(`${API_BASE}/test-suites/${id}`, { method: "DELETE" })
+    return res.ok
+  }
+
+  async getTestSuiteById(id: string): Promise<TestSuite | undefined> {
+    try {
+      const res = await fetch(`${API_BASE}/test-suites/${id}`)
+      if (!res.ok) return undefined
+      return await res.json()
+    } catch (error) {
+      console.error("Error fetching test suite:", error)
+      return undefined
+    }
   }
 
   initialize(): void {
