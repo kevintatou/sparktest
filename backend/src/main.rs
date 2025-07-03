@@ -20,7 +20,7 @@ use tempfile::TempDir;
 use git2::Repository;
 use std::fs;
 use serde_json::Value;
-use log::{info, warn, error};
+use log::{info, error};
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
 struct TestExecutor {
@@ -42,6 +42,14 @@ struct TestDefinition {
     image: String,
     commands: Vec<String>,
     created_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct CreateTestDefinitionRequest {
+    name: String,
+    description: Option<String>,
+    image: String,
+    commands: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
@@ -148,17 +156,35 @@ async fn get_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -
     Ok(Json(row))
 }
 
-async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<&'static str>, StatusCode> {
-    sqlx::query("INSERT INTO test_definitions (id, name, description, image, commands) VALUES ($1, $2, $3, $4, $5)")
-        .bind(&body.id)
+async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<CreateTestDefinitionRequest>) -> Result<Json<TestDefinition>, StatusCode> {
+    let id = Uuid::new_v4();
+    let created_at = Utc::now();
+    
+    sqlx::query("INSERT INTO test_definitions (id, name, description, image, commands, created_at) VALUES ($1, $2, $3, $4, $5, $6)")
+        .bind(&id)
         .bind(&body.name)
         .bind(&body.description)
         .bind(&body.image)
         .bind(&body.commands)
+        .bind(&created_at)
         .execute(&pool)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    Ok(Json("Created test definition"))
+        .map_err(|e| {
+            log::error!("Failed to create test definition: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+    
+    let test_definition = TestDefinition {
+        id,
+        name: body.name,
+        description: body.description,
+        image: body.image,
+        commands: body.commands,
+        created_at: Some(created_at),
+    };
+    
+    log::info!("Created test definition '{}' with id {}", test_definition.name, test_definition.id);
+    Ok(Json(test_definition))
 }
 
 async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<&'static str>, StatusCode> {
@@ -302,20 +328,28 @@ async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<
     let description = json.get("description").and_then(|v| v.as_str());
 
     // Upsert by name
-    let existing = sqlx::query!("SELECT id FROM test_definitions WHERE name = $1", name)
+    let existing = sqlx::query_scalar::<_, Uuid>("SELECT id FROM test_definitions WHERE name = $1")
+        .bind(name)
         .fetch_optional(pool)
         .await?;
 
-    if let Some(row) = existing {
-        sqlx::query!("UPDATE test_definitions SET image = $1, commands = $2, description = $3 WHERE id = $4",
-            image, &commands, description, row.id)
+    if let Some(existing_id) = existing {
+        sqlx::query("UPDATE test_definitions SET image = $1, commands = $2, description = $3 WHERE id = $4")
+            .bind(image)
+            .bind(&commands)
+            .bind(description)
+            .bind(existing_id)
             .execute(pool)
             .await?;
         log::info!("Updated test definition '{}'", name);
     } else {
         let id = uuid::Uuid::new_v4();
-        sqlx::query!("INSERT INTO test_definitions (id, name, image, commands, description) VALUES ($1, $2, $3, $4, $5)",
-            id, name, image, &commands, description)
+        sqlx::query("INSERT INTO test_definitions (id, name, image, commands, description) VALUES ($1, $2, $3, $4, $5)")
+            .bind(id)
+            .bind(name)
+            .bind(image)
+            .bind(&commands)
+            .bind(description)
             .execute(pool)
             .await?;
         log::info!("Inserted new test definition '{}'", name);
@@ -610,5 +644,42 @@ mod tests {
         assert_eq!(StatusCode::CREATED.as_u16(), 201);
         assert_eq!(StatusCode::NOT_FOUND.as_u16(), 404);
         assert_eq!(StatusCode::INTERNAL_SERVER_ERROR.as_u16(), 500);
+    }
+
+    #[test]
+    fn test_create_test_definition_request_serialization() {
+        let request = CreateTestDefinitionRequest {
+            name: "Test Definition".to_string(),
+            description: Some("A test definition".to_string()),
+            image: "nginx:latest".to_string(),
+            commands: vec!["echo".to_string(), "hello".to_string()],
+        };
+
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("Test Definition"));
+        assert!(json.contains("nginx:latest"));
+        assert!(!json.contains("\"id\"")); // Should not contain id field
+
+        let deserialized: CreateTestDefinitionRequest = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.name, request.name);
+        assert_eq!(deserialized.image, request.image);
+        assert_eq!(deserialized.commands, request.commands);
+    }
+
+    #[test]
+    fn test_create_test_definition_request_without_id() {
+        // Test that we can deserialize frontend payload without id
+        let frontend_payload = serde_json::json!({
+            "name": "Frontend Test",
+            "description": "From frontend",
+            "image": "ubuntu:latest",
+            "commands": ["npm", "test"]
+        });
+
+        let request: CreateTestDefinitionRequest = serde_json::from_value(frontend_payload).unwrap();
+        assert_eq!(request.name, "Frontend Test");
+        assert_eq!(request.description, Some("From frontend".to_string()));
+        assert_eq!(request.image, "ubuntu:latest");
+        assert_eq!(request.commands, vec!["npm", "test"]);
     }
 }
