@@ -179,6 +179,59 @@ describe("ApiStorageService", () => {
         })
         expect(result).toEqual(mockDefinition)
       })
+
+      it("should save definition without ID and receive generated ID from backend", async () => {
+        // What frontend sends (no id)
+        const frontendDefinition = {
+          name: "Test Definition",
+          description: "Test desc", 
+          image: "test:latest",
+          commands: ["echo", "hello"],
+          createdAt: new Date().toISOString()
+        }
+        
+        // What backend returns (with generated id)
+        const backendResponse = {
+          id: "generated-uuid-123",
+          name: "Test Definition",
+          description: "Test desc",
+          image: "test:latest", 
+          commands: ["echo", "hello"],
+          created_at: new Date().toISOString()
+        }
+        
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(backendResponse),
+        })
+
+        const result = await service.saveDefinition(frontendDefinition as any)
+
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-definitions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(frontendDefinition),
+        })
+        expect(result).toEqual(backendResponse)
+        expect(result.id).toBe("generated-uuid-123") // Verify ID was generated
+      })
+
+      it("should handle 422 error gracefully", async () => {
+        const mockDefinition = { 
+          name: "Test Definition",
+          description: "Test desc",
+          image: "test:latest",
+          commands: ["echo", "hello"],
+          createdAt: new Date().toISOString()
+        }
+        
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+          status: 422,
+        })
+
+        await expect(service.saveDefinition(mockDefinition as any)).rejects.toThrow("Failed to save definition")
+      })
     })
 
     describe("deleteDefinition", () => {
