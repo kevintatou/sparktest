@@ -18,9 +18,14 @@ export default function NewRunPage() {
 
   useEffect(() => {
     const fetchDefinitions = async () => {
-      const defs = await storage.getDefinitions()
-      setDefinitions(defs)
-      setLoading(false)
+      try {
+        const defs = await storage.getDefinitions()
+        setDefinitions(defs)
+      } catch (error) {
+        console.error('Error loading test definitions:', error)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchDefinitions()
   }, [])
@@ -42,7 +47,10 @@ export default function NewRunPage() {
             </div>
 
             {loading ? (
-              <p className="text-muted-foreground">Loading test definitions...</p>
+              <div className="text-center py-10">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+                <p className="mt-4 text-muted-foreground">Loading test definitions...</p>
+              </div>
             ) : definitions.length === 0 ? (
               <p className="text-muted-foreground">No test definitions found. Create one before running tests.</p>
             ) : selected ? (

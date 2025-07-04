@@ -16,10 +16,16 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     const loadDefinitionById = async () => {
-      setDefinition(await storage.getDefinitionById(params.id))
+      try {
+        const def = await storage.getDefinitionById(params.id)
+        setDefinition(def)
+      } catch (error) {
+        console.error('Error loading test definition:', error)
+      } finally {
+        setLoading(false)
+      }
     }
     loadDefinitionById()
-    setLoading(false)
   }, [params.id])
 
   if (loading) {
