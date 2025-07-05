@@ -176,14 +176,8 @@ export default function TestRunsPage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
                     <span className="text-muted-foreground">Started:</span>
-                    <p className="font-medium">{formatDistanceToNow(run.startTime)} ago</p>
+                    <p className="font-medium">{formatDistanceToNow(run.createdAt)}</p>
                   </div>
-                  {run.endTime && (
-                    <div>
-                      <span className="text-muted-foreground">Ended:</span>
-                      <p className="font-medium">{formatDistanceToNow(run.endTime)} ago</p>
-                    </div>
-                  )}
                   <div>
                     <span className="text-muted-foreground">Duration:</span>
                     <p className="font-medium">{run.status === "running" ? "Running..." : `${run.duration}s`}</p>

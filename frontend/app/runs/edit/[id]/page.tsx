@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { TestDefinitionForm } from "@/components/test-definition-form"
 import { storage } from "@/lib/storage"
 import type { Definition } from "@/lib/types"
-import { Navbar } from "@/components/ui/navbar"
 
 export default function EditTestPage({ params }: { params: { id: string } }) {
   const [definition, setDefinition] = useState<Definition | undefined>(undefined)
@@ -55,7 +54,6 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
-      <Navbar />
       <main className="flex-1">
         <div className="container py-6">
           <div className="mx-auto max-w-2xl">

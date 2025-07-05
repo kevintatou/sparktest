@@ -1,12 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
-import { Navbar } from "@/components/ui/navbar"
 import { RunTestForm } from "@/components/run-test-form"
 import { storage } from "@/lib/storage"
 import type { Definition } from "@/lib/types"
@@ -32,7 +30,6 @@ export default function NewRunPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1">
         <div className="container py-6">
           <div className="mx-auto max-w-2xl">

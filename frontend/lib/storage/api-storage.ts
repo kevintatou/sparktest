@@ -62,7 +62,15 @@ export class ApiStorageService implements StorageService {
   async getRuns(): Promise<Run[]> {
     const res = await fetch(`${API_BASE}/test-runs`)
     if (!res.ok) throw new Error("Failed to fetch runs")
-    return await res.json()
+    const data = await res.json()
+    // Convert snake_case to camelCase, ensure createdAt is valid, filter and sort
+    return data
+      .map((run: any) => ({
+        ...run,
+        createdAt: run.created_at ? new Date(run.created_at).toISOString() : "",
+      }))
+      .filter((run: any) => !!run.createdAt && !isNaN(new Date(run.createdAt).getTime()))
+      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   }
 
   async getRunById(id: string): Promise<Run | undefined> {

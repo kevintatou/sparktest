@@ -3,12 +3,10 @@ import { ArrowLeft, Zap } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { NewTestForm } from "@/components/new-test-form"
-import { Navbar } from "@/components/ui/navbar"
 
 export default function NewTestPage() {
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
       <main className="flex-1">
         <div className="container py-6">
           <div className="mx-auto max-w-2xl">

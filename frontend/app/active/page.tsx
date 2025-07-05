@@ -11,7 +11,6 @@ import { Progress } from "@/components/ui/progress"
 import { storage } from "@/lib/storage"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { Run } from "@/lib/types"
-import { Navbar } from "@/components/ui/navbar"
 
 export default function ActiveTestsPage() {
   const [tests, setTests] = useState<Run[]>([])
@@ -76,7 +75,6 @@ export default function ActiveTestsPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
-      <Navbar />
       <main className="flex-1">
         <div className="container py-6">
           <div className="flex items-center gap-2 mb-6">
