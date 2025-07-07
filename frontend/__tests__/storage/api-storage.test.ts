@@ -266,7 +266,8 @@ describe("ApiStorageService", () => {
   describe("runs", () => {
     describe("getRuns", () => {
       it("should fetch runs from API", async () => {
-        const mockRuns = [{ id: "1", name: "Test Run", status: "running" }]
+        const mockRuns = [{ id: "1", name: "Test Run", status: "running", created_at: "2025-07-07T08:20:00.000Z" }]
+        const expectedRuns = [{ id: "1", name: "Test Run", status: "running", createdAt: "2025-07-07T08:20:00.000Z" }]
         mockFetch.mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve(mockRuns),
@@ -275,7 +276,7 @@ describe("ApiStorageService", () => {
         const result = await service.getRuns()
 
         expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-runs")
-        expect(result).toEqual(mockRuns)
+        expect(result).toEqual(expectedRuns)
       })
 
       it("should throw error when API request fails", async () => {
@@ -290,8 +291,9 @@ describe("ApiStorageService", () => {
     describe("getRunById", () => {
       it("should return specific run by id", async () => {
         const runs = [
-          { id: "1", name: "Run 1", image: "test1:latest", command: ["echo"], status: "running", createdAt: new Date().toISOString() }
+          { id: "1", name: "Run 1", image: "test1:latest", command: ["echo"], status: "running", created_at: "2025-07-07T08:20:00.000Z" }
         ]
+        const expectedRun = { id: "1", name: "Run 1", image: "test1:latest", command: ["echo"], status: "running", createdAt: "2025-07-07T08:20:00.000Z" }
         mockFetch.mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve(runs),
@@ -299,7 +301,7 @@ describe("ApiStorageService", () => {
 
         const result = await service.getRunById("1")
 
-        expect(result).toEqual(runs[0])
+        expect(result).toEqual(expectedRun)
       })
     })
 

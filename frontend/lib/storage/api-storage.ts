@@ -65,10 +65,13 @@ export class ApiStorageService implements StorageService {
     const data = await res.json()
     // Convert snake_case to camelCase, ensure createdAt is valid, filter and sort
     return data
-      .map((run: any) => ({
-        ...run,
-        createdAt: run.created_at ? new Date(run.created_at).toISOString() : "",
-      }))
+      .map((run: any) => {
+        const { created_at, ...rest } = run
+        return {
+          ...rest,
+          createdAt: created_at ? new Date(created_at).toISOString() : "",
+        }
+      })
       .filter((run: any) => !!run.createdAt && !isNaN(new Date(run.createdAt).getTime()))
       .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   }

@@ -20,7 +20,7 @@ use tempfile::TempDir;
 use git2::Repository;
 use std::fs;
 use serde_json::Value;
-use log::{info, error};
+use log;
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
 struct TestExecutor {
@@ -562,6 +562,7 @@ mod tests {
             image: "nginx:latest".to_string(),
             commands: vec!["echo".to_string(), "hello".to_string()],
             created_at: Some(Utc::now()),
+            executor_id: None,
         };
 
         let json = serde_json::to_string(&definition).unwrap();
@@ -586,6 +587,7 @@ mod tests {
             duration: Some(30),
             logs: Some(vec!["Starting test...".to_string()]),
             test_definition_id: Some(Uuid::new_v4()),
+            executor_id: None,
         };
 
         let json = serde_json::to_string(&test_run).unwrap();
@@ -661,6 +663,7 @@ mod tests {
             description: Some("A test definition".to_string()),
             image: "nginx:latest".to_string(),
             commands: vec!["echo".to_string(), "hello".to_string()],
+            executor_id: None,
         };
 
         let json = serde_json::to_string(&request).unwrap();
