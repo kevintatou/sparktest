@@ -29,7 +29,7 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
     description: existingTest?.description || "",
     image: existingTest?.image || "",
     commands: existingTest?.commands || [""],
-    executorId: existingTest?.executorId || "",
+    executorId: existingTest?.executorId ? existingTest.executorId : "none", // Use existing executorId or default to "none"
   })
   const [githubUrl, setGithubUrl] = useState("")
   const [githubPath, setGithubPath] = useState("/tests")
@@ -56,7 +56,7 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
 
   // Auto-populate image and commands when executor is selected
   useEffect(() => {
-    if (formData.executorId && executors.length > 0) {
+    if (formData.executorId && formData.executorId !== "none" && executors.length > 0) {
       const selectedExecutor = executors.find(e => e.id === formData.executorId)
       if (selectedExecutor) {
         setFormData(prev => ({
@@ -97,11 +97,13 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
 
     try {
       // Save to localStorage
-      storage.saveDefinition({
+      const submissionData = {
         ...formData,
         commands: formData.commands.filter(Boolean),
         createdAt: existingTest?.createdAt || new Date().toISOString(),
-      })
+        executorId: formData.executorId === "none" ? undefined : formData.executorId, // Convert "none" to undefined
+      }
+      storage.saveDefinition(submissionData)
 
       toast({
         title: existingTest ? "Test definition updated" : "Test definition created",
@@ -188,14 +190,14 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
                 <Label htmlFor="executor">Executor (Optional)</Label>
                 <Select
                   value={formData.executorId}
-                  onValueChange={(value) => setFormData({ ...formData, executorId: value })}
+                  onValueChange={(value) => setFormData({ ...formData, executorId: value === "none" ? "" : value })}
                   disabled={isLoadingExecutors}
                 >
                   <SelectTrigger className="transition-all focus-visible:ring-primary">
                     <SelectValue placeholder={isLoadingExecutors ? "Loading executors..." : "Select an executor (optional)"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">
+                    <SelectItem value="none">
                       <div className="flex flex-col">
                         <span>No executor (custom)</span>
                         <span className="text-xs text-muted-foreground">Use custom image and commands</span>
