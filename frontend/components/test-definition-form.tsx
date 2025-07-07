@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2 } from "lucide-react"
 
@@ -12,22 +12,63 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { storage } from "@/lib/storage"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import type { Executor } from "@/lib/types"
 
 export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [tab, setTab] = useState("manual")
+  const [executors, setExecutors] = useState<Executor[]>([])
+  const [isLoadingExecutors, setIsLoadingExecutors] = useState(false)
   const [formData, setFormData] = useState({
     name: existingTest?.name || "",
     description: existingTest?.description || "",
     image: existingTest?.image || "",
     commands: existingTest?.commands || [""],
+    executorId: existingTest?.executorId ? existingTest.executorId : "none", // Use existing executorId or default to "none"
   })
   const [githubUrl, setGithubUrl] = useState("")
   const [githubPath, setGithubPath] = useState("/tests")
+
+  useEffect(() => {
+    const fetchExecutors = async () => {
+      setIsLoadingExecutors(true)
+      try {
+        const data = await storage.getExecutors()
+        setExecutors(data)
+      } catch (error) {
+        console.error("Failed to fetch executors:", error)
+        toast({
+          title: "Error fetching executors",
+          description: "Failed to load available executors. You can still create a test definition without selecting an executor.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoadingExecutors(false)
+      }
+    }
+    fetchExecutors()
+  }, [])
+
+  // Auto-populate image and commands when executor is selected
+  useEffect(() => {
+    if (formData.executorId && formData.executorId !== "none" && executors.length > 0) {
+      const selectedExecutor = executors.find(e => e.id === formData.executorId)
+      if (selectedExecutor) {
+        setFormData(prev => ({
+          ...prev,
+          image: selectedExecutor.image,
+          commands: selectedExecutor.command && selectedExecutor.command.length > 0 
+            ? selectedExecutor.command 
+            : ["echo hello"]
+        }))
+      }
+    }
+  }, [formData.executorId, executors])
 
   const addCommand = () => {
     setFormData((prev) => ({
@@ -56,11 +97,13 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
 
     try {
       // Save to localStorage
-      storage.saveDefinition({
+      const submissionData = {
         ...formData,
         commands: formData.commands.filter(Boolean),
         createdAt: existingTest?.createdAt || new Date().toISOString(),
-      })
+        executorId: formData.executorId === "none" ? undefined : formData.executorId, // Convert "none" to undefined
+      }
+      storage.saveDefinition(submissionData)
 
       toast({
         title: existingTest ? "Test definition updated" : "Test definition created",
@@ -141,6 +184,38 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
                   rows={3}
                   className="transition-all focus-visible:ring-primary"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="executor">Executor (Optional)</Label>
+                <Select
+                  value={formData.executorId}
+                  onValueChange={(value) => setFormData({ ...formData, executorId: value === "none" ? "" : value })}
+                  disabled={isLoadingExecutors}
+                >
+                  <SelectTrigger className="transition-all focus-visible:ring-primary">
+                    <SelectValue placeholder={isLoadingExecutors ? "Loading executors..." : "Select an executor (optional)"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">
+                      <div className="flex flex-col">
+                        <span>No executor (custom)</span>
+                        <span className="text-xs text-muted-foreground">Use custom image and commands</span>
+                      </div>
+                    </SelectItem>
+                    {executors.map((executor) => (
+                      <SelectItem key={executor.id} value={executor.id}>
+                        <div className="flex flex-col">
+                          <span>{executor.name}</span>
+                          <span className="text-xs text-muted-foreground">{executor.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground">
+                  Select a pre-configured executor to automatically populate image and commands, or leave empty for custom configuration.
+                </p>
               </div>
 
               <div className="space-y-2">

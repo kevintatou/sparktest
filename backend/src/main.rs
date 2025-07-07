@@ -20,7 +20,7 @@ use tempfile::TempDir;
 use git2::Repository;
 use std::fs;
 use serde_json::Value;
-use log::{info, error};
+use log;
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
 struct TestExecutor {
@@ -42,6 +42,7 @@ struct TestDefinition {
     image: String,
     commands: Vec<String>,
     created_at: Option<chrono::DateTime<chrono::Utc>>,
+    executor_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -50,6 +51,7 @@ struct CreateTestDefinitionRequest {
     description: Option<String>,
     image: String,
     commands: Vec<String>,
+    executor_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
@@ -63,6 +65,7 @@ struct TestRun {
     duration: Option<i32>,
     logs: Option<Vec<String>>,
     test_definition_id: Option<Uuid>,
+    executor_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -160,13 +163,14 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
     let id = Uuid::new_v4();
     let created_at = Utc::now();
     
-    sqlx::query("INSERT INTO test_definitions (id, name, description, image, commands, created_at) VALUES ($1, $2, $3, $4, $5, $6)")
+    sqlx::query("INSERT INTO test_definitions (id, name, description, image, commands, created_at, executor_id) VALUES ($1, $2, $3, $4, $5, $6, $7)")
         .bind(&id)
         .bind(&body.name)
         .bind(&body.description)
         .bind(&body.image)
         .bind(&body.commands)
         .bind(&created_at)
+        .bind(&body.executor_id)
         .execute(&pool)
         .await
         .map_err(|e| {
@@ -181,6 +185,7 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
         image: body.image,
         commands: body.commands,
         created_at: Some(created_at),
+        executor_id: body.executor_id,
     };
     
     log::info!("Created test definition '{}' with id {}", test_definition.name, test_definition.id);
@@ -188,11 +193,12 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
 }
 
 async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<&'static str>, StatusCode> {
-    sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4 WHERE id = $5")
+    sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5 WHERE id = $6")
         .bind(&body.name)
         .bind(&body.description)
         .bind(&body.image)
         .bind(&body.commands)
+        .bind(&body.executor_id)
         .bind(id)
         .execute(&pool)
         .await
@@ -235,13 +241,14 @@ async fn create_test_run(
     let command = payload.commands.unwrap_or_else(|| def.commands.clone());
     let job_name = format!("sparktest-job-{}", run_id.simple());
 
-    sqlx::query("INSERT INTO test_runs (id, name, image, command, status, created_at, test_definition_id, duration, logs) VALUES ($1, $2, $3, $4, 'running', $5, $6, NULL, NULL)")
+    sqlx::query("INSERT INTO test_runs (id, name, image, command, status, created_at, test_definition_id, executor_id, duration, logs) VALUES ($1, $2, $3, $4, 'running', $5, $6, $7, NULL, NULL)")
         .bind(run_id)
         .bind(&name)
         .bind(&image)
         .bind(&command)
         .bind(Utc::now())
         .bind(def.id)
+        .bind(def.executor_id)
         .execute(&pool)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -344,12 +351,13 @@ async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<
         log::info!("Updated test definition '{}'", name);
     } else {
         let id = uuid::Uuid::new_v4();
-        sqlx::query("INSERT INTO test_definitions (id, name, image, commands, description) VALUES ($1, $2, $3, $4, $5)")
+        sqlx::query("INSERT INTO test_definitions (id, name, image, commands, description, executor_id) VALUES ($1, $2, $3, $4, $5, $6)")
             .bind(id)
             .bind(name)
             .bind(image)
             .bind(&commands)
             .bind(description)
+            .bind(None::<Uuid>) // No executor_id for GitHub sync definitions
             .execute(pool)
             .await?;
         log::info!("Inserted new test definition '{}'", name);
@@ -554,6 +562,7 @@ mod tests {
             image: "nginx:latest".to_string(),
             commands: vec!["echo".to_string(), "hello".to_string()],
             created_at: Some(Utc::now()),
+            executor_id: None,
         };
 
         let json = serde_json::to_string(&definition).unwrap();
@@ -578,6 +587,7 @@ mod tests {
             duration: Some(30),
             logs: Some(vec!["Starting test...".to_string()]),
             test_definition_id: Some(Uuid::new_v4()),
+            executor_id: None,
         };
 
         let json = serde_json::to_string(&test_run).unwrap();
@@ -653,6 +663,7 @@ mod tests {
             description: Some("A test definition".to_string()),
             image: "nginx:latest".to_string(),
             commands: vec!["echo".to_string(), "hello".to_string()],
+            executor_id: None,
         };
 
         let json = serde_json::to_string(&request).unwrap();
