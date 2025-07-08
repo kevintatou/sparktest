@@ -67,9 +67,13 @@ export class ApiStorageService implements StorageService {
     return data
       .map((run: any) => {
         const { created_at, ...rest } = run
+        let createdAt = ""
+        if (created_at && !isNaN(new Date(created_at).getTime())) {
+          createdAt = new Date(created_at).toISOString()
+        }
         return {
           ...rest,
-          createdAt: created_at ? new Date(created_at).toISOString() : "",
+          createdAt,
         }
       })
       .filter((run: any) => !!run.createdAt && !isNaN(new Date(run.createdAt).getTime()))

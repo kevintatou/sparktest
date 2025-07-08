@@ -126,10 +126,21 @@ export class HybridStorageService implements StorageService {
   ): () => void {
     // Try API subscription first, fallback to local storage if it fails
     try {
-      return this.apiStorage.subscribeToRuns(callback)
+      const unsub = this.apiStorage.subscribeToRuns(callback)
+      if (typeof unsub === "function") return unsub
+      // If API returns null/undefined, fallback
+      return this.localStorage.subscribeToRuns(callback)
     } catch (error) {
       console.warn("API subscription failed, falling back to local storage:", error)
-      return this.localStorage.subscribeToRuns(callback)
+      try {
+        const unsub = this.localStorage.subscribeToRuns(callback)
+        if (typeof unsub === "function") return unsub
+      } catch (err) {
+        // Both failed, return a no-op
+        return () => {}
+      }
+      // If local returns null/undefined
+      return () => {}
     }
   }
 
