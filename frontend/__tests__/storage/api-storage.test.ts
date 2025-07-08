@@ -383,6 +383,551 @@ describe("ApiStorageService", () => {
     })
   })
 
+  describe("saveRun", () => {
+    it("should save new run (POST) when no ID is provided", async () => {
+      const newRun = {
+        name: "Test Run",
+        image: "test:latest",
+        command: ["echo", "hello"],
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        definitionId: "def123",
+        executorId: "exec456"
+      }
+      
+      const expectedPayload = {
+        name: "Test Run",
+        image: "test:latest", 
+        command: ["echo", "hello"],
+        status: "pending",
+        created_at: newRun.createdAt,
+        definition_id: "def123",
+        executor_id: "exec456"
+      }
+
+      const savedRun = { id: "run123", ...newRun }
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(savedRun),
+      })
+
+      const result = await service.saveRun(newRun as any)
+
+      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-runs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(expectedPayload),
+      })
+      expect(result).toEqual(savedRun)
+    })
+
+    it("should update existing run (PUT) when ID is provided", async () => {
+      const existingRun = {
+        id: "run123",
+        name: "Updated Run",
+        image: "test:latest",
+        command: ["echo", "updated"],
+        status: "completed",
+        createdAt: new Date().toISOString(),
+        definitionId: "def123",
+        executorId: "exec456"
+      }
+      
+      const expectedPayload = {
+        id: "run123",
+        name: "Updated Run",
+        image: "test:latest",
+        command: ["echo", "updated"],
+        status: "completed",
+        created_at: existingRun.createdAt,
+        definition_id: "def123",
+        executor_id: "exec456"
+      }
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(existingRun),
+      })
+
+      const result = await service.saveRun(existingRun as any)
+
+      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-runs/run123", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(expectedPayload),
+      })
+      expect(result).toEqual(existingRun)
+    })
+
+    it("should throw error when save fails", async () => {
+      const run = { name: "Test Run", status: "pending", createdAt: new Date().toISOString() }
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+      })
+
+      await expect(service.saveRun(run as any)).rejects.toThrow("Failed to save run")
+    })
+  })
+
+  describe("test suites", () => {
+    describe("getTestSuites", () => {
+      it("should fetch and transform test suites from API", async () => {
+        const apiResponse = [
+          {
+            id: "suite1",
+            name: "Test Suite 1",
+            description: "Suite description",
+            test_definition_ids: ["def1", "def2"],
+            execution_mode: "sequential",
+            created_at: "2025-07-07T10:00:00.000Z",
+            labels: ["tag1", "tag2"]
+          }
+        ]
+        
+        const expectedResult = [
+          {
+            id: "suite1",
+            name: "Test Suite 1", 
+            description: "Suite description",
+            testDefinitionIds: ["def1", "def2"],
+            executionMode: "sequential",
+            createdAt: "2025-07-07T10:00:00.000Z",
+            labels: ["tag1", "tag2"]
+          }
+        ]
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(apiResponse),
+        })
+
+        const result = await service.getTestSuites()
+
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-suites")
+        expect(result).toEqual(expectedResult)
+      })
+
+      it("should handle API response with missing optional fields", async () => {
+        const apiResponse = [
+          {
+            id: "suite1",
+            name: "Minimal Suite",
+            execution_mode: "parallel"
+          }
+        ]
+        
+        const expectedResult = [
+          {
+            id: "suite1",
+            name: "Minimal Suite",
+            description: "",
+            testDefinitionIds: [],
+            executionMode: "parallel",
+            createdAt: expect.any(String),
+            labels: []
+          }
+        ]
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(apiResponse),
+        })
+
+        const result = await service.getTestSuites()
+        expect(result).toEqual(expectedResult)
+      })
+
+      it("should throw error when API request fails", async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+        })
+
+        await expect(service.getTestSuites()).rejects.toThrow("Failed to fetch test suites")
+      })
+    })
+
+    describe("saveTestSuite", () => {
+      it("should save new test suite (POST) when no ID is provided", async () => {
+        const newSuite = {
+          id: "",
+          name: "New Suite",
+          description: "Suite description",
+          testDefinitionIds: ["def1", "def2"],
+          executionMode: "sequential" as const,
+          createdAt: "2025-07-07T10:00:00.000Z",
+          labels: ["tag1"]
+        }
+
+        const expectedPayload = {
+          id: "00000000-0000-0000-0000-000000000000",
+          name: "New Suite",
+          description: "Suite description", 
+          labels: ["tag1"],
+          execution_mode: "sequential",
+          test_definition_ids: ["00000000-0000-0000-0000-00000000def1", "00000000-0000-0000-0000-00000000def2"],
+          created_at: "2025-07-07T10:00:00.000Z"
+        }
+
+        const savedSuite = { id: "suite123", ...newSuite }
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(savedSuite),
+        })
+
+        const result = await service.saveTestSuite(newSuite)
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          "http://localhost:3001/api/test-suites",
+          expect.objectContaining({
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(expectedPayload),
+          })
+        )
+        expect(result).toEqual(savedSuite)
+      })
+
+      it("should update existing test suite (PUT) when ID is provided", async () => {
+        const existingSuite = {
+          id: "suite123",
+          name: "Updated Suite",
+          description: "Updated description",
+          testDefinitionIds: ["12345678-1234-1234-1234-123456789012"], // Already UUID
+          executionMode: "parallel" as const,
+          createdAt: "2025-07-07T10:00:00.000Z",
+          labels: []
+        }
+
+        const expectedPayload = {
+          id: "suite123",
+          name: "Updated Suite",
+          description: "Updated description",
+          labels: [],
+          execution_mode: "parallel",
+          test_definition_ids: ["12345678-1234-1234-1234-123456789012"], // UUID preserved
+          created_at: "2025-07-07T10:00:00.000Z"
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(existingSuite),
+        })
+
+        const result = await service.saveTestSuite(existingSuite)
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          "http://localhost:3001/api/test-suites/suite123",
+          expect.objectContaining({
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(expectedPayload),
+          })
+        )
+        expect(result).toEqual(existingSuite)
+      })
+
+      it("should throw error when save fails", async () => {
+        const suite = { id: "test-suite", name: "Test Suite", executionMode: "sequential" as const, testDefinitionIds: [], createdAt: "", labels: [], description: "" }
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+        })
+
+        await expect(service.saveTestSuite(suite)).rejects.toThrow("Failed to save test suite")
+      })
+    })
+
+    describe("deleteTestSuite", () => {
+      it("should delete test suite with string ID conversion", async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+        })
+
+        const result = await service.deleteTestSuite("def1")
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          "http://localhost:3001/api/test-suites/00000000-0000-0000-0000-00000000def1",
+          expect.objectContaining({
+            method: "DELETE"
+          })
+        )
+        expect(result).toBe(true)
+      })
+
+      it("should delete test suite with UUID ID (no conversion)", async () => {
+        const uuidId = "12345678-1234-1234-1234-123456789012"
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+        })
+
+        const result = await service.deleteTestSuite(uuidId)
+
+        expect(mockFetch).toHaveBeenCalledWith(
+          `http://localhost:3001/api/test-suites/${uuidId}`,
+          expect.objectContaining({
+            method: "DELETE"
+          })
+        )
+        expect(result).toBe(true)
+      })
+
+      it("should return false when delete fails", async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+        })
+
+        const result = await service.deleteTestSuite("suite1")
+        expect(result).toBe(false)
+      })
+    })
+
+    describe("getTestSuiteById", () => {
+      it("should fetch and transform specific test suite by string ID", async () => {
+        const apiResponse = {
+          id: "suite1",
+          name: "Test Suite",
+          description: "Suite description",
+          test_definition_ids: ["def1"],
+          execution_mode: "sequential",
+          created_at: "2025-07-07T10:00:00.000Z",
+          labels: ["tag1"]
+        }
+
+        const expectedResult = {
+          id: "suite1",
+          name: "Test Suite",
+          description: "Suite description",
+          testDefinitionIds: ["def1"],
+          executionMode: "sequential",
+          createdAt: "2025-07-07T10:00:00.000Z",
+          labels: ["tag1"]
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(apiResponse),
+        })
+
+        const result = await service.getTestSuiteById("suite1")
+
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-suites/00000000-0000-0000-0000-000000suite1")
+        expect(result).toEqual(expectedResult)
+      })
+
+      it("should fetch test suite by UUID ID (no conversion)", async () => {
+        const uuidId = "12345678-1234-1234-1234-123456789012"
+        const apiResponse = {
+          id: uuidId,
+          name: "UUID Suite",
+          execution_mode: "parallel"
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(apiResponse),
+        })
+
+        const result = await service.getTestSuiteById(uuidId)
+
+        expect(mockFetch).toHaveBeenCalledWith(`http://localhost:3001/api/test-suites/${uuidId}`)
+        expect(result?.id).toBe(uuidId)
+      })
+
+      it("should throw error when API request fails", async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+        })
+
+        await expect(service.getTestSuiteById("suite1")).rejects.toThrow("Failed to fetch test suite")
+      })
+    })
+  })
+
+  describe("kubernetes integration", () => {
+    describe("getKubernetesHealth", () => {
+      it("should fetch Kubernetes health status", async () => {
+        const healthResponse = {
+          healthy: true,
+          cluster_info: {
+            name: "test-cluster",
+            version: "v1.25.0"
+          }
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(healthResponse),
+        })
+
+        const result = await service.getKubernetesHealth()
+
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/k8s/health")
+        expect(result).toEqual(healthResponse)
+      })
+
+      it("should throw error when health check fails", async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+        })
+
+        await expect(service.getKubernetesHealth()).rejects.toThrow("Failed to check Kubernetes health")
+      })
+    })
+
+    describe("getTestRunLogs", () => {
+      it("should fetch logs for a test run", async () => {
+        const logsResponse = {
+          job_name: "test-run-123",
+          logs: "Pod started\nTest completed successfully",
+          pod_status: "Succeeded"
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(logsResponse),
+        })
+
+        const result = await service.getTestRunLogs("run123")
+
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-runs/run123/logs")
+        expect(result).toEqual(logsResponse)
+      })
+
+      it("should throw error when log fetch fails", async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+        })
+
+        await expect(service.getTestRunLogs("run123")).rejects.toThrow("Failed to fetch logs for test run run123")
+      })
+    })
+
+    describe("getJobLogs", () => {
+      it("should fetch logs for a specific job", async () => {
+        const logsResponse = {
+          job_name: "test-job-abc",
+          logs: "Job execution logs here",
+          pod_status: "Running"
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(logsResponse),
+        })
+
+        const result = await service.getJobLogs("test-job-abc")
+
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/k8s/jobs/test-job-abc/logs")
+        expect(result).toEqual(logsResponse)
+      })
+
+      it("should throw error when job log fetch fails", async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+        })
+
+        await expect(service.getJobLogs("test-job-abc")).rejects.toThrow("Failed to fetch logs for job test-job-abc")
+      })
+    })
+
+    describe("getJobStatus", () => {
+      it("should fetch status for a specific job", async () => {
+        const statusResponse = {
+          job_name: "test-job-abc",
+          status: "Running",
+          active: 1,
+          succeeded: 0,
+          failed: 0
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(statusResponse),
+        })
+
+        const result = await service.getJobStatus("test-job-abc")
+
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/k8s/jobs/test-job-abc/status")
+        expect(result).toEqual(statusResponse)
+      })
+
+      it("should throw error when status fetch fails", async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+        })
+
+        await expect(service.getJobStatus("test-job-abc")).rejects.toThrow("Failed to fetch status for job test-job-abc")
+      })
+    })
+
+    describe("deleteJob", () => {
+      it("should delete a Kubernetes job", async () => {
+        const deleteResponse = {
+          success: true,
+          message: "Job deleted successfully"
+        }
+
+        mockFetch.mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve(deleteResponse),
+        })
+
+        const result = await service.deleteJob("test-job-abc")
+
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/k8s/jobs/test-job-abc", {
+          method: "DELETE"
+        })
+        expect(result).toEqual(deleteResponse)
+      })
+
+      it("should throw error when job deletion fails", async () => {
+        mockFetch.mockResolvedValueOnce({
+          ok: false,
+        })
+
+        await expect(service.deleteJob("test-job-abc")).rejects.toThrow("Failed to delete job test-job-abc")
+      })
+    })
+  })
+
+  describe("data transformation", () => {
+    it("should properly handle runs data transformation from snake_case", async () => {
+      const apiResponse = [
+        {
+          id: "run1",
+          name: "Test Run 1",
+          status: "completed",
+          created_at: "2025-07-07T10:00:00.000Z",
+          other_field: "value"
+        },
+        {
+          id: "run4",
+          name: "Test Run 4",
+          status: "pending", 
+          created_at: "2025-07-07T09:00:00.000Z"
+        }
+      ]
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(apiResponse),
+      })
+
+      const result = await service.getRuns()
+
+      // Should transform data and sort by newest first
+      expect(result).toHaveLength(2)
+      expect(result[0].id).toBe("run1") // Newest first
+      expect(result[1].id).toBe("run4")
+      expect(result[0]).toEqual({
+        id: "run1",
+        name: "Test Run 1",
+        status: "completed",
+        createdAt: "2025-07-07T10:00:00.000Z",
+        other_field: "value"
+      })
+    })
+  })
+
   describe("initialize", () => {
     it("should be a no-op for API mode", () => {
       expect(() => service.initialize()).not.toThrow()

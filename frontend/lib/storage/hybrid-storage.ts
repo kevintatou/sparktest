@@ -1,4 +1,4 @@
-import type { Executor, Definition, Run, TestSuite } from "../types"
+import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
 import { StorageService } from "./storage"
 import { ApiStorageService } from "./api-storage"
 import { LocalStorageService } from "./local-storage"
@@ -126,10 +126,21 @@ export class HybridStorageService implements StorageService {
   ): () => void {
     // Try API subscription first, fallback to local storage if it fails
     try {
-      return this.apiStorage.subscribeToRuns(callback)
+      const unsub = this.apiStorage.subscribeToRuns(callback)
+      if (typeof unsub === "function") return unsub
+      // If API returns null/undefined, fallback
+      return this.localStorage.subscribeToRuns(callback)
     } catch (error) {
       console.warn("API subscription failed, falling back to local storage:", error)
-      return this.localStorage.subscribeToRuns(callback)
+      try {
+        const unsub = this.localStorage.subscribeToRuns(callback)
+        if (typeof unsub === "function") return unsub
+      } catch (err) {
+        // Both failed, return a no-op
+        return () => {}
+      }
+      // If local returns null/undefined
+      return () => {}
     }
   }
 
@@ -159,6 +170,42 @@ export class HybridStorageService implements StorageService {
     return this.tryApiWithFallback(
       () => this.apiStorage.getTestSuiteById(id),
       () => this.localStorage.getTestSuiteById(id)
+    )
+  }
+
+  // Kubernetes methods
+  async getKubernetesHealth(): Promise<KubernetesHealth> {
+    return this.tryApiWithFallback(
+      () => this.apiStorage.getKubernetesHealth(),
+      () => this.localStorage.getKubernetesHealth()
+    )
+  }
+
+  async getTestRunLogs(runId: string): Promise<JobLogs> {
+    return this.tryApiWithFallback(
+      () => this.apiStorage.getTestRunLogs(runId),
+      () => this.localStorage.getTestRunLogs(runId)
+    )
+  }
+
+  async getJobLogs(jobName: string): Promise<JobLogs> {
+    return this.tryApiWithFallback(
+      () => this.apiStorage.getJobLogs(jobName),
+      () => this.localStorage.getJobLogs(jobName)
+    )
+  }
+
+  async getJobStatus(jobName: string): Promise<JobStatus> {
+    return this.tryApiWithFallback(
+      () => this.apiStorage.getJobStatus(jobName),
+      () => this.localStorage.getJobStatus(jobName)
+    )
+  }
+
+  async deleteJob(jobName: string): Promise<JobDeleteResponse> {
+    return this.tryApiWithFallback(
+      () => this.apiStorage.deleteJob(jobName),
+      () => this.localStorage.deleteJob(jobName)
     )
   }
 

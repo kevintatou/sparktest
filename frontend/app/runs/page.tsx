@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { Plus, Play, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react"
+import { Plus, Play, Clock, CheckCircle, XCircle, AlertCircle, FileText, Cpu } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
-import type { Run } from "@/lib/types"
+import type { Run, Definition, Executor } from "@/lib/types"
 import { storage } from "@/lib/storage"
 
 const getStatusIcon = (status: string) => {
@@ -42,20 +42,51 @@ const getStatusColor = (status: string) => {
 export default function TestRunsPage() {
   const { toast } = useToast()
   const [testRuns, setTestRuns] = useState<Run[]>([])
+  const [definitions, setDefinitions] = useState<Definition[]>([])
+  const [executors, setExecutors] = useState<Executor[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const initializedRef = useRef(false)
 
-  // Mock test runs data
+  // Load test runs, definitions, and executors
   useEffect(() => {
     if (!initializedRef.current) {
       (async () => {
-        const runs = await storage.getRuns()
-        setTestRuns(runs)
-        initializedRef.current = true
+        try {
+          const [runs, defs, execs] = await Promise.all([
+            storage.getRuns(),
+            storage.getDefinitions(),
+            storage.getExecutors()
+          ])
+          setTestRuns(runs)
+          setDefinitions(defs)
+          setExecutors(execs)
+          initializedRef.current = true
+        } catch (error) {
+          console.error("Error loading data:", error)
+          toast({
+            title: "Error",
+            description: "Failed to load test runs data",
+            variant: "destructive",
+          })
+        }
       })()
     }
-  }, [])
+  }, [toast])
+
+  // Helper function to get definition name from ID
+  const getDefinitionName = (definitionId?: string) => {
+    if (!definitionId) return "Unknown"
+    const definition = definitions.find(d => d.id === definitionId)
+    return definition?.name || `Definition ${definitionId}`
+  }
+
+  // Helper function to get executor name from ID
+  const getExecutorName = (executorId?: string) => {
+    if (!executorId) return "Unknown"
+    const executor = executors.find(e => e.id === executorId)
+    return executor?.name || `Executor ${executorId}`
+  }
 
   const handleDelete = (id: string) => {
     setIsDeleting(id)
@@ -76,7 +107,9 @@ export default function TestRunsPage() {
     (run) =>
       run.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       run.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      run.id.toLowerCase().includes(searchQuery.toLowerCase()),
+      run.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      getDefinitionName(run.definitionId).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      getExecutorName(run.executorId).toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   return (
@@ -180,17 +213,58 @@ export default function TestRunsPage() {
                   </div>
                   <div>
                     <span className="text-muted-foreground">Duration:</span>
-                    <p className="font-medium">{run.status === "running" ? "Running..." : `${run.duration}s`}</p>
+                    <p className="font-medium">{run.status === "running" ? "Running..." : `${run.duration || 0}s`}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Definition:</span>
-                    <p className="font-medium">{run.definitionId}</p>
+                    <span className="text-muted-foreground">Test Definition:</span>
+                    <p className="font-medium text-blue-600 dark:text-blue-400">
+                      {getDefinitionName(run.definitionId)}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Executor:</span>
+                    <p className="font-medium text-purple-600 dark:text-purple-400">
+                      {getExecutorName(run.executorId)}
+                    </p>
                   </div>
                 </div>
 
-                {run.logs && (
+                {/* Kubernetes Job Info */}
+                {run.k8sJobName && (
                   <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
-                    <p className="text-sm font-mono text-slate-700 dark:text-slate-300">{run.logs}</p>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Cpu className="h-4 w-4 text-blue-500" />
+                      <span className="text-sm font-medium">Kubernetes Job</span>
+                    </div>
+                    <p className="text-sm font-mono text-slate-600 dark:text-slate-400">{run.k8sJobName}</p>
+                  </div>
+                )}
+
+                {/* Log Preview */}
+                {run.logs && run.logs.length > 0 && (
+                  <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm font-medium">Recent Logs</span>
+                      </div>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/runs/${run.id}`} className="text-xs">
+                          View All
+                        </Link>
+                      </Button>
+                    </div>
+                    <div className="text-sm font-mono text-slate-700 dark:text-slate-300 max-h-20 overflow-hidden">
+                      {Array.isArray(run.logs) 
+                        ? run.logs.slice(-3).join('\n')
+                        : String(run.logs || '')
+                      }
+                      {Array.isArray(run.logs) && run.logs.length > 3 && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          ... and {run.logs.length - 3} more lines
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </CardContent>
@@ -199,6 +273,14 @@ export default function TestRunsPage() {
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/runs/${run.id}`}>View Details</Link>
                   </Button>
+                  {(run.logs || run.k8sJobName) && (
+                    <Button variant="outline" size="sm" asChild className="text-blue-600 hover:text-blue-700">
+                      <Link href={`/runs/${run.id}#logs`}>
+                        <FileText className="mr-1 h-3 w-3" />
+                        Logs
+                      </Link>
+                    </Button>
+                  )}
                   {run.status !== "running" && (
                     <Button
                       variant="outline"
