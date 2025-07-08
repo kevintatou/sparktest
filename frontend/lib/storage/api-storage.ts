@@ -1,4 +1,4 @@
-import type { Executor, Definition, Run, TestSuite } from "../types"
+import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
 import { StorageService } from "./storage"
 
 const API_BASE = "http://localhost:3001/api"
@@ -248,6 +248,37 @@ export class ApiStorageService implements StorageService {
       createdAt: data.created_at || new Date().toISOString(),
       labels: data.labels || [],
     };
+  }
+
+  // Kubernetes Integration
+  async getKubernetesHealth(): Promise<KubernetesHealth> {
+    const res = await fetch(`${API_BASE}/k8s/health`)
+    if (!res.ok) throw new Error("Failed to check Kubernetes health")
+    return await res.json()
+  }
+
+  async getTestRunLogs(runId: string): Promise<JobLogs> {
+    const res = await fetch(`${API_BASE}/test-runs/${runId}/logs`)
+    if (!res.ok) throw new Error(`Failed to fetch logs for test run ${runId}`)
+    return await res.json()
+  }
+
+  async getJobLogs(jobName: string): Promise<JobLogs> {
+    const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}/logs`)
+    if (!res.ok) throw new Error(`Failed to fetch logs for job ${jobName}`)
+    return await res.json()
+  }
+
+  async getJobStatus(jobName: string): Promise<JobStatus> {
+    const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}/status`)
+    if (!res.ok) throw new Error(`Failed to fetch status for job ${jobName}`)
+    return await res.json()
+  }
+
+  async deleteJob(jobName: string): Promise<JobDeleteResponse> {
+    const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}`, { method: "DELETE" })
+    if (!res.ok) throw new Error(`Failed to delete job ${jobName}`)
+    return await res.json()
   }
 
   initialize(): void {

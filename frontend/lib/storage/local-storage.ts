@@ -1,6 +1,6 @@
 import type { StorageService } from "./storage"
 import { getFromStorage, setToStorage } from "../utils"
-import type { Executor, Definition, Run, TestSuite } from "../types"
+import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
 import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from "../samples"
 
 export class LocalStorageService implements StorageService {
@@ -176,6 +176,27 @@ export class LocalStorageService implements StorageService {
   async getTestSuiteById(id: string): Promise<TestSuite | undefined> {
     const list = await this.getTestSuites()
     return list.find((s) => s.id === id)
+  }
+
+  // Kubernetes Integration - Not supported in local storage mode
+  async getKubernetesHealth(): Promise<KubernetesHealth> {
+    throw new Error("Kubernetes integration not available in local storage mode")
+  }
+
+  async getTestRunLogs(runId: string): Promise<JobLogs> {
+    throw new Error("Kubernetes integration not available in local storage mode")
+  }
+
+  async getJobLogs(jobName: string): Promise<JobLogs> {
+    throw new Error("Kubernetes integration not available in local storage mode")
+  }
+
+  async getJobStatus(jobName: string): Promise<JobStatus> {
+    throw new Error("Kubernetes integration not available in local storage mode")
+  }
+
+  async deleteJob(jobName: string): Promise<JobDeleteResponse> {
+    throw new Error("Kubernetes integration not available in local storage mode")
   }
 
   initialize(): void {

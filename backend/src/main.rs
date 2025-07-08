@@ -1,13 +1,16 @@
 mod k8s;
 
+#[cfg(test)]
+mod k8s_tests;
+
 use axum::{
     extract::{Path, State},
-    routing::{get},
+    routing::{get, post, put, delete},
     Json, Router,
     http::StatusCode,
 };
 use chrono::Utc;
-use k8s::{create_k8s_job, monitor_job_and_update_status};
+use k8s::{create_k8s_job, monitor_job_and_update_status, KubernetesClient, JobLogs};
 use kube::Client;
 use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgPoolOptions, FromRow, PgPool};
@@ -429,6 +432,112 @@ async fn delete_test_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> 
     Ok(Json("Suite deleted"))
 }
 
+// ---------------------- Kubernetes Log Endpoints ----------------------
+
+/// Get logs for a specific job by name
+async fn get_job_logs(Path(job_name): Path<String>) -> Result<Json<JobLogs>, StatusCode> {
+    let k8s_client = KubernetesClient::new().await
+        .map_err(|e| {
+            tracing::error!("Failed to create Kubernetes client: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    let logs = k8s_client.get_job_logs(&job_name).await
+        .map_err(|e| {
+            tracing::error!("Failed to get logs for job '{}': {}", job_name, e);
+            StatusCode::NOT_FOUND
+        })?;
+
+    Ok(Json(logs))
+}
+
+/// Get logs for a test run by ID (maps to Kubernetes job)
+async fn get_test_run_logs(Path(run_id): Path<Uuid>) -> Result<Json<JobLogs>, StatusCode> {
+    let job_name = format!("sparktest-job-{}", run_id.simple());
+    let k8s_client = KubernetesClient::new().await
+        .map_err(|e| {
+            tracing::error!("Failed to create Kubernetes client: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    let logs = k8s_client.get_job_logs(&job_name).await
+        .map_err(|e| {
+            tracing::error!("Failed to get logs for test run '{}': {}", run_id, e);
+            StatusCode::NOT_FOUND
+        })?;
+
+    Ok(Json(logs))
+}
+
+/// Get status of a Kubernetes job
+async fn get_job_status(Path(job_name): Path<String>) -> Result<Json<serde_json::Value>, StatusCode> {
+    let k8s_client = KubernetesClient::new().await
+        .map_err(|e| {
+            tracing::error!("Failed to create Kubernetes client: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    let status = k8s_client.get_job_status(&job_name).await
+        .map_err(|e| {
+            tracing::error!("Failed to get status for job '{}': {}", job_name, e);
+            StatusCode::NOT_FOUND
+        })?;
+
+    Ok(Json(serde_json::json!({
+        "job_name": job_name,
+        "status": status,
+        "timestamp": Utc::now()
+    })))
+}
+
+/// Health check for Kubernetes connectivity
+async fn kubernetes_health() -> Result<Json<serde_json::Value>, StatusCode> {
+    let k8s_client = KubernetesClient::new().await
+        .map_err(|e| {
+            tracing::error!("Failed to create Kubernetes client: {}", e);
+            return StatusCode::SERVICE_UNAVAILABLE;
+        })?;
+
+    let is_healthy = k8s_client.health_check().await
+        .unwrap_or(false);
+
+    let status = if is_healthy { 
+        StatusCode::OK 
+    } else { 
+        StatusCode::SERVICE_UNAVAILABLE 
+    };
+
+    let response = Json(serde_json::json!({
+        "kubernetes_connected": is_healthy,
+        "timestamp": Utc::now()
+    }));
+
+    match status {
+        StatusCode::OK => Ok(response),
+        _ => Err(StatusCode::SERVICE_UNAVAILABLE)
+    }
+}
+
+/// Delete a Kubernetes job
+async fn delete_job(Path(job_name): Path<String>) -> Result<Json<serde_json::Value>, StatusCode> {
+    let k8s_client = KubernetesClient::new().await
+        .map_err(|e| {
+            tracing::error!("Failed to create Kubernetes client: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    k8s_client.delete_job(&job_name).await
+        .map_err(|e| {
+            tracing::error!("Failed to delete job '{}': {}", job_name, e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })?;
+
+    Ok(Json(serde_json::json!({
+        "message": format!("Job '{}' deleted successfully", job_name),
+        "timestamp": Utc::now()
+    })))
+}
+
 // ---------------------- Start App ----------------------
 
 #[tokio::main]
@@ -458,6 +567,12 @@ async fn main() {
         .route("/api/test-runs", get(get_test_runs).post(create_test_run))
         .route("/api/test-suites", get(get_test_suites).post(create_test_suite))
         .route("/api/test-suites/:id", get(get_test_suite).put(update_test_suite).delete(delete_test_suite))
+        // Kubernetes endpoints
+        .route("/api/k8s/health", get(kubernetes_health))
+        .route("/api/k8s/jobs/:job_name/logs", get(get_job_logs))
+        .route("/api/k8s/jobs/:job_name/status", get(get_job_status))
+        .route("/api/k8s/jobs/:job_name", delete(delete_job))
+        .route("/api/test-runs/:run_id/logs", get(get_test_run_logs))
         .with_state(pool.clone()) // Clone pool for Axum
         .layer(cors);
 

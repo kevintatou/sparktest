@@ -1,4 +1,4 @@
-import { Executor, Definition, Run, TestSuite } from "../types"
+import { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
 
 export interface StorageService {
   // Executors
@@ -31,6 +31,13 @@ export interface StorageService {
   saveTestSuite(suite: TestSuite): Promise<TestSuite>
   deleteTestSuite(id: string): Promise<boolean>
   getTestSuiteById(id: string): Promise<TestSuite | undefined>
+
+  // Kubernetes Integration
+  getKubernetesHealth(): Promise<KubernetesHealth>
+  getTestRunLogs(runId: string): Promise<JobLogs>
+  getJobLogs(jobName: string): Promise<JobLogs>
+  getJobStatus(jobName: string): Promise<JobStatus>
+  deleteJob(jobName: string): Promise<JobDeleteResponse>
 
   // Optional: setup
   initialize(): void
