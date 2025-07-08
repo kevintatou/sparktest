@@ -49,6 +49,24 @@ cd backend
 cargo run
 ```
 
+### 🎯 Want to Run Tests on Kubernetes?
+
+**Quick Setup (5 minutes):**
+```bash
+# Install k3d (lightweight Kubernetes)
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+
+# Create a local cluster
+k3d cluster create sparktest
+
+# Restart the backend - it will auto-detect Kubernetes!
+cd backend && cargo run
+```
+
+Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI! 
+
+📚 [More details in the Kubernetes guide](backend/KUBERNETES.md)
+
 ### Testing
 
 ```bash
