@@ -1,4 +1,5 @@
 mod k8s;
+mod validation;
 
 #[cfg(test)]
 mod k8s_tests;
@@ -24,30 +25,6 @@ use git2::Repository;
 use std::fs;
 use serde_json::Value;
 use log;
-use regex::Regex;
-
-fn validate_name(name: &str) -> bool {
-    let re = Regex::new(r"^[a-zA-Z0-9_-]{1,64}$").unwrap();
-    re.is_match(name)
-}
-
-fn validate_image(image: &str) -> bool {
-    // Docker image regex (simplified)
-    let re = Regex::new(r"^([a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*)(/[a-zA-Z0-9]+([._-][a-zA-Z0-9]+)*)*(:[a-zA-Z0-9._-]+)?(@[A-Za-z0-9]+)?$").unwrap();
-    re.is_match(image)
-}
-
-fn validate_command(commands: &[String]) -> bool {
-    let forbidden = [";", "&&", "|", "`", "$()", ">", "<", "\"", "'", "\\"];
-    for cmd in commands {
-        for bad in &forbidden {
-            if cmd.contains(bad) {
-                return false;
-            }
-        }
-    }
-    true
-}
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
 struct TestExecutor {
@@ -144,13 +121,13 @@ async fn get_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Resul
 
 async fn create_executor(State(pool): State<PgPool>, Json(body): Json<TestExecutor>) -> Result<Json<&'static str>, StatusCode> {
     // Input validation
-    if !validate_name(&body.name) {
+    if !validation::validate_name(&body.name) {
         return Err(StatusCode::BAD_REQUEST);
     }
-    if !validate_image(&body.image) {
+    if !validation::validate_image(&body.image) {
         return Err(StatusCode::BAD_REQUEST);
     }
-    if !validate_command(&vec![body.default_command.clone()]) {
+    if !validation::validate_command(&vec![body.default_command.clone()]) {
         return Err(StatusCode::BAD_REQUEST);
     }
 
@@ -199,13 +176,13 @@ async fn get_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -
 
 async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<CreateTestDefinitionRequest>) -> Result<Json<TestDefinition>, StatusCode> {
     // Input validation
-    if !validate_name(&body.name) {
+    if !validation::validate_name(&body.name) {
         return Err(StatusCode::BAD_REQUEST);
     }
-    if !validate_image(&body.image) {
+    if !validation::validate_image(&body.image) {
         return Err(StatusCode::BAD_REQUEST);
     }
-    if !validate_command(&body.commands) {
+    if !validation::validate_command(&body.commands) {
         return Err(StatusCode::BAD_REQUEST);
     }
     let id = Uuid::new_v4();
@@ -242,13 +219,13 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
 
 async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<&'static str>, StatusCode> {
     // Input validation
-    if !validate_name(&body.name) {
+    if !validation::validate_name(&body.name) {
         return Err(StatusCode::BAD_REQUEST);
     }
-    if !validate_image(&body.image) {
+    if !validation::validate_image(&body.image) {
         return Err(StatusCode::BAD_REQUEST);
     }
-    if !validate_command(&body.commands) {
+    if !validation::validate_command(&body.commands) {
         return Err(StatusCode::BAD_REQUEST);
     }
 
@@ -301,13 +278,13 @@ async fn create_test_run(
     let job_name = format!("sparktest-job-{}", run_id.simple());
 
     // Input validation
-    if !validate_name(&name) {
+    if !validation::validate_name(&name) {
         return Err(StatusCode::BAD_REQUEST);
     }
-    if !validate_image(&image) {
+    if !validation::validate_image(&image) {
         return Err(StatusCode::BAD_REQUEST);
     }
-    if !validate_command(&command) {
+    if !validation::validate_command(&command) {
         return Err(StatusCode::BAD_REQUEST);
     }
 
@@ -874,58 +851,5 @@ mod tests {
         assert_eq!(request.description, Some("From frontend".to_string()));
         assert_eq!(request.image, "ubuntu:latest");
         assert_eq!(request.commands, vec!["npm", "test"]);
-    }
-
-    #[cfg(test)]
-    mod input_validation_tests {
-        use super::*;
-
-        #[test]
-        fn test_validate_name() {
-            // Valid names
-            assert!(validate_name("abc"));
-            assert!(validate_name("abc-123_ABC"));
-            assert!(validate_name("a"));
-            assert!(validate_name(&"a".repeat(64)));
-            // Invalid names
-            assert!(!validate_name(""));
-            assert!(!validate_name("abc!@#"));
-            assert!(!validate_name(&"a".repeat(65)));
-            assert!(!validate_name("name with spaces"));
-        }
-
-        #[test]
-        fn test_validate_image() {
-            // Valid images
-            assert!(validate_image("ubuntu:latest"));
-            assert!(validate_image("myrepo/myimage:v1.2.3"));
-            assert!(validate_image("nginx"));
-            assert!(validate_image("repo/image"));
-            assert!(validate_image("repo/image:tag"));
-            // Invalid images
-            assert!(!validate_image(""));
-            assert!(!validate_image("invalid image name"));
-            assert!(!validate_image("image:tag:extra"));
-            assert!(!validate_image("image@sha256:bad"));
-        }
-
-        #[test]
-        fn test_validate_command() {
-            // Valid commands
-            assert!(validate_command(&vec!["echo hello".to_string()]));
-            assert!(validate_command(&vec!["ls -la".to_string()]));
-            assert!(validate_command(&vec!["run".to_string(), "test".to_string()]));
-            // Invalid commands
-            assert!(!validate_command(&vec!["rm -rf /; echo hacked".to_string()]));
-            assert!(!validate_command(&vec!["echo foo && shutdown".to_string()]));
-            assert!(!validate_command(&vec!["cat /etc/passwd | grep root".to_string()]));
-            assert!(!validate_command(&vec!["bad`command`".to_string()]));
-            assert!(!validate_command(&vec!["echo $()".to_string()]));
-            assert!(!validate_command(&vec!["ls > out.txt".to_string()]));
-            assert!(!validate_command(&vec!["ls < in.txt".to_string()]));
-            assert!(!validate_command(&vec!["echo \"quoted\"".to_string()]));
-            assert!(!validate_command(&vec!["echo 'single'".to_string()]));
-            assert!(!validate_command(&vec!["echo \\backslash".to_string()]));
-        }
     }
 }
