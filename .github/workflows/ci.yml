@@ -81,7 +81,9 @@ jobs:
         run: |
           mkdir -p coverage-combined
           cat coverage-frontend/lcov.info coverage-backend/lcov.info > coverage-combined/lcov.info
-      - name: Show overall coverage summary
+      - name: Print Combined Coverage Summary
         run: |
+          echo "\n==================== COMBINED COVERAGE SUMMARY ===================="
           npx lcov-result-merger coverage-frontend/lcov.info coverage-backend/lcov.info > merged.info
           npx lcov-summary merged.info
+          echo "================== END COMBINED COVERAGE SUMMARY =================\n"
