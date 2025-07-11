@@ -81,13 +81,6 @@ jobs:
         run: |
           mkdir -p coverage-combined
           cat coverage-frontend/lcov.info coverage-backend/lcov.info > coverage-combined/lcov.info
-      - name: Report overall coverage (Codecov)
-        uses: codecov/codecov-action@v4
-        with:
-          files: coverage-combined/lcov.info
-          flags: overall
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Show overall coverage summary
         run: |
           npx lcov-result-merger coverage-frontend/lcov.info coverage-backend/lcov.info > merged.info
