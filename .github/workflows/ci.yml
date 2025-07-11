@@ -81,6 +81,16 @@ jobs:
         run: |
           mkdir -p coverage-combined
           cat coverage-frontend/lcov.info coverage-backend/lcov.info > coverage-combined/lcov.info
+      - name: Check coverage files exist and are not empty
+        run: |
+          if [ ! -s coverage-frontend/lcov.info ]; then
+            echo "Frontend coverage file missing or empty!"
+            exit 1
+          fi
+          if [ ! -s coverage-backend/lcov.info ]; then
+            echo "Backend coverage file missing or empty!"
+            exit 1
+          fi
       - name: Print Combined Coverage Summary
         run: |
           echo "\n==================== COMBINED COVERAGE SUMMARY ===================="
