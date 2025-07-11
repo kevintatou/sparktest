@@ -107,6 +107,12 @@ jobs:
           echo "Downloaded backend coverage:"
           ls -lh coverage-backend || true
           cat coverage-backend/lcov.info || echo "No backend lcov.info"
+      - name: Show working directory and files
+        run: |
+          pwd
+          ls -lh
+          ls -lh coverage-frontend
+          ls -lh coverage-backend
       - name: Print Combined Coverage Summary
         run: |
           echo "\n==================== COMBINED COVERAGE SUMMARY ===================="
