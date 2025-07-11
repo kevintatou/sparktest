@@ -91,6 +91,22 @@ jobs:
             echo "Backend coverage file missing or empty!"
             exit 1
           fi
+      - name: Debug coverage files
+        run: |
+          echo "Frontend coverage:"
+          ls -lh coverage-frontend || true
+          cat coverage-frontend/lcov.info || echo "No frontend lcov.info"
+          echo "Backend coverage:"
+          ls -lh coverage-backend || true
+          cat coverage-backend/lcov.info || echo "No backend lcov.info"
+      - name: List downloaded coverage files
+        run: |
+          echo "Downloaded frontend coverage:"
+          ls -lh coverage-frontend || true
+          cat coverage-frontend/lcov.info || echo "No frontend lcov.info"
+          echo "Downloaded backend coverage:"
+          ls -lh coverage-backend || true
+          cat coverage-backend/lcov.info || echo "No backend lcov.info"
       - name: Print Combined Coverage Summary
         run: |
           echo "\n==================== COMBINED COVERAGE SUMMARY ===================="
