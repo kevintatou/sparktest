@@ -87,6 +87,7 @@ jobs:
           files: coverage-combined/lcov.info
           flags: overall
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Show overall coverage summary
         run: |
           npx lcov-result-merger coverage-frontend/lcov.info coverage-backend/lcov.info > merged.info
