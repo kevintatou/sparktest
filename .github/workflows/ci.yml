@@ -23,6 +23,11 @@ jobs:
           node-version: 20
           cache: 'pnpm'
           cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Debug workspace file
+        run: |
+          pwd
+          ls -l ../pnpm-workspace.yaml || true
+          cat ../pnpm-workspace.yaml || true
       - name: Install dependencies
         run: pnpm install
       - name: Run tests with coverage
