@@ -47,6 +47,15 @@ export const sampleTestSuites: TestSuite[] = [
     executionMode: "parallel",
     labels: ["mobile", "cross-platform"],
   },
+  {
+    id: "static-backend-suite",
+    name: "Static Backend Test Suite",
+    description: "Simple static tests perfect for backend Rust mode - lightweight and dependency-free",
+    testDefinitionIds: ["static-bash-tests", "static-curl-tests", "static-file-tests", "static-json-tests"],
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    executionMode: "sequential",
+    labels: ["static", "backend", "simple"],
+  },
 ]
 
 // Sample Definitions
@@ -275,6 +284,78 @@ export const sampleDefinitions: Definition[] = [
       OUTPUT_FORMAT: "json",
     },
     labels: ["accessibility", "a11y", "wcag", "axe-core"],
+  },
+  {
+    id: "static-bash-tests",
+    name: "Static Bash Tests",
+    description: "Simple bash commands and file operations - perfect for backend Rust execution mode",
+    image: "alpine:latest",
+    commands: ["echo 'Test started'", "ls -la", "echo 'Environment check'", "env | grep -E '^(PATH|HOME|USER)'", "echo 'Test completed successfully'"],
+    createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    executorId: "kubernetes",
+    variables: {
+      TEST_TYPE: "static",
+      LOG_LEVEL: "info",
+    },
+    labels: ["static", "bash", "simple", "backend-ready"],
+  },
+  {
+    id: "static-curl-tests",
+    name: "Static HTTP Tests",
+    description: "Basic HTTP endpoint testing using curl - minimal dependencies for backend execution",
+    image: "alpine/curl:latest",
+    commands: ["curl -I https://httpbin.org/status/200", "curl -s https://httpbin.org/json", "curl -X POST -d '{\"test\":\"data\"}' https://httpbin.org/post"],
+    createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+    executorId: "docker",
+    variables: {
+      API_ENDPOINT: "https://httpbin.org",
+      TIMEOUT: "10",
+      RETRIES: "3",
+    },
+    labels: ["static", "http", "curl", "api-basic"],
+  },
+  {
+    id: "static-file-tests",
+    name: "Static File Operations",
+    description: "File system operations and data validation - great for backend processing tests",
+    image: "alpine:latest",
+    commands: ["touch /tmp/test.txt", "echo 'Hello World' > /tmp/test.txt", "cat /tmp/test.txt", "wc -l /tmp/test.txt", "rm /tmp/test.txt"],
+    createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
+    executorId: "docker",
+    variables: {
+      TEMP_DIR: "/tmp",
+      FILE_NAME: "test.txt",
+    },
+    labels: ["static", "filesystem", "basic", "backend-ready"],
+  },
+  {
+    id: "static-json-tests",
+    name: "Static JSON Processing",
+    description: "JSON data processing and validation using jq - lightweight for backend mode",
+    image: "alpine/jq:latest",
+    commands: ["echo '{\"name\":\"test\",\"value\":123}' | jq .", "echo '[1,2,3,4,5]' | jq 'length'", "echo '{\"items\":[{\"id\":1},{\"id\":2}]}' | jq '.items | length'"],
+    createdAt: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
+    executorId: "kubernetes",
+    variables: {
+      JSON_FORMAT: "compact",
+      VALIDATE_SCHEMA: "false",
+    },
+    labels: ["static", "json", "jq", "data-processing"],
+  },
+  {
+    id: "static-network-tests",
+    name: "Static Network Tests",
+    description: "Basic network connectivity and DNS resolution - simple backend networking tests",
+    image: "alpine:latest",
+    commands: ["ping -c 3 8.8.8.8", "nslookup google.com", "wget -O /dev/null -q https://example.com", "echo 'Network tests completed'"],
+    createdAt: new Date(Date.now() - 432000000).toISOString(), // 5 days ago
+    executorId: "docker",
+    variables: {
+      PING_COUNT: "3",
+      DNS_SERVER: "8.8.8.8",
+      TIMEOUT: "5",
+    },
+    labels: ["static", "network", "connectivity", "dns"],
   },
 ]
 
@@ -713,6 +794,118 @@ export const sampleRuns: Run[] = [
       "🎉 All iOS tests passed successfully!",
     ],
   },
+  {
+    id: "run-9",
+    name: "Static Bash Tests - Backend Mode",
+    image: "alpine:latest",
+    command: ["echo", "Test started"],
+    status: "completed",
+    createdAt: new Date(Date.now() - 1200000).toISOString(), // 20 minutes ago
+    definitionId: "static-bash-tests",
+    executorId: "kubernetes",
+    variables: {
+      TEST_TYPE: "static",
+      LOG_LEVEL: "info",
+    },
+    artifacts: ["test-output.txt"],
+    duration: 8000, // 8 seconds
+    logs: [
+      "Test started",
+      "total 8",
+      "drwxr-xr-x    1 root     root          4096 Jan 15 14:30 .",
+      "drwxr-xr-x    1 root     root          4096 Jan 15 14:30 ..",
+      "-rw-r--r--    1 root     root             0 Jan 15 14:30 .dockerenv",
+      "Environment check",
+      "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "HOME=/root",
+      "USER=root",
+      "Test completed successfully",
+    ],
+  },
+  {
+    id: "run-10",
+    name: "Static HTTP Tests - Basic API",
+    image: "alpine/curl:latest",
+    command: ["curl", "-I", "https://httpbin.org/status/200"],
+    status: "completed",
+    createdAt: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
+    definitionId: "static-curl-tests",
+    executorId: "docker",
+    variables: {
+      API_ENDPOINT: "https://httpbin.org",
+      TIMEOUT: "10",
+      RETRIES: "3",
+    },
+    artifacts: ["api-response.json"],
+    duration: 3000, // 3 seconds
+    logs: [
+      "HTTP/1.1 200 OK",
+      "Date: Mon, 15 Jan 2024 14:25:00 GMT",
+      "Content-Type: application/json",
+      "Content-Length: 0",
+      "Connection: keep-alive",
+      "Server: gunicorn/19.9.0",
+      "Access-Control-Allow-Origin: *",
+      "Access-Control-Allow-Credentials: true",
+      "",
+      "✅ HTTP endpoint responded successfully",
+      "✅ Status code: 200",
+      "✅ Response time: 89ms",
+    ],
+  },
+  {
+    id: "run-11",
+    name: "Static File Operations - Backend Test",
+    image: "alpine:latest",
+    command: ["touch", "/tmp/test.txt"],
+    status: "completed",
+    createdAt: new Date(Date.now() - 600000).toISOString(), // 10 minutes ago
+    definitionId: "static-file-tests",
+    executorId: "docker",
+    variables: {
+      TEMP_DIR: "/tmp",
+      FILE_NAME: "test.txt",
+    },
+    artifacts: ["file-operations.log"],
+    duration: 2000, // 2 seconds
+    logs: [
+      "Hello World",
+      "      1 /tmp/test.txt",
+      "",
+      "✅ File created successfully",
+      "✅ Data written to file",
+      "✅ File content verified",
+      "✅ File cleanup completed",
+    ],
+  },
+  {
+    id: "run-12",
+    name: "Static JSON Processing - Data Validation",
+    image: "alpine/jq:latest",
+    command: ["echo", "{\"name\":\"test\",\"value\":123}", "|", "jq", "."],
+    status: "completed",
+    createdAt: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
+    definitionId: "static-json-tests",
+    executorId: "kubernetes",
+    variables: {
+      JSON_FORMAT: "compact",
+      VALIDATE_SCHEMA: "false",
+    },
+    artifacts: ["json-results.json"],
+    duration: 1500, // 1.5 seconds
+    logs: [
+      "{",
+      "  \"name\": \"test\",",
+      "  \"value\": 123",
+      "}",
+      "5",
+      "2",
+      "",
+      "✅ JSON parsing successful",
+      "✅ Array length validation passed",
+      "✅ Object structure verified",
+    ],
+  },
 ]
 
 // Sample Executors
@@ -780,5 +973,18 @@ export const sampleExecutors: Executor[] = [
       AZURE_RESOURCE_GROUP: "sparktest-rg",
     },
     createdAt: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
+  },
+  {
+    id: "static-executor",
+    name: "Static Backend Executor",
+    image: "alpine:latest",
+    description: "Lightweight executor for simple static tests - ideal for backend Rust mode with minimal dependencies.",
+    command: ["sh", "-c"],
+    supportedFileTypes: ["sh", "txt", "json"],
+    env: {
+      PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      SHELL: "/bin/sh",
+    },
+    createdAt: new Date(Date.now() - 21600000).toISOString(), // 6 hours ago
   },
 ]
