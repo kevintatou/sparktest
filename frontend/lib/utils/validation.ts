@@ -99,9 +99,9 @@ export function validateDockerImage(image: string): ValidationResult {
     }
   }
 
-  // Docker image name regex: [registry/]namespace/repository[:tag]
-  // This is a simplified version - real docker image validation is complex
-  const imageRegex = /^[a-zA-Z0-9._-]+(?:\/[a-zA-Z0-9._-]+)*(?::[a-zA-Z0-9._-]+)?$/;
+  // Docker image name validation - simplified but secure
+  // Allow alphanumeric, dots, hyphens, underscores, slashes, and colons
+  const imageRegex = /^[a-zA-Z0-9._/-]+(?::[a-zA-Z0-9._-]+)?$/;
   if (!imageRegex.test(image)) {
     return { 
       isValid: false, 
@@ -143,7 +143,16 @@ export function sanitizeCommands(commands: string[]): ValidationArrayResult {
     // Check for dangerous shell patterns
     const dangerousPatterns = [
       "$(", "`", ";", "&", "|", "&&", "||", ">", "<", ">>", "<<",
-      "rm -rf", "dd if=", ":(){ :|:& };:", "chmod -R", "chown -R"
+      "rm -rf", "dd if=", ":(){ :|:& };:", "chmod -R", "chown -R",
+      "cat /etc/", "cat ~/", "cat ~/.ssh/", "grep -r", "find /", 
+      "history", "passwd", "sudo", "su ", "su -", "crontab", "systemctl",
+      "service ", "pkill", "killall", "mount", "umount", "iptables",
+      "usermod", "useradd", "userdel", "/etc/passwd", "/etc/shadow",
+      "/etc/hosts", "/dev/", "/proc/", "/sys/", "~/.ssh/", "~/.bash_history",
+      "curl ", "wget ", "nc ", "netcat ", "telnet ", "ssh ", "scp ", "rsync ",
+      "tar ", "zip ", "unzip ", "gzip ", "gunzip ", "python -c", "node -e",
+      "ruby -e", "php -e", "perl -e", "bash -c", "sh -c", "eval ",
+      "exec ", "system(", "os.system", "child_process", "require(", "import os"
     ];
 
     for (const pattern of dangerousPatterns) {
