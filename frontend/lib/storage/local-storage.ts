@@ -1,7 +1,7 @@
 import type { StorageService } from "./storage"
 import { getFromStorage, setToStorage } from "../utils"
-import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
-import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from "../samples"
+import type { Executor, Definition, Run, Suite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
+import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "../samples"
 
 export class LocalStorageService implements StorageService {
   async getExecutors(): Promise<Executor[]> {
@@ -149,32 +149,32 @@ export class LocalStorageService implements StorageService {
   }
   
 
-  // Test Suites
-  async getTestSuites(): Promise<TestSuite[]> {
-    return getFromStorage("sparktest_test_suites", sampleTestSuites)
+  // Suites
+  async getSuites(): Promise<Suite[]> {
+    return getFromStorage("sparktest_suites", sampleSuites)
   }
 
-  async saveTestSuite(suite: TestSuite): Promise<TestSuite> {
-    const list = await this.getTestSuites()
+  async saveSuite(suite: Suite): Promise<Suite> {
+    const list = await this.getSuites()
     const index = list.findIndex((s) => s.id === suite.id)
     if (index >= 0) {
       list[index] = suite
     } else {
       list.push(suite)
     }
-    setToStorage("sparktest_test_suites", list)
+    setToStorage("sparktest_suites", list)
     return suite
   }
 
-  async deleteTestSuite(id: string): Promise<boolean> {
-    const list = await this.getTestSuites()
+  async deleteSuite(id: string): Promise<boolean> {
+    const list = await this.getSuites()
     const updated = list.filter((s) => s.id !== id)
-    setToStorage("sparktest_test_suites", updated)
+    setToStorage("sparktest_suites", updated)
     return true
   }
 
-  async getTestSuiteById(id: string): Promise<TestSuite | undefined> {
-    const list = await this.getTestSuites()
+  async getSuiteById(id: string): Promise<Suite | undefined> {
+    const list = await this.getSuites()
     return list.find((s) => s.id === id)
   }
 
@@ -210,8 +210,8 @@ export class LocalStorageService implements StorageService {
     if (!localStorage.getItem("sparktest_runs")) {
       setToStorage("sparktest_runs", sampleRuns)
     }
-    if (!localStorage.getItem("sparktest_test_suites")) {
-      setToStorage("sparktest_test_suites", sampleTestSuites)
+    if (!localStorage.getItem("sparktest_suites")) {
+      setToStorage("sparktest_suites", sampleSuites)
     }
   }
 }

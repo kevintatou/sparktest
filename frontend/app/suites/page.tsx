@@ -10,30 +10,30 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
-import type { TestSuite } from "@/lib/types"
+import type { Suite } from "@/lib/types"
 import { storage } from "@/lib/storage"
 
-export default function TestSuitesPage() {
+export default function SuitesPage() {
   const { toast } = useToast()
-  const [testSuites, setTestSuites] = useState<TestSuite[]>([])
+  const [suites, setSuites] = useState<Suite[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [isRunning, setIsRunning] = useState<string | null>(null)
   const initializedRef = useRef(false)
-  const [selectedSuite, setSelectedSuite] = useState<TestSuite | null>(null)
+  const [selectedSuite, setSelectedSuite] = useState<Suite | null>(null)
 
-  // Load test suites from storage
+  // Load suites from storage
   useEffect(() => {
     if (!initializedRef.current) {
-      const fetchTestSuites = async () => {
+      const fetchSuites = async () => {
         try {
-          const suites = await storage.getTestSuites()
-          setTestSuites(suites)
+          const suites = await storage.getSuites()
+          setSuites(suites)
         } catch (error) {
-          console.error("Error fetching test suites:", error)
+          console.error("Error fetching suites:", error)
           toast({
-            title: "Error loading test suites",
-            description: "Failed to load test suites. Please try again.",
+            title: "Error loading suites",
+            description: "Failed to load suites. Please try again.",
             variant: "destructive",
           })
         } finally {
@@ -49,23 +49,23 @@ export default function TestSuitesPage() {
     setIsDeleting(id)
 
     try {
-      const success = await storage.deleteTestSuite(id)
+      const success = await storage.deleteSuite(id)
       
       if (success) {
-        setTestSuites((prev) => prev.filter((suite) => suite.id !== id))
+        setSuites((prev) => prev.filter((suite) => suite.id !== id))
         
         toast({
-          title: "Test suite deleted",
-          description: "The test suite has been removed successfully.",
+          title: "Suite deleted",
+          description: "The suite has been removed successfully.",
         })
       } else {
-        throw new Error("Failed to delete test suite")
+        throw new Error("Failed to delete suite")
       }
     } catch (error) {
-      console.error("Error deleting test suite:", error)
+      console.error("Error deleting suite:", error)
       toast({
-        title: "Error deleting test suite",
-        description: "Failed to delete the test suite. Please try again.",
+        title: "Error deleting suite",
+        description: "Failed to delete the suite. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -113,10 +113,10 @@ export default function TestSuitesPage() {
         description: `Running ${validDefinitions.length} tests in ${suite.executionMode} mode.`,
       })
     } catch (error) {
-      console.error("Error running test suite:", error)
+      console.error("Error running suite:", error)
       toast({
-        title: "Error starting test suite",
-        description: "Failed to start the test suite. Please check if all test definitions exist.",
+        title: "Error starting suite",
+        description: "Failed to start the suite. Please check if all definitions exist.",
         variant: "destructive",
       })
     } finally {
@@ -124,8 +124,8 @@ export default function TestSuitesPage() {
     }
   }
 
-  // Filter test suites based on search query
-  const filteredSuites = testSuites.filter(
+  // Filter suites based on search query
+  const filteredSuites = suites.filter(
     (suite) =>
       suite.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       suite.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -137,7 +137,7 @@ export default function TestSuitesPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Test Suites
+            Suites
           </h1>
           <p className="text-muted-foreground mt-1">Group related tests into logical test sets</p>
         </div>
@@ -185,12 +185,12 @@ export default function TestSuitesPage() {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2">
-                {searchQuery ? "No test suites match your search" : "No test suites yet"}
+                {searchQuery ? "No suites match your search" : "No suites yet"}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {searchQuery
                   ? "Try adjusting your search terms."
-                  : "Create your first test suite to group related tests together."}
+                  : "Create your first suite to group related tests together."}
               </p>
               {!searchQuery && (
                 <Button
@@ -199,7 +199,7 @@ export default function TestSuitesPage() {
                 >
                   <Link href="/suites/new">
                     <Plus className="mr-2 h-4 w-4" />
-                    Create Test Suite
+                    Create Suite
                   </Link>
                 </Button>
               )}
