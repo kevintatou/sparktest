@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { ConfirmationModal } from "@/components/ui/confirmation-modal"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { Run, Definition, Executor } from "@/lib/types"
@@ -88,18 +89,25 @@ export default function TestRunsPage() {
     return executor?.name || `Executor ${executorId}`
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     setIsDeleting(id)
-
-    setTimeout(() => {
-      setTestRuns((prev) => prev.filter((run) => run.id !== id))
-      setIsDeleting(null)
-
+    try {
+      await storage.deleteRun(id)
+      const runs = await storage.getRuns()
+      setTestRuns(runs)
       toast({
         title: "Test run deleted",
         description: "The test run has been removed successfully.",
       })
-    }, 500)
+    } catch (error) {
+      toast({
+        title: "Error deleting test run",
+        description: "Failed to delete the test run.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsDeleting(null)
+    }
   }
 
   // Filter test runs based on search query
@@ -282,38 +290,44 @@ export default function TestRunsPage() {
                     </Button>
                   )}
                   {run.status !== "running" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
-                      onClick={() => handleDelete(run.id)}
+                    <ConfirmationModal
+                      title="Delete Test Run"
+                      description={`Are you sure you want to delete the test run "${run.name}"? This action cannot be undone and will permanently remove the run history, logs, and results.`}
+                      onConfirm={() => handleDelete(run.id)}
                       disabled={isDeleting === run.id}
                     >
-                      {isDeleting === run.id ? (
-                        <svg
-                          className="h-4 w-4 animate-spin"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                      ) : (
-                        "Delete"
-                      )}
-                    </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
+                        disabled={isDeleting === run.id}
+                      >
+                        {isDeleting === run.id ? (
+                          <svg
+                            className="h-4 w-4 animate-spin"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        ) : (
+                          "Delete"
+                        )}
+                      </Button>
+                    </ConfirmationModal>
                   )}
                 </div>
                 {run.status === "failed" && (
