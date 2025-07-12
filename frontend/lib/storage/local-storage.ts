@@ -1,5 +1,5 @@
 import type { StorageService } from "./storage"
-import { getFromStorage, setToStorage } from "../utils"
+import { getFromStorage, setToStorage } from "./storage-utils"
 import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
 import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from "../samples"
 
