@@ -91,11 +91,11 @@ jobs:
           }
         });
 
-        console.log('Calculated Coverage Summary:');
-        console.log('Lines: ' + (coveredLines/totalLines*100).toFixed(2) + '%');
-        console.log('Statements: ' + (coveredStatements/totalStatements*100).toFixed(2) + '%');
-        console.log('Branches: ' + (coveredBranches/totalBranches*100).toFixed(2) + '%');
-        console.log('Functions: ' + (coveredFunctions/totalFunctions*100).toFixed(2) + '%');
+        console.log('Frontend Coverage Summary:');
+        console.log('Lines: ' + (coveredLines/totalLines*100).toFixed(2) + '% (' + coveredLines + '/' + totalLines + ')');
+        console.log('Statements: ' + (coveredStatements/totalStatements*100).toFixed(2) + '% (' + coveredStatements + '/' + totalStatements + ')');
+        console.log('Branches: ' + (coveredBranches/totalBranches*100).toFixed(2) + '% (' + coveredBranches + '/' + totalBranches + ')');
+        console.log('Functions: ' + (coveredFunctions/totalFunctions*100).toFixed(2) + '% (' + coveredFunctions + '/' + totalFunctions + ')');
         "
       working-directory: frontend
 
@@ -116,3 +116,63 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         lcov-file: ./frontend/coverage/lcov.info
         delete-old-comments: true
+
+  backend-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+
+    - name: Cache Rust dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          backend/target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
+    - name: Run backend tests
+      run: cargo test --verbose
+      working-directory: backend
+
+    - name: Install cargo-llvm-cov
+      run: cargo install cargo-llvm-cov
+
+    - name: Generate coverage report
+      run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+      working-directory: backend
+
+    - name: Show backend coverage summary
+      run: |
+        echo "Backend Coverage Summary:"
+        cargo llvm-cov --all-features --workspace --summary-only
+      working-directory: backend
+
+    - name: Upload backend coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./backend/lcov.info
+        flags: backend
+        name: codecov-backend
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false
+        verbose: true
+
+    - name: Comment PR with backend coverage
+      if: github.event_name == 'pull_request'
+      uses: romeovs/lcov-reporter-action@v0.4.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        lcov-file: ./backend/lcov.info
+        delete-old-comments: false

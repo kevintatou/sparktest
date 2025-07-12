@@ -1,4 +1,5 @@
 mod k8s;
+mod validation;
 
 #[cfg(test)]
 mod k8s_tests;
@@ -24,6 +25,10 @@ use git2::Repository;
 use std::fs;
 use serde_json::Value;
 use log;
+use validation::{
+    sanitize_name, sanitize_description, validate_docker_image, 
+    sanitize_commands, sanitize_labels, validate_execution_mode
+};
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
 struct TestExecutor {
@@ -119,14 +124,38 @@ async fn get_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Resul
 }
 
 async fn create_executor(State(pool): State<PgPool>, Json(body): Json<TestExecutor>) -> Result<Json<&'static str>, StatusCode> {
+    // Sanitize and validate inputs
+    let name = sanitize_name(&body.name).map_err(|e| {
+        log::error!("Invalid executor name: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let image = validate_docker_image(&body.image).map_err(|e| {
+        log::error!("Invalid executor image: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let command = sanitize_commands(&[body.default_command.clone()]).map_err(|e| {
+        log::error!("Invalid executor command: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let description = match &body.description {
+        Some(desc) => Some(sanitize_description(desc).map_err(|e| {
+            log::error!("Invalid executor description: {}", e);
+            StatusCode::BAD_REQUEST
+        })?),
+        None => None,
+    };
+    
     sqlx::query("INSERT INTO test_executors (id, name, image, command, supported_file_types, env_vars, description) VALUES ($1, $2, $3, $4, $5, $6, $7)")
         .bind(&body.id)
-        .bind(&body.name)
-        .bind(&body.image)
-        .bind(&body.default_command)
+        .bind(&name)
+        .bind(&image)
+        .bind(&command[0]) // Take first command after sanitization
         .bind(&body.supported_file_types)
         .bind(&body.environment_variables)
-        .bind(&body.description)
+        .bind(&description)
         .bind(&body.icon)
         .execute(&pool)
         .await
@@ -166,12 +195,36 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
     let id = Uuid::new_v4();
     let created_at = Utc::now();
     
+    // Sanitize and validate inputs
+    let name = sanitize_name(&body.name).map_err(|e| {
+        log::error!("Invalid name: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let description = match &body.description {
+        Some(desc) => Some(sanitize_description(desc).map_err(|e| {
+            log::error!("Invalid description: {}", e);
+            StatusCode::BAD_REQUEST
+        })?),
+        None => None,
+    };
+    
+    let image = validate_docker_image(&body.image).map_err(|e| {
+        log::error!("Invalid Docker image: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let commands = sanitize_commands(&body.commands).map_err(|e| {
+        log::error!("Invalid commands: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
     sqlx::query("INSERT INTO test_definitions (id, name, description, image, commands, created_at, executor_id) VALUES ($1, $2, $3, $4, $5, $6, $7)")
         .bind(&id)
-        .bind(&body.name)
-        .bind(&body.description)
-        .bind(&body.image)
-        .bind(&body.commands)
+        .bind(&name)
+        .bind(&description)
+        .bind(&image)
+        .bind(&commands)
         .bind(&created_at)
         .bind(&body.executor_id)
         .execute(&pool)
@@ -183,10 +236,10 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
     
     let test_definition = TestDefinition {
         id,
-        name: body.name,
-        description: body.description,
-        image: body.image,
-        commands: body.commands,
+        name,
+        description,
+        image,
+        commands,
         created_at: Some(created_at),
         executor_id: body.executor_id,
     };
@@ -196,11 +249,35 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
 }
 
 async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<&'static str>, StatusCode> {
+    // Sanitize and validate inputs
+    let name = sanitize_name(&body.name).map_err(|e| {
+        log::error!("Invalid name: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let description = match &body.description {
+        Some(desc) => Some(sanitize_description(desc).map_err(|e| {
+            log::error!("Invalid description: {}", e);
+            StatusCode::BAD_REQUEST
+        })?),
+        None => None,
+    };
+    
+    let image = validate_docker_image(&body.image).map_err(|e| {
+        log::error!("Invalid Docker image: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let commands = sanitize_commands(&body.commands).map_err(|e| {
+        log::error!("Invalid commands: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
     sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5 WHERE id = $6")
-        .bind(&body.name)
-        .bind(&body.description)
-        .bind(&body.image)
-        .bind(&body.commands)
+        .bind(&name)
+        .bind(&description)
+        .bind(&image)
+        .bind(&commands)
         .bind(&body.executor_id)
         .bind(id)
         .execute(&pool)
@@ -239,9 +316,34 @@ async fn create_test_run(
         .map_err(|_| StatusCode::NOT_FOUND)?;
 
     let run_id = Uuid::new_v4();
-    let name = payload.name.unwrap_or_else(|| def.name.clone());
-    let image = payload.image.unwrap_or_else(|| def.image.clone());
-    let command = payload.commands.unwrap_or_else(|| def.commands.clone());
+    
+    // Sanitize name if provided
+    let name = match &payload.name {
+        Some(n) => sanitize_name(n).map_err(|e| {
+            log::error!("Invalid run name: {}", e);
+            StatusCode::BAD_REQUEST
+        })?,
+        None => def.name.clone(),
+    };
+    
+    // Validate image if provided
+    let image = match &payload.image {
+        Some(img) => validate_docker_image(img).map_err(|e| {
+            log::error!("Invalid run image: {}", e);
+            StatusCode::BAD_REQUEST
+        })?,
+        None => def.image.clone(),
+    };
+    
+    // Sanitize commands if provided
+    let command = match &payload.commands {
+        Some(cmds) => sanitize_commands(cmds).map_err(|e| {
+            log::error!("Invalid run commands: {}", e);
+            StatusCode::BAD_REQUEST
+        })?,
+        None => def.commands.clone(),
+    };
+    
     let job_name = format!("sparktest-job-{}", run_id.simple());
 
     sqlx::query("INSERT INTO test_runs (id, name, image, command, status, created_at, test_definition_id, executor_id, duration, logs) VALUES ($1, $2, $3, $4, 'running', $5, $6, $7, NULL, NULL)")
@@ -330,24 +432,57 @@ async fn sync_repo(repo_url: &str, pool: &PgPool) -> Result<(), Box<dyn std::err
 
 async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<(), sqlx::Error> {
     // Extract fields (adjust as needed)
-    let name = json.get("name").and_then(|v| v.as_str()).unwrap_or("Unnamed");
-    let image = json.get("image").and_then(|v| v.as_str()).unwrap_or("ubuntu:latest");
-    let commands = json.get("commands").and_then(|v| v.as_array())
+    let raw_name = json.get("name").and_then(|v| v.as_str()).unwrap_or("Unnamed");
+    let raw_image = json.get("image").and_then(|v| v.as_str()).unwrap_or("ubuntu:latest");
+    let raw_commands = json.get("commands").and_then(|v| v.as_array())
         .map(|arr| arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect::<Vec<_>>())
         .unwrap_or_else(|| vec!["echo Hello".to_string()]);
-    let description = json.get("description").and_then(|v| v.as_str());
+    let raw_description = json.get("description").and_then(|v| v.as_str());
+
+    // Sanitize inputs
+    let name = match sanitize_name(raw_name) {
+        Ok(n) => n,
+        Err(e) => {
+            log::error!("Invalid name in GitHub sync: {}", e);
+            return Err(sqlx::Error::Protocol("Invalid name in GitHub sync".to_string()));
+        }
+    };
+    
+    let image = match validate_docker_image(raw_image) {
+        Ok(i) => i,
+        Err(e) => {
+            log::error!("Invalid image in GitHub sync: {}", e);
+            return Err(sqlx::Error::Protocol("Invalid image in GitHub sync".to_string()));
+        }
+    };
+    
+    let commands = match sanitize_commands(&raw_commands) {
+        Ok(c) => c,
+        Err(e) => {
+            log::error!("Invalid commands in GitHub sync: {}", e);
+            return Err(sqlx::Error::Protocol("Invalid commands in GitHub sync".to_string()));
+        }
+    };
+    
+    let description = match raw_description {
+        Some(desc) => Some(sanitize_description(desc).map_err(|e| {
+            log::error!("Invalid description in GitHub sync: {}", e);
+            sqlx::Error::Protocol("Invalid description in GitHub sync".to_string())
+        })?),
+        None => None,
+    };
 
     // Upsert by name
     let existing = sqlx::query_scalar::<_, Uuid>("SELECT id FROM test_definitions WHERE name = $1")
-        .bind(name)
+        .bind(&name)
         .fetch_optional(pool)
         .await?;
 
     if let Some(existing_id) = existing {
         sqlx::query("UPDATE test_definitions SET image = $1, commands = $2, description = $3 WHERE id = $4")
-            .bind(image)
+            .bind(&image)
             .bind(&commands)
-            .bind(description)
+            .bind(&description)
             .bind(existing_id)
             .execute(pool)
             .await?;
@@ -356,10 +491,10 @@ async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<
         let id = uuid::Uuid::new_v4();
         sqlx::query("INSERT INTO test_definitions (id, name, image, commands, description, executor_id) VALUES ($1, $2, $3, $4, $5, $6)")
             .bind(id)
-            .bind(name)
-            .bind(image)
+            .bind(&name)
+            .bind(&image)
             .bind(&commands)
-            .bind(description)
+            .bind(&description)
             .bind(None::<Uuid>) // No executor_id for GitHub sync definitions
             .execute(pool)
             .await?;
@@ -395,12 +530,37 @@ async fn create_test_suite(State(pool): State<PgPool>, Json(mut body): Json<Test
         body.id
     };
     body.id = suite_id;
+    
+    // Sanitize and validate inputs
+    let name = sanitize_name(&body.name).map_err(|e| {
+        log::error!("Invalid suite name: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let description = match &body.description {
+        Some(desc) => Some(sanitize_description(desc).map_err(|e| {
+            log::error!("Invalid suite description: {}", e);
+            StatusCode::BAD_REQUEST
+        })?),
+        None => None,
+    };
+    
+    let execution_mode = validate_execution_mode(&body.execution_mode).map_err(|e| {
+        log::error!("Invalid execution mode: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let labels = sanitize_labels(&body.labels).map_err(|e| {
+        log::error!("Invalid labels: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
     sqlx::query("INSERT INTO test_suites (id, name, description, execution_mode, labels, test_definition_ids, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)")
-        .bind(&body.id)
-        .bind(&body.name)
-        .bind(&body.description)
-        .bind(&body.execution_mode)
-        .bind(&body.labels)
+        .bind(&suite_id)
+        .bind(&name)
+        .bind(&description)
+        .bind(&execution_mode)
+        .bind(&labels)
         .bind(&body.test_definition_ids)
         .bind(body.created_at)
         .execute(&pool)
@@ -410,11 +570,35 @@ async fn create_test_suite(State(pool): State<PgPool>, Json(mut body): Json<Test
 }
 
 async fn update_test_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestSuite>) -> Result<Json<&'static str>, StatusCode> {
+    // Sanitize and validate inputs
+    let name = sanitize_name(&body.name).map_err(|e| {
+        log::error!("Invalid suite name: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let description = match &body.description {
+        Some(desc) => Some(sanitize_description(desc).map_err(|e| {
+            log::error!("Invalid suite description: {}", e);
+            StatusCode::BAD_REQUEST
+        })?),
+        None => None,
+    };
+    
+    let execution_mode = validate_execution_mode(&body.execution_mode).map_err(|e| {
+        log::error!("Invalid execution mode: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
+    let labels = sanitize_labels(&body.labels).map_err(|e| {
+        log::error!("Invalid labels: {}", e);
+        StatusCode::BAD_REQUEST
+    })?;
+    
     sqlx::query("UPDATE test_suites SET name = $1, description = $2, execution_mode = $3, labels = $4, test_definition_ids = $5 WHERE id = $6")
-        .bind(&body.name)
-        .bind(&body.description)
-        .bind(&body.execution_mode)
-        .bind(&body.labels)
+        .bind(&name)
+        .bind(&description)
+        .bind(&execution_mode)
+        .bind(&labels)
         .bind(&body.test_definition_ids)
         .bind(id)
         .execute(&pool)
