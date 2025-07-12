@@ -15,7 +15,7 @@ export default function NewDefinitionPage() {
               </Link>
             </Button>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Create Test Definition</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Create Definition</h1>
               <p className="text-muted-foreground">Define a reusable test blueprint</p>
             </div>
           </div>

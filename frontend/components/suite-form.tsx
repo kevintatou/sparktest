@@ -174,7 +174,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
           </div>
 
           <div className="space-y-4">
-            <Label>Test Definitions</Label>
+            <Label>Definitions</Label>
             <Autocomplete
               options={definitions}
               getOptionLabel={(option) => option.name}

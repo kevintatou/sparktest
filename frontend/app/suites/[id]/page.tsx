@@ -9,13 +9,13 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
-import type { TestSuite, Definition } from "@/lib/types"
+import type { Suite, Definition } from "@/lib/types"
 import { storage } from "@/lib/storage"
 
 export default function SuiteDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { toast } = useToast()
-  const [suite, setSuite] = useState<TestSuite | null>(null)
+  const [suite, setSuite] = useState<Suite | null>(null)
   const [definitions, setDefinitions] = useState<Definition[]>([])
   const [isRunning, setIsRunning] = useState(false)
 
@@ -23,7 +23,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
     const loadSuiteAndDefinitions = async () => {
       try {
         // Load the suite from storage
-        const loadedSuite = await storage.getTestSuiteById(id)
+        const loadedSuite = await storage.getSuiteById(id)
         if (!loadedSuite) {
           toast({
             title: "Suite not found",
@@ -84,10 +84,10 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
         description: `Running ${validDefinitions.length} tests in ${suite.executionMode} mode.`,
       })
     } catch (error) {
-      console.error("Error running test suite:", error)
+      console.error("Error running suite:", error)
       toast({
-        title: "Error starting test suite",
-        description: "Failed to start the test suite. Please check if all test definitions exist.",
+        title: "Error starting suite",
+        description: "Failed to start the suite. Please check if all definitions exist.",
         variant: "destructive",
       })
     } finally {
@@ -167,7 +167,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                Test Definitions ({definitions.length})
+                Definitions ({definitions.length})
               </CardTitle>
               <CardDescription>Tests included in this suite</CardDescription>
             </CardHeader>

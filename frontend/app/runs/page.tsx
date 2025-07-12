@@ -117,7 +117,7 @@ export default function TestRunsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Test Runs
+            Runs
           </h1>
           <p className="text-muted-foreground mt-1">Monitor and manage your test runs</p>
         </div>
@@ -179,7 +179,7 @@ export default function TestRunsPage() {
                 >
                   <Link href="/runs/new">
                     <Plus className="mr-2 h-4 w-4" />
-                    Start Test Run
+                    Start Run
                   </Link>
                 </Button>
               )}
@@ -216,7 +216,7 @@ export default function TestRunsPage() {
                     <p className="font-medium">{run.status === "running" ? "Running..." : `${run.duration || 0}s`}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Test Definition:</span>
+                    <span className="text-muted-foreground">Definition:</span>
                     <p className="font-medium text-blue-600 dark:text-blue-400">
                       {getDefinitionName(run.definitionId)}
                     </p>

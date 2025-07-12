@@ -107,7 +107,7 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
               {getStatusIcon(activeRun.status)}
               <div>
                 <h3 className="text-xl font-semibold">{activeRun.name}</h3>
-                <p className="text-sm text-muted-foreground">Test Run Details</p>
+                <p className="text-sm text-muted-foreground">Run Details</p>
               </div>
             </div>
             <Badge className={getStatusColor(activeRun.status)} variant="outline">
@@ -177,12 +177,12 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
         </CardContent>
       </Card>
 
-      {/* Test Definition Details */}
+      {/* Definition Details */}
       {definition && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Test Definition</span>
+              <span>Definition</span>
               <Button variant="outline" size="sm" asChild>
                 <a href={`/definitions/${definition.id}`}>
                   <ExternalLink className="h-4 w-4 mr-2" />
@@ -244,7 +244,7 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Test Executor</span>
+              <span>Executor</span>
               <Button variant="outline" size="sm" asChild>
                 <a href={`/executors/${executor.id}`}>
                   <ExternalLink className="h-4 w-4 mr-2" />
