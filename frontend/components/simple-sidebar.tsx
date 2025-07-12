@@ -1,17 +1,94 @@
 "use client"
 
 import { usePathname } from "next/navigation"
-import { Plus } from "lucide-react"
+import { Plus, Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useSidebar } from "@/hooks/use-sidebar"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { isActiveRoute } from "@/lib/utils/navigation"
 import { NAVIGATION_ITEMS, CREATE_OPTIONS } from "@/lib/constants/navigation"
 import { SidebarLogo } from "./sidebar/sidebar-logo"
 import { NavigationItemComponent } from "./sidebar/navigation-item"
 import { CreateOptionComponent } from "./sidebar/create-option"
 
-export function SimpleSidebar() {
+// Mobile sidebar component
+function MobileSidebar() {
+  const pathname = usePathname()
+  const { isCreateOpen, setIsCreateOpen, dropdownRef } = useSidebar()
+
+  return (
+    <div className="flex h-full w-full flex-col bg-white dark:bg-slate-900">
+      <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+        <SidebarLogo />
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-4 py-4">
+        <div className="space-y-2">
+          {NAVIGATION_ITEMS.map((item) => (
+            <div key={item.name} className="group relative">
+              <a
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 w-full px-3 py-2 rounded-md transition-colors text-sm",
+                  isActiveRoute(pathname, item.href)
+                    ? "bg-blue-700 text-white"
+                    : "text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.name}</span>
+              </a>
+            </div>
+          ))}
+        </div>
+      </nav>
+
+      {/* Create Button + Options */}
+      <div className="px-4 pb-4 border-t border-slate-200 dark:border-slate-700 pt-4" ref={dropdownRef}>
+        <div className="space-y-2">
+          <Button
+            size="sm"
+            className={cn(
+              "w-full justify-start gap-2 transition-colors",
+              isCreateOpen
+                ? "bg-blue-700 text-white shadow-lg"
+                : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+            )}
+            onClick={() => setIsCreateOpen(!isCreateOpen)}
+            aria-label="Create new item"
+            aria-expanded={isCreateOpen}
+          >
+            <Plus className={cn("h-4 w-4 transition-transform", isCreateOpen && "rotate-45")} />
+            <span>Create New</span>
+          </Button>
+
+          {/* Mobile-friendly Create Options */}
+          {isCreateOpen && (
+            <div className="space-y-1 pl-2">
+              {CREATE_OPTIONS.map((option) => (
+                <a
+                  key={option.name}
+                  href={option.href}
+                  onClick={() => setIsCreateOpen(false)}
+                  className="flex items-center gap-3 w-full px-3 py-2 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-muted-foreground text-sm transition-colors"
+                >
+                  <option.icon className="h-4 w-4" />
+                  <span>{option.name}</span>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Desktop sidebar component (original)
+function DesktopSidebar() {
   const pathname = usePathname()
   const { isCreateOpen, setIsCreateOpen, dropdownRef } = useSidebar()
 
@@ -59,7 +136,6 @@ export function SimpleSidebar() {
             </Button>
           </div>
 
-
           {/* Dropdown Options */}
           <div
             className={cn(
@@ -75,4 +151,38 @@ export function SimpleSidebar() {
       </div>
     </div>
   )
+}
+
+export function SimpleSidebar() {
+  const isMobile = useIsMobile()
+
+  if (isMobile) {
+    return (
+      <>
+        {/* Mobile hamburger menu trigger */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="fixed top-4 left-4 z-50 md:hidden h-10 w-10"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64 p-0">
+            <SheetHeader className="sr-only">
+              <SheetTitle>Navigation Menu</SheetTitle>
+            </SheetHeader>
+            <MobileSidebar />
+          </SheetContent>
+        </Sheet>
+        {/* Return empty div for layout purposes */}
+        <div className="w-0" />
+      </>
+    )
+  }
+
+  return <DesktopSidebar />
 }

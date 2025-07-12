@@ -75,7 +75,7 @@ export function TopHeader() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-4 sm:px-6">
+    <header className="flex h-16 items-center justify-between border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-4 sm:px-6 md:pl-6 pl-20">
       <div className="flex items-center gap-4 sm:gap-6 flex-1">
         {/* Search */}
         <div className="relative flex-1 max-w-sm sm:max-w-md">
@@ -103,7 +103,7 @@ export function TopHeader() {
                       <span className="text-xs bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded capitalize">
                         {result.type}
                       </span>
-                      <span className="font-medium text-sm">{result.name}</span>
+                      <span className="font-medium text-sm truncate">{result.name}</span>
                     </div>
                     {result.description && (
                       <div className="text-xs text-muted-foreground mt-1 truncate">{result.description}</div>
