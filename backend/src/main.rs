@@ -46,6 +46,7 @@ struct TestDefinition {
     commands: Vec<String>,
     created_at: Option<chrono::DateTime<chrono::Utc>>,
     executor_id: Option<Uuid>,
+    source: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -55,6 +56,7 @@ struct CreateTestDefinitionRequest {
     image: String,
     commands: Vec<String>,
     executor_id: Option<Uuid>,
+    source: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
@@ -146,7 +148,7 @@ async fn delete_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Re
 // ---------------------- Definitions ----------------------
 
 async fn get_test_definitions(State(pool): State<PgPool>) -> Result<Json<Vec<TestDefinition>>, StatusCode> {
-    let rows = sqlx::query_as::<_, TestDefinition>("SELECT * FROM test_definitions")
+    let rows = sqlx::query_as::<_, TestDefinition>("SELECT id, name, description, image, commands, created_at, executor_id, source FROM test_definitions")
         .fetch_all(&pool)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -154,7 +156,7 @@ async fn get_test_definitions(State(pool): State<PgPool>) -> Result<Json<Vec<Tes
 }
 
 async fn get_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<TestDefinition>, StatusCode> {
-    let row = sqlx::query_as::<_, TestDefinition>("SELECT * FROM test_definitions WHERE id = $1")
+    let row = sqlx::query_as::<_, TestDefinition>("SELECT id, name, description, image, commands, created_at, executor_id, source FROM test_definitions WHERE id = $1")
         .bind(id)
         .fetch_one(&pool)
         .await
@@ -166,7 +168,7 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
     let id = Uuid::new_v4();
     let created_at = Utc::now();
     
-    sqlx::query("INSERT INTO test_definitions (id, name, description, image, commands, created_at, executor_id) VALUES ($1, $2, $3, $4, $5, $6, $7)")
+    sqlx::query("INSERT INTO test_definitions (id, name, description, image, commands, created_at, executor_id, source) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")
         .bind(&id)
         .bind(&body.name)
         .bind(&body.description)
@@ -174,6 +176,7 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
         .bind(&body.commands)
         .bind(&created_at)
         .bind(&body.executor_id)
+        .bind(&body.source)
         .execute(&pool)
         .await
         .map_err(|e| {
@@ -189,6 +192,7 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
         commands: body.commands,
         created_at: Some(created_at),
         executor_id: body.executor_id,
+        source: body.source,
     };
     
     log::info!("Created test definition '{}' with id {}", test_definition.name, test_definition.id);
@@ -196,12 +200,13 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
 }
 
 async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<&'static str>, StatusCode> {
-    sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5 WHERE id = $6")
+    sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5, source = $6 WHERE id = $7")
         .bind(&body.name)
         .bind(&body.description)
         .bind(&body.image)
         .bind(&body.commands)
         .bind(&body.executor_id)
+        .bind(&body.source)
         .bind(id)
         .execute(&pool)
         .await
@@ -232,7 +237,7 @@ async fn create_test_run(
     State(pool): State<PgPool>,
     Json(payload): Json<CreateTestRunRequest>
 ) -> Result<Json<TestRun>, StatusCode> {
-    let def = sqlx::query_as::<_, TestDefinition>("SELECT * FROM test_definitions WHERE id = $1")
+    let def = sqlx::query_as::<_, TestDefinition>("SELECT id, name, description, image, commands, created_at, executor_id, source FROM test_definitions WHERE id = $1")
         .bind(payload.test_definition_id)
         .fetch_one(&pool)
         .await
@@ -313,9 +318,15 @@ async fn sync_repo(repo_url: &str, pool: &PgPool) -> Result<(), Box<dyn std::err
         let path = entry.path();
         if path.extension().and_then(|s| s.to_str()) == Some("json") {
             let file_content = fs::read_to_string(&path)?;
+            let relative_path = path.strip_prefix(&repo_path)
+                .unwrap_or(&path)
+                .to_string_lossy()
+                .to_string();
+            let source = format!("{}#{}", repo_url, relative_path);
+            
             match serde_json::from_str::<Value>(&file_content) {
                 Ok(json) => {
-                    if let Err(e) = upsert_test_definition_from_json(json, pool).await {
+                    if let Err(e) = upsert_test_definition_from_json(json, &source, pool).await {
                         log::error!("Failed to upsert definition from {:?}: {:?}", path, e);
                     } else {
                         log::info!("Synced definition from {:?}", path);
@@ -328,7 +339,7 @@ async fn sync_repo(repo_url: &str, pool: &PgPool) -> Result<(), Box<dyn std::err
     Ok(())
 }
 
-async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<(), sqlx::Error> {
+async fn upsert_test_definition_from_json(json: Value, source: &str, pool: &PgPool) -> Result<(), sqlx::Error> {
     // Extract fields (adjust as needed)
     let name = json.get("name").and_then(|v| v.as_str()).unwrap_or("Unnamed");
     let image = json.get("image").and_then(|v| v.as_str()).unwrap_or("ubuntu:latest");
@@ -337,33 +348,56 @@ async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<
         .unwrap_or_else(|| vec!["echo Hello".to_string()]);
     let description = json.get("description").and_then(|v| v.as_str());
 
-    // Upsert by name
-    let existing = sqlx::query_scalar::<_, Uuid>("SELECT id FROM test_definitions WHERE name = $1")
-        .bind(name)
+    // Check if a definition with the same source already exists (for updates)
+    let existing_by_source = sqlx::query_scalar::<_, Uuid>("SELECT id FROM test_definitions WHERE source = $1")
+        .bind(source)
         .fetch_optional(pool)
         .await?;
 
-    if let Some(existing_id) = existing {
-        sqlx::query("UPDATE test_definitions SET image = $1, commands = $2, description = $3 WHERE id = $4")
+    if let Some(existing_id) = existing_by_source {
+        // Update existing definition identified by source
+        sqlx::query("UPDATE test_definitions SET name = $1, image = $2, commands = $3, description = $4 WHERE id = $5")
+            .bind(name)
             .bind(image)
             .bind(&commands)
             .bind(description)
             .bind(existing_id)
             .execute(pool)
             .await?;
-        log::info!("Updated test definition '{}'", name);
+        log::info!("Updated test definition '{}' from source {}", name, source);
     } else {
-        let id = uuid::Uuid::new_v4();
-        sqlx::query("INSERT INTO test_definitions (id, name, image, commands, description, executor_id) VALUES ($1, $2, $3, $4, $5, $6)")
-            .bind(id)
+        // Check if a definition with the same name already exists (legacy support)
+        let existing_by_name = sqlx::query_scalar::<_, Uuid>("SELECT id FROM test_definitions WHERE name = $1 AND source IS NULL")
             .bind(name)
-            .bind(image)
-            .bind(&commands)
-            .bind(description)
-            .bind(None::<Uuid>) // No executor_id for GitHub sync definitions
-            .execute(pool)
+            .fetch_optional(pool)
             .await?;
-        log::info!("Inserted new test definition '{}'", name);
+
+        if let Some(existing_id) = existing_by_name {
+            // Update existing definition by name and set source
+            sqlx::query("UPDATE test_definitions SET image = $1, commands = $2, description = $3, source = $4 WHERE id = $5")
+                .bind(image)
+                .bind(&commands)
+                .bind(description)
+                .bind(source)
+                .bind(existing_id)
+                .execute(pool)
+                .await?;
+            log::info!("Updated test definition '{}' and set source to {}", name, source);
+        } else {
+            // Insert new definition
+            let id = uuid::Uuid::new_v4();
+            sqlx::query("INSERT INTO test_definitions (id, name, image, commands, description, executor_id, source) VALUES ($1, $2, $3, $4, $5, $6, $7)")
+                .bind(id)
+                .bind(name)
+                .bind(image)
+                .bind(&commands)
+                .bind(description)
+                .bind(None::<Uuid>) // No executor_id for GitHub sync definitions
+                .bind(source)
+                .execute(pool)
+                .await?;
+            log::info!("Inserted new test definition '{}' with source {}", name, source);
+        }
     }
     Ok(())
 }
@@ -678,16 +712,19 @@ mod tests {
             commands: vec!["echo".to_string(), "hello".to_string()],
             created_at: Some(Utc::now()),
             executor_id: None,
+            source: Some("https://github.com/test/repo#tests/test.json".to_string()),
         };
 
         let json = serde_json::to_string(&definition).unwrap();
         assert!(json.contains("Test Definition"));
         assert!(json.contains("nginx:latest"));
+        assert!(json.contains("https://github.com/test/repo#tests/test.json"));
 
         let deserialized: TestDefinition = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.name, definition.name);
         assert_eq!(deserialized.image, definition.image);
         assert_eq!(deserialized.commands, definition.commands);
+        assert_eq!(deserialized.source, definition.source);
     }
 
     #[test]
@@ -779,22 +816,25 @@ mod tests {
             image: "nginx:latest".to_string(),
             commands: vec!["echo".to_string(), "hello".to_string()],
             executor_id: None,
+            source: Some("https://github.com/test/repo#tests/test.json".to_string()),
         };
 
         let json = serde_json::to_string(&request).unwrap();
         assert!(json.contains("Test Definition"));
         assert!(json.contains("nginx:latest"));
         assert!(!json.contains("\"id\"")); // Should not contain id field
+        assert!(json.contains("https://github.com/test/repo#tests/test.json"));
 
         let deserialized: CreateTestDefinitionRequest = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.name, request.name);
         assert_eq!(deserialized.image, request.image);
         assert_eq!(deserialized.commands, request.commands);
+        assert_eq!(deserialized.source, request.source);
     }
 
     #[test]
     fn test_create_test_definition_request_without_id() {
-        // Test that we can deserialize frontend payload without id
+        // Test that we can deserialize frontend payload without id and source
         let frontend_payload = serde_json::json!({
             "name": "Frontend Test",
             "description": "From frontend",
@@ -807,5 +847,46 @@ mod tests {
         assert_eq!(request.description, Some("From frontend".to_string()));
         assert_eq!(request.image, "ubuntu:latest");
         assert_eq!(request.commands, vec!["npm", "test"]);
+        assert_eq!(request.source, None);
+    }
+
+    #[test]
+    fn test_test_definition_with_source_field() {
+        // Test that TestDefinition can handle source field
+        let definition = TestDefinition {
+            id: Uuid::new_v4(),
+            name: "GitHub Test".to_string(),
+            description: Some("Test from GitHub".to_string()),
+            image: "node:18".to_string(),
+            commands: vec!["npm".to_string(), "test".to_string()],
+            created_at: Some(Utc::now()),
+            executor_id: None,
+            source: Some("https://github.com/owner/repo#tests/api-test.json".to_string()),
+        };
+
+        let json = serde_json::to_string(&definition).unwrap();
+        assert!(json.contains("GitHub Test"));
+        assert!(json.contains("https://github.com/owner/repo#tests/api-test.json"));
+
+        let deserialized: TestDefinition = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.source, Some("https://github.com/owner/repo#tests/api-test.json".to_string()));
+    }
+
+    #[test]
+    fn test_test_definition_without_source_field() {
+        // Test that TestDefinition can handle missing source field (backwards compatibility)
+        let json = serde_json::json!({
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "name": "Legacy Test",
+            "description": "Test without source",
+            "image": "ubuntu:latest",
+            "commands": ["echo", "hello"],
+            "created_at": "2023-01-01T00:00:00Z",
+            "executor_id": null
+        });
+
+        let definition: TestDefinition = serde_json::from_value(json).unwrap();
+        assert_eq!(definition.name, "Legacy Test");
+        assert_eq!(definition.source, None);
     }
 }
