@@ -8,7 +8,11 @@ export interface Definition {
   executorId?: string
   variables?: Record<string, string>
   labels?: string[]
+  source?: string
 }
+
+// Alias for backward compatibility
+export type TestDefinition = Definition
 
 export interface Run {
   id: string

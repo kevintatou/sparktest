@@ -186,6 +186,33 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
                 />
               </div>
 
+              {existingTest?.source && (
+                <div className="space-y-2">
+                  <Label htmlFor="source">Source</Label>
+                  <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
+                    <code className="text-sm flex-1 text-muted-foreground">
+                      {existingTest.source}
+                    </code>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (existingTest.source) {
+                          const [repoUrl, filePath] = existingTest.source.split('#')
+                          window.open(`${repoUrl}/blob/main/${filePath}`, '_blank')
+                        }
+                      }}
+                    >
+                      View Source
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    This test definition was synced from GitHub. Changes should be made to the source file.
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="executor">Executor (Optional)</Label>
                 <Select

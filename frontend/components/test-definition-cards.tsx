@@ -183,6 +183,11 @@ export function TestDefinitionCards() {
                 <div className="space-y-1">
                   <p>Image: {test.image}</p>
                   <p>Commands: {test.commands.join(", ")}</p>
+                  {test.source && (
+                    <p className="flex items-center gap-1 text-xs">
+                      <Code className="h-3 w-3" /> Source: {test.source}
+                    </p>
+                  )}
                   <p className="flex items-center gap-1 mt-2">
                     <Clock className="h-3 w-3" /> Created: {formatDistanceToNow(test.createdAt)}
                   </p>
