@@ -26,7 +26,7 @@ use serde_json::Value;
 use log;
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
-struct TestExecutor {
+struct Executor {
     id: Uuid,
     name: String,
     image: String,
@@ -38,7 +38,7 @@ struct TestExecutor {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
-struct TestDefinition {
+struct Definition {
     id: Uuid,
     name: String,
     description: Option<String>,
@@ -49,7 +49,7 @@ struct TestDefinition {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-struct CreateTestDefinitionRequest {
+struct CreateDefinitionRequest {
     name: String,
     description: Option<String>,
     image: String,
@@ -58,7 +58,7 @@ struct CreateTestDefinitionRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
-struct TestRun {
+struct Run {
     id: Uuid,
     name: String,
     image: String,
@@ -72,7 +72,7 @@ struct TestRun {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct CreateTestRunRequest {
+struct CreateRunRequest {
     test_definition_id: Uuid,
     name: Option<String>,
     image: Option<String>,
@@ -80,7 +80,7 @@ struct CreateTestRunRequest {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
-struct TestSuite {
+struct Suite {
     id: Uuid,
     name: String,
     description: Option<String>,
@@ -101,16 +101,16 @@ async fn health_handler() -> Json<&'static str> {
 
 // ---------------------- Executors ----------------------
 
-async fn get_executors(State(pool): State<PgPool>) -> Result<Json<Vec<TestExecutor>>, StatusCode> {
-    let rows = sqlx::query_as::<_, TestExecutor>("SELECT * FROM test_executors")
+async fn get_executors(State(pool): State<PgPool>) -> Result<Json<Vec<Executor>>, StatusCode> {
+    let rows = sqlx::query_as::<_, Executor>("SELECT * FROM test_executors")
         .fetch_all(&pool)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     Ok(Json(rows))
 }
 
-async fn get_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<TestExecutor>, StatusCode> {
-    let row = sqlx::query_as::<_, TestExecutor>("SELECT * FROM test_executors WHERE id = $1")
+async fn get_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<Executor>, StatusCode> {
+    let row = sqlx::query_as::<_, Executor>("SELECT * FROM test_executors WHERE id = $1")
         .bind(id)
         .fetch_one(&pool)
         .await
@@ -118,7 +118,7 @@ async fn get_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Resul
     Ok(Json(row))
 }
 
-async fn create_executor(State(pool): State<PgPool>, Json(body): Json<TestExecutor>) -> Result<Json<&'static str>, StatusCode> {
+async fn create_executor(State(pool): State<PgPool>, Json(body): Json<Executor>) -> Result<Json<&'static str>, StatusCode> {
     sqlx::query("INSERT INTO test_executors (id, name, image, command, supported_file_types, env_vars, description) VALUES ($1, $2, $3, $4, $5, $6, $7)")
         .bind(&body.id)
         .bind(&body.name)
@@ -145,16 +145,16 @@ async fn delete_executor(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Re
 
 // ---------------------- Definitions ----------------------
 
-async fn get_test_definitions(State(pool): State<PgPool>) -> Result<Json<Vec<TestDefinition>>, StatusCode> {
-    let rows = sqlx::query_as::<_, TestDefinition>("SELECT * FROM test_definitions")
+async fn get_definitions(State(pool): State<PgPool>) -> Result<Json<Vec<Definition>>, StatusCode> {
+    let rows = sqlx::query_as::<_, Definition>("SELECT * FROM test_definitions")
         .fetch_all(&pool)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     Ok(Json(rows))
 }
 
-async fn get_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<TestDefinition>, StatusCode> {
-    let row = sqlx::query_as::<_, TestDefinition>("SELECT * FROM test_definitions WHERE id = $1")
+async fn get_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<Definition>, StatusCode> {
+    let row = sqlx::query_as::<_, Definition>("SELECT * FROM test_definitions WHERE id = $1")
         .bind(id)
         .fetch_one(&pool)
         .await
@@ -162,7 +162,7 @@ async fn get_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -
     Ok(Json(row))
 }
 
-async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<CreateTestDefinitionRequest>) -> Result<Json<TestDefinition>, StatusCode> {
+async fn create_definition(State(pool): State<PgPool>, Json(body): Json<CreateDefinitionRequest>) -> Result<Json<Definition>, StatusCode> {
     let id = Uuid::new_v4();
     let created_at = Utc::now();
     
@@ -181,7 +181,7 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
             StatusCode::INTERNAL_SERVER_ERROR
         })?;
     
-    let test_definition = TestDefinition {
+    let definition = Definition {
         id,
         name: body.name,
         description: body.description,
@@ -191,11 +191,11 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
         executor_id: body.executor_id,
     };
     
-    log::info!("Created test definition '{}' with id {}", test_definition.name, test_definition.id);
-    Ok(Json(test_definition))
+    log::info!("Created test definition '{}' with id {}", definition.name, definition.id);
+    Ok(Json(definition))
 }
 
-async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestDefinition>) -> Result<Json<&'static str>, StatusCode> {
+async fn update_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<Definition>) -> Result<Json<&'static str>, StatusCode> {
     sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5 WHERE id = $6")
         .bind(&body.name)
         .bind(&body.description)
@@ -209,7 +209,7 @@ async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>
     Ok(Json("Updated test definition"))
 }
 
-async fn delete_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<&'static str>, StatusCode> {
+async fn delete_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<&'static str>, StatusCode> {
     sqlx::query("DELETE FROM test_definitions WHERE id = $1")
         .bind(id)
         .execute(&pool)
@@ -220,19 +220,19 @@ async fn delete_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>
 
 // ---------------------- Runs ----------------------
 
-async fn get_test_runs(State(pool): State<PgPool>) -> Result<Json<Vec<TestRun>>, StatusCode> {
-    let rows = sqlx::query_as::<_, TestRun>("SELECT * FROM test_runs")
+async fn get_runs(State(pool): State<PgPool>) -> Result<Json<Vec<Run>>, StatusCode> {
+    let rows = sqlx::query_as::<_, Run>("SELECT * FROM test_runs")
         .fetch_all(&pool)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     Ok(Json(rows))
 }
 
-async fn create_test_run(
+async fn create_run(
     State(pool): State<PgPool>,
-    Json(payload): Json<CreateTestRunRequest>
-) -> Result<Json<TestRun>, StatusCode> {
-    let def = sqlx::query_as::<_, TestDefinition>("SELECT * FROM test_definitions WHERE id = $1")
+    Json(payload): Json<CreateRunRequest>
+) -> Result<Json<Run>, StatusCode> {
+    let def = sqlx::query_as::<_, Definition>("SELECT * FROM test_definitions WHERE id = $1")
         .bind(payload.test_definition_id)
         .fetch_one(&pool)
         .await
@@ -267,7 +267,7 @@ async fn create_test_run(
     });
 
     // Fetch and return the created run
-    let run: TestRun = sqlx::query_as::<_, TestRun>("SELECT * FROM test_runs WHERE id = $1")
+    let run: Run = sqlx::query_as::<_, Run>("SELECT * FROM test_runs WHERE id = $1")
         .bind(run_id)
         .fetch_one(&pool)
         .await
@@ -315,7 +315,7 @@ async fn sync_repo(repo_url: &str, pool: &PgPool) -> Result<(), Box<dyn std::err
             let file_content = fs::read_to_string(&path)?;
             match serde_json::from_str::<Value>(&file_content) {
                 Ok(json) => {
-                    if let Err(e) = upsert_test_definition_from_json(json, pool).await {
+                    if let Err(e) = upsert_definition_from_json(json, pool).await {
                         log::error!("Failed to upsert definition from {:?}: {:?}", path, e);
                     } else {
                         log::info!("Synced definition from {:?}", path);
@@ -328,7 +328,7 @@ async fn sync_repo(repo_url: &str, pool: &PgPool) -> Result<(), Box<dyn std::err
     Ok(())
 }
 
-async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<(), sqlx::Error> {
+async fn upsert_definition_from_json(json: Value, pool: &PgPool) -> Result<(), sqlx::Error> {
     // Extract fields (adjust as needed)
     let name = json.get("name").and_then(|v| v.as_str()).unwrap_or("Unnamed");
     let image = json.get("image").and_then(|v| v.as_str()).unwrap_or("ubuntu:latest");
@@ -370,16 +370,16 @@ async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<
 
 // ---------------------- Suites ----------------------
 
-async fn get_test_suites(State(pool): State<PgPool>) -> Result<Json<Vec<TestSuite>>, StatusCode> {
-    let rows = sqlx::query_as::<_, TestSuite>("SELECT * FROM test_suites")
+async fn get_suites(State(pool): State<PgPool>) -> Result<Json<Vec<Suite>>, StatusCode> {
+    let rows = sqlx::query_as::<_, Suite>("SELECT * FROM test_suites")
         .fetch_all(&pool)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     Ok(Json(rows))
 }
 
-async fn get_test_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<TestSuite>, StatusCode> {
-    let row = sqlx::query_as::<_, TestSuite>("SELECT * FROM test_suites WHERE id = $1")
+async fn get_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<Suite>, StatusCode> {
+    let row = sqlx::query_as::<_, Suite>("SELECT * FROM test_suites WHERE id = $1")
         .bind(id)
         .fetch_one(&pool)
         .await
@@ -387,7 +387,7 @@ async fn get_test_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Res
     Ok(Json(row))
 }
 
-async fn create_test_suite(State(pool): State<PgPool>, Json(mut body): Json<TestSuite>) -> Result<Json<&'static str>, StatusCode> {
+async fn create_suite(State(pool): State<PgPool>, Json(mut body): Json<Suite>) -> Result<Json<&'static str>, StatusCode> {
     // Generate a new UUID for the suite if not provided
     let suite_id = if body.id == Uuid::nil() {
         Uuid::new_v4()
@@ -409,7 +409,7 @@ async fn create_test_suite(State(pool): State<PgPool>, Json(mut body): Json<Test
     Ok(Json("Suite created"))
 }
 
-async fn update_test_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<TestSuite>) -> Result<Json<&'static str>, StatusCode> {
+async fn update_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>, Json(body): Json<Suite>) -> Result<Json<&'static str>, StatusCode> {
     sqlx::query("UPDATE test_suites SET name = $1, description = $2, execution_mode = $3, labels = $4, test_definition_ids = $5 WHERE id = $6")
         .bind(&body.name)
         .bind(&body.description)
@@ -423,7 +423,7 @@ async fn update_test_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>, Jso
     Ok(Json("Suite updated"))
 }
 
-async fn delete_test_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<&'static str>, StatusCode> {
+async fn delete_suite(Path(id): Path<Uuid>, State(pool): State<PgPool>) -> Result<Json<&'static str>, StatusCode> {
     sqlx::query("DELETE FROM test_suites WHERE id = $1")
         .bind(id)
         .execute(&pool)
@@ -560,13 +560,13 @@ async fn main() {
     let app = Router::new()
         .route("/", get(root_handler))
         .route("/api/health", get(health_handler))
-        .route("/api/test-executors", get(get_executors).post(create_executor))
-        .route("/api/test-executors/:id", get(get_executor).delete(delete_executor))
-        .route("/api/test-definitions", get(get_test_definitions).post(create_test_definition))
-        .route("/api/test-definitions/:id", get(get_test_definition).put(update_test_definition).delete(delete_test_definition))
-        .route("/api/test-runs", get(get_test_runs).post(create_test_run))
-        .route("/api/test-suites", get(get_test_suites).post(create_test_suite))
-        .route("/api/test-suites/:id", get(get_test_suite).put(update_test_suite).delete(delete_test_suite))
+        .route("/api/executors", get(get_executors).post(create_executor))
+        .route("/api/executors/:id", get(get_executor).delete(delete_executor))
+        .route("/api/definitions", get(get_definitions).post(create_definition))
+        .route("/api/definitions/:id", get(get_definition).put(update_definition).delete(delete_definition))
+        .route("/api/runs", get(get_runs).post(create_run))
+        .route("/api/suites", get(get_suites).post(create_suite))
+        .route("/api/suites/:id", get(get_suite).put(update_suite).delete(delete_suite))
         // Kubernetes endpoints
         .route("/api/k8s/health", get(kubernetes_health))
         .route("/api/k8s/jobs/:job_name/logs", get(get_job_logs))
@@ -645,8 +645,8 @@ mod tests {
     }
 
     #[test]
-    fn test_test_executor_serialization() {
-        let executor = TestExecutor {
+    fn test_executor_serialization() {
+        let executor = Executor {
             id: Uuid::new_v4(),
             name: "Test Executor".to_string(),
             image: "test:latest".to_string(),
@@ -662,15 +662,15 @@ mod tests {
         assert!(json.contains("test:latest"));
         assert!(json.contains("echo hello"));
 
-        let deserialized: TestExecutor = serde_json::from_str(&json).unwrap();
+        let deserialized: Executor = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.name, executor.name);
         assert_eq!(deserialized.image, executor.image);
         assert_eq!(deserialized.default_command, executor.default_command);
     }
 
     #[test]
-    fn test_test_definition_serialization() {
-        let definition = TestDefinition {
+    fn test_definition_serialization() {
+        let definition = Definition {
             id: Uuid::new_v4(),
             name: "Test Definition".to_string(),
             description: Some("A test definition".to_string()),
@@ -684,15 +684,15 @@ mod tests {
         assert!(json.contains("Test Definition"));
         assert!(json.contains("nginx:latest"));
 
-        let deserialized: TestDefinition = serde_json::from_str(&json).unwrap();
+        let deserialized: Definition = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.name, definition.name);
         assert_eq!(deserialized.image, definition.image);
         assert_eq!(deserialized.commands, definition.commands);
     }
 
     #[test]
-    fn test_test_run_serialization() {
-        let test_run = TestRun {
+    fn test_run_serialization() {
+        let run = Run {
             id: Uuid::new_v4(),
             name: "Test Run".to_string(),
             image: "ubuntu:latest".to_string(),
@@ -705,20 +705,20 @@ mod tests {
             executor_id: None,
         };
 
-        let json = serde_json::to_string(&test_run).unwrap();
+        let json = serde_json::to_string(&run).unwrap();
         assert!(json.contains("Test Run"));
         assert!(json.contains("ubuntu:latest"));
         assert!(json.contains("running"));
 
-        let deserialized: TestRun = serde_json::from_str(&json).unwrap();
-        assert_eq!(deserialized.name, test_run.name);
-        assert_eq!(deserialized.image, test_run.image);
-        assert_eq!(deserialized.status, test_run.status);
+        let deserialized: Run = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.name, run.name);
+        assert_eq!(deserialized.image, run.image);
+        assert_eq!(deserialized.status, run.status);
     }
 
     #[test]
-    fn test_create_test_run_request_serialization() {
-        let request = CreateTestRunRequest {
+    fn test_create_run_request_serialization() {
+        let request = CreateRunRequest {
             test_definition_id: Uuid::new_v4(),
             name: Some("Custom Run".to_string()),
             image: Some("custom:latest".to_string()),
@@ -729,15 +729,15 @@ mod tests {
         assert!(json.contains("Custom Run"));
         assert!(json.contains("custom:latest"));
 
-        let deserialized: CreateTestRunRequest = serde_json::from_str(&json).unwrap();
+        let deserialized: CreateRunRequest = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.name, request.name);
         assert_eq!(deserialized.image, request.image);
         assert_eq!(deserialized.commands, request.commands);
     }
 
     #[test]
-    fn test_create_test_run_request_minimal() {
-        let request = CreateTestRunRequest {
+    fn test_create_run_request_minimal() {
+        let request = CreateRunRequest {
             test_definition_id: Uuid::new_v4(),
             name: None,
             image: None,
@@ -745,7 +745,7 @@ mod tests {
         };
 
         let json = serde_json::to_string(&request).unwrap();
-        let deserialized: CreateTestRunRequest = serde_json::from_str(&json).unwrap();
+        let deserialized: CreateRunRequest = serde_json::from_str(&json).unwrap();
         
         assert_eq!(deserialized.test_definition_id, request.test_definition_id);
         assert_eq!(deserialized.name, None);
@@ -772,8 +772,8 @@ mod tests {
     }
 
     #[test]
-    fn test_create_test_definition_request_serialization() {
-        let request = CreateTestDefinitionRequest {
+    fn test_create_definition_request_serialization() {
+        let request = CreateDefinitionRequest {
             name: "Test Definition".to_string(),
             description: Some("A test definition".to_string()),
             image: "nginx:latest".to_string(),
@@ -786,14 +786,14 @@ mod tests {
         assert!(json.contains("nginx:latest"));
         assert!(!json.contains("\"id\"")); // Should not contain id field
 
-        let deserialized: CreateTestDefinitionRequest = serde_json::from_str(&json).unwrap();
+        let deserialized: CreateDefinitionRequest = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.name, request.name);
         assert_eq!(deserialized.image, request.image);
         assert_eq!(deserialized.commands, request.commands);
     }
 
     #[test]
-    fn test_create_test_definition_request_without_id() {
+    fn test_create_definition_request_without_id() {
         // Test that we can deserialize frontend payload without id
         let frontend_payload = serde_json::json!({
             "name": "Frontend Test",
@@ -802,7 +802,7 @@ mod tests {
             "commands": ["npm", "test"]
         });
 
-        let request: CreateTestDefinitionRequest = serde_json::from_value(frontend_payload).unwrap();
+        let request: CreateDefinitionRequest = serde_json::from_value(frontend_payload).unwrap();
         assert_eq!(request.name, "Frontend Test");
         assert_eq!(request.description, Some("From frontend".to_string()));
         assert_eq!(request.image, "ubuntu:latest");

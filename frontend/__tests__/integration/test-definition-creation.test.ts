@@ -36,7 +36,7 @@ describe("Test Definition Creation Integration", () => {
     const result = await service.saveDefinition(formData as any)
 
     // Verify the request was made correctly (without id)
-    expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-definitions", {
+    expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/definitions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData), // Form data without id

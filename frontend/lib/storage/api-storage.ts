@@ -4,15 +4,15 @@ import { StorageService } from "./storage"
 const API_BASE = "http://localhost:3001/api"
 
 export class ApiStorageService implements StorageService {
-  // Test Executors
+  // Executors
   async getExecutors(): Promise<Executor[]> {
-    const res = await fetch(`${API_BASE}/test-executors`)
+    const res = await fetch(`${API_BASE}/executors`)
     if (!res.ok) throw new Error("Failed to fetch executors")
     return await res.json()
   }
 
   async saveExecutor(executor: Executor): Promise<Executor> {
-    const res = await fetch(`${API_BASE}/test-executors`, {
+    const res = await fetch(`${API_BASE}/executors`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(executor),
@@ -22,7 +22,7 @@ export class ApiStorageService implements StorageService {
   }
 
   async deleteExecutor(id: string): Promise<boolean> {
-    const res = await fetch(`${API_BASE}/test-executors/${id}`, { method: "DELETE" })
+    const res = await fetch(`${API_BASE}/executors/${id}`, { method: "DELETE" })
     return res.ok
   }
 
@@ -31,15 +31,15 @@ export class ApiStorageService implements StorageService {
     return list.find((e) => e.id === id)
   }
 
-  // Test Definitions
+  // Definitions
   async getDefinitions(): Promise<Definition[]> {
-    const res = await fetch(`${API_BASE}/test-definitions`)
+    const res = await fetch(`${API_BASE}/definitions`)
     if (!res.ok) throw new Error("Failed to fetch definitions")
     return await res.json()
   }
 
   async saveDefinition(def: Definition): Promise<Definition> {
-    const res = await fetch(`${API_BASE}/test-definitions`, {
+    const res = await fetch(`${API_BASE}/definitions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(def),
@@ -49,7 +49,7 @@ export class ApiStorageService implements StorageService {
   }
 
   async deleteDefinition(id: string): Promise<boolean> {
-    const res = await fetch(`${API_BASE}/test-definitions/${id}`, { method: "DELETE" })
+    const res = await fetch(`${API_BASE}/definitions/${id}`, { method: "DELETE" })
     return res.ok
   }
 
@@ -58,9 +58,9 @@ export class ApiStorageService implements StorageService {
     return list.find((d) => d.id === id)
   }
 
-  // Test Runs
+  // Runs
   async getRuns(): Promise<Run[]> {
-    const res = await fetch(`${API_BASE}/test-runs`)
+    const res = await fetch(`${API_BASE}/runs`)
     if (!res.ok) throw new Error("Failed to fetch runs")
     const data = await res.json()
     // Convert snake_case to camelCase, ensure createdAt is valid, filter and sort
@@ -87,7 +87,7 @@ export class ApiStorageService implements StorageService {
 
   async saveRun(run: Run): Promise<Run> {
     const method = run.id ? "PUT" : "POST"
-    const url = run.id ? `${API_BASE}/test-runs/${run.id}` : `${API_BASE}/test-runs`
+    const url = run.id ? `${API_BASE}/runs/${run.id}` : `${API_BASE}/runs`
     
     // Convert camelCase to snake_case for the API
     const payload = {
@@ -110,7 +110,7 @@ export class ApiStorageService implements StorageService {
   }
 
   async deleteRun(id: string): Promise<boolean> {
-    const res = await fetch(`${API_BASE}/test-runs/${id}`, { method: "DELETE" })
+    const res = await fetch(`${API_BASE}/runs/${id}`, { method: "DELETE" })
     return res.ok
   }
 
@@ -155,7 +155,7 @@ export class ApiStorageService implements StorageService {
       test_definition_id: definitionId,
       ...options,
     }
-    const res = await fetch(`${API_BASE}/test-runs`, {
+    const res = await fetch(`${API_BASE}/runs`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

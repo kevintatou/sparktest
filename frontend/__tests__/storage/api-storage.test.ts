@@ -27,7 +27,7 @@ describe("ApiStorageService", () => {
 
       const result = await service.getExecutors()
 
-      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-executors")
+      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/executors")
       expect(result).toEqual(mockExecutors)
     })
 
@@ -55,7 +55,7 @@ describe("ApiStorageService", () => {
 
       const result = await service.saveExecutor(mockExecutor)
 
-      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-executors", {
+      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/executors", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(mockExecutor),
@@ -86,7 +86,7 @@ describe("ApiStorageService", () => {
 
       const result = await service.deleteExecutor("1")
 
-      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-executors/1", {
+      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/executors/1", {
         method: "DELETE"
       })
       expect(result).toBe(true)
@@ -142,7 +142,7 @@ describe("ApiStorageService", () => {
 
         const result = await service.getDefinitions()
 
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-definitions")
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/definitions")
         expect(result).toEqual(mockDefinitions)
       })
 
@@ -172,7 +172,7 @@ describe("ApiStorageService", () => {
 
         const result = await service.saveDefinition(mockDefinition)
 
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-definitions", {
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/definitions", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(mockDefinition),
@@ -207,7 +207,7 @@ describe("ApiStorageService", () => {
 
         const result = await service.saveDefinition(frontendDefinition as any)
 
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-definitions", {
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/definitions", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(frontendDefinition),
@@ -275,7 +275,7 @@ describe("ApiStorageService", () => {
 
         const result = await service.getRuns()
 
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-runs")
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/runs")
         expect(result).toEqual(expectedRuns)
       })
 
@@ -334,7 +334,7 @@ describe("ApiStorageService", () => {
 
         const result = await service.createRun("def1", { name: "Custom Run" })
 
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-runs", {
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/runs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -413,7 +413,7 @@ describe("ApiStorageService", () => {
 
       const result = await service.saveRun(newRun as any)
 
-      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-runs", {
+      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/runs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(expectedPayload),
@@ -451,7 +451,7 @@ describe("ApiStorageService", () => {
 
       const result = await service.saveRun(existingRun as any)
 
-      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-runs/run123", {
+      expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/runs/run123", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(expectedPayload),

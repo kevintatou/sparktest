@@ -38,7 +38,7 @@ describe("Executor Selection in Test Definition", () => {
     const result = await service.saveDefinition(formDataWithExecutor as any)
 
     // Verify the request was made correctly with executorId
-    expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-definitions", {
+    expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/definitions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formDataWithExecutor), // Should include executorId
