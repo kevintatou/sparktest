@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Spinner } from "@/components/ui/spinner"
 import { useToast } from "@/components/ui/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
@@ -104,8 +105,8 @@ export function NewTestForm() {
             Configure your test to run in Kubernetes. SparkTest will create a job based on these settings.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
+        <CardContent className="space-y-8">
+          <div className="space-y-3">
             <Label htmlFor="test-def">Test Definition</Label>
             <Select onValueChange={setSelectedTestDefId}>
               <SelectTrigger id="test-def">
@@ -121,7 +122,7 @@ export function NewTestForm() {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label htmlFor="name">Test Name</Label>
             <Input
               id="name"
@@ -132,7 +133,7 @@ export function NewTestForm() {
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label htmlFor="image">Container Image</Label>
             <Input
               id="image"
@@ -154,7 +155,7 @@ export function NewTestForm() {
                 Add Command
               </Button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {formData.commands.map((command, index) => (
                 <div key={index} className="flex gap-2">
                   <Input
@@ -177,10 +178,17 @@ export function NewTestForm() {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="flex justify-between gap-4">
           <Button variant="outline" type="button" onClick={() => router.push("/")}>Cancel</Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating..." : "Create Test"}
+          <Button type="submit" disabled={isSubmitting} className="min-w-[120px]">
+            {isSubmitting ? (
+              <>
+                <Spinner size="sm" className="mr-2" />
+                Creating...
+              </>
+            ) : (
+              "Create Test"
+            )}
           </Button>
         </CardFooter>
       </Card>

@@ -82,7 +82,7 @@ export function TopHeader() {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search..."
-            className="pl-10 bg-slate-50 dark:bg-slate-800 border-0 focus-visible:ring-1 text-sm sm:text-base"
+            className="pl-10 bg-slate-50 dark:bg-slate-800 border-0 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:border-blue-500 dark:focus-visible:ring-blue-400 dark:focus-visible:border-blue-400 transition-all duration-200 text-sm sm:text-base"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -119,9 +119,7 @@ export function TopHeader() {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        <Button variant="ghost" size="sm" className="gap-2 hidden sm:flex" asChild></Button>
-
-        <Button variant="ghost" size="icon" className="sm:hidden ml-2" asChild>
+        <Button variant="ghost" size="icon" className="sm:hidden" asChild>
           <a href="https://github.com/sparktest/sparktest" target="_blank" rel="noopener noreferrer">
             <Github className="h-4 w-4" />
           </a>
@@ -131,8 +129,12 @@ export function TopHeader() {
           <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
         </Button>
-        <Button>
-          <Github></Github>
+        
+        <Button variant="ghost" size="sm" className="gap-2 hidden sm:flex" asChild>
+          <a href="https://github.com/sparktest/sparktest" target="_blank" rel="noopener noreferrer">
+            <Github className="h-4 w-4" />
+            <span>GitHub</span>
+          </a>
         </Button>
       </div>
     </header>

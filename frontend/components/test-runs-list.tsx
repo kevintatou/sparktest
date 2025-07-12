@@ -4,7 +4,8 @@ import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, XCircle, Clock, RotateCcw, Filter, MoreHorizontal, Play } from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
+import { CheckCircle, XCircle, Clock, Filter, MoreHorizontal, Play } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
@@ -22,7 +23,7 @@ const statusConfig = {
     badge: "bg-red-100 text-red-700",
   },
   running: {
-    icon: RotateCcw,
+    icon: () => <Spinner size="sm" className="text-blue-500" />,
     color: "text-blue-500",
     bg: "bg-blue-50 dark:bg-blue-950/20",
     badge: "bg-blue-100 text-blue-700",
@@ -116,14 +117,14 @@ export function TestRunsList() {
           <div className="divide-y">
             {mockRuns.map((run) => {
               const config = statusConfig[run.status]
-              const StatusIcon = config.icon
+              const StatusIcon = typeof config.icon === 'function' ? config.icon : config.icon
 
               return (
                 <div key={run.id} className="p-4 sm:p-6 hover:bg-muted/30 transition-colors">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
-                      <div className={cn("p-2 rounded-lg flex-shrink-0", config.bg)}>
-                        <StatusIcon className={cn("h-4 w-4 sm:h-5 sm:w-5", config.color)} />
+                      <div className={cn("p-2 rounded-lg flex-shrink-0 flex items-center justify-center", config.bg)}>
+                        {typeof StatusIcon === 'function' ? <StatusIcon /> : <StatusIcon className={cn("h-4 w-4 sm:h-5 sm:w-5", config.color)} />}
                       </div>
 
                       <div className="flex-1 min-w-0">

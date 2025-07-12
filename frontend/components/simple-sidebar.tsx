@@ -63,8 +63,8 @@ export function SimpleSidebar() {
           {/* Dropdown Options */}
           <div
             className={cn(
-              "space-y-1 transition-all duration-200 ease-in-out",
-              isCreateOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+              "space-y-1 transition-all duration-200 ease-in-out transform",
+              isCreateOpen ? "max-h-48 opacity-100 translate-y-0" : "max-h-0 opacity-0 overflow-hidden -translate-y-2"
             )}
           >
             {CREATE_OPTIONS.map((option) => (

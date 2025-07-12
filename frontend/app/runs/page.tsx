@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Spinner } from "@/components/ui/spinner"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { Run, Definition, Executor } from "@/lib/types"
@@ -20,7 +21,7 @@ const getStatusIcon = (status: string) => {
     case "failed":
       return <XCircle className="h-4 w-4 text-red-500" />
     case "running":
-      return <Clock className="h-4 w-4 text-blue-500" />
+      return <Spinner size="sm" className="h-4 w-4" />
     default:
       return <AlertCircle className="h-4 w-4 text-yellow-500" />
   }
@@ -136,7 +137,7 @@ export default function TestRunsPage() {
         <div className="relative w-full max-w-sm">
           <Input
             placeholder="Search runs..."
-            className="pl-10 bg-slate-50 dark:bg-slate-800 border-0 focus-visible:ring-1"
+            className="pl-10 bg-slate-50 dark:bg-slate-800 border-0 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:border-blue-500 dark:focus-visible:ring-blue-400 dark:focus-visible:border-blue-400 transition-all duration-200"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
