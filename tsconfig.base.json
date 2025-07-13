@@ -21,8 +21,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@sparktest/core": ["./packages/core/src"],
-      "@sparktest/storage-service": ["./packages/storage-service/src"]
+      "@sparktest/core": ["./packages/core/src"]
     }
   },
   "include": [
