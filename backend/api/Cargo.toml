@@ -1,0 +1,19 @@
+[package]
+name = "sparktest-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sparktest-core = { path = "../core" }
+axum = "0.7"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.36", features = ["full"] }
+tower-http = { version = "0.5", features = ["cors"] }
+tracing = "0.1"
+uuid = { version = "1", features = ["serde", "v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+sqlx = { version = "0.7", features = ["runtime-tokio", "postgres", "uuid", "chrono", "macros"] }
+kube = { version = "0.90", features = ["runtime", "derive"] }
+k8s-openapi = { version = "0.21", default-features = false, features = ["v1_28"] }
+anyhow = "1.0"
