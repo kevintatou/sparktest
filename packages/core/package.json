@@ -18,6 +18,9 @@
     "dev": "tsc --watch",
     "type-check": "tsc --noEmit"
   },
+  "dependencies": {
+    "lucide-react": "^0.454.0"
+  },
   "devDependencies": {
     "typescript": "^5"
   },
