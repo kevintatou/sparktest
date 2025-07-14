@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { GenericLocalStorageService } from "@/lib/storage/generic-local-storage"
-import { GenericApiStorageService } from "@/lib/storage/generic-api-storage"
-import { GenericHybridStorageService } from "@/lib/storage/generic-hybrid-storage"
-import { storageUtils } from "@/lib/storage/storage-utils"
+import { GenericLocalStorageService, GenericApiStorageService, GenericHybridStorageService, storageUtils } from "@/lib/storage/generic"
 
 // Mock localStorage
 const localStorageMock = {

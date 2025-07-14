@@ -40,8 +40,3 @@ export interface StorageConfig {
   onError?: (error: Error, context: string) => void
   onFallback?: (reason: string) => void
 }
-
-// Re-export all storage service implementations
-export { GenericLocalStorageService } from './generic-local-storage'
-export { GenericApiStorageService } from './generic-api-storage'
-export { GenericHybridStorageService } from './generic-hybrid-storage'

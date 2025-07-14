@@ -3,7 +3,7 @@
  * This service provides API operations for any data type with request/response transformations
  */
 
-import type { ChangeEvent, GenericStorageService } from './generic-storage'
+import type { ChangeEvent, GenericStorageService } from './storage'
 
 export class GenericApiStorageService<T> implements GenericStorageService<T> {
   private endpoint: string

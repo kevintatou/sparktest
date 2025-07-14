@@ -3,7 +3,7 @@
  * This service tries API first and falls back to localStorage on failure
  */
 
-import type { ChangeEvent, GenericStorageService, StorageConfig } from './generic-storage'
+import type { ChangeEvent, GenericStorageService, StorageConfig } from './storage'
 
 export class GenericHybridStorageService<T> implements GenericStorageService<T> {
   private apiStorage: GenericStorageService<T>

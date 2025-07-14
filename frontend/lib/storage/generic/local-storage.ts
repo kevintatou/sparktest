@@ -3,8 +3,8 @@
  * This service provides localStorage operations for any data type
  */
 
-import type { ChangeEvent, GenericStorageService } from './generic-storage'
-import type { StorageHelpers } from './storage-utils'
+import type { ChangeEvent, GenericStorageService } from './storage'
+import type { StorageHelpers } from './utils'
 
 export class GenericLocalStorageService<T> implements GenericStorageService<T> {
   private storageKey: string
