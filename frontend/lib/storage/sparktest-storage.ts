@@ -3,7 +3,9 @@
  * This service uses the generic storage services but provides SparkTest-specific business logic
  */
 
-import { GenericHybridStorageService, GenericLocalStorageService, GenericApiStorageService } from './generic-storage'
+import { GenericHybridStorageService } from './generic-hybrid-storage'
+import { GenericLocalStorageService } from './generic-local-storage'
+import { GenericApiStorageService } from './generic-api-storage'
 import { StorageService } from './storage'
 import { storageUtils } from './storage-utils'
 import type { 

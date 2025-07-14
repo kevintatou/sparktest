@@ -3,7 +3,7 @@
  * These utilities provide safe localStorage access with fallbacks
  */
 
-export interface StorageUtils {
+export interface StorageHelpers {
   getFromStorage<T>(key: string, defaultValue: T): T
   setToStorage<T>(key: string, value: T): void
 }
@@ -27,7 +27,7 @@ export function setToStorage<T>(key: string, value: T): void {
   }
 }
 
-export const storageUtils: StorageUtils = {
+export const storageUtils: StorageHelpers = {
   getFromStorage,
   setToStorage
 }

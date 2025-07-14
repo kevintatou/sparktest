@@ -7,6 +7,9 @@ import { USE_RUST_API } from "@/lib/config"
 
 // Export the new generic storage services for future extraction
 export * from "./generic-storage"
+export * from "./generic-local-storage"
+export * from "./generic-api-storage"
+export * from "./generic-hybrid-storage"
 export * from "./storage-utils"
 export { SparkTestStorageService }
 

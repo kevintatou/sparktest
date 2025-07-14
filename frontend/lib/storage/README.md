@@ -10,6 +10,22 @@ This module provides reusable storage patterns for building hybrid storage servi
 - **Type Safety**: Full TypeScript support with generic types
 - **Framework Agnostic**: Works with React, Vue, Svelte, and any JavaScript framework
 
+## File Structure
+
+The generic storage services are organized into separate files for better modularity:
+
+```
+frontend/lib/storage/
+├── generic-storage.ts           # Common interfaces and types
+├── generic-local-storage.ts     # Generic localStorage service
+├── generic-api-storage.ts       # Generic API storage service
+├── generic-hybrid-storage.ts    # Generic hybrid storage service
+├── storage-utils.ts             # Storage utilities
+├── sparktest-storage.ts         # SparkTest-specific implementation
+├── README.md                    # Documentation
+└── index.ts                     # Exports
+```
+
 ## Storage Services
 
 ### GenericLocalStorageService<T>
@@ -17,7 +33,7 @@ This module provides reusable storage patterns for building hybrid storage servi
 A generic localStorage-based storage service that works with any data type.
 
 ```typescript
-import { GenericLocalStorageService } from './generic-storage'
+import { GenericLocalStorageService } from './generic-local-storage'
 import { storageUtils } from './storage-utils'
 
 interface User {
@@ -49,7 +65,7 @@ await userStorage.deleteItem('1')
 A generic API-based storage service with request/response transformation support.
 
 ```typescript
-import { GenericApiStorageService } from './generic-storage'
+import { GenericApiStorageService } from './generic-api-storage'
 
 const userApiStorage = new GenericApiStorageService<User>(
   'users',
@@ -79,7 +95,7 @@ const newUser = await userApiStorage.saveItem(user)
 A generic hybrid storage service that tries API first and falls back to localStorage.
 
 ```typescript
-import { GenericHybridStorageService } from './generic-storage'
+import { GenericHybridStorageService } from './generic-hybrid-storage'
 
 const hybridStorage = new GenericHybridStorageService<User>(
   userApiStorage,
@@ -165,7 +181,10 @@ const testSuites = await storage.getTestSuites()
 
 These generic storage services are designed to be easily extracted to a separate npm package. The following files would be included in the extracted package:
 
-- `generic-storage.ts` - Core storage services
+- `generic-storage.ts` - Common interfaces and types
+- `generic-local-storage.ts` - Generic localStorage service
+- `generic-api-storage.ts` - Generic API storage service  
+- `generic-hybrid-storage.ts` - Generic hybrid storage service
 - `storage-utils.ts` - Storage utilities
 - Tests and documentation
 
@@ -178,7 +197,8 @@ The extracted package would be framework-agnostic and could be used by any JavaS
 3. **Flexibility**: Configurable behavior and transformations
 4. **Reliability**: Automatic fallback handling
 5. **Framework Agnostic**: Works with any JavaScript framework
-6. **Battle Tested**: Used in production by SparkTest
+6. **Modular**: Each storage type is in its own file for better organization
+7. **Battle Tested**: Used in production by SparkTest
 
 ## Example Use Cases
 
