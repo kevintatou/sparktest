@@ -22,8 +22,8 @@ import { useSidebar as useCustomSidebar } from "@/hooks/use-sidebar"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { isActiveRoute } from "@/lib/utils/navigation"
 import { NAVIGATION_ITEMS, CREATE_OPTIONS } from "@/lib/constants/navigation"
-import { SidebarLogo } from "./sidebar/sidebar-logo"
-import { CreateOptionComponent } from "./sidebar/create-option"
+import { SidebarLogo } from "./sidebar-logo"
+import { CreateOptionComponent } from "./create-option"
 
 function SidebarNavigation() {
   const pathname = usePathname()
