@@ -40,7 +40,7 @@ export default function NewRunPage() {
                   <span className="sr-only">Back</span>
                 </Link>
               </Button>
-              <h1 className="text-2xl font-bold">Create Run</h1>
+              <h1 className="text-2xl font-bold">Create Test Run</h1>
             </div>
 
             {loading ? (

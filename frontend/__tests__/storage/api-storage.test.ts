@@ -542,7 +542,7 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.getSuites()).rejects.toThrow("Failed to fetch suites")
+        await expect(service.getSuites()).rejects.toThrow("Failed to fetch test suites")
       })
     })
 
@@ -632,7 +632,7 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.saveSuite(suite)).rejects.toThrow("Failed to save suite")
+        await expect(service.saveSuite(suite)).rejects.toThrow("Failed to save test suite")
       })
     })
 
@@ -737,7 +737,7 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.getSuiteById("suite1")).rejects.toThrow("Failed to fetch suite")
+        await expect(service.getSuiteById("suite1")).rejects.toThrow("Failed to fetch test suite")
       })
     })
   })
@@ -788,7 +788,7 @@ describe("ApiStorageService", () => {
 
         const result = await service.getTestRunLogs("run123")
 
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-runs/run123/logs")
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/runs/run123/logs")
         expect(result).toEqual(logsResponse)
       })
 

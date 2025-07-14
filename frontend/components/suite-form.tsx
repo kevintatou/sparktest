@@ -15,11 +15,11 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@/lib/storage"
-import type { Suite, Definition } from "@/lib/types"
+import type { TestSuite, Definition } from "@/lib/types"
 import { Autocomplete } from "@/components/ui/autocomplete"
 
 interface SuiteFormProps {
-  existingSuite?: Suite
+  existingSuite?: TestSuite
 }
 
 export function SuiteForm({ existingSuite }: SuiteFormProps) {
@@ -81,22 +81,22 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
         throw new Error("Please select at least one test definition")
       }
       
-      const suiteData: Suite = {
+      const suiteData: TestSuite = {
         ...formData,
         createdAt: existingSuite?.createdAt || new Date().toISOString(),
       }
 
       // Save the suite using the storage service
-      await storage.saveSuite(suiteData)
+      await storage.saveTestSuite(suiteData)
 
       toast({
         title: existingSuite ? "Suite updated" : "Suite created",
-        description: `Suite "${formData.name}" has been ${existingSuite ? "updated" : "created"} successfully.`,
+        description: `Test suite "${formData.name}" has been ${existingSuite ? "updated" : "created"} successfully.`,
       })
 
       router.push("/suites")
     } catch (error) {
-      console.error("Error saving suite:", error)
+      console.error("Error saving test suite:", error)
       toast({
         title: `Error ${existingSuite ? "updating" : "creating"} suite`,
         description: error instanceof Error ? error.message : "Unknown error occurred",
@@ -111,11 +111,11 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
     <form onSubmit={handleSubmit}>
       <Card className="shadow-sm">
         <CardHeader>
-          <CardTitle>{existingSuite ? "Edit" : "Create"} Suite</CardTitle>
+          <CardTitle>{existingSuite ? "Edit" : "Create"} Test Suite</CardTitle>
           <CardDescription>
             {existingSuite
-              ? "Update this suite configuration"
-              : "Create a suite to group related definitions together."}
+              ? "Update this test suite configuration"
+              : "Create a test suite to group related test definitions together."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -137,7 +137,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
             <Label htmlFor="name">Suite Name</Label>
             <Input
               id="name"
-              placeholder="e.g., API Integration Suite"
+              placeholder="e.g., API Integration Test Suite"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
@@ -149,7 +149,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Describe what this suite covers..."
+              placeholder="Describe what this test suite covers..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
@@ -174,7 +174,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
           </div>
 
           <div className="space-y-4">
-            <Label>Definitions</Label>
+            <Label>Test Definitions</Label>
             <Autocomplete
               options={definitions}
               getOptionLabel={(option) => option.name}

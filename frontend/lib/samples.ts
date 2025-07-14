@@ -1,10 +1,10 @@
-import { Definition, Executor, Run, Suite } from "./types"
+import { Definition, Executor, Run, TestSuite } from "./types"
 
-// Sample Suites
-export const sampleSuites: Suite[] = [
+// Sample Test Suites
+export const sampleTestSuites: TestSuite[] = [
   {
     id: "api-suite",
-    name: "API Suite",
+    name: "API Test Suite",
     description: "Complete API testing including auth, CRUD operations, and error handling",
     testDefinitionIds: ["api-integration-tests", "security-scan", "performance-tests"],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
@@ -22,7 +22,7 @@ export const sampleSuites: Suite[] = [
   },
   {
     id: "performance-suite",
-    name: "Performance Suite",
+    name: "Performance Test Suite",
     description: "Load testing and performance benchmarks",
     testDefinitionIds: ["performance-tests", "database-migration-tests"],
     createdAt: new Date(Date.now() - 259200000).toISOString(),

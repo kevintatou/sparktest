@@ -45,7 +45,7 @@ export type Executor = {
   createdAt: string
 }
 
-export interface Suite {
+export interface TestSuite {
   id: string
   name: string
   description: string

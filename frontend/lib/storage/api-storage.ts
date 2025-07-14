@@ -164,10 +164,10 @@ export class ApiStorageService implements StorageService {
     return await res.json()
   }
 
-  // Suites
+  // Test Suites
   async getSuites(): Promise<Suite[]> {
     const res = await fetch(`${API_BASE}/suites`)
-    if (!res.ok) throw new Error("Failed to fetch suites")
+    if (!res.ok) throw new Error("Failed to fetch test suites")
     
     const data = await res.json();
     
@@ -215,7 +215,7 @@ export class ApiStorageService implements StorageService {
       body: JSON.stringify(suitePayload),
     })
 
-    if (!res.ok) throw new Error("Failed to save suite")
+    if (!res.ok) throw new Error("Failed to save test suite")
     return await res.json()
   }
 
@@ -238,7 +238,7 @@ export class ApiStorageService implements StorageService {
     }
     
     const res = await fetch(`${API_BASE}/suites/${uuidId}`)
-    if (!res.ok) throw new Error("Failed to fetch suite")
+    if (!res.ok) throw new Error("Failed to fetch test suite")
     
     const data = await res.json();
     

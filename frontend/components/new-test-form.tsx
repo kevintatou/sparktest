@@ -106,7 +106,7 @@ export function NewTestForm() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="test-def">Definition</Label>
+            <Label htmlFor="test-def">Test Definition</Label>
             <Select onValueChange={setSelectedTestDefId}>
               <SelectTrigger id="test-def">
                 <SelectValue placeholder="Select a test definition" />

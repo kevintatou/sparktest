@@ -154,7 +154,7 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
         <form onSubmit={handleSubmit}>
           <Card className="shadow-sm">
             <CardHeader>
-              <CardTitle>{existingTest ? "Edit" : "Create"} Definition</CardTitle>
+              <CardTitle>{existingTest ? "Edit" : "Create"} Test Definition</CardTitle>
               <CardDescription>
                 {existingTest
                   ? "Update this test definition"
@@ -294,9 +294,9 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
                     {existingTest ? "Updating..." : "Creating..."}
                   </>
                 ) : existingTest ? (
-                  "Update Definition"
+                  "Update Test Definition"
                 ) : (
-                  "Create Definition"
+                  "Create Test Definition"
                 )}
               </Button>
             </CardFooter>

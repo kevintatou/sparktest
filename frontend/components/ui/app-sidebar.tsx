@@ -25,17 +25,17 @@ const navigationItems = [
     icon: BarChart3,
   },
   {
-    title: "Runs",
+    title: "Test Runs",
     url: "/runs",
     icon: Play,
   },
   {
-    title: "Definitions",
-    url: "/definitions",
+    title: "Test Definitions",
+    url: "/runs",
     icon: FileText,
   },
   {
-    title: "Suites",
+    title: "Test Suites",
     url: "/suites",
     icon: Layers,
   },
@@ -49,14 +49,14 @@ const navigationItems = [
 // Create menu items
 const createItems = [
   {
-    title: "New Run",
+    title: "New Test Run",
     url: "/new",
-    description: "Create a new run",
+    description: "Create a new test run",
   },
   {
     title: "New Definition",
     url: "/runs/new",
-    description: "Define a new case",
+    description: "Define a new test case",
   },
   {
     title: "New Executor",
