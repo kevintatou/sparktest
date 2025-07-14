@@ -14,8 +14,8 @@ import type {
   JobLogs, 
   JobStatus, 
   JobDeleteResponse 
-} from '../types'
-import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from '../samples'
+} from '../../lib/types'
+import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from '../../lib/samples'
 
 const API_BASE = 'http://localhost:3001/api'
 

@@ -5,7 +5,7 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TestDefinitionForm } from "@/components/test-definition-form"
-import { storage } from "@/lib/storage"
+import { storage } from "@/packages/storage"
 import type { Definition } from "@/lib/types"
 
 export default function EditDefinitionPage({ params }: { params: { id: string } }) {

@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
-import { HybridStorageService } from "@/lib/storage/hybrid-storage"
-import { ApiStorageService } from "@/lib/storage/api-storage"
-import { LocalStorageService } from "@/lib/storage/local-storage"
+import { HybridStorageService } from "@/packages/storage/hybrid-storage"
+import { ApiStorageService } from "@/packages/storage/api-storage"
+import { LocalStorageService } from "@/packages/storage/local-storage"
 
 // Mock the storage services
-vi.mock("@/lib/storage/api-storage")
-vi.mock("@/lib/storage/local-storage")
+vi.mock("@/packages/storage/api-storage")
+vi.mock("@/packages/storage/local-storage")
 
 const mockApiStorage = vi.mocked(ApiStorageService)
 const mockLocalStorage = vi.mocked(LocalStorageService)

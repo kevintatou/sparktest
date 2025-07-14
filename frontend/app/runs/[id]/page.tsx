@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { RunDetails } from "@/components/run-details"
-import { storage } from "@/lib/storage"
+import { storage } from "@/packages/storage"
 import type { Run } from "@/lib/types"
 
 export default function TestDetailsPage({ params }: { params: { id: string } }) {

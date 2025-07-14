@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { SparkTestStorageService } from "@/lib/storage/sparktest-storage"
+import { SparkTestStorageService } from "@/packages/storage/sparktest-storage"
 import type { Executor, Definition, Run, TestSuite } from "@/lib/types"
 
 // Mock localStorage

@@ -38,5 +38,5 @@ export function formatDistanceToNow(dateString: string): string {
   return `${diffInDays} day${diffInDays === 1 ? "" : "s"} ago`
 }
 
-// Storage utilities moved to lib/storage/storage-utils.ts for better organization
-export { getFromStorage, setToStorage } from "./storage/storage-utils"
+// Storage utilities moved to packages/storage/storage-utils.ts for better organization
+export { getFromStorage, setToStorage } from "../packages/storage/generic/utils"

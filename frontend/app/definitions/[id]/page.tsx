@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
-import { storage } from "@/lib/storage"
+import { storage } from "@/packages/storage"
 import type { Definition } from "@/lib/types"
 
 export default function DefinitionDetailsPage({ params }: { params: { id: string } }) {

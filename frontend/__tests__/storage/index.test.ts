@@ -5,14 +5,14 @@ vi.mock("@/lib/config", () => ({
   USE_RUST_API: false,
 }))
 
-vi.mock("@/lib/storage/local-storage", () => ({
+vi.mock("@/packages/storage/local-storage", () => ({
   LocalStorageService: vi.fn().mockImplementation(() => ({
     getExecutors: vi.fn(),
     saveExecutor: vi.fn(),
   })),
 }))
 
-vi.mock("@/lib/storage/sparktest-storage", () => ({
+vi.mock("@/packages/storage/sparktest-storage", () => ({
   SparkTestStorageService: vi.fn().mockImplementation(() => ({
     getExecutors: vi.fn(),
     saveExecutor: vi.fn(),
@@ -31,8 +31,8 @@ describe("Storage Index", () => {
       USE_RUST_API: false,
     }))
 
-    const { storage } = await import("@/lib/storage/index")
-    const { LocalStorageService } = await import("@/lib/storage/local-storage")
+    const { storage } = await import("@/packages/storage/index")
+    const { LocalStorageService } = await import("@/packages/storage/local-storage")
 
     expect(LocalStorageService).toHaveBeenCalled()
     expect(storage).toBeDefined()
@@ -43,8 +43,8 @@ describe("Storage Index", () => {
       USE_RUST_API: true,
     }))
 
-    const { storage } = await import("@/lib/storage/index")
-    const { SparkTestStorageService } = await import("@/lib/storage/sparktest-storage")
+    const { storage } = await import("@/packages/storage/index")
+    const { SparkTestStorageService } = await import("@/packages/storage/sparktest-storage")
 
     expect(SparkTestStorageService).toHaveBeenCalled()
     expect(storage).toBeDefined()

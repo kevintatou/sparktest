@@ -6,7 +6,7 @@ import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { RunTestForm } from "@/components/run-test-form"
-import { storage } from "@/lib/storage"
+import { storage } from "@/packages/storage"
 import type { Definition } from "@/lib/types"
 
 export default function NewRunPage() {

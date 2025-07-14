@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { TestSuite, Definition } from "@/lib/types"
-import { storage } from "@/lib/storage"
+import { storage } from "@/packages/storage"
 
 export default function SuiteDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)

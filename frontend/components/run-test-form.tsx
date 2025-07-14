@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@/lib/storage"
+import { storage } from "@/packages/storage"
 import type { Definition } from "@/lib/types"
 
 export function RunTestForm({ def: definition }: { def: Definition }) {

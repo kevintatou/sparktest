@@ -1,7 +1,7 @@
 import type { StorageService } from "./storage"
-import { getFromStorage, setToStorage } from "./storage-utils"
-import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
-import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from "../samples"
+import { getFromStorage, setToStorage } from "./generic/utils"
+import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../../lib/types"
+import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from "../../lib/samples"
 
 export class LocalStorageService implements StorageService {
   async getExecutors(): Promise<Executor[]> {

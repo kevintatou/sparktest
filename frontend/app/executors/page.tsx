@@ -10,7 +10,7 @@ import { useEffect, useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { Executor } from "@/lib/types"
-import { storage } from "@/lib/storage"
+import { storage } from "@/packages/storage"
 
 export default function ExecutorsPage() {
   const { toast } = useToast()

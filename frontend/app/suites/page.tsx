@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { TestSuite } from "@/lib/types"
-import { storage } from "@/lib/storage"
+import { storage } from "@/packages/storage"
 
 export default function TestSuitesPage() {
   const { toast } = useToast()

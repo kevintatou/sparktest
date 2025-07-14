@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { SuiteForm } from "@/components/suite-form"
 import { useToast } from "@/components/ui/use-toast"
 import type { TestSuite } from "@/lib/types"
-import { storage } from "@/lib/storage"
+import { storage } from "@/packages/storage"
 
 export default function EditSuitePage({ params }: { params: { id: string } }) {
   const { id } = params

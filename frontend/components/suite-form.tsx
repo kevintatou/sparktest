@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@/lib/storage"
+import { storage } from "@/packages/storage"
 import type { TestSuite, Definition } from "@/lib/types"
 import { Autocomplete } from "@/components/ui/autocomplete"
 
