@@ -35,7 +35,7 @@
 ### Frontend Development
 
 ```bash
-cd frontend
+cd apps/oss
 pnpm install
 pnpm dev
 ```
@@ -70,7 +70,7 @@ Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI!
 ### Testing
 
 ```bash
-cd frontend
+cd apps/oss
 pnpm test          # Run unit tests
 pnpm test:coverage # Run tests with coverage
 pnpm lint          # Run ESLint
