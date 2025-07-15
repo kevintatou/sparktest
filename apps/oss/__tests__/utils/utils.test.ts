@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import { cn, formatDate, formatDistanceToNow, getFromStorage, setToStorage } from "@sparktest/core/utils"
+import { cn } from "@/lib/utils"
+import { formatDate, formatDistanceToNow, getFromStorage, setToStorage } from "@sparktest/core/utils"
 
 describe("utils", () => {
   describe("cn", () => {

@@ -1,6 +1,6 @@
 import Link from "next/link"
-import { getTooltipClasses } from "@sparktest/core/utils/navigation"
-import { SIDEBAR_CONFIG } from "@sparktest/core/constants/navigation"
+import { getTooltipClasses } from "@/lib/utils/navigation"
+import { SIDEBAR_CONFIG } from "@/lib/constants/navigation"
 
 export function SidebarLogo() {
   return (
