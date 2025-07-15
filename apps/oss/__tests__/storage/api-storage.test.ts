@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
-import { ApiStorageService } from "@/lib/storage/api-storage"
+import { ApiStorageService } from "@sparktest/core/storage/api-storage"
 
 // Mock fetch
 const mockFetch = vi.fn()

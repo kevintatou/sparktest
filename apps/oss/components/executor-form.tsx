@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import type { Executor } from "@/lib/types"
-import { storage } from "@/lib/storage"
+import type { Executor } from "@sparktest/core/types"
+import { storage } from "@sparktest/core/storage"
 
 interface ExecutorFormProps {
   existingExecutor?: Executor

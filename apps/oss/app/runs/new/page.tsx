@@ -6,8 +6,8 @@ import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { RunTestForm } from "@/components/run-test-form"
-import { storage } from "@/lib/storage"
-import type { Definition } from "@/lib/types"
+import { storage } from "@sparktest/core/storage"
+import type { Definition } from "@sparktest/core/types"
 
 export default function NewRunPage() {
   const [definitions, setDefinitions] = useState<Definition[]>([])

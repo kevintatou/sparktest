@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
-import { formatDistanceToNow } from "@/lib/utils"
-import type { Executor } from "@/lib/types"
-import { storage } from "@/lib/storage"
+import { formatDistanceToNow } from "@sparktest/core/utils"
+import type { Executor } from "@sparktest/core/types"
+import { storage } from "@sparktest/core/storage"
 
 export default function ExecutorsPage() {
   const { toast } = useToast()

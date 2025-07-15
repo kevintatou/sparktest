@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { storage } from "@/lib/storage"
-import { formatDistanceToNow } from "@/lib/utils"
-import type { Run } from "@/lib/types"
+import { storage } from "@sparktest/core/storage"
+import { formatDistanceToNow } from "@sparktest/core/utils"
+import type { Run } from "@sparktest/core/types"
 
 export default function ActiveTestsPage() {
   const [tests, setTests] = useState<Run[]>([])
