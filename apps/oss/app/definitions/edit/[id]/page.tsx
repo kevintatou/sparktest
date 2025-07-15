@@ -5,8 +5,8 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { TestDefinitionForm } from "@/components/test-definition-form"
-import { storage } from "@/lib/storage"
-import type { Definition } from "@/lib/types"
+import { storage } from "@sparktest/core/storage"
+import type { Definition } from "@sparktest/core/types"
 
 export default function EditDefinitionPage({ params }: { params: { id: string } }) {
   const { id } = params

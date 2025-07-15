@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { formatDistanceToNow } from "@/lib/utils"
+import { formatDistanceToNow } from "@sparktest/core/utils"
 
 interface TestResult {
   success: boolean

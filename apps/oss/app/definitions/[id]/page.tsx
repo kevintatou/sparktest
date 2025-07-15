@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { formatDistanceToNow } from "@/lib/utils"
-import { storage } from "@/lib/storage"
-import type { Definition } from "@/lib/types"
+import { formatDistanceToNow } from "@sparktest/core/utils"
+import { storage } from "@sparktest/core/storage"
+import type { Definition } from "@sparktest/core/types"
 
 export default function DefinitionDetailsPage({ params }: { params: { id: string } }) {
   const { toast } = useToast()

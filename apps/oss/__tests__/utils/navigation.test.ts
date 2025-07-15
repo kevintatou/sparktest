@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { isActiveRoute, getTooltipClasses } from "@/lib/utils/navigation"
+import { isActiveRoute, getTooltipClasses } from "@sparktest/core/utils/navigation"
 
 describe("Navigation Utils", () => {
   describe("isActiveRoute", () => {

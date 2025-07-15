@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
-import { HybridStorageService } from "@/lib/storage/hybrid-storage"
-import { ApiStorageService } from "@/lib/storage/api-storage"
-import { LocalStorageService } from "@/lib/storage/local-storage"
+import { HybridStorageService } from "@sparktest/core/storage/hybrid-storage"
+import { ApiStorageService } from "@sparktest/core/storage/api-storage"
+import { LocalStorageService } from "@sparktest/core/storage/local-storage"
 
 // Mock the storage services
-vi.mock("@/lib/storage/api-storage")
-vi.mock("@/lib/storage/local-storage")
+vi.mock("@sparktest/core/storage/api-storage")
+vi.mock("@sparktest/core/storage/local-storage")
 
 const mockApiStorage = vi.mocked(ApiStorageService)
 const mockLocalStorage = vi.mocked(LocalStorageService)

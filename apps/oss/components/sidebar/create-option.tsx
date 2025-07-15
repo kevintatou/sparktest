@@ -1,6 +1,6 @@
 // components/sidebar/create-option.tsx
-import { cn } from "@/lib/utils"
-import type { CreateOption } from "@/lib/constants/navigation"
+import { cn } from "@sparktest/core/utils"
+import type { CreateOption } from "@sparktest/core/constants/navigation"
 import Link from "next/link"
 
 interface Props {

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import type { TestExecutor } from "@/lib/executors"
+import type { Executor } from "@sparktest/core"
 
 interface ExecutorTestResult {
   success: boolean
@@ -28,7 +28,7 @@ interface ExecutorTestResult {
 interface ExecutorTestModalProps {
   isOpen: boolean
   onClose: () => void
-  executor: TestExecutor
+  executor: Executor
 }
 
 export function ExecutorTestModal({ isOpen, onClose, executor }: ExecutorTestModalProps) {

@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { formatDistanceToNow } from "@/lib/utils"
-import type { TestDefinition } from "@/lib/types"
+import { formatDistanceToNow } from "@sparktest/core/utils"
+import type { TestDefinition } from "@sparktest/core/types"
 
 interface TestResult {
   success: boolean
