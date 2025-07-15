@@ -141,15 +141,6 @@ export function TestDefinitionCards() {
       }
     } catch (error) {
       setRunningTests((prev) => prev.filter((id) => id !== testId))
-      toast({
-        title: "Error",
-        description: "Failed to start test run",
-        variant: "destructive",
-      })
-    }
-  }
-    } catch (error) {
-      setRunningTests((prev) => prev.filter((id) => id !== testId))
 
       toast({
         title: "Error starting test",

@@ -1,5 +1,5 @@
 // components/sidebar/create-option.tsx
-import { cn } from "@sparktest/core/utils"
+import { cn } from "@/lib/utils"
 import type { CreateOption } from "@sparktest/core/constants/navigation"
 import Link from "next/link"
 

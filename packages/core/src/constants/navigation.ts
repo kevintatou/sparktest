@@ -15,12 +15,3 @@ export const CREATE_OPTIONS: readonly CreateOption[] = [
   { name: "New Suite", href: "/suites/new", icon: LayersIcon },
   { name: "New Executor", href: "/executors/new", icon: CpuIcon },
 ] as const
-
-export const SIDEBAR_CONFIG = {
-  width: 16,
-  logoSize: 8,
-  iconSize: 5,
-  createIconSize: 4,
-  tooltipDelay: 200,
-  animationDuration: 200,
-} as const

@@ -49,10 +49,6 @@
       "types": "./src/utils.ts",
       "default": "./src/utils.ts"
     },
-    "./utils/navigation": {
-      "types": "./src/utils/navigation.ts",
-      "default": "./src/utils/navigation.ts"
-    },
     "./constants": {
       "types": "./src/constants/index.ts",
       "default": "./src/constants/index.ts"
@@ -79,9 +75,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "lucide-react": "^0.454.0",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.5"
+    "lucide-react": "^0.454.0"
   },
   "devDependencies": {
     "typescript": "^5",

@@ -2,10 +2,10 @@
 
 import { usePathname } from "next/navigation"
 import { Plus } from "lucide-react"
-import { cn } from "@sparktest/core/utils"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useSidebar } from "@/hooks/use-sidebar"
-import { isActiveRoute } from "@sparktest/core/utils/navigation"
+import { isActiveRoute } from "@/lib/utils/navigation"
 import { NAVIGATION_ITEMS, CREATE_OPTIONS } from "@sparktest/core/constants/navigation"
 import { SidebarLogo } from "./sidebar/sidebar-logo"
 import { NavigationItemComponent } from "./sidebar/navigation-item"
