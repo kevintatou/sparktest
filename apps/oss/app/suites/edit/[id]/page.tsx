@@ -6,8 +6,8 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SuiteForm } from "@/components/suite-form"
 import { useToast } from "@/components/ui/use-toast"
-import type { TestSuite } from "@/lib/types"
-import { storage } from "@/lib/storage"
+import type { TestSuite } from "@sparktest/core/types"
+import { storage } from "@sparktest/core/storage"
 
 export default function EditSuitePage({ params }: { params: { id: string } }) {
   const { id } = params

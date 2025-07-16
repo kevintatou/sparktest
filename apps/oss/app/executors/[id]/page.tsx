@@ -4,8 +4,8 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { storage } from "@/lib/storage"
-import type { Executor } from "@/lib/types"
+import { storage } from "@sparktest/core/storage"
+import type { Executor } from "@sparktest/core/types"
 import ClientLayout from "@/app/client-layout"
 
 

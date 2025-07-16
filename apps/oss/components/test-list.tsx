@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { fetchTestRuns, updateTestRun, initialize } from "@/lib/api-service"
-import { formatDistanceToNow } from "@/lib/utils"
-import type { Test } from "@/lib/types"
+import { storage } from "@sparktest/core/storage"
+import { formatDistanceToNow } from "@sparktest/core/utils"
+import type { Test } from "@sparktest/core/types"
 
 export function TestList() {
   const [tests, setTests] = useState<Test[]>([])
@@ -22,16 +22,14 @@ export function TestList() {
   useEffect(() => {
     if (!initializedRef.current) {
       // Initialize storage on component mount
-      initialize().then(() => {
-        fetchTestRuns().then((data) => {
-          setTests(data)
-        })
+      storage.getRuns().then((data) => {
+        setTests(data)
       })
       initializedRef.current = true
 
       // Set up a refresh interval to check for updates
       intervalRef.current = setInterval(async () => {
-        const updatedTests = await fetchTestRuns()
+        const updatedTests = await storage.getRuns()
         setTests((prev) => {
           // Only update if the tests have actually changed
           if (JSON.stringify(prev) !== JSON.stringify(updatedTests)) {
@@ -90,7 +88,7 @@ export function TestList() {
                 ...test,
                 status: newStatus,
               }
-              updateTestRun(updatedTest)
+              storage.saveRun(updatedTest)
 
               // Update the local state
               setTests((prevTests) => prevTests.map((t) => (t.id === test.id ? updatedTest : t)))

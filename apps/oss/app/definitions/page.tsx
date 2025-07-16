@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { storage } from "@/lib/storage"
+import { storage } from "@sparktest/core/storage"
 import { useToast } from "@/components/ui/use-toast"
-import { formatDistanceToNow } from "@/lib/utils"
-import type { Definition } from "@/lib/types"
+import { formatDistanceToNow } from "@sparktest/core/utils"
+import type { Definition } from "@sparktest/core/types"
 
 export default function DefinitionsPage() {
   const { toast } = useToast()

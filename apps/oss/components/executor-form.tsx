@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import type { Executor } from "@/lib/types"
-import { storage } from "@/lib/storage"
+import type { Executor } from "@sparktest/core/types"
+import { storage } from "@sparktest/core/storage"
 
 interface ExecutorFormProps {
   existingExecutor?: Executor
@@ -79,7 +79,7 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
           }
           placeholder="e.g. run, /scripts/test.js"
         />
-        <p className="text-xs text-muted-foreground mt-1">Comma-separated. This becomes your container's command.</p>
+        <p className="text-xs text-muted-foreground mt-1">Comma-separated. This becomes your container&apos;s command.</p>
       </div>
 
       <div>

@@ -5,8 +5,8 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ExecutorForm } from "@/components/executor-form"
-import { storage } from "@/lib/storage"
-import type { Executor } from "@/lib/types"
+import { storage } from "@sparktest/core/storage"
+import type { Executor } from "@sparktest/core/types"
 import ClientLayout from "@/app/client-layout"
 
 export default function EditExecutorPage({ params }: { params: { id: string } }) {

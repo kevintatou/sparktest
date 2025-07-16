@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { fetchTestDefinitions, createTestRun, initialize } from "@/lib/api-service"
-import { formatDistanceToNow } from "@/lib/utils"
+import { storage } from "@sparktest/core/storage"
+import { formatDistanceToNow } from "@sparktest/core/utils"
 import { TestDefinitionTestModal } from "@/components/test-definition-test-modal"
-import type { TestDefinition } from "@/lib/types"
+import type { TestDefinition } from "@sparktest/core/types"
 
 // Map of icons for different test types
 const iconMap: Record<string, any> = {
@@ -114,10 +114,8 @@ export function TestDefinitionCards() {
   useEffect(() => {
     if (!initializedRef.current) {
       // Initialize storage on component mount
-      initialize().then(() => {
-        fetchTestDefinitions().then((data) => {
-          setTestDefinitions(data)
-        })
+      storage.getDefinitions().then((data) => {
+        setTestDefinitions(data)
       })
       initializedRef.current = true
     }
@@ -128,16 +126,19 @@ export function TestDefinitionCards() {
 
     try {
       // Create a new test run in localStorage
-      const newRun = await createTestRun(testId)
+      const definition = testDefinitions.find((def) => def.id === testId)
+      if (definition) {
+        const newRun = await storage.createRun(definition)
 
-      setTimeout(() => {
-        setRunningTests((prev) => prev.filter((id) => id !== testId))
+        setTimeout(() => {
+          setRunningTests((prev) => prev.filter((id) => id !== testId))
 
-        toast({
-          title: "Test started successfully",
-          description: `Test "${newRun.name}" is now running.`,
-        })
-      }, 1500)
+          toast({
+            title: "Test started successfully",
+            description: `Test "${newRun.name}" is now running.`,
+          })
+        }, 1500)
+      }
     } catch (error) {
       setRunningTests((prev) => prev.filter((id) => id !== testId))
 

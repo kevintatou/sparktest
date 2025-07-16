@@ -6,8 +6,8 @@ import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { RunTestForm } from "@/components/run-test-form"
-import { storage  } from "@/lib/storage"
-import type { Definition } from "@/lib/types"
+import { storage  } from "@sparktest/core/storage"
+import type { Definition } from "@sparktest/core/types"
 
 export default function RunTestPage({ params }: { params: { id: string } }) {
   const [definition, setDefinition] = useState<Definition | undefined>(undefined)

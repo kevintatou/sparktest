@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { formatDistanceToNow } from "@/lib/utils"
+import { formatDistanceToNow } from "@sparktest/core/utils"
 
 interface TestResult {
   success: boolean
@@ -145,7 +145,7 @@ export function TestWebhookModal({ isOpen, onClose, webhook }: TestWebhookModalP
           {!testing && !result && (
             <div className="p-4 bg-muted/30 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                This will send a test payload to your webhook endpoint to verify it's working correctly.
+                This will send a test payload to your webhook endpoint to verify it&apos;s working correctly.
               </p>
             </div>
           )}

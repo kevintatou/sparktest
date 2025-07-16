@@ -8,9 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
-import { formatDistanceToNow } from "@/lib/utils"
-import type { TestSuite, Definition } from "@/lib/types"
-import { storage } from "@/lib/storage"
+import { formatDistanceToNow } from "@sparktest/core/utils"
+import type { TestSuite, Definition } from "@sparktest/core/types"
+import { storage } from "@sparktest/core/storage"
 
 export default function SuiteDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)

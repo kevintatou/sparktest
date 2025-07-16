@@ -9,9 +9,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { formatDistanceToNow } from "@/lib/utils"
-import type { Run, Definition, Executor } from "@/lib/types"
-import { storage } from "@/lib/storage"
+import { formatDistanceToNow } from "@sparktest/core/utils"
+import type { Run, Definition, Executor } from "@sparktest/core/types"
+import { storage } from "@sparktest/core/storage"
 
 const getStatusIcon = (status: string) => {
   switch (status) {
