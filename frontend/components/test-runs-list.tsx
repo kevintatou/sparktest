@@ -87,8 +87,8 @@ export function TestRunsList() {
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <CardTitle className="text-lg sm:text-xl">Recent Test Runs</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">Latest execution results across all environments</p>
+              <CardTitle className="text-lg sm:text-xl">🏇 Recent Horse Races</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">Latest racing results across all tracks</p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <DropdownMenu>

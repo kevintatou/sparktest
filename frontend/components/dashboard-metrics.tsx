@@ -75,8 +75,8 @@ export function DashboardMetrics() {
     return (
       <div className="space-y-4 sm:space-y-6">
         <div>
-          <h2 className="text-lg sm:text-xl font-semibold mb-1">Test Execution Overview</h2>
-          <p className="text-sm text-muted-foreground">Loading metrics...</p>
+          <h2 className="text-lg sm:text-xl font-semibold mb-1">🐎 Stable Performance Overview</h2>
+          <p className="text-sm text-muted-foreground">Loading racing metrics...</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
@@ -98,8 +98,8 @@ export function DashboardMetrics() {
   return (
     <div className="space-y-4 sm:space-y-6">
       <div>
-        <h2 className="text-lg sm:text-xl font-semibold mb-1">Test Execution Overview</h2>
-        <p className="text-sm text-muted-foreground">Real-time metrics from your test data</p>
+        <h2 className="text-lg sm:text-xl font-semibold mb-1">🐎 Stable Performance Overview</h2>
+        <p className="text-sm text-muted-foreground">Real-time racing metrics from your stable</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

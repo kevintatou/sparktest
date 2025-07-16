@@ -10,10 +10,10 @@ export function SidebarLogo() {
           <div
             className={`h-${SIDEBAR_CONFIG.logoSize} w-${SIDEBAR_CONFIG.logoSize} rounded-lg bg-blue-600 flex items-center justify-center hover:bg-blue-700 transition-colors`}
           >
-            <span className="text-white font-bold text-sm">S</span>
+            <span className="text-white font-bold text-lg">🐴</span>
           </div>
         </Link>
-        <div className={getTooltipClasses(false, true)}>SparkTest</div>
+        <div className={getTooltipClasses(false, true)}>🐎 HorseTest</div>
       </div>
     </div>
   )

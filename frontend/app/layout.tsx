@@ -4,8 +4,8 @@ import "./globals.css"
 import ClientLayout from "./client-layout"
 
 export const metadata: Metadata = {
-  title: "SparkTest",
-  description: "Kubernetes Testing Platform",
+  title: "🐴 HorseTest",
+  description: "Equestrian Testing Platform",
     generator: 'v0.dev'
 }
 
