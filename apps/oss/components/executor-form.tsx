@@ -79,7 +79,7 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
           }
           placeholder="e.g. run, /scripts/test.js"
         />
-        <p className="text-xs text-muted-foreground mt-1">Comma-separated. This becomes your container's command.</p>
+        <p className="text-xs text-muted-foreground mt-1">Comma-separated. This becomes your container&apos;s command.</p>
       </div>
 
       <div>
