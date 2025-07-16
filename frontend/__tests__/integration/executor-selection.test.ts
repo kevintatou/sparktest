@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
-import { ApiStorageService } from "@/packages/storage/api-storage"
+import { ApiStorageService } from "../../../packages/storage/api-storage"
 
 // Test the executor selection in test definition creation
 describe("Executor Selection in Test Definition", () => {
