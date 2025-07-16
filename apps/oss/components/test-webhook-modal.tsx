@@ -145,7 +145,7 @@ export function TestWebhookModal({ isOpen, onClose, webhook }: TestWebhookModalP
           {!testing && !result && (
             <div className="p-4 bg-muted/30 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                This will send a test payload to your webhook endpoint to verify it's working correctly.
+                This will send a test payload to your webhook endpoint to verify it&apos;s working correctly.
               </p>
             </div>
           )}
