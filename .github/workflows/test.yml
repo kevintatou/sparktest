@@ -33,23 +33,19 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
-        cache-dependency-path: frontend/pnpm-lock.yaml
+        cache-dependency-path: pnpm-lock.yaml
 
     - name: Install dependencies
       run: pnpm install
-      working-directory: frontend
 
     - name: Run linter
       run: pnpm lint
-      working-directory: frontend
 
     - name: Run type check
       run: pnpm type-check
-      working-directory: frontend
 
     - name: Run tests
       run: pnpm test:coverage
-      working-directory: frontend
 
     - name: Verify coverage file and show summary
       run: |
@@ -97,12 +93,11 @@ jobs:
         console.log('Branches: ' + (coveredBranches/totalBranches*100).toFixed(2) + '%');
         console.log('Functions: ' + (coveredFunctions/totalFunctions*100).toFixed(2) + '%');
         "
-      working-directory: frontend
-
+        
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
-        file: ./frontend/coverage/lcov.info
+        file: ./coverage/lcov.info
         flags: unittests
         name: codecov-umbrella
         token: ${{ secrets.CODECOV_TOKEN }}
@@ -114,5 +109,5 @@ jobs:
       uses: romeovs/lcov-reporter-action@v0.4.0
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: ./frontend/coverage/lcov.info
+        lcov-file: ./coverage/lcov.info
         delete-old-comments: true
