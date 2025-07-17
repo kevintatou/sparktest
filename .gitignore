@@ -1,14 +1,17 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-frontend/node_modules
+node_modules/
+packages/*/node_modules/
 
 # next.js
 /.next/
 /out/
+packages/*/.next/
 
 # production
 /build
+packages/*/build/
 
 # debug
 npm-debug.log*
@@ -26,5 +29,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Coverage
+coverage/
 
-frontend/.next/
+# Logs
+*.log
+
+# Lock files (preserve only root)
+packages/*/package-lock.json
+packages/*/pnpm-lock.yaml

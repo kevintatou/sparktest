@@ -1,0 +1,17 @@
+{
+  "name": "@sparktest/storage",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "build": "echo 'TypeScript compilation handled by consuming package'",
+    "test": "echo 'Tests run from consuming package'"
+  },
+  "peerDependencies": {
+    "uuid": "*",
+    "zod": "*",
+    "clsx": "*",
+    "tailwind-merge": "*"
+  }
+}
