@@ -45,7 +45,19 @@ export class ApiStorageService implements StorageService {
       body: JSON.stringify(def),
     })
     if (!res.ok) throw new Error("Failed to save definition")
-    return await res.json()
+    const data = await res.json()
+    
+    // Transform snake_case backend response to camelCase frontend format
+    // Handle both camelCase (from tests) and snake_case (from real backend)
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      image: data.image,
+      commands: data.commands,
+      createdAt: data.created_at || data.createdAt,
+      executorId: data.executor_id !== undefined ? data.executor_id : data.executorId,
+    }
   }
 
   async deleteDefinition(id: string): Promise<boolean> {
@@ -262,7 +274,7 @@ export class ApiStorageService implements StorageService {
   }
 
   async getTestRunLogs(runId: string): Promise<JobLogs> {
-    const res = await fetch(`${API_BASE}/test-runs/${runId}/logs`)
+    const res = await fetch(`${API_BASE}/runs/${runId}/logs`)
     if (!res.ok) throw new Error(`Failed to fetch logs for test run ${runId}`)
     return await res.json()
   }

@@ -212,7 +212,15 @@ describe("ApiStorageService", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(frontendDefinition),
         })
-        expect(result).toEqual(backendResponse)
+        expect(result).toEqual({
+          id: "generated-uuid-123",
+          name: "Test Definition",
+          description: "Test desc",
+          image: "test:latest", 
+          commands: ["echo", "hello"],
+          createdAt: backendResponse.created_at,
+          executorId: undefined
+        })
         expect(result.id).toBe("generated-uuid-123") // Verify ID was generated
       })
 
