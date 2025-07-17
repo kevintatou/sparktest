@@ -18,7 +18,6 @@ export default defineConfig({
         "lib/**/*.ts",
         "app/api/**/*.ts",
         "hooks/**/*.ts",
-        "../packages/**/*.ts",
       ],
       exclude: [
         "node_modules/", 
@@ -31,7 +30,6 @@ export default defineConfig({
         "lib/config.ts", // Simple configuration
         "lib/constants/**", // Constants only
         "lib/storage/storage.ts", // Interface definition only
-        "../packages/storage/storage.ts", // Interface definition only
         "hooks/use-toast.ts", // External library code
       ],
     },
@@ -39,7 +37,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./"),
-      "@/packages": path.resolve(__dirname, "../packages"),
     },
   },
 })

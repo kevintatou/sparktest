@@ -5,7 +5,7 @@ import { Moon, Sun, Search, Github } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
-import { storage } from "@/packages/storage"
+import { storage } from "@/lib/storage"
 import { useRouter } from "next/navigation"
 
 export function TopHeader() {

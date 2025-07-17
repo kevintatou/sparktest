@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { Run, Definition, Executor } from "@/lib/types"
-import { storage } from "@/packages/storage"
+import { storage } from "@/lib/storage"
 
 const getStatusIcon = (status: string) => {
   switch (status) {

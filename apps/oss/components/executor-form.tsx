@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import type { Executor } from "@/lib/types"
-import { storage } from "@/packages/storage"
+import { storage } from "@/lib/storage"
 
 interface ExecutorFormProps {
   existingExecutor?: Executor

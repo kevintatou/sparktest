@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { TestDefinitionForm } from "@/components/test-definition-form"
-import { storage } from "@/packages/storage"
+import { storage } from "@/lib/storage"
 import type { Definition } from "@/lib/types"
 
 export default function EditTestPage({ params }: { params: { id: string } }) {

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { storage } from "@/packages/storage"
+import { storage } from "@/lib/storage"
 import { formatDistanceToNow } from "@/lib/utils"
 import type { Run } from "@/lib/types"
 

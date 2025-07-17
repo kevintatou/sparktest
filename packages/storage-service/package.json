@@ -1,0 +1,30 @@
+{
+  "name": "@sparktest/storage-service",
+  "version": "0.1.0",
+  "description": "Storage service abstraction for SparkTest",
+  "main": "src/index.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sparktest/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

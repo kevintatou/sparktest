@@ -2,13 +2,16 @@
 
 # dependencies
 frontend/node_modules
+node_modules/
 
 # next.js
 /.next/
 /out/
+apps/*/. next/
 
 # production
 /build
+dist/
 
 # debug
 npm-debug.log*
@@ -26,5 +29,18 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Backend
+target/
+Cargo.lock
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
 
 frontend/.next/

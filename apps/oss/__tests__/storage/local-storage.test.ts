@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { LocalStorageService } from "@/packages/storage/local-storage"
+import { LocalStorageService } from "@/lib/storage/local-storage"
 
 // Mock localStorage
 const localStorageMock = {
