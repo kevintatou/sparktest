@@ -235,6 +235,7 @@ dependencies = [
  "k8s-openapi",
  "kube",
  "log",
+ "regex",
  "serde",
  "serde_json",
  "sqlx",
