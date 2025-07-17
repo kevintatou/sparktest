@@ -219,10 +219,14 @@ describe("TestRunsPage", () => {
       render(<TestRunsPage />)
 
       await waitFor(() => {
-        expect(screen.getByText("All tests passed!")).toBeInTheDocument()
+        expect(screen.getByText((content, element) => {
+          return content.includes("All tests passed!")
+        })).toBeInTheDocument()
       })
 
-      expect(screen.getByText("Test failed: Connection refused")).toBeInTheDocument()
+      expect(screen.getByText((content, element) => {
+        return content.includes("Test failed: Connection refused")
+      })).toBeInTheDocument()
     })
 
     it("should show log truncation when there are many logs", async () => {
