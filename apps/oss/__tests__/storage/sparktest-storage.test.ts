@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { SparkTestStorageService } from "@/packages/storage/sparktest-storage"
-import type { Executor, Definition, Run, TestSuite } from "@/lib/types"
+import { SparkTestStorageService } from "@sparktest/core/storage/sparktest-storage"
+import type { Executor, Definition, Run, TestSuite } from "@sparktest/core/types"
 
 // Mock localStorage
 const localStorageMock = {
