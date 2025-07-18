@@ -12,3 +12,7 @@ export const storage: StorageService = USE_RUST_API
 export { LocalStorageService, ApiStorageService, HybridStorageService }
 export type { StorageService }
 export * from "./dummy-definitions"
+
+// Export generic storage services (but not the conflicting utilities)
+export { GenericLocalStorageService, GenericApiStorageService, GenericHybridStorageService, storageUtils } from "./generic"
+export { SparkTestStorageService } from "./sparktest-storage"
