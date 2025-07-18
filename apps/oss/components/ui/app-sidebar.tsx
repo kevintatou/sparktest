@@ -4,7 +4,7 @@ import type React from "react"
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { BarChart3, Play, FileText, Layers, Cpu, ZapIcon, Plus, Settings } from "lucide-react"
+import { ZapIcon, Plus, Settings } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -16,54 +16,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-
-// Navigation items
-const navigationItems = [
-  {
-    title: "Dashboard",
-    url: "/",
-    icon: BarChart3,
-  },
-  {
-    title: "Test Runs",
-    url: "/runs",
-    icon: Play,
-  },
-  {
-    title: "Test Definitions",
-    url: "/runs",
-    icon: FileText,
-  },
-  {
-    title: "Test Suites",
-    url: "/suites",
-    icon: Layers,
-  },
-  {
-    title: "Executors",
-    url: "/executors",
-    icon: Cpu,
-  },
-]
-
-// Create menu items
-const createItems = [
-  {
-    title: "New Test Run",
-    url: "/new",
-    description: "Create a new test run",
-  },
-  {
-    title: "New Definition",
-    url: "/runs/new",
-    description: "Define a new test case",
-  },
-  {
-    title: "New Executor",
-    url: "/executors/new",
-    description: "Create a new executor",
-  },
-]
+import { NAVIGATION_ITEMS, CREATE_OPTIONS } from "@sparktest/core/constants/navigation"
+import { isActiveRoute } from "@/lib/utils/navigation"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
@@ -90,14 +44,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarContent>
         <SidebarMenu>
-          {navigationItems.map((item) => {
-            const isActive = pathname === item.url || (item.url !== "/" && pathname.startsWith(item.url))
+          {NAVIGATION_ITEMS.map((item) => {
+            const isActive = isActiveRoute(pathname, item.href)
             return (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
-                  <Link href={item.url}>
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton asChild isActive={isActive} tooltip={item.name}>
+                  <Link href={item.href}>
                     <item.icon className="size-4" />
-                    <span>{item.title}</span>
+                    <span>{item.name}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -117,15 +71,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" side="right" align="end" sideOffset={4}>
-                {createItems.map((item) => (
-                  <DropdownMenuItem key={item.title} asChild>
-                    <Link href={item.url} className="flex items-center gap-2 p-2">
+                {CREATE_OPTIONS.map((option) => (
+                  <DropdownMenuItem key={option.name} asChild>
+                    <Link href={option.href} className="flex items-center gap-2 p-2">
                       <div className="flex size-6 items-center justify-center rounded-sm border">
-                        <Plus className="size-3" />
+                        <option.icon className="size-3" />
                       </div>
                       <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="font-medium">{item.title}</span>
-                        <span className="text-xs text-muted-foreground">{item.description}</span>
+                        <span className="font-medium">{option.name}</span>
                       </div>
                     </Link>
                   </DropdownMenuItem>

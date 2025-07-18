@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Moon, Sun, Search, Github } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Input } from "@/components/ui/input"
@@ -75,8 +76,11 @@ export function TopHeader() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-4 sm:px-6">
-      <div className="flex items-center gap-4 sm:gap-6 flex-1">
+    <header className="flex h-16 shrink-0 items-center justify-between border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-4 sm:px-6">
+      <div className="flex items-center gap-2 sm:gap-4 flex-1">
+        {/* Mobile menu trigger */}
+        <SidebarTrigger className="md:hidden" />
+        
         {/* Search */}
         <div className="relative flex-1 max-w-sm sm:max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -118,10 +122,15 @@ export function TopHeader() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-3">
-        <Button variant="ghost" size="sm" className="gap-2 hidden sm:flex" asChild></Button>
+      <div className="flex items-center gap-1 sm:gap-2">
+        <Button variant="ghost" size="sm" className="gap-2 hidden sm:flex" asChild>
+          <a href="https://github.com/sparktest/sparktest" target="_blank" rel="noopener noreferrer">
+            <Github className="h-4 w-4" />
+            <span className="hidden md:inline">GitHub</span>
+          </a>
+        </Button>
 
-        <Button variant="ghost" size="icon" className="sm:hidden ml-2" asChild>
+        <Button variant="ghost" size="icon" className="sm:hidden" asChild>
           <a href="https://github.com/sparktest/sparktest" target="_blank" rel="noopener noreferrer">
             <Github className="h-4 w-4" />
           </a>
@@ -130,9 +139,6 @@ export function TopHeader() {
         <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
           <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-        </Button>
-        <Button>
-          <Github></Github>
         </Button>
       </div>
     </header>
