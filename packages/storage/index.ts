@@ -1,14 +1,14 @@
 import { LocalStorageService } from "./local-storage"
 import { ApiStorageService } from "./api-storage"
 import { HybridStorageService } from "./hybrid-storage"
-import type { StorageService } from "./storage"
+import { SparkTestStorageService } from "./sparktest-storage"
+import { StorageService } from "./storage"
 import { USE_RUST_API } from "./config"
 
-export const storage: StorageService = USE_RUST_API
-  ? new HybridStorageService() // Use hybrid storage for automatic fallback
-  : new LocalStorageService()
+// Export the new generic storage services for future extraction
+export * from "./generic"
+export { SparkTestStorageService }
 
-// Export everything for external use
-export { LocalStorageService, ApiStorageService, HybridStorageService }
-export type { StorageService }
-export type * from "./types"
+export const storage: StorageService = USE_RUST_API
+  ? new SparkTestStorageService() // Use the new SparkTest storage service
+  : new LocalStorageService()

@@ -1,4 +1,4 @@
-import type { Definition } from "../types"
+import type { Definition } from "./types"
 
 export const sampleDefinitions: Definition[] = [
   {
