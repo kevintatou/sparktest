@@ -51,6 +51,7 @@ struct TestDefinition {
     commands: Vec<String>,
     created_at: Option<chrono::DateTime<chrono::Utc>>,
     executor_id: Option<Uuid>,
+    source: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -60,6 +61,7 @@ struct CreateTestDefinitionRequest {
     image: String,
     commands: Vec<String>,
     executor_id: Option<Uuid>,
+    source: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -69,6 +71,7 @@ struct PatchTestDefinitionRequest {
     image: Option<String>,
     commands: Option<Vec<String>>,
     executor_id: Option<Option<Uuid>>,
+    source: Option<Option<String>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromRow)]
@@ -237,7 +240,7 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
         StatusCode::BAD_REQUEST
     })?;
     
-    sqlx::query("INSERT INTO test_definitions (id, name, description, image, commands, created_at, executor_id) VALUES ($1, $2, $3, $4, $5, $6, $7)")
+    sqlx::query("INSERT INTO test_definitions (id, name, description, image, commands, created_at, executor_id, source) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")
         .bind(&id)
         .bind(&name)
         .bind(&description)
@@ -245,6 +248,7 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
         .bind(&commands)
         .bind(&created_at)
         .bind(&body.executor_id)
+        .bind(&body.source)
         .execute(&pool)
         .await
         .map_err(|e| {
@@ -260,6 +264,7 @@ async fn create_test_definition(State(pool): State<PgPool>, Json(body): Json<Cre
         commands,
         created_at: Some(created_at),
         executor_id: body.executor_id,
+        source: body.source,
     };
     
     log::info!("Created test definition '{}' with id {}", test_definition.name, test_definition.id);
@@ -291,12 +296,13 @@ async fn update_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>
         StatusCode::BAD_REQUEST
     })?;
     
-    sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5 WHERE id = $6")
+    sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5, source = $6 WHERE id = $7")
         .bind(&name)
         .bind(&description)
         .bind(&image)
         .bind(&commands)
         .bind(&body.executor_id)
+        .bind(&body.source)
         .bind(id)
         .execute(&pool)
         .await
@@ -318,14 +324,16 @@ async fn patch_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>,
     let updated_image = body.image.unwrap_or(current.image);
     let updated_commands = body.commands.unwrap_or(current.commands);
     let updated_executor_id = body.executor_id.unwrap_or(current.executor_id);
+    let updated_source = body.source.unwrap_or(current.source);
     
     // Update the database
-    sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5 WHERE id = $6")
+    sqlx::query("UPDATE test_definitions SET name = $1, description = $2, image = $3, commands = $4, executor_id = $5, source = $6 WHERE id = $7")
         .bind(&updated_name)
         .bind(&updated_description)
         .bind(&updated_image)
         .bind(&updated_commands)
         .bind(&updated_executor_id)
+        .bind(&updated_source)
         .bind(id)
         .execute(&pool)
         .await
@@ -340,6 +348,7 @@ async fn patch_test_definition(Path(id): Path<Uuid>, State(pool): State<PgPool>,
         commands: updated_commands,
         created_at: current.created_at,
         executor_id: updated_executor_id,
+        source: updated_source,
     };
     
     Ok(Json(updated_definition))
@@ -460,8 +469,12 @@ async fn sync_repo(repo_url: &str, pool: &PgPool) -> Result<(), Box<dyn std::err
     let repo_path = tmp_dir.path().join("repo");
     log::info!("Cloning {} to {:?}", repo_url, repo_path);
 
-    // Clone the repo
-    Repository::clone(repo_url, &repo_path)?;
+    // Clone the repo and get branch name in a limited scope
+    let branch_name = {
+        let repo = Repository::clone(repo_url, &repo_path)?;
+        let head = repo.head()?;
+        head.shorthand().unwrap_or("main").to_string()
+    };
 
     let tests_dir = repo_path.join("tests");
     if !tests_dir.exists() {
@@ -473,10 +486,16 @@ async fn sync_repo(repo_url: &str, pool: &PgPool) -> Result<(), Box<dyn std::err
         let entry = entry?;
         let path = entry.path();
         if path.extension().and_then(|s| s.to_str()) == Some("json") {
+            let file_name = path.file_name().unwrap().to_str().unwrap();
+            let file_path = format!("tests/{}", file_name);
+            
+            // Build the GitHub file URL
+            let github_file_url = format!("{}/blob/{}/{}", repo_url, branch_name, file_path);
+            
             let file_content = fs::read_to_string(&path)?;
             match serde_json::from_str::<Value>(&file_content) {
                 Ok(json) => {
-                    if let Err(e) = upsert_test_definition_from_json(json, pool).await {
+                    if let Err(e) = upsert_test_definition_from_json(json, &github_file_url, pool).await {
                         log::error!("Failed to upsert definition from {:?}: {:?}", path, e);
                     } else {
                         log::info!("Synced definition from {:?}", path);
@@ -489,7 +508,7 @@ async fn sync_repo(repo_url: &str, pool: &PgPool) -> Result<(), Box<dyn std::err
     Ok(())
 }
 
-async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<(), sqlx::Error> {
+async fn upsert_test_definition_from_json(json: Value, source_url: &str, pool: &PgPool) -> Result<(), sqlx::Error> {
     // Extract fields (adjust as needed)
     let raw_name = json.get("name").and_then(|v| v.as_str()).unwrap_or("Unnamed");
     let raw_image = json.get("image").and_then(|v| v.as_str()).unwrap_or("ubuntu:latest");
@@ -531,33 +550,35 @@ async fn upsert_test_definition_from_json(json: Value, pool: &PgPool) -> Result<
         None => None,
     };
 
-    // Upsert by name
-    let existing = sqlx::query_scalar::<_, Uuid>("SELECT id FROM test_definitions WHERE name = $1")
-        .bind(&name)
+    // Use source field for tracking instead of name to avoid duplicates
+    let existing = sqlx::query_scalar::<_, Uuid>("SELECT id FROM test_definitions WHERE source = $1")
+        .bind(source_url)
         .fetch_optional(pool)
         .await?;
 
     if let Some(existing_id) = existing {
-        sqlx::query("UPDATE test_definitions SET image = $1, commands = $2, description = $3 WHERE id = $4")
+        sqlx::query("UPDATE test_definitions SET name = $1, image = $2, commands = $3, description = $4 WHERE id = $5")
+            .bind(&name)
             .bind(&image)
             .bind(&commands)
             .bind(&description)
             .bind(existing_id)
             .execute(pool)
             .await?;
-        log::info!("Updated test definition '{}'", name);
+        log::info!("Updated test definition '{}' from source '{}'", name, source_url);
     } else {
         let id = uuid::Uuid::new_v4();
-        sqlx::query("INSERT INTO test_definitions (id, name, image, commands, description, executor_id) VALUES ($1, $2, $3, $4, $5, $6)")
+        sqlx::query("INSERT INTO test_definitions (id, name, image, commands, description, executor_id, source) VALUES ($1, $2, $3, $4, $5, $6, $7)")
             .bind(id)
             .bind(&name)
             .bind(&image)
             .bind(&commands)
             .bind(&description)
             .bind(None::<Uuid>) // No executor_id for GitHub sync definitions
+            .bind(source_url)
             .execute(pool)
             .await?;
-        log::info!("Inserted new test definition '{}'", name);
+        log::info!("Inserted new test definition '{}' from source '{}'", name, source_url);
     }
     Ok(())
 }
@@ -962,6 +983,7 @@ mod tests {
             commands: vec!["echo".to_string(), "hello".to_string()],
             created_at: Some(Utc::now()),
             executor_id: None,
+            source: Some("https://github.com/test/repo/blob/main/tests/example.json".to_string()),
         };
 
         let json = serde_json::to_string(&definition).unwrap();
@@ -972,6 +994,7 @@ mod tests {
         assert_eq!(deserialized.name, definition.name);
         assert_eq!(deserialized.image, definition.image);
         assert_eq!(deserialized.commands, definition.commands);
+        assert_eq!(deserialized.source, definition.source);
     }
 
     #[test]
@@ -1063,6 +1086,7 @@ mod tests {
             image: "nginx:latest".to_string(),
             commands: vec!["echo".to_string(), "hello".to_string()],
             executor_id: None,
+            source: None,
         };
 
         let json = serde_json::to_string(&request).unwrap();
@@ -1101,6 +1125,7 @@ mod tests {
             image: Some("updated:latest".to_string()),
             commands: Some(vec!["echo".to_string(), "updated".to_string()]),
             executor_id: Some(Some(Uuid::new_v4())),
+            source: Some(Some("https://github.com/test/repo/blob/main/tests/updated.json".to_string())),
         };
 
         let json = serde_json::to_string(&request).unwrap();
@@ -1121,6 +1146,7 @@ mod tests {
             image: None,
             commands: None,
             executor_id: None,
+            source: None,
         };
 
         let json = serde_json::to_string(&request).unwrap();
@@ -1141,6 +1167,7 @@ mod tests {
             image: None,
             commands: None,
             executor_id: None,
+            source: None,
         };
 
         let json = serde_json::to_string(&request).unwrap();
@@ -1262,6 +1289,7 @@ mod patch_tests {
             commands: body.commands.unwrap_or_else(|| vec!["echo".to_string(), "test".to_string()]),
             created_at: Some(chrono::Utc::now()),
             executor_id: body.executor_id.unwrap_or(None),
+            source: body.source.unwrap_or(None),
         };
         Ok(Json(test_definition))
     }
