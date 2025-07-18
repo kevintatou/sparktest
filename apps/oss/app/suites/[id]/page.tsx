@@ -9,13 +9,13 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@sparktest/core/utils"
-import type { TestSuite, Definition } from "@sparktest/core/types"
+import type { Suite, Definition } from "@sparktest/core/types"
 import { storage } from "@sparktest/core/storage"
 
 export default function SuiteDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { toast } = useToast()
-  const [suite, setSuite] = useState<TestSuite | null>(null)
+  const [suite, setSuite] = useState<Suite | null>(null)
   const [definitions, setDefinitions] = useState<Definition[]>([])
   const [isRunning, setIsRunning] = useState(false)
 
@@ -23,7 +23,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
     const loadSuiteAndDefinitions = async () => {
       try {
         // Load the suite from storage
-        const loadedSuite = await storage.getTestSuiteById(id)
+        const loadedSuite = await storage.getSuiteById(id)
         if (!loadedSuite) {
           toast({
             title: "Suite not found",
@@ -63,7 +63,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
       const validDefinitions = definitions.filter(def => def !== undefined)
       
       if (validDefinitions.length === 0) {
-        throw new Error("No valid test definitions found in suite")
+        throw new Error("No valid definitions found in suite")
       }
       
       // Create runs for each definition based on execution mode
@@ -80,14 +80,14 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
       }
 
       toast({
-        title: "Test suite started",
+        title: "Suite started",
         description: `Running ${validDefinitions.length} tests in ${suite.executionMode} mode.`,
       })
     } catch (error) {
-      console.error("Error running test suite:", error)
+      console.error("Error running suite:", error)
       toast({
-        title: "Error starting test suite",
-        description: "Failed to start the test suite. Please check if all test definitions exist.",
+        title: "Error starting suite",
+        description: "Failed to start the suite. Please check if all definitions exist.",
         variant: "destructive",
       })
     } finally {
@@ -167,13 +167,13 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
-                Test Definitions ({definitions.length})
+                Definitions ({definitions.length})
               </CardTitle>
               <CardDescription>Tests included in this suite</CardDescription>
             </CardHeader>
             <CardContent>
               {definitions.length === 0 ? (
-                <p className="text-muted-foreground">No test definitions found for this suite.</p>
+                <p className="text-muted-foreground">No definitions found for this suite.</p>
               ) : (
                 <div className="space-y-4">
                   {definitions.map((definition, index) => (

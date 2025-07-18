@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { SparkTestStorageService } from "@sparktest/core/storage/sparktest-storage"
-import type { Executor, Definition, Run, TestSuite } from "@sparktest/core/types"
+import type { Executor, Definition, Run, Suite } from "@sparktest/core/types"
 
 // Mock localStorage
 const localStorageMock = {
@@ -27,7 +27,7 @@ describe("SparkTestStorageService", () => {
   describe("executors", () => {
     const mockExecutor: Executor = {
       id: "1",
-      name: "Test Executor",
+      name: "Executor",
       image: "test:latest",
       createdAt: new Date().toISOString(),
     }
@@ -64,7 +64,7 @@ describe("SparkTestStorageService", () => {
   describe("definitions", () => {
     const mockDefinition: Definition = {
       id: "1",
-      name: "Test Definition",
+      name: "Definition",
       description: "Test description",
       image: "test:latest",
       commands: ["echo", "hello"],
@@ -103,7 +103,7 @@ describe("SparkTestStorageService", () => {
   describe("runs", () => {
     const mockRun: Run = {
       id: "1",
-      name: "Test Run",
+      name: "Run",
       image: "test:latest",
       command: ["echo", "hello"],
       status: "running",
@@ -141,7 +141,7 @@ describe("SparkTestStorageService", () => {
     it("should create run from definition", async () => {
       const mockDefinition: Definition = {
         id: "def1",
-        name: "Test Definition",
+        name: "Definition",
         description: "Test description",
         image: "test:latest",
         commands: ["echo", "hello"],
@@ -167,41 +167,41 @@ describe("SparkTestStorageService", () => {
     })
   })
 
-  describe("test suites", () => {
-    const mockTestSuite: TestSuite = {
+  describe("suites", () => {
+    const mockTestSuite: Suite = {
       id: "1",
-      name: "Test Suite",
+      name: "Suite",
       description: "Test description",
       testDefinitionIds: ["def1", "def2"],
       createdAt: new Date().toISOString(),
       executionMode: "sequential",
     }
 
-    it("should get test suites", async () => {
+    it("should get suites", async () => {
       localStorageMock.getItem.mockReturnValue(JSON.stringify([mockTestSuite]))
 
-      const result = await service.getTestSuites()
+      const result = await service.getSuites()
       expect(Array.isArray(result)).toBe(true)
     })
 
-    it("should save test suite", async () => {
+    it("should save suite", async () => {
       localStorageMock.getItem.mockReturnValue("[]")
 
-      const result = await service.saveTestSuite(mockTestSuite)
+      const result = await service.saveSuite(mockTestSuite)
       expect(result).toEqual(mockTestSuite)
     })
 
-    it("should delete test suite", async () => {
+    it("should delete suite", async () => {
       localStorageMock.getItem.mockReturnValue(JSON.stringify([mockTestSuite]))
 
-      const result = await service.deleteTestSuite("1")
+      const result = await service.deleteSuite("1")
       expect(result).toBe(true)
     })
 
-    it("should get test suite by id", async () => {
+    it("should get suite by id", async () => {
       localStorageMock.getItem.mockReturnValue(JSON.stringify([mockTestSuite]))
 
-      const result = await service.getTestSuiteById("1")
+      const result = await service.getSuiteById("1")
       expect(result).toEqual(mockTestSuite)
     })
   })

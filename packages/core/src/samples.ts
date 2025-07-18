@@ -1,7 +1,7 @@
-import { Definition, Executor, Run, TestSuite } from "./types"
+import { Definition, Executor, Run, Suite } from "./types"
 
-// Sample Test Suites
-export const sampleTestSuites: TestSuite[] = [
+// Sample Suites
+export const sampleSuites: Suite[] = [
   {
     id: "frontend-test-suite",
     name: "Frontend Test Suite",

@@ -9,13 +9,13 @@ import type {
   Executor, 
   Definition, 
   Run, 
-  TestSuite, 
+  Suite, 
   KubernetesHealth, 
   JobLogs, 
   JobStatus, 
   JobDeleteResponse 
 } from '../types'
-import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from '../samples'
+import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from '../samples'
 
 const API_BASE = 'http://localhost:3001/api'
 
@@ -23,7 +23,7 @@ export class SparkTestStorageService implements StorageService {
   private executorStorage: GenericHybridStorageService<Executor>
   private definitionStorage: GenericHybridStorageService<Definition>
   private runStorage: GenericHybridStorageService<Run>
-  private testSuiteStorage: GenericHybridStorageService<TestSuite>
+  private testSuiteStorage: GenericHybridStorageService<Suite>
 
   constructor() {
     // Initialize executor storage
@@ -110,14 +110,14 @@ export class SparkTestStorageService implements StorageService {
       runLocalStorage
     )
 
-    // Initialize test suite storage with transformations
-    const testSuiteLocalStorage = new GenericLocalStorageService<TestSuite>(
+    // Initialize suite storage with transformations
+    const testSuiteLocalStorage = new GenericLocalStorageService<Suite>(
       'sparktest_test_suites',
-      sampleTestSuites,
+      sampleSuites,
       (suite) => suite.id,
       storageUtils
     )
-    const testSuiteApiStorage = new GenericApiStorageService<TestSuite>(
+    const testSuiteApiStorage = new GenericApiStorageService<Suite>(
       'test-suites',
       API_BASE,
       (suite) => suite.id,
@@ -152,7 +152,7 @@ export class SparkTestStorageService implements StorageService {
         }
       }
     )
-    this.testSuiteStorage = new GenericHybridStorageService<TestSuite>(
+    this.testSuiteStorage = new GenericHybridStorageService<Suite>(
       testSuiteApiStorage,
       testSuiteLocalStorage
     )
@@ -245,20 +245,20 @@ export class SparkTestStorageService implements StorageService {
     })
   }
 
-  // Test Suite methods
-  async getTestSuites(): Promise<TestSuite[]> {
+  // Suite methods
+  async getSuites(): Promise<Suite[]> {
     return this.testSuiteStorage.getItems()
   }
 
-  async saveTestSuite(suite: TestSuite): Promise<TestSuite> {
+  async saveSuite(suite: Suite): Promise<Suite> {
     return this.testSuiteStorage.saveItem(suite)
   }
 
-  async deleteTestSuite(id: string): Promise<boolean> {
+  async deleteSuite(id: string): Promise<boolean> {
     return this.testSuiteStorage.deleteItem(id)
   }
 
-  async getTestSuiteById(id: string): Promise<TestSuite | undefined> {
+  async getSuiteById(id: string): Promise<Suite | undefined> {
     return this.testSuiteStorage.getItemById(id)
   }
 
