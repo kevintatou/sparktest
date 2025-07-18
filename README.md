@@ -67,6 +67,16 @@ Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI!
 
 📚 [More details in the Kubernetes guide](backend/KUBERNETES.md)
 
+### 🎯 Want to See Demo Data?
+
+SparkTest includes comprehensive demo data with realistic testing scenarios:
+
+- **Realistic Test Scenarios**: Jest, Cypress, Playwright, K6, OWASP security scans
+- **Working Test Examples**: Self-contained tests that actually run through K8s
+- **Production-Ready Examples**: Real-world configurations and test outputs
+
+📖 [See the complete Demo Data Guide](DEMO_DATA_GUIDE.md)
+
 ### Testing
 
 ```bash
