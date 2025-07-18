@@ -1,10 +1,14 @@
 # Working Test Examples
 
-This document describes the working test examples that can actually be executed through the SparkTest Kubernetes backend.
+This document describes the working test examples that can actually be executed through the SparkTest Kubernetes backend and are also available in local storage mode for frontend development.
 
 ## Overview
 
-The test definitions in migration `0004_working_test_examples.sql` are designed to be self-contained and executable without requiring external files or complex configurations. These examples demonstrate the platform's capabilities with tests that will actually run successfully.
+The working test examples are available in two places:
+1. **Database Migration**: `0004_working_test_examples.sql` - For production/real K8s runs
+2. **TypeScript Samples**: `packages/core/src/samples.ts` - For local development and frontend demo
+
+These test definitions are designed to be self-contained and executable without requiring external files or complex configurations. They demonstrate the platform's capabilities with tests that will actually run successfully in both modes.
 
 ## Test Definitions
 
@@ -87,25 +91,38 @@ The test definitions in migration `0004_working_test_examples.sql` are designed 
 - **Total Duration**: ~30-40 seconds (when run in parallel)
 - **Purpose**: Demonstrates platform capabilities with guaranteed working tests
 
-## Usage
+## Demo Usage
 
-### Running Individual Tests
+### Local Storage Mode (Frontend Development)
 
-To run a specific test through the K8s backend:
+When running the frontend in local storage mode, the working examples are automatically available:
 
 ```bash
-# Create a test run for the health check
+# Start the frontend in local storage mode
+npm run dev
+
+# The working examples will be visible in:
+# - Test Suites: "Working Examples Suite"
+# - Test Definitions: All 10 working examples
+# - Test Runs: Sample successful runs showing expected outputs
+```
+
+### Production Mode (K8s Backend)
+
+To run the working examples through the K8s backend:
+
+```bash
+# Apply the database migration
+psql -d sparktest -f backend/migrations/0004_working_test_examples.sql
+
+# Create a test run for a specific test
 curl -X POST http://localhost:3001/api/test-runs \
   -H "Content-Type: application/json" \
   -d '{
     "test_definition_id": "simple-health-check"
   }'
-```
 
-### Running the Test Suite
-
-```bash
-# Create test runs for all tests in the suite
+# Run the entire working examples suite
 curl -X POST http://localhost:3001/api/test-runs \
   -H "Content-Type: application/json" \
   -d '{
@@ -113,15 +130,33 @@ curl -X POST http://localhost:3001/api/test-runs \
   }'
 ```
 
-### Monitoring Test Progress
+### Demo Benefits
 
-```bash
-# Get logs for a specific test run
-curl http://localhost:3001/api/test-runs/{run_id}/logs
+1. **Consistent Experience**: Same test definitions work in both modes
+2. **Realistic Data**: Frontend shows actual working examples instead of placeholder data
+3. **Instant Demo**: No setup required - tests will run successfully out of the box
+4. **Educational Value**: Shows real Docker images and commands that actually work
+5. **Stakeholder Confidence**: Demonstrates that the platform can execute real tests
 
-# Get job status
-curl http://localhost:3001/api/k8s/jobs/{job_name}/status
-```
+## Migration from Complex Examples
+
+The working examples complement the existing complex test definitions in `samples.ts`. The key difference:
+
+**Complex Examples (existing):**
+- Require external files (test suites, config files)
+- Use sophisticated frameworks (Jest, Playwright, Cypress)
+- Demonstrate advanced testing scenarios
+- May fail when run due to missing dependencies
+
+**Working Examples (new):**
+- Self-contained commands with no external dependencies
+- Use simple, reliable Docker images
+- Demonstrate basic system capabilities
+- Guaranteed to run successfully
+
+Both sets of examples serve different purposes:
+- **Complex examples**: Show the platform's full capabilities and realistic usage
+- **Working examples**: Provide guaranteed working demos and basic validation
 
 ## Expected Outputs
 
