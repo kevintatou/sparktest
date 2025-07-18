@@ -6,20 +6,20 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SuiteForm } from "@/components/suite-form"
 import { useToast } from "@/components/ui/use-toast"
-import type { TestSuite } from "@sparktest/core/types"
+import type { Suite } from "@sparktest/core/types"
 import { storage } from "@sparktest/core/storage"
 
 export default function EditSuitePage({ params }: { params: { id: string } }) {
   const { id } = params
   const { toast } = useToast()
-  const [suite, setSuite] = useState<TestSuite | null>(null)
+  const [suite, setSuite] = useState<Suite | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadSuite = async () => {
       setLoading(true)
       try {
-        const loadedSuite = await storage.getTestSuiteById(id)
+        const loadedSuite = await storage.getSuiteById(id)
         if (!loadedSuite) {
           toast({
             title: "Suite not found",
@@ -99,9 +99,9 @@ export default function EditSuitePage({ params }: { params: { id: string } }) {
         </Button>
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Edit Test Suite
+            Edit Suite
           </h1>
-          <p className="text-muted-foreground mt-1">Update your test suite configuration</p>
+          <p className="text-muted-foreground mt-1">Update your suite configuration</p>
         </div>
       </div>
       <div className="max-w-2xl">
