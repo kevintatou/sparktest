@@ -211,7 +211,7 @@ describe("HybridStorageService", () => {
     })
   })
 
-  describe("test suites", () => {
+  describe("suites", () => {
     it("should handle getSuites with fallback", async () => {
       const mockSuites = [{ id: "1", name: "Suite", description: "", testDefinitionIds: [], executionMode: "sequential" as const, createdAt: "2023-01-01", labels: [] }]
       apiInstance.getSuites.mockRejectedValue(new Error("Network Error"))

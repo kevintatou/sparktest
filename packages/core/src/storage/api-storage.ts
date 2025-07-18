@@ -215,7 +215,7 @@ export class ApiStorageService implements StorageService {
       body: JSON.stringify(suitePayload),
     })
 
-    if (!res.ok) throw new Error("Failed to save test suite")
+    if (!res.ok) throw new Error("Failed to save suite")
     return await res.json()
   }
 
@@ -238,7 +238,7 @@ export class ApiStorageService implements StorageService {
     }
     
     const res = await fetch(`${API_BASE}/test-suites/${uuidId}`)
-    if (!res.ok) throw new Error("Failed to fetch test suite")
+    if (!res.ok) throw new Error("Failed to fetch suite")
     
     const data = await res.json();
     
