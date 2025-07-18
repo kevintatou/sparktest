@@ -1,0 +1,96 @@
+{
+  "name": "@sparktest/core",
+  "version": "0.1.0",
+  "description": "Shared TypeScript types and utilities for SparkTest",
+  "main": "src/index.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./storage": {
+      "types": "./src/storage/index.ts",
+      "default": "./src/storage/index.ts"
+    },
+    "./storage/index": {
+      "types": "./src/storage/index.ts",
+      "default": "./src/storage/index.ts"
+    },
+    "./storage/api-storage": {
+      "types": "./src/storage/api-storage.ts",
+      "default": "./src/storage/api-storage.ts"
+    },
+    "./storage/local-storage": {
+      "types": "./src/storage/local-storage.ts",
+      "default": "./src/storage/local-storage.ts"
+    },
+    "./storage/hybrid-storage": {
+      "types": "./src/storage/hybrid-storage.ts",
+      "default": "./src/storage/hybrid-storage.ts"
+    },
+    "./storage/storage": {
+      "types": "./src/storage/storage.ts",
+      "default": "./src/storage/storage.ts"
+    },
+    "./storage/dummy-definitions": {
+      "types": "./src/storage/dummy-definitions.ts",
+      "default": "./src/storage/dummy-definitions.ts"
+    },
+    "./storage/generic": {
+      "types": "./src/storage/generic/index.ts",
+      "default": "./src/storage/generic/index.ts"
+    },
+    "./storage/sparktest-storage": {
+      "types": "./src/storage/sparktest-storage.ts",
+      "default": "./src/storage/sparktest-storage.ts"
+    },
+    "./config": {
+      "types": "./src/config.ts",
+      "default": "./src/config.ts"
+    },
+    "./samples": {
+      "types": "./src/samples.ts",
+      "default": "./src/samples.ts"
+    },
+    "./utils": {
+      "types": "./src/utils.ts",
+      "default": "./src/utils.ts"
+    },
+    "./constants": {
+      "types": "./src/constants/index.ts",
+      "default": "./src/constants/index.ts"
+    },
+    "./constants/navigation": {
+      "types": "./src/constants/navigation.ts",
+      "default": "./src/constants/navigation.ts"
+    },
+    "./types": {
+      "types": "./src/types.ts",
+      "default": "./src/types.ts"
+    },
+    "./types/navigation": {
+      "types": "./src/types/navigation.ts",
+      "default": "./src/types/navigation.ts"
+    }
+  },
+  "files": [
+    "src/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lucide-react": "^0.454.0"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^22",
+    "@types/react": "^18"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
