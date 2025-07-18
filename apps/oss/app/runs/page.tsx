@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@sparktest/core/utils"
 import type { Run, Definition, Executor } from "@sparktest/core/types"
 import { storage } from "@sparktest/core/storage"
+import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -46,6 +47,8 @@ export default function TestRunsPage() {
   const [executors, setExecutors] = useState<Executor[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [runToDelete, setRunToDelete] = useState<Run | null>(null)
   const initializedRef = useRef(false)
 
   // Load test runs, definitions, and executors
@@ -94,12 +97,30 @@ export default function TestRunsPage() {
     setTimeout(() => {
       setTestRuns((prev) => prev.filter((run) => run.id !== id))
       setIsDeleting(null)
+      setDeleteModalOpen(false)
+      setRunToDelete(null)
 
       toast({
         title: "Test run deleted",
         description: "The test run has been removed successfully.",
       })
     }, 500)
+  }
+
+  const handleDeleteClick = (run: Run) => {
+    setRunToDelete(run)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (runToDelete) {
+      handleDelete(runToDelete.id)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false)
+    setRunToDelete(null)
   }
 
   // Filter test runs based on search query
@@ -286,7 +307,7 @@ export default function TestRunsPage() {
                       variant="outline"
                       size="sm"
                       className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
-                      onClick={() => handleDelete(run.id)}
+                      onClick={() => handleDeleteClick(run)}
                       disabled={isDeleting === run.id}
                     >
                       {isDeleting === run.id ? (
@@ -331,6 +352,17 @@ export default function TestRunsPage() {
           ))}
         </div>
       )}
+
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting === runToDelete?.id}
+        title="Delete Test Run"
+        description="Are you sure you want to delete this test run? This will permanently remove the run history, logs, and results."
+        itemName={runToDelete?.name}
+        itemType="Test Run"
+      />
     </div>
   )
 }
