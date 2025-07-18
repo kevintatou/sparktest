@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Plus, Play, Edit, Trash2, FileText } from "lucide-react"
+import { Plus, Play, Edit, Trash2, FileText, Github, ExternalLink } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -178,6 +178,22 @@ export default function DefinitionsPage() {
                       <Badge variant="outline" className="text-xs">
                         {definition.executorId}
                       </Badge>
+                    </div>
+                  )}
+
+                  {definition.source && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Source:</span>
+                      <a
+                        href={definition.source}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 hover:underline"
+                      >
+                        <Github className="h-3 w-3" />
+                        GitHub
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
                     </div>
                   )}
 

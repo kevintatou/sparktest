@@ -8,6 +8,7 @@ export interface Definition {
   executorId?: string
   variables?: Record<string, string>
   labels?: string[]
+  source?: string
 }
 
 export interface Run {
