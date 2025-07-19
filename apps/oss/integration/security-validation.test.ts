@@ -6,7 +6,8 @@ import {
   sanitizeCommands,
   validateDockerImage,
   sanitizeName
-} from '../../lib/utils/validation';
+} from '../utils/validation';
+
 
 describe('Security Integration Tests', () => {
   describe('Command Injection Prevention', () => {
