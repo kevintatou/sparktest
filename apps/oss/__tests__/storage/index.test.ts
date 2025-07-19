@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
 // Mock the config
-vi.mock("@sparktest/core/config", () => ({
+vi.mock("@sparktest/core", () => ({
   USE_RUST_API: false,
 }))
 
@@ -27,7 +27,7 @@ describe("Storage Index", () => {
   })
 
   it("should use LocalStorageService when USE_RUST_API is false", async () => {
-    vi.doMock("@sparktest/core/config", () => ({
+    vi.doMock("@sparktest/core", () => ({
       USE_RUST_API: false,
     }))
 
@@ -39,7 +39,7 @@ describe("Storage Index", () => {
   })
 
   it("should use ApiStorageService when USE_RUST_API is true", async () => {
-    vi.doMock("@sparktest/core/config", () => ({
+    vi.doMock("@sparktest/core", () => ({
       USE_RUST_API: true,
     }))
 

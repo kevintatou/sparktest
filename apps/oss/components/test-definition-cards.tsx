@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@sparktest/storage-service"
-import { formatDistanceToNow } from "@sparktest/core/utils"
+import { formatDistanceToNow } from "@sparktest/core"
 import { TestDefinitionTestModal } from "@/components/test-definition-test-modal"
 import type { TestDefinition } from "@sparktest/core"
 
