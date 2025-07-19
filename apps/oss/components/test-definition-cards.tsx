@@ -11,7 +11,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@sparktest/storage-service"
 import { formatDistanceToNow } from "@sparktest/core/utils"
 import { TestDefinitionTestModal } from "@/components/test-definition-test-modal"
-import type { TestDefinition } from "@sparktest/core/types"
+import type { TestDefinition } from "@sparktest/core"
 
 // Map of icons for different test types
 const iconMap: Record<string, any> = {

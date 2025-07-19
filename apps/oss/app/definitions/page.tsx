@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { storage } from "@sparktest/storage-service"
 import { useToast } from "@/components/ui/use-toast"
-import { formatDistanceToNow } from "@sparktest/core/utils"
-import type { Definition } from "@sparktest/core/types"
+import { formatDistanceToNow } from "@sparktest/core"
+import type { Definition } from "@sparktest/core"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 
 export default function DefinitionsPage() {

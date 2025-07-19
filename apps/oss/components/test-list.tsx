@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { storage } from "@sparktest/storage-service"
 import { formatDistanceToNow } from "@sparktest/core/utils"
-import type { Test } from "@sparktest/core/types"
+import type { Test } from "@sparktest/core"
 
 export function TestList() {
   const [tests, setTests] = useState<Test[]>([])

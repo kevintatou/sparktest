@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@sparktest/storage-service"
-import type { Definition } from "@sparktest/core/types"
+import type { Definition } from "@sparktest/core"
 
 export function TestDefinitionsList() {
   const [testDefinitions, setTestDefinitions] = useState<Definition[]>([])

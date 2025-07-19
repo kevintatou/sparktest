@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { storage } from "@sparktest/storage-service"
-import { formatDistanceToNow } from "@sparktest/core/utils"
-import type { Run } from "@sparktest/core/types"
+import { formatDistanceToNow } from "@sparktest/core"
+import type { Run } from "@sparktest/core"
 
 export default function ActiveTestsPage() {
   const [tests, setTests] = useState<Run[]>([])

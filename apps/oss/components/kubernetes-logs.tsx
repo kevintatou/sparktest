@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { RefreshCw, Download, Terminal, AlertCircle, CheckCircle, XCircle, Clock } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@sparktest/storage-service"
-import type { JobLogs, KubernetesHealth } from "@sparktest/core/types"
+import type { JobLogs, KubernetesHealth } from "@sparktest/core"
 
 interface KubernetesLogsProps {
   runId: string
