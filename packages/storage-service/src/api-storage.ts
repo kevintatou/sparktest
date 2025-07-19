@@ -1,4 +1,4 @@
-import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
+import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@sparktest/core"
 import { StorageService } from "./storage"
 
 const API_BASE = "http://localhost:3001/api"
@@ -90,15 +90,13 @@ export class ApiStorageService implements StorageService {
     const url = run.id ? `${API_BASE}/test-runs/${run.id}` : `${API_BASE}/test-runs`
     
     // Convert camelCase to snake_case for the API
-    const payload: any = {
-      ...run,
-      created_at: run.createdAt,
-      definition_id: run.definitionId,
-      executor_id: run.executorId,
+    const { createdAt, definitionId, executorId, ...rest } = run
+    const payload = {
+      ...rest,
+      created_at: createdAt,
+      definition_id: definitionId,
+      executor_id: executorId,
     }
-    delete payload.createdAt
-    delete payload.definitionId
-    delete payload.executorId
     
     const res = await fetch(url, {
       method,

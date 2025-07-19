@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@sparktest/core": "workspace:*",
+    "@sparktest/storage-service": "workspace:*",
     "@edge-runtime/vm": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "latest",

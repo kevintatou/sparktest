@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { storage } from "@sparktest/core/storage"
+import { storage } from "@sparktest/storage-service"
 import { formatDistanceToNow } from "@sparktest/core/utils"
 import type { Test } from "@sparktest/core/types"
 

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import type { Executor } from "@sparktest/core/types"
-import { storage } from "@sparktest/core/storage"
+import { storage } from "@sparktest/storage-service"
 
 interface ExecutorFormProps {
   existingExecutor?: Executor

@@ -2,95 +2,65 @@
   "name": "@sparktest/core",
   "version": "0.1.0",
   "description": "Shared TypeScript types and utilities for SparkTest",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
-    },
-    "./storage": {
-      "types": "./src/storage/index.ts",
-      "default": "./src/storage/index.ts"
-    },
-    "./storage/index": {
-      "types": "./src/storage/index.ts",
-      "default": "./src/storage/index.ts"
-    },
-    "./storage/api-storage": {
-      "types": "./src/storage/api-storage.ts",
-      "default": "./src/storage/api-storage.ts"
-    },
-    "./storage/local-storage": {
-      "types": "./src/storage/local-storage.ts",
-      "default": "./src/storage/local-storage.ts"
-    },
-    "./storage/hybrid-storage": {
-      "types": "./src/storage/hybrid-storage.ts",
-      "default": "./src/storage/hybrid-storage.ts"
-    },
-    "./storage/storage": {
-      "types": "./src/storage/storage.ts",
-      "default": "./src/storage/storage.ts"
-    },
-    "./storage/dummy-definitions": {
-      "types": "./src/storage/dummy-definitions.ts",
-      "default": "./src/storage/dummy-definitions.ts"
-    },
-    "./storage/generic": {
-      "types": "./src/storage/generic/index.ts",
-      "default": "./src/storage/generic/index.ts"
-    },
-    "./storage/sparktest-storage": {
-      "types": "./src/storage/sparktest-storage.ts",
-      "default": "./src/storage/sparktest-storage.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./config": {
-      "types": "./src/config.ts",
-      "default": "./src/config.ts"
+      "types": "./dist/config.d.ts",
+      "default": "./dist/config.js"
     },
     "./samples": {
-      "types": "./src/samples.ts",
-      "default": "./src/samples.ts"
+      "types": "./dist/samples.d.ts",
+      "default": "./dist/samples.js"
     },
     "./utils": {
-      "types": "./src/utils.ts",
-      "default": "./src/utils.ts"
+      "types": "./dist/utils.d.ts",
+      "default": "./dist/utils.js"
     },
     "./constants": {
-      "types": "./src/constants/index.ts",
-      "default": "./src/constants/index.ts"
+      "types": "./dist/constants/index.d.ts",
+      "default": "./dist/constants/index.js"
     },
     "./constants/navigation": {
-      "types": "./src/constants/navigation.ts",
-      "default": "./src/constants/navigation.ts"
+      "types": "./dist/constants/navigation.d.ts",
+      "default": "./dist/constants/navigation.js"
     },
     "./types": {
-      "types": "./src/types.ts",
-      "default": "./src/types.ts"
+      "types": "./dist/types.d.ts",
+      "default": "./dist/types.js"
     },
     "./types/navigation": {
-      "types": "./src/types/navigation.ts",
-      "default": "./src/types/navigation.ts"
+      "types": "./dist/types/navigation.d.ts",
+      "default": "./dist/types/navigation.js"
     }
   },
   "files": [
-    "src/"
+    "dist",
+    "src"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "tsup src/index.ts --dts --format esm,cjs",
+    "dev": "tsup src/index.ts --dts --format esm,cjs --watch",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "lucide-react": "^0.454.0"
   },
   "devDependencies": {
+    "tsup": "^8.0.0",
     "typescript": "^5",
     "@types/node": "^22",
     "@types/react": "^18"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

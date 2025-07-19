@@ -1,0 +1,11 @@
+{
+  "name": "sparktest-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "pnpm --filter './packages/*' build",
+    "dev": "pnpm --filter './packages/*' dev",
+    "type-check": "pnpm --filter './packages/*' type-check"
+  },
+  "devDependencies": {}
+}

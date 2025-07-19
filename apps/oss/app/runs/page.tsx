@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@sparktest/core/utils"
 import type { Run, Definition, Executor } from "@sparktest/core/types"
-import { storage } from "@sparktest/core/storage"
+import { storage } from "@sparktest/storage-service"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 
 const getStatusIcon = (status: string) => {
