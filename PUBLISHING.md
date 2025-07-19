@@ -106,4 +106,32 @@ backend/
 - `.npmrc` - npm registry configuration
 - `pnpm-workspace.yaml` - TypeScript workspace configuration
 - `Cargo.toml` - Rust workspace configuration
-- `.github/workflows/npm-publish.yml` - Automated publishing
+- `.github/workflows/npm-publish.yml` - Automated npm publishing
+- `.github/workflows/crate-publish.yml` - Automated Rust crate publishing
+
+## Publishing Workflows
+
+### TypeScript Packages
+
+Packages are automatically published to npm when version tags are pushed:
+
+```bash
+git tag v0.1.1
+git push origin v0.1.1
+```
+
+### Rust Crates
+
+Crates are automatically published to crates.io when crate version tags are pushed:
+
+```bash
+git tag crate-v0.1.1
+git push origin crate-v0.1.1
+```
+
+This enables:
+- **SaaS integration** through modular package imports
+- **External reuse** of both TypeScript packages and Rust crates
+- **Long-term maintainability** with clear separation of concerns
+
+**Note**: Make sure to set up the `CARGO_REGISTRY_TOKEN` secret in the repository settings for automatic crate publishing.
