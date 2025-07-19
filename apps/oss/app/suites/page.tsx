@@ -22,6 +22,7 @@ export default function SuitesPage() {
   const [isRunning, setIsRunning] = useState<string | null>(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [suiteToDelete, setSuiteToDelete] = useState<Suite | null>(null)
+
   const initializedRef = useRef(false)
   const [selectedSuite, setSelectedSuite] = useState<Suite | null>(null)
 
@@ -79,6 +80,7 @@ export default function SuitesPage() {
   }
 
   const handleDeleteClick = (suite: Suite) => {
+
     setSuiteToDelete(suite)
     setDeleteModalOpen(true)
   }
@@ -95,6 +97,7 @@ export default function SuitesPage() {
   }
 
   const handleRun = (suite: Suite) => {
+
     setSelectedSuite(suite)
   }
 
