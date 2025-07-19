@@ -9,7 +9,7 @@ import {
   validateTestDefinition,
   validateTestExecutor,
   validateTestSuite
-} from '../../lib/utils/validation';
+} from '../../utils/validation';
 
 describe('Frontend Validation Utilities', () => {
   describe('sanitizeName', () => {
