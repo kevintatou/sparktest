@@ -12,12 +12,15 @@ import { storage } from "@sparktest/core/storage"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@sparktest/core/utils"
 import type { Definition } from "@sparktest/core/types"
+import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 
 export default function DefinitionsPage() {
   const { toast } = useToast()
   const [definitions, setDefinitions] = useState<Definition[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [definitionToDelete, setDefinitionToDelete] = useState<Definition | null>(null)
 
   useEffect(() => {
     const loadDefinitions = async () => {
@@ -45,7 +48,25 @@ export default function DefinitionsPage() {
       })
     } finally {
       setIsDeleting(null)
+      setDeleteModalOpen(false)
+      setDefinitionToDelete(null)
     }
+  }
+
+  const handleDeleteClick = (definition: Definition) => {
+    setDefinitionToDelete(definition)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (definitionToDelete) {
+      handleDelete(definitionToDelete.id)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false)
+    setDefinitionToDelete(null)
   }
 
   const handleRunTest = async (definitionId: string) => {
@@ -221,7 +242,7 @@ export default function DefinitionsPage() {
                     variant="outline"
                     size="sm"
                     className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
-                    onClick={() => handleDelete(definition.id)}
+                    onClick={() => handleDeleteClick(definition)}
                     disabled={isDeleting === definition.id}
                   >
                     {isDeleting === definition.id ? (
@@ -263,6 +284,17 @@ export default function DefinitionsPage() {
           ))}
         </div>
       )}
+
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting === definitionToDelete?.id}
+        title="Delete Test Definition"
+        description="Are you sure you want to delete this test definition? This will permanently remove the test configuration and cannot be undone."
+        itemName={definitionToDelete?.name}
+        itemType="Test Definition"
+      />
     </div>
   )
 }

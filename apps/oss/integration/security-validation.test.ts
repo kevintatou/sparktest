@@ -8,6 +8,7 @@ import {
   sanitizeName
 } from '../utils/validation';
 
+
 describe('Security Integration Tests', () => {
   describe('Command Injection Prevention', () => {
     it('should reject dangerous shell commands', () => {

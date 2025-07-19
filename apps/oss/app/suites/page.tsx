@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@sparktest/core/utils"
 import type { TestSuite } from "@sparktest/core/types"
 import { storage } from "@sparktest/core/storage"
+import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 
 export default function TestSuitesPage() {
   const { toast } = useToast()
@@ -19,6 +20,8 @@ export default function TestSuitesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [isRunning, setIsRunning] = useState<string | null>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [suiteToDelete, setSuiteToDelete] = useState<TestSuite | null>(null)
   const initializedRef = useRef(false)
   const [selectedSuite, setSelectedSuite] = useState<TestSuite | null>(null)
 
@@ -70,7 +73,25 @@ export default function TestSuitesPage() {
       })
     } finally {
       setIsDeleting(null)
+      setDeleteModalOpen(false)
+      setSuiteToDelete(null)
     }
+  }
+
+  const handleDeleteClick = (suite: TestSuite) => {
+    setSuiteToDelete(suite)
+    setDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (suiteToDelete) {
+      handleDelete(suiteToDelete.id)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false)
+    setSuiteToDelete(null)
   }
 
   const handleRun = (suite: TestSuite) => {
@@ -257,7 +278,7 @@ export default function TestSuitesPage() {
                     variant="outline"
                     size="sm"
                     className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
-                    onClick={() => handleDelete(suite.id)}
+                    onClick={() => handleDeleteClick(suite)}
                     disabled={isDeleting === suite.id}
                   >
                     {isDeleting === suite.id ? (
@@ -328,6 +349,17 @@ export default function TestSuitesPage() {
           ))}
         </div>
       )}
+
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting === suiteToDelete?.id}
+        title="Delete Test Suite"
+        description="Are you sure you want to delete this test suite? This will permanently remove the suite configuration and cannot be undone. Individual test definitions will remain unchanged."
+        itemName={suiteToDelete?.name}
+        itemType="Test Suite"
+      />
     </div>
   )
 }
