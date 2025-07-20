@@ -38,12 +38,12 @@ export default function DefinitionsPage() {
       setDefinitions(defs)
       toast({
         title: "Definition deleted",
-        description: "The test definition has been removed successfully.",
+        description: "The definition has been removed successfully.",
       })
     } catch (error) {
       toast({
         title: "Error deleting definition",
-        description: "Failed to delete the test definition.",
+        description: "Failed to delete the definition.",
         variant: "destructive",
       })
     } finally {
@@ -97,7 +97,7 @@ export default function DefinitionsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Test Definitions
+            Definitions
           </h1>
           <p className="text-muted-foreground mt-1">Manage your reusable test blueprints</p>
         </div>
@@ -145,10 +145,10 @@ export default function DefinitionsPage() {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2">
-                {searchQuery ? "No definitions match your search" : "No test definitions yet"}
+                {searchQuery ? "No definitions match your search" : "No definitions yet"}
               </h3>
               <p className="text-muted-foreground mb-4">
-                {searchQuery ? "Try adjusting your search terms." : "Create your first test definition to get started."}
+                {searchQuery ? "Try adjusting your search terms." : "Create your first definition to get started."}
               </p>
               {!searchQuery && (
                 <Button
@@ -290,10 +290,10 @@ export default function DefinitionsPage() {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         isDeleting={isDeleting === definitionToDelete?.id}
-        title="Delete Test Definition"
-        description="Are you sure you want to delete this test definition? This will permanently remove the test configuration and cannot be undone."
+        title="Delete Definition"
+        description="Are you sure you want to delete this definition? This will permanently remove the test configuration and cannot be undone."
         itemName={definitionToDelete?.name}
-        itemType="Test Definition"
+        itemType="Definition"
       />
     </div>
   )

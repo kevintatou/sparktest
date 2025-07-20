@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { SparkTestStorageService } from "@sparktest/storage-service/sparktest-storage"
-import type { Executor, Definition, Run, TestSuite } from "@sparktest/core/types"
+import type { Executor, Definition, Run, Suite } from "@sparktest/core/types"
 
 // Mock localStorage
 const localStorageMock = {
@@ -167,8 +167,8 @@ describe("SparkTestStorageService", () => {
     })
   })
 
-  describe("test suites", () => {
-    const mockTestSuite: TestSuite = {
+  describe("suites", () => {
+    const mockSuite: Suite = {
       id: "1",
       name: "Test Suite",
       description: "Test description",
@@ -177,32 +177,32 @@ describe("SparkTestStorageService", () => {
       executionMode: "sequential",
     }
 
-    it("should get test suites", async () => {
-      localStorageMock.getItem.mockReturnValue(JSON.stringify([mockTestSuite]))
+    it("should get suites", async () => {
+      localStorageMock.getItem.mockReturnValue(JSON.stringify([mockSuite]))
 
-      const result = await service.getTestSuites()
+      const result = await service.getSuites()
       expect(Array.isArray(result)).toBe(true)
     })
 
-    it("should save test suite", async () => {
+    it("should save suite", async () => {
       localStorageMock.getItem.mockReturnValue("[]")
 
-      const result = await service.saveTestSuite(mockTestSuite)
-      expect(result).toEqual(mockTestSuite)
+      const result = await service.saveSuite(mockSuite)
+      expect(result).toEqual(mockSuite)
     })
 
-    it("should delete test suite", async () => {
-      localStorageMock.getItem.mockReturnValue(JSON.stringify([mockTestSuite]))
+    it("should delete suite", async () => {
+      localStorageMock.getItem.mockReturnValue(JSON.stringify([mockSuite]))
 
-      const result = await service.deleteTestSuite("1")
+      const result = await service.deleteSuite("1")
       expect(result).toBe(true)
     })
 
-    it("should get test suite by id", async () => {
-      localStorageMock.getItem.mockReturnValue(JSON.stringify([mockTestSuite]))
+    it("should get suite by id", async () => {
+      localStorageMock.getItem.mockReturnValue(JSON.stringify([mockSuite]))
 
-      const result = await service.getTestSuiteById("1")
-      expect(result).toEqual(mockTestSuite)
+      const result = await service.getSuiteById("1")
+      expect(result).toEqual(mockSuite)
     })
   })
 

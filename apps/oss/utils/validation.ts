@@ -308,7 +308,7 @@ export function validateTestExecutor(data: {
 /**
  * Validate form data for test suite
  */
-export function validateTestSuite(data: {
+export function validateSuite(data: {
   name: string;
   description?: string;
   execution_mode: string;

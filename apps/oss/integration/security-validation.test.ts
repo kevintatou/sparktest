@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   validateTestDefinition,
   validateTestExecutor,
-  validateTestSuite,
+  validateSuite,
   sanitizeCommands,
   validateDockerImage,
   sanitizeName
@@ -300,7 +300,7 @@ describe('Security Integration Tests', () => {
         labels: ['test@evil', 'hack$suite', 'xss<script>']
       };
 
-      const result = validateTestSuite(maliciousSuite);
+      const result = validateSuite(maliciousSuite);
       expect(result.isValid).toBe(false);
       expect(result.errors).toHaveProperty('name');
       expect(result.errors).toHaveProperty('execution_mode');
@@ -315,7 +315,7 @@ describe('Security Integration Tests', () => {
         labels: ['api', 'integration', 'production']
       };
 
-      const result = validateTestSuite(safeSuite);
+      const result = validateSuite(safeSuite);
       expect(result.isValid).toBe(true);
       expect(result.errors).toEqual({});
     });

@@ -31,10 +31,10 @@ describe("HybridStorageService", () => {
       getRunById: vi.fn(),
       createRun: vi.fn(),
       subscribeToRuns: vi.fn(),
-      getTestSuites: vi.fn(),
-      saveTestSuite: vi.fn(),
-      deleteTestSuite: vi.fn(),
-      getTestSuiteById: vi.fn(),
+      getSuites: vi.fn(),
+      saveSuite: vi.fn(),
+      deleteSuite: vi.fn(),
+      getSuiteById: vi.fn(),
       initialize: vi.fn(),
       getKubernetesHealth: vi.fn(),
       getTestRunLogs: vi.fn(),
@@ -58,10 +58,10 @@ describe("HybridStorageService", () => {
       getRunById: vi.fn(),
       createRun: vi.fn(),
       subscribeToRuns: vi.fn(),
-      getTestSuites: vi.fn(),
-      saveTestSuite: vi.fn(),
-      deleteTestSuite: vi.fn(),
-      getTestSuiteById: vi.fn(),
+      getSuites: vi.fn(),
+      saveSuite: vi.fn(),
+      deleteSuite: vi.fn(),
+      getSuiteById: vi.fn(),
       getKubernetesHealth: vi.fn(),
       getTestRunLogs: vi.fn(),
       getJobLogs: vi.fn(),
@@ -212,15 +212,15 @@ describe("HybridStorageService", () => {
   })
 
   describe("test suites", () => {
-    it("should handle getTestSuites with fallback", async () => {
+    it("should handle getSuites with fallback", async () => {
       const mockSuites = [{ id: "1", name: "Test Suite", description: "", testDefinitionIds: [], executionMode: "sequential" as const, createdAt: "2023-01-01", labels: [] }]
-      apiInstance.getTestSuites.mockRejectedValue(new Error("Network Error"))
-      localInstance.getTestSuites.mockResolvedValue(mockSuites)
+      apiInstance.getSuites.mockRejectedValue(new Error("Network Error"))
+      localInstance.getSuites.mockResolvedValue(mockSuites)
 
-      const result = await service.getTestSuites()
+      const result = await service.getSuites()
 
-      expect(apiInstance.getTestSuites).toHaveBeenCalled()
-      expect(localInstance.getTestSuites).toHaveBeenCalled()
+      expect(apiInstance.getSuites).toHaveBeenCalled()
+      expect(localInstance.getSuites).toHaveBeenCalled()
       expect(result).toEqual(mockSuites)
     })
   })
@@ -319,7 +319,7 @@ describe("HybridStorageService", () => {
       expect(result).toEqual(mockRun)
     })
 
-    it("should handle saveTestSuite with fallback", async () => {
+    it("should handle saveSuite with fallback", async () => {
       const mockSuite = { 
         id: "1", 
         name: "Test Suite", 
@@ -329,28 +329,28 @@ describe("HybridStorageService", () => {
         createdAt: "2023-01-01", 
         labels: [] 
       }
-      apiInstance.saveTestSuite.mockRejectedValue(new Error("Network Error"))
-      localInstance.saveTestSuite.mockResolvedValue(mockSuite)
+      apiInstance.saveSuite.mockRejectedValue(new Error("Network Error"))
+      localInstance.saveSuite.mockResolvedValue(mockSuite)
 
-      const result = await service.saveTestSuite(mockSuite)
+      const result = await service.saveSuite(mockSuite)
 
-      expect(apiInstance.saveTestSuite).toHaveBeenCalledWith(mockSuite)
-      expect(localInstance.saveTestSuite).toHaveBeenCalledWith(mockSuite)
+      expect(apiInstance.saveSuite).toHaveBeenCalledWith(mockSuite)
+      expect(localInstance.saveSuite).toHaveBeenCalledWith(mockSuite)
       expect(result).toEqual(mockSuite)
     })
 
-    it("should handle deleteTestSuite with fallback", async () => {
-      apiInstance.deleteTestSuite.mockRejectedValue(new Error("Network Error"))
-      localInstance.deleteTestSuite.mockResolvedValue(true)
+    it("should handle deleteSuite with fallback", async () => {
+      apiInstance.deleteSuite.mockRejectedValue(new Error("Network Error"))
+      localInstance.deleteSuite.mockResolvedValue(true)
 
-      const result = await service.deleteTestSuite("1")
+      const result = await service.deleteSuite("1")
 
-      expect(apiInstance.deleteTestSuite).toHaveBeenCalledWith("1")
-      expect(localInstance.deleteTestSuite).toHaveBeenCalledWith("1")
+      expect(apiInstance.deleteSuite).toHaveBeenCalledWith("1")
+      expect(localInstance.deleteSuite).toHaveBeenCalledWith("1")
       expect(result).toBe(true)
     })
 
-    it("should handle getTestSuiteById with fallback", async () => {
+    it("should handle getSuiteById with fallback", async () => {
       const mockSuite = { 
         id: "1", 
         name: "Test Suite", 
@@ -360,13 +360,13 @@ describe("HybridStorageService", () => {
         createdAt: "2023-01-01", 
         labels: [] 
       }
-      apiInstance.getTestSuiteById.mockRejectedValue(new Error("Network Error"))
-      localInstance.getTestSuiteById.mockResolvedValue(mockSuite)
+      apiInstance.getSuiteById.mockRejectedValue(new Error("Network Error"))
+      localInstance.getSuiteById.mockResolvedValue(mockSuite)
 
-      const result = await service.getTestSuiteById("1")
+      const result = await service.getSuiteById("1")
 
-      expect(apiInstance.getTestSuiteById).toHaveBeenCalledWith("1")
-      expect(localInstance.getTestSuiteById).toHaveBeenCalledWith("1")
+      expect(apiInstance.getSuiteById).toHaveBeenCalledWith("1")
+      expect(localInstance.getSuiteById).toHaveBeenCalledWith("1")
       expect(result).toEqual(mockSuite)
     })
   })

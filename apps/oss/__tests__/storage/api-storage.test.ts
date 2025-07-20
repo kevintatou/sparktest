@@ -469,8 +469,8 @@ describe("ApiStorageService", () => {
     })
   })
 
-  describe("test suites", () => {
-    describe("getTestSuites", () => {
+  describe("suites", () => {
+    describe("getSuites", () => {
       it("should fetch and transform test suites from API", async () => {
         const apiResponse = [
           {
@@ -501,7 +501,7 @@ describe("ApiStorageService", () => {
           json: () => Promise.resolve(apiResponse),
         })
 
-        const result = await service.getTestSuites()
+        const result = await service.getSuites()
 
         expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-suites")
         expect(result).toEqual(expectedResult)
@@ -533,7 +533,7 @@ describe("ApiStorageService", () => {
           json: () => Promise.resolve(apiResponse),
         })
 
-        const result = await service.getTestSuites()
+        const result = await service.getSuites()
         expect(result).toEqual(expectedResult)
       })
 
@@ -542,11 +542,11 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.getTestSuites()).rejects.toThrow("Failed to fetch test suites")
+        await expect(service.getSuites()).rejects.toThrow("Failed to fetch test suites")
       })
     })
 
-    describe("saveTestSuite", () => {
+    describe("saveSuite", () => {
       it("should save new test suite (POST) when no ID is provided", async () => {
         const newSuite = {
           id: "",
@@ -574,7 +574,7 @@ describe("ApiStorageService", () => {
           json: () => Promise.resolve(savedSuite),
         })
 
-        const result = await service.saveTestSuite(newSuite)
+        const result = await service.saveSuite(newSuite)
 
         expect(mockFetch).toHaveBeenCalledWith(
           "http://localhost:3001/api/test-suites",
@@ -613,7 +613,7 @@ describe("ApiStorageService", () => {
           json: () => Promise.resolve(existingSuite),
         })
 
-        const result = await service.saveTestSuite(existingSuite)
+        const result = await service.saveSuite(existingSuite)
 
         expect(mockFetch).toHaveBeenCalledWith(
           "http://localhost:3001/api/test-suites/suite123",
@@ -632,17 +632,17 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.saveTestSuite(suite)).rejects.toThrow("Failed to save test suite")
+        await expect(service.saveSuite(suite)).rejects.toThrow("Failed to save test suite")
       })
     })
 
-    describe("deleteTestSuite", () => {
+    describe("deleteSuite", () => {
       it("should delete test suite with string ID conversion", async () => {
         mockFetch.mockResolvedValueOnce({
           ok: true,
         })
 
-        const result = await service.deleteTestSuite("def1")
+        const result = await service.deleteSuite("def1")
 
         expect(mockFetch).toHaveBeenCalledWith(
           "http://localhost:3001/api/test-suites/00000000-0000-0000-0000-00000000def1",
@@ -659,7 +659,7 @@ describe("ApiStorageService", () => {
           ok: true,
         })
 
-        const result = await service.deleteTestSuite(uuidId)
+        const result = await service.deleteSuite(uuidId)
 
         expect(mockFetch).toHaveBeenCalledWith(
           `http://localhost:3001/api/test-suites/${uuidId}`,
@@ -675,12 +675,12 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        const result = await service.deleteTestSuite("suite1")
+        const result = await service.deleteSuite("suite1")
         expect(result).toBe(false)
       })
     })
 
-    describe("getTestSuiteById", () => {
+    describe("getSuiteById", () => {
       it("should fetch and transform specific test suite by string ID", async () => {
         const apiResponse = {
           id: "suite1",
@@ -707,7 +707,7 @@ describe("ApiStorageService", () => {
           json: () => Promise.resolve(apiResponse),
         })
 
-        const result = await service.getTestSuiteById("suite1")
+        const result = await service.getSuiteById("suite1")
 
         expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-suites/00000000-0000-0000-0000-000000suite1")
         expect(result).toEqual(expectedResult)
@@ -726,7 +726,7 @@ describe("ApiStorageService", () => {
           json: () => Promise.resolve(apiResponse),
         })
 
-        const result = await service.getTestSuiteById(uuidId)
+        const result = await service.getSuiteById(uuidId)
 
         expect(mockFetch).toHaveBeenCalledWith(`http://localhost:3001/api/test-suites/${uuidId}`)
         expect(result?.id).toBe(uuidId)
@@ -737,7 +737,7 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.getTestSuiteById("suite1")).rejects.toThrow("Failed to fetch test suite")
+        await expect(service.getSuiteById("suite1")).rejects.toThrow("Failed to fetch test suite")
       })
     })
   })

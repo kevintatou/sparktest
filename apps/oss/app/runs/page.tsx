@@ -51,7 +51,7 @@ export default function TestRunsPage() {
   const [runToDelete, setRunToDelete] = useState<Run | null>(null)
   const initializedRef = useRef(false)
 
-  // Load test runs, definitions, and executors
+  // Load runs, definitions, and executors
   useEffect(() => {
     if (!initializedRef.current) {
       (async () => {
@@ -69,7 +69,7 @@ export default function TestRunsPage() {
           console.error("Error loading data:", error)
           toast({
             title: "Error",
-            description: "Failed to load test runs data",
+            description: "Failed to load runs data",
             variant: "destructive",
           })
         }
@@ -101,8 +101,8 @@ export default function TestRunsPage() {
       setRunToDelete(null)
 
       toast({
-        title: "Test run deleted",
-        description: "The test run has been removed successfully.",
+        title: "Run deleted",
+        description: "The run has been removed successfully.",
       })
     }, 500)
   }
@@ -123,7 +123,7 @@ export default function TestRunsPage() {
     setRunToDelete(null)
   }
 
-  // Filter test runs based on search query
+  // Filter runs based on search query
   const filteredRuns = testRuns.filter(
     (run) =>
       run.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -138,9 +138,9 @@ export default function TestRunsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Test Runs
+            Runs
           </h1>
-          <p className="text-muted-foreground mt-1">Monitor and manage your test runs</p>
+          <p className="text-muted-foreground mt-1">Monitor and manage your runs</p>
         </div>
         <Button
           asChild
@@ -186,12 +186,12 @@ export default function TestRunsPage() {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2">
-                {searchQuery ? "No test runs match your search" : "No test runs yet"}
+                {searchQuery ? "No runs match your search" : "No runs yet"}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {searchQuery
                   ? "Try adjusting your search terms."
-                  : "Start your first test run to see execution results here."}
+                  : "Start your first run to see execution results here."}
               </p>
               {!searchQuery && (
                 <Button
@@ -200,7 +200,7 @@ export default function TestRunsPage() {
                 >
                   <Link href="/runs/new">
                     <Plus className="mr-2 h-4 w-4" />
-                    Start Test Run
+                    Start Run
                   </Link>
                 </Button>
               )}
@@ -358,10 +358,10 @@ export default function TestRunsPage() {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         isDeleting={isDeleting === runToDelete?.id}
-        title="Delete Test Run"
-        description="Are you sure you want to delete this test run? This will permanently remove the run history, logs, and results."
+        title="Delete Run"
+        description="Are you sure you want to delete this run? This will permanently remove the run history, logs, and results."
         itemName={runToDelete?.name}
-        itemType="Test Run"
+        itemType="Run"
       />
     </div>
   )
