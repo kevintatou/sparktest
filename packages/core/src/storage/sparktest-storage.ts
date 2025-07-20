@@ -267,7 +267,7 @@ export class SparkTestStorageService implements StorageService {
     try {
       const res = await fetch(`${API_BASE}/k8s/health`)
       if (!res.ok) throw new Error('Failed to check Kubernetes health')
-      return await res.json()
+      return await res.json() as KubernetesHealth
     } catch (error) {
       throw new Error('Kubernetes integration not available')
     }
@@ -277,7 +277,7 @@ export class SparkTestStorageService implements StorageService {
     try {
       const res = await fetch(`${API_BASE}/test-runs/${runId}/logs`)
       if (!res.ok) throw new Error(`Failed to fetch logs for test run ${runId}`)
-      return await res.json()
+      return await res.json() as JobLogs
     } catch (error) {
       throw new Error('Kubernetes integration not available')
     }
@@ -287,7 +287,7 @@ export class SparkTestStorageService implements StorageService {
     try {
       const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}/logs`)
       if (!res.ok) throw new Error(`Failed to fetch logs for job ${jobName}`)
-      return await res.json()
+      return await res.json() as JobLogs
     } catch (error) {
       throw new Error('Kubernetes integration not available')
     }
@@ -297,7 +297,7 @@ export class SparkTestStorageService implements StorageService {
     try {
       const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}/status`)
       if (!res.ok) throw new Error(`Failed to fetch status for job ${jobName}`)
-      return await res.json()
+      return await res.json() as JobStatus
     } catch (error) {
       throw new Error('Kubernetes integration not available')
     }
@@ -307,7 +307,7 @@ export class SparkTestStorageService implements StorageService {
     try {
       const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}`, { method: 'DELETE' })
       if (!res.ok) throw new Error(`Failed to delete job ${jobName}`)
-      return await res.json()
+      return await res.json() as JobDeleteResponse
     } catch (error) {
       throw new Error('Kubernetes integration not available')
     }
