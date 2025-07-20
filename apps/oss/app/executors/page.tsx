@@ -10,6 +10,7 @@ import { useEffect, useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@sparktest/core"
 import { storage } from "@sparktest/storage-service"
+import type { Executor } from "@sparktest/core/types"
 
 export default function ExecutorsPage() {
   const { toast } = useToast()
