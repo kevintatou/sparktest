@@ -1,4 +1,10 @@
-# Add test:coverage to CI
+name: CI Coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
