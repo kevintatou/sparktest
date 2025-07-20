@@ -22,34 +22,14 @@
    npm publish
    ```
 
-### GitHub Actions Setup
-Create `.github/workflows/publish-npm.yml` for automated publishing on git tags:
+### Automated Publishing with GitHub Actions
 
-```yaml
-name: Publish NPM Packages
-on:
-  push:
-    tags:
-      - 'v*'
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          registry-url: 'https://registry.npmjs.org/'
-      - run: npm install -g pnpm
-      - run: pnpm install
-      - run: pnpm build:packages
-      - run: cd packages/core && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: cd packages/storage-service && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-```
+**Automated publishing is configured** via `.github/workflows/publish-npm.yml` that triggers on git tags starting with `v*`.
+
+**To publish npm packages:**
+1. Create and push a version tag: `git tag v1.0.0 && git push origin v1.0.0`
+2. The GitHub Action will automatically build and publish both packages to npm
+3. Requires `NPM_TOKEN` secret to be configured in repository settings
 
 ## Rust Crates
 
@@ -57,7 +37,16 @@ jobs:
 - Ensure Cargo.toml files have proper metadata
 - Login to crates.io: `cargo login`
 
-### Publishing Rust Crates
+### Automated Publishing with GitHub Actions
+
+**Automated publishing is configured** via `.github/workflows/publish-cargo.yml` that triggers on git tags starting with `v*`.
+
+**To publish Rust crates:**
+1. Create and push a version tag: `git tag v1.0.0 && git push origin v1.0.0`
+2. The GitHub Action will automatically build, test, and publish all crates in dependency order
+3. Requires `CRATES_IO_TOKEN` secret to be configured in repository settings
+
+### Manual Publishing (Alternative)
 
 1. **Build and test**:
    ```bash
@@ -73,6 +62,8 @@ jobs:
    ```
 
 ### Notes
-- Core should be published first as other crates depend on it
+- **Safeguard**: Both npm and cargo publishing workflows only trigger on version tags (e.g., `v1.0.0`), not on direct merges to main
+- Core packages should be published first as other packages/crates depend on them (workflows handle this automatically)
 - Use `cargo publish --dry-run` to test before actual publish
-- Version bumps should be coordinated across dependent crates
+- Version bumps should be coordinated across dependent packages/crates
+- Configure repository secrets: `NPM_TOKEN` for npm publishing, `CRATES_IO_TOKEN` for cargo publishing

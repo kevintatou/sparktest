@@ -1,0 +1,58 @@
+name: Publish Cargo Crates
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Build and test
+        run: |
+          cargo build --verbose
+          cargo test --verbose
+        working-directory: backend
+
+      - name: Login to crates.io
+        run: cargo login ${{ secrets.CRATES_IO_TOKEN }}
+
+      - name: Publish sparktest-core
+        run: cargo publish -p sparktest-core --allow-dirty
+        working-directory: backend
+
+      - name: Wait for crates.io to update
+        run: sleep 30
+
+      - name: Publish sparktest-api
+        run: cargo publish -p sparktest-api --allow-dirty
+        working-directory: backend
+
+      - name: Wait for crates.io to update
+        run: sleep 30
+
+      - name: Publish sparktest-bin
+        run: cargo publish -p sparktest-bin --allow-dirty
+        working-directory: backend

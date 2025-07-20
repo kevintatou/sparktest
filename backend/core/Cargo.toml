@@ -2,6 +2,10 @@
 name = "sparktest-core"
 version = "0.1.0"
 edition = "2021"
+description = "Core types and database models for SparkTest"
+license = "MIT"
+repository = "https://github.com/kevintatou/sparktest"
+homepage = "https://github.com/kevintatou/sparktest"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
