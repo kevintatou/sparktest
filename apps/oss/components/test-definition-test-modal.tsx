@@ -155,10 +155,10 @@ export function TestDefinitionTestModal({ isOpen, onClose, testDefinition }: Tes
           </div>
 
           {testing && (
-            <div className="space-y-3">
+            <div className="space-y-3 p-3 bg-muted/30 rounded-lg border">
               <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm">{currentStep}</span>
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <span className="text-sm font-medium">{currentStep}</span>
               </div>
               <Progress value={progress} className="h-2" />
               <p className="text-xs text-muted-foreground">{Math.round(progress)}% complete</p>
@@ -213,7 +213,7 @@ export function TestDefinitionTestModal({ isOpen, onClose, testDefinition }: Tes
           <Button variant="outline" onClick={handleClose}>
             Close
           </Button>
-          <Button onClick={runTest} disabled={testing} className="min-w-[100px]">
+          <Button onClick={runTest} disabled={testing} className="min-w-[120px]">
             {testing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
