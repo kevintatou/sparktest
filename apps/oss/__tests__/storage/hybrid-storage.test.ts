@@ -1,77 +1,91 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
 import { HybridStorageService } from "@sparktest/storage-service"
-import { ApiStorageService } from "@sparktest/storage-service"
-import { LocalStorageService } from "@sparktest/storage-service"
 
 // Mock the storage services
-vi.mock("@sparktest/storage-service")
-vi.mock("@sparktest/storage-service")
+vi.mock("@sparktest/storage-service", async (importOriginal) => {
+  const actual = await importOriginal()
+  
+  // Create mock instances that will be returned by the constructors
+  const mockApiInstance = {
+    getExecutors: vi.fn(),
+    saveExecutor: vi.fn(),
+    deleteExecutor: vi.fn(),
+    getExecutorById: vi.fn(),
+    getDefinitions: vi.fn(),
+    saveDefinition: vi.fn(),
+    deleteDefinition: vi.fn(),
+    getDefinitionById: vi.fn(),
+    getRuns: vi.fn(),
+    saveRun: vi.fn(),
+    deleteRun: vi.fn(),
+    getRunById: vi.fn(),
+    createRun: vi.fn(),
+    subscribeToRuns: vi.fn(),
+    getTestSuites: vi.fn(),
+    saveTestSuite: vi.fn(),
+    deleteTestSuite: vi.fn(),
+    getTestSuiteById: vi.fn(),
+    initialize: vi.fn(),
+    getKubernetesHealth: vi.fn(),
+    getTestRunLogs: vi.fn(),
+    getJobLogs: vi.fn(),
+    getJobStatus: vi.fn(),
+    deleteJob: vi.fn(),
+  }
 
-const mockApiStorage = vi.mocked(ApiStorageService)
-const mockLocalStorage = vi.mocked(LocalStorageService)
+  const mockLocalInstance = {
+    getExecutors: vi.fn(),
+    saveExecutor: vi.fn(),
+    deleteExecutor: vi.fn(),
+    getExecutorById: vi.fn(),
+    getDefinitions: vi.fn(),
+    saveDefinition: vi.fn(),
+    deleteDefinition: vi.fn(),
+    getDefinitionById: vi.fn(),
+    getRuns: vi.fn(),
+    saveRun: vi.fn(),
+    deleteRun: vi.fn(),
+    getRunById: vi.fn(),
+    createRun: vi.fn(),
+    subscribeToRuns: vi.fn(),
+    getTestSuites: vi.fn(),
+    saveTestSuite: vi.fn(),
+    deleteTestSuite: vi.fn(),
+    getTestSuiteById: vi.fn(),
+    getKubernetesHealth: vi.fn(),
+    getTestRunLogs: vi.fn(),
+    getJobLogs: vi.fn(),
+    getJobStatus: vi.fn(),
+    deleteJob: vi.fn(),
+    initialize: vi.fn(),
+  }
+
+  return {
+    ...actual,
+    ApiStorageService: vi.fn(() => mockApiInstance),
+    LocalStorageService: vi.fn(() => mockLocalInstance),
+    // Store references to the mock instances for access in tests
+    __mockApiInstance: mockApiInstance,
+    __mockLocalInstance: mockLocalInstance,
+  }
+})
+
+const mockApiStorage = vi.mocked((await import("@sparktest/storage-service")).ApiStorageService)
+const mockLocalStorage = vi.mocked((await import("@sparktest/storage-service")).LocalStorageService)
 
 describe("HybridStorageService", () => {
   let service: HybridStorageService
   let apiInstance: any
   let localInstance: any
 
-  beforeEach(() => {
-    apiInstance = {
-      getExecutors: vi.fn(),
-      saveExecutor: vi.fn(),
-      deleteExecutor: vi.fn(),
-      getExecutorById: vi.fn(),
-      getDefinitions: vi.fn(),
-      saveDefinition: vi.fn(),
-      deleteDefinition: vi.fn(),
-      getDefinitionById: vi.fn(),
-      getRuns: vi.fn(),
-      saveRun: vi.fn(),
-      deleteRun: vi.fn(),
-      getRunById: vi.fn(),
-      createRun: vi.fn(),
-      subscribeToRuns: vi.fn(),
-      getTestSuites: vi.fn(),
-      saveTestSuite: vi.fn(),
-      deleteTestSuite: vi.fn(),
-      getTestSuiteById: vi.fn(),
-      initialize: vi.fn(),
-      getKubernetesHealth: vi.fn(),
-      getTestRunLogs: vi.fn(),
-      getJobLogs: vi.fn(),
-      getJobStatus: vi.fn(),
-      deleteJob: vi.fn(),
-    }
+  beforeEach(async () => {
+    // Get the mock instances from the module mock
+    const { __mockApiInstance, __mockLocalInstance } = await import("@sparktest/storage-service")
+    apiInstance = __mockApiInstance
+    localInstance = __mockLocalInstance
 
-    localInstance = {
-      getExecutors: vi.fn(),
-      saveExecutor: vi.fn(),
-      deleteExecutor: vi.fn(),
-      getExecutorById: vi.fn(),
-      getDefinitions: vi.fn(),
-      saveDefinition: vi.fn(),
-      deleteDefinition: vi.fn(),
-      getDefinitionById: vi.fn(),
-      getRuns: vi.fn(),
-      saveRun: vi.fn(),
-      deleteRun: vi.fn(),
-      getRunById: vi.fn(),
-      createRun: vi.fn(),
-      subscribeToRuns: vi.fn(),
-      getTestSuites: vi.fn(),
-      saveTestSuite: vi.fn(),
-      deleteTestSuite: vi.fn(),
-      getTestSuiteById: vi.fn(),
-      getKubernetesHealth: vi.fn(),
-      getTestRunLogs: vi.fn(),
-      getJobLogs: vi.fn(),
-      getJobStatus: vi.fn(),
-      deleteJob: vi.fn(),
-      initialize: vi.fn(),
-    }
-
-    mockApiStorage.mockImplementation(() => apiInstance)
-    mockLocalStorage.mockImplementation(() => localInstance)
+    // Clear all mocks before each test
+    vi.clearAllMocks()
 
     service = new HybridStorageService()
   })
