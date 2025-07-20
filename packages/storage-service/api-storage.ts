@@ -1,4 +1,4 @@
-import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@sparktest/core"
+import type { Executor, Definition, Run, Suite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@sparktest/core"
 import { StorageService } from "./storage"
 
 const API_BASE = "http://localhost:3001/api"
@@ -8,7 +8,7 @@ export class ApiStorageService implements StorageService {
   async getExecutors(): Promise<Executor[]> {
     const res = await fetch(`${API_BASE}/test-executors`)
     if (!res.ok) throw new Error("Failed to fetch executors")
-    return await res.json()
+    return await res.json() as Executor[]
   }
 
   async saveExecutor(executor: Executor): Promise<Executor> {
@@ -18,7 +18,7 @@ export class ApiStorageService implements StorageService {
       body: JSON.stringify(executor),
     })
     if (!res.ok) throw new Error("Failed to save executor")
-    return await res.json()
+    return await res.json() as Executor
   }
 
   async deleteExecutor(id: string): Promise<boolean> {
@@ -35,7 +35,7 @@ export class ApiStorageService implements StorageService {
   async getDefinitions(): Promise<Definition[]> {
     const res = await fetch(`${API_BASE}/test-definitions`)
     if (!res.ok) throw new Error("Failed to fetch definitions")
-    return await res.json()
+    return await res.json() as Definition[]
   }
 
   async saveDefinition(def: Definition): Promise<Definition> {
@@ -45,7 +45,7 @@ export class ApiStorageService implements StorageService {
       body: JSON.stringify(def),
     })
     if (!res.ok) throw new Error("Failed to save definition")
-    return await res.json()
+    return await res.json() as Definition
   }
 
   async deleteDefinition(id: string): Promise<boolean> {
@@ -62,7 +62,7 @@ export class ApiStorageService implements StorageService {
   async getRuns(): Promise<Run[]> {
     const res = await fetch(`${API_BASE}/test-runs`)
     if (!res.ok) throw new Error("Failed to fetch runs")
-    const data = await res.json()
+    const data = await res.json() as any[]
     // Convert snake_case to camelCase, ensure createdAt is valid, filter and sort
     return data
       .map((run: any) => {
@@ -106,7 +106,7 @@ export class ApiStorageService implements StorageService {
       body: JSON.stringify(payload),
     })
     if (!res.ok) throw new Error("Failed to save run")
-    return await res.json()
+    return await res.json() as Run
   }
 
   async deleteRun(id: string): Promise<boolean> {
@@ -161,15 +161,15 @@ export class ApiStorageService implements StorageService {
       body: JSON.stringify(payload),
     })
     if (!res.ok) throw new Error("Failed to create test run")
-    return await res.json()
+    return await res.json() as Run
   }
 
-  // Test Suites
-  async getTestSuites(): Promise<TestSuite[]> {
+  // Suites
+  async getSuites(): Promise<Suite[]> {
     const res = await fetch(`${API_BASE}/test-suites`)
     if (!res.ok) throw new Error("Failed to fetch test suites")
     
-    const data = await res.json();
+    const data = await res.json() as any[];
     
     // Convert snake_case to camelCase for each suite
     return data.map((suite: any) => ({
@@ -183,7 +183,7 @@ export class ApiStorageService implements StorageService {
     }));
   }
 
-  async saveTestSuite(suite: TestSuite): Promise<TestSuite> {
+  async saveSuite(suite: Suite): Promise<Suite> {
     const method = suite.id ? "PUT" : "POST"
     const url = suite.id ? `${API_BASE}/test-suites/${suite.id}` : `${API_BASE}/test-suites`
 
@@ -193,7 +193,7 @@ export class ApiStorageService implements StorageService {
       id: suite.id || "00000000-0000-0000-0000-000000000000", // Use nil UUID if no ID
       execution_mode: suite.executionMode,
       // Convert string IDs to UUIDs
-      test_definition_ids: suite.testDefinitionIds.map((id: string) => {
+      test_definition_ids: suite.testDefinitionIds.map(id => {
         // Check if ID is already a UUID
         if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
           return id;
@@ -216,10 +216,10 @@ export class ApiStorageService implements StorageService {
     })
 
     if (!res.ok) throw new Error("Failed to save test suite")
-    return await res.json()
+    return await res.json() as Suite
   }
 
-  async deleteTestSuite(id: string): Promise<boolean> {
+  async deleteSuite(id: string): Promise<boolean> {
     // Convert to UUID format if needed
     let uuidId = id;
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
@@ -230,7 +230,7 @@ export class ApiStorageService implements StorageService {
     return res.ok
   }
 
-  async getTestSuiteById(id: string): Promise<TestSuite | undefined> {
+  async getSuiteById(id: string): Promise<Suite | undefined> {
     // Convert to UUID format if needed
     let uuidId = id;
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
@@ -240,7 +240,7 @@ export class ApiStorageService implements StorageService {
     const res = await fetch(`${API_BASE}/test-suites/${uuidId}`)
     if (!res.ok) throw new Error("Failed to fetch test suite")
     
-    const data = await res.json();
+    const data = await res.json() as any;
     
     // Convert snake_case back to camelCase
     return {
@@ -258,31 +258,31 @@ export class ApiStorageService implements StorageService {
   async getKubernetesHealth(): Promise<KubernetesHealth> {
     const res = await fetch(`${API_BASE}/k8s/health`)
     if (!res.ok) throw new Error("Failed to check Kubernetes health")
-    return await res.json()
+    return await res.json() as KubernetesHealth
   }
 
   async getTestRunLogs(runId: string): Promise<JobLogs> {
     const res = await fetch(`${API_BASE}/test-runs/${runId}/logs`)
     if (!res.ok) throw new Error(`Failed to fetch logs for test run ${runId}`)
-    return await res.json()
+    return await res.json() as JobLogs
   }
 
   async getJobLogs(jobName: string): Promise<JobLogs> {
     const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}/logs`)
     if (!res.ok) throw new Error(`Failed to fetch logs for job ${jobName}`)
-    return await res.json()
+    return await res.json() as JobLogs
   }
 
   async getJobStatus(jobName: string): Promise<JobStatus> {
     const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}/status`)
     if (!res.ok) throw new Error(`Failed to fetch status for job ${jobName}`)
-    return await res.json()
+    return await res.json() as JobStatus
   }
 
   async deleteJob(jobName: string): Promise<JobDeleteResponse> {
     const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}`, { method: "DELETE" })
     if (!res.ok) throw new Error(`Failed to delete job ${jobName}`)
-    return await res.json()
+    return await res.json() as JobDeleteResponse
   }
 
   initialize(): void {

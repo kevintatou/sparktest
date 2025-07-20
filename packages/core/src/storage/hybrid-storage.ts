@@ -1,4 +1,4 @@
-import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
+import type { Executor, Definition, Run, Suite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
 import { StorageService } from "./storage"
 import { ApiStorageService } from "./api-storage"
 import { LocalStorageService } from "./local-storage"
@@ -144,32 +144,32 @@ export class HybridStorageService implements StorageService {
     }
   }
 
-  // Test Suites
-  async getTestSuites(): Promise<TestSuite[]> {
+  // Suites
+  async getSuites(): Promise<Suite[]> {
     return this.tryApiWithFallback(
-      () => this.apiStorage.getTestSuites(),
-      () => this.localStorage.getTestSuites()
+      () => this.apiStorage.getSuites(),
+      () => this.localStorage.getSuites()
     )
   }
 
-  async saveTestSuite(suite: TestSuite): Promise<TestSuite> {
+  async saveSuite(suite: Suite): Promise<Suite> {
     return this.tryApiWithFallback(
-      () => this.apiStorage.saveTestSuite(suite),
-      () => this.localStorage.saveTestSuite(suite)
+      () => this.apiStorage.saveSuite(suite),
+      () => this.localStorage.saveSuite(suite)
     )
   }
 
-  async deleteTestSuite(id: string): Promise<boolean> {
+  async deleteSuite(id: string): Promise<boolean> {
     return this.tryApiWithFallback(
-      () => this.apiStorage.deleteTestSuite(id),
-      () => this.localStorage.deleteTestSuite(id)
+      () => this.apiStorage.deleteSuite(id),
+      () => this.localStorage.deleteSuite(id)
     )
   }
 
-  async getTestSuiteById(id: string): Promise<TestSuite | undefined> {
+  async getSuiteById(id: string): Promise<Suite | undefined> {
     return this.tryApiWithFallback(
-      () => this.apiStorage.getTestSuiteById(id),
-      () => this.localStorage.getTestSuiteById(id)
+      () => this.apiStorage.getSuiteById(id),
+      () => this.localStorage.getSuiteById(id)
     )
   }
 

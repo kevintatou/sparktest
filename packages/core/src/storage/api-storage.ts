@@ -1,4 +1,4 @@
-import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
+import type { Executor, Definition, Run, Suite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../types"
 import { StorageService } from "./storage"
 
 const API_BASE = "http://localhost:3001/api"
@@ -164,8 +164,8 @@ export class ApiStorageService implements StorageService {
     return await res.json() as Run
   }
 
-  // Test Suites
-  async getTestSuites(): Promise<TestSuite[]> {
+  // Suites
+  async getSuites(): Promise<Suite[]> {
     const res = await fetch(`${API_BASE}/test-suites`)
     if (!res.ok) throw new Error("Failed to fetch test suites")
     
@@ -183,7 +183,7 @@ export class ApiStorageService implements StorageService {
     }));
   }
 
-  async saveTestSuite(suite: TestSuite): Promise<TestSuite> {
+  async saveSuite(suite: Suite): Promise<Suite> {
     const method = suite.id ? "PUT" : "POST"
     const url = suite.id ? `${API_BASE}/test-suites/${suite.id}` : `${API_BASE}/test-suites`
 
@@ -216,10 +216,10 @@ export class ApiStorageService implements StorageService {
     })
 
     if (!res.ok) throw new Error("Failed to save test suite")
-    return await res.json() as TestSuite
+    return await res.json() as Suite
   }
 
-  async deleteTestSuite(id: string): Promise<boolean> {
+  async deleteSuite(id: string): Promise<boolean> {
     // Convert to UUID format if needed
     let uuidId = id;
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
@@ -230,7 +230,7 @@ export class ApiStorageService implements StorageService {
     return res.ok
   }
 
-  async getTestSuiteById(id: string): Promise<TestSuite | undefined> {
+  async getSuiteById(id: string): Promise<Suite | undefined> {
     // Convert to UUID format if needed
     let uuidId = id;
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
