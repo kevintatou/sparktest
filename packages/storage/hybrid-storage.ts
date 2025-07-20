@@ -1,4 +1,4 @@
-import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../core/src/types"
+import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@sparktest/core/types"
 import { StorageService } from "./storage"
 import { ApiStorageService } from "./api-storage"
 import { LocalStorageService } from "./local-storage"
