@@ -1,4 +1,4 @@
-import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@sparktest/core/types"
+import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@sparktest/core"
 import { StorageService } from "./storage"
 
 const API_BASE = "http://localhost:3001/api"
@@ -90,7 +90,7 @@ export class ApiStorageService implements StorageService {
     const url = run.id ? `${API_BASE}/test-runs/${run.id}` : `${API_BASE}/test-runs`
     
     // Convert camelCase to snake_case for the API
-    const payload = {
+    const payload: any = {
       ...run,
       created_at: run.createdAt,
       definition_id: run.definitionId,
@@ -193,7 +193,7 @@ export class ApiStorageService implements StorageService {
       id: suite.id || "00000000-0000-0000-0000-000000000000", // Use nil UUID if no ID
       execution_mode: suite.executionMode,
       // Convert string IDs to UUIDs
-      test_definition_ids: suite.testDefinitionIds.map(id => {
+      test_definition_ids: suite.testDefinitionIds.map((id: string) => {
         // Check if ID is already a UUID
         if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
           return id;

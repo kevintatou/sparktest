@@ -1,0 +1,74 @@
+{
+  "name": "@sparktest/storage-service",
+  "version": "0.1.0",
+  "description": "Storage service implementations for SparkTest",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./api-storage": {
+      "types": "./dist/api-storage.d.ts",
+      "import": "./dist/api-storage.js",
+      "default": "./dist/api-storage.js"
+    },
+    "./local-storage": {
+      "types": "./dist/local-storage.d.ts",
+      "import": "./dist/local-storage.js",
+      "default": "./dist/local-storage.js"
+    },
+    "./hybrid-storage": {
+      "types": "./dist/hybrid-storage.d.ts",
+      "import": "./dist/hybrid-storage.js",
+      "default": "./dist/hybrid-storage.js"
+    },
+    "./storage": {
+      "types": "./dist/storage.d.ts",
+      "import": "./dist/storage.js",
+      "default": "./dist/storage.js"
+    },
+    "./dummy-definitions": {
+      "types": "./dist/dummy-definitions.d.ts",
+      "import": "./dist/dummy-definitions.js",
+      "default": "./dist/dummy-definitions.js"
+    },
+    "./generic": {
+      "types": "./dist/generic/index.d.ts",
+      "import": "./dist/generic/index.js",
+      "default": "./dist/generic/index.js"
+    },
+    "./sparktest-storage": {
+      "types": "./dist/sparktest-storage.d.ts",
+      "import": "./dist/sparktest-storage.js",
+      "default": "./dist/sparktest-storage.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "pnpm build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@sparktest/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^22"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

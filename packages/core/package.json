@@ -2,85 +2,54 @@
   "name": "@sparktest/core",
   "version": "0.1.0",
   "description": "Shared TypeScript types and utilities for SparkTest",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./storage": {
-      "types": "./src/storage/index.ts",
-      "default": "./src/storage/index.ts"
-    },
-    "./storage/index": {
-      "types": "./src/storage/index.ts",
-      "default": "./src/storage/index.ts"
-    },
-    "./storage/api-storage": {
-      "types": "./src/storage/api-storage.ts",
-      "default": "./src/storage/api-storage.ts"
-    },
-    "./storage/local-storage": {
-      "types": "./src/storage/local-storage.ts",
-      "default": "./src/storage/local-storage.ts"
-    },
-    "./storage/hybrid-storage": {
-      "types": "./src/storage/hybrid-storage.ts",
-      "default": "./src/storage/hybrid-storage.ts"
-    },
-    "./storage/storage": {
-      "types": "./src/storage/storage.ts",
-      "default": "./src/storage/storage.ts"
-    },
-    "./storage/dummy-definitions": {
-      "types": "./src/storage/dummy-definitions.ts",
-      "default": "./src/storage/dummy-definitions.ts"
-    },
-    "./storage/generic": {
-      "types": "./src/storage/generic/index.ts",
-      "default": "./src/storage/generic/index.ts"
-    },
-    "./storage/sparktest-storage": {
-      "types": "./src/storage/sparktest-storage.ts",
-      "default": "./src/storage/sparktest-storage.ts"
+      "types": "./dist/storage/index.d.ts",
+      "import": "./dist/storage/index.js",
+      "default": "./dist/storage/index.js"
     },
     "./config": {
-      "types": "./src/config.ts",
-      "default": "./src/config.ts"
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js",
+      "default": "./dist/config.js"
     },
     "./samples": {
-      "types": "./src/samples.ts",
-      "default": "./src/samples.ts"
+      "types": "./dist/samples.d.ts",
+      "import": "./dist/samples.js",
+      "default": "./dist/samples.js"
     },
     "./utils": {
-      "types": "./src/utils.ts",
-      "default": "./src/utils.ts"
-    },
-    "./constants": {
-      "types": "./src/constants/index.ts",
-      "default": "./src/constants/index.ts"
-    },
-    "./constants/navigation": {
-      "types": "./src/constants/navigation.ts",
-      "default": "./src/constants/navigation.ts"
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js",
+      "default": "./dist/utils.js"
     },
     "./types": {
-      "types": "./src/types.ts",
-      "default": "./src/types.ts"
-    },
-    "./types/navigation": {
-      "types": "./src/types/navigation.ts",
-      "default": "./src/types/navigation.ts"
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "default": "./dist/types.js"
     }
   },
   "files": [
-    "src/"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "type-check": "tsc --noEmit"
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "pnpm build"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "lucide-react": "^0.454.0"

@@ -1,4 +1,4 @@
-import { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@sparktest/core/types"
+import { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@sparktest/core"
 
 export interface StorageService {
   // Executors
