@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { GenericLocalStorageService, GenericApiStorageService, GenericHybridStorageService, storageUtils } from "@sparktest/core/storage/generic"
+import { GenericLocalStorageService, GenericApiStorageService, GenericHybridStorageService, storageUtils } from "@sparktest/storage-service/generic"
 
 // Mock localStorage
 const localStorageMock = {

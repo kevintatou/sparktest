@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { KubernetesLogs } from "@/components/kubernetes-logs"
 import { CheckCircle, XCircle, Clock, AlertCircle, ExternalLink, Copy } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@sparktest/core/storage"
+import { storage } from "@sparktest/storage-service"
 import type React from "react"
 
 interface TestDetailsProps {

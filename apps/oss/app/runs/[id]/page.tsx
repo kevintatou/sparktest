@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { RunDetails } from "@/components/run-details"
-import { storage } from "@sparktest/core/storage"
+import { storage } from "@sparktest/storage-service"
 import type { Run } from "@sparktest/core/types"
 
 export default function TestDetailsPage({ params }: { params: { id: string } }) {

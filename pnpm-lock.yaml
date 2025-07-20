@@ -257,19 +257,6 @@ importers:
         specifier: ^5
         version: 5.8.3
 
-  packages/storage:
-    dependencies:
-      '@sparktest/core':
-        specifier: workspace:*
-        version: link:../core
-    devDependencies:
-      '@types/node':
-        specifier: ^22
-        version: 22.16.3
-      typescript:
-        specifier: ^5
-        version: 5.8.3
-
   packages/storage-service:
     dependencies:
       '@sparktest/core':
