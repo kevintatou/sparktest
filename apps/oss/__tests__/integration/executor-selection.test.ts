@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
-import { ApiStorageService } from "@sparktest/core/storage/api-storage"
+import { ApiStorageService } from "@sparktest/storage-service/api-storage"
 
 // Test the executor selection in test definition creation
 describe("Executor Selection in Test Definition", () => {

@@ -2,6 +2,10 @@
 name = "sparktest-api"
 version = "0.1.0"
 edition = "2021"
+description = "API server and Kubernetes integration for SparkTest"
+license = "MIT"
+repository = "https://github.com/kevintatou/sparktest"
+homepage = "https://github.com/kevintatou/sparktest"
 
 [dependencies]
 sparktest-core = { path = "../core" }

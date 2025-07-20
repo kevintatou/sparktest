@@ -3,7 +3,7 @@ import { ApiStorageService } from "./api-storage"
 import { HybridStorageService } from "./hybrid-storage"
 import { SparkTestStorageService } from "./sparktest-storage"
 import { StorageService } from "./storage"
-import { USE_RUST_API } from "@sparktest/core/config"
+import { USE_RUST_API } from "@sparktest/core"
 
 // Export the new generic storage services for future extraction
 export * from "./generic"

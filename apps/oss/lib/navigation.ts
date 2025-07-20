@@ -1,5 +1,22 @@
 import { Home, Play, FileText, Layers, Cpu, PlayCircle, FileTextIcon, LayersIcon, CpuIcon } from "lucide-react"
-import { NavigationItem, CreateOption } from "../types/navigation"
+import type { LucideIcon } from "lucide-react"
+
+export interface NavigationItem {
+  name: string
+  href: string
+  icon: LucideIcon
+}
+
+export interface CreateOption {
+  name: string
+  href: string
+  icon: LucideIcon
+}
+
+export interface SidebarState {
+  isCreateOpen: boolean
+  setIsCreateOpen: (open: boolean) => void
+}
 
 export const NAVIGATION_ITEMS: readonly NavigationItem[] = [
   { name: "Dashboard", href: "/", icon: Home },

@@ -32,7 +32,7 @@ export class GenericApiStorageService<T> implements GenericStorageService<T> {
     const res = await fetch(`${this.apiBaseUrl}/${this.endpoint}`)
     if (!res.ok) throw new Error(`Failed to fetch ${this.endpoint}`)
     
-    const data = await res.json()
+    const data = await res.json() as T[]
     return this.transformResponse ? this.transformResponse(data) : data
   }
 
@@ -51,7 +51,7 @@ export class GenericApiStorageService<T> implements GenericStorageService<T> {
     
     if (!res.ok) throw new Error(`Failed to save ${this.endpoint}`)
     
-    const data = await res.json()
+    const data = await res.json() as T
     return this.transformResponse ? this.transformResponse(data) : data
   }
 

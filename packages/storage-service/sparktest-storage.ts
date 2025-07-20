@@ -14,8 +14,8 @@ import type {
   JobLogs, 
   JobStatus, 
   JobDeleteResponse 
-} from '@sparktest/core/types'
-import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from '@sparktest/core/samples'
+} from '@sparktest/core'
+import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from '@sparktest/core'
 
 const API_BASE = 'http://localhost:3001/api'
 
@@ -126,7 +126,7 @@ export class SparkTestStorageService implements StorageService {
           ...suite,
           id: suite.id || '00000000-0000-0000-0000-000000000000',
           execution_mode: suite.executionMode,
-          test_definition_ids: suite.testDefinitionIds.map(id => {
+          test_definition_ids: suite.testDefinitionIds.map((id: string) => {
             if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
               return id
             }
