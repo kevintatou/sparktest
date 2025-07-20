@@ -109,6 +109,10 @@ backend/
 - `.github/workflows/npm-publish.yml` - Automated npm publishing
 - `.github/workflows/crate-publish.yml` - Automated Rust crate publishing
 
+## Merge History
+
+*Note: Main branch changes have been incorporated into this refactoring branch. The storage package improvements that were made in main have been implemented more comprehensively in this branch structure.*
+
 ## Publishing Workflows
 
 ### TypeScript Packages
