@@ -2,10 +2,11 @@
 
 import type React from "react"
 
-import { SimpleSidebar } from "@/components/simple-sidebar"
+import { AppSidebar } from "@/components/ui/app-sidebar"
 import { TopHeader } from "@/components/top-header"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 
 export default function ClientLayout({
   children,
@@ -14,13 +15,13 @@ export default function ClientLayout({
 }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <div className="flex h-screen bg-background">
-        <SimpleSidebar />
-        <div className="flex flex-1 flex-col overflow-hidden">
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
           <TopHeader />
-          <main className="flex-1 overflow-auto">{children}</main>
-        </div>
-      </div>
+          <main className="flex-1 overflow-auto p-4">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
       <Toaster />
     </ThemeProvider>
   )

@@ -59,6 +59,11 @@ const createItems = [
     description: "Define a new test case",
   },
   {
+    title: "New Suite",
+    url: "/suites/new", 
+    description: "Create a new test suite",
+  },
+  {
     title: "New Executor",
     url: "/executors/new",
     description: "Create a new executor",
@@ -116,10 +121,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span>Create</span>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" side="right" align="end" sideOffset={4}>
+              <DropdownMenuContent className="w-56" side="right" align="end" sideOffset={4} 
+                                               alignOffset={-8} avoidCollisions={true}>
                 {createItems.map((item) => (
                   <DropdownMenuItem key={item.title} asChild>
-                    <Link href={item.url} className="flex items-center gap-2 p-2">
+                    <Link href={item.url} className="flex items-center gap-2 p-2 min-h-[44px]">
                       <div className="flex size-6 items-center justify-center rounded-sm border">
                         <Plus className="size-3" />
                       </div>

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
 import { storage } from "@sparktest/core/storage"
 import { useRouter } from "next/navigation"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 
 export function TopHeader() {
   const { setTheme, theme } = useTheme()
@@ -77,6 +78,9 @@ export function TopHeader() {
   return (
     <header className="flex h-16 items-center justify-between border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-4 sm:px-6">
       <div className="flex items-center gap-4 sm:gap-6 flex-1">
+        {/* Mobile Sidebar Trigger */}
+        <SidebarTrigger className="md:hidden" />
+        
         {/* Search */}
         <div className="relative flex-1 max-w-sm sm:max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
