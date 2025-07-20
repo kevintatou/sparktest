@@ -1,0 +1,37 @@
+# Add test:coverage to CI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Enable Corepack and install pnpm
+      run: |
+        corepack enable
+        corepack prepare pnpm@latest --activate
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'pnpm'
+        cache-dependency-path: pnpm-lock.yaml
+
+    - name: Install dependencies
+      run: pnpm install
+
+    - name: Build application
+      run: pnpm --filter "@sparktest/oss" build
+
+    - name: Run E2E tests
+      run: pnpm --filter "@sparktest/oss" test:e2e
+      env:
+        CI: true
+
+    - name: Run Coverage
+      run: pnpm --filter "@sparktest/oss" test:coverage
+      env:
+        CI: true
