@@ -11,7 +11,7 @@
     "build:packages": "pnpm build:core && pnpm build:storage-service",
     "build:app": "pnpm --filter '@sparktest/oss' build",
     "dev": "pnpm --filter '@sparktest/oss' dev",
-    "test": "pnpm --filter './packages/*' test && pnpm --filter '@sparktest/oss' test",
+    "test": "pnpm build:packages && pnpm --filter '@sparktest/oss' test",
     "lint": "pnpm --filter './packages/*' lint && pnpm --filter '@sparktest/oss' lint",
     "type-check": "pnpm --filter './packages/*' type-check && pnpm --filter '@sparktest/oss' type-check",
     "clean": "pnpm --filter './packages/*' clean",
