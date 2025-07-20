@@ -342,7 +342,7 @@ export function validateTestExecutor(data: any): MultiFieldValidationResult {
 }
 
 // Validate test suite
-export function validateTestSuite(data: any): MultiFieldValidationResult {
+export function validateSuite(data: any): MultiFieldValidationResult {
   const errors: ValidationErrors = {};
 
   // Validate name

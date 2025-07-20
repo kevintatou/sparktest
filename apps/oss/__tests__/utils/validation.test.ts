@@ -8,7 +8,7 @@ import {
   validateExecutionMode,
   validateTestDefinition,
   validateTestExecutor,
-  validateTestSuite
+  validateSuite
 } from '../../utils/validation';
 
 describe('Frontend Validation Utilities', () => {
@@ -257,7 +257,7 @@ describe('Frontend Validation Utilities', () => {
     });
   });
 
-  describe('validateTestSuite', () => {
+  describe('validateSuite', () => {
     it('should accept valid test suite', () => {
       const data = {
         name: 'Test Suite',
@@ -265,7 +265,7 @@ describe('Frontend Validation Utilities', () => {
         execution_mode: 'sequential',
         labels: ['test', 'integration']
       };
-      expect(validateTestSuite(data)).toEqual({
+      expect(validateSuite(data)).toEqual({
         isValid: true,
         errors: {}
       });
@@ -278,7 +278,7 @@ describe('Frontend Validation Utilities', () => {
         execution_mode: 'invalid',
         labels: ['test@invalid']
       };
-      const result = validateTestSuite(data);
+      const result = validateSuite(data);
       expect(result.isValid).toBe(false);
       expect(result.errors).toHaveProperty('name');
       expect(result.errors).toHaveProperty('execution_mode');
