@@ -107,10 +107,86 @@ export class LocalStorageService implements StorageService {
       executorId: def.executorId,
       variables: def.variables || {},
       artifacts: [],
-      logs: ["> Starting test..."],
+      logs: ["> Starting test...", "> Initializing container..."],
     }
 
-    return this.saveRun(run)
+    const savedRun = await this.saveRun(run)
+    
+    // Simulate test execution with automatic completion
+    this.simulateTestExecution(savedRun)
+    
+    return savedRun
+  }
+
+  private simulateTestExecution(run: Run): void {
+    // Simulate realistic test execution timing (5-15 seconds)
+    const executionDuration = Math.floor(Math.random() * 10000) + 5000 // 5-15 seconds
+    const progressInterval = 1000 // Update logs every second
+    
+    let elapsed = 0
+    
+    const progressTimer = setInterval(async () => {
+      elapsed += progressInterval
+      
+      // Add progress logs
+      const currentRun = await this.getRunById(run.id)
+      if (!currentRun || currentRun.status !== "running") {
+        clearInterval(progressTimer)
+        return
+      }
+      
+      const logs = [...(currentRun.logs || [])]
+      
+      if (elapsed <= executionDuration * 0.3) {
+        logs.push(`> Setting up test environment... (${Math.floor(elapsed / 1000)}s)`)
+      } else if (elapsed <= executionDuration * 0.7) {
+        logs.push(`> Executing test commands... (${Math.floor(elapsed / 1000)}s)`)
+      } else if (elapsed < executionDuration) {
+        logs.push(`> Finalizing test results... (${Math.floor(elapsed / 1000)}s)`)
+      }
+      
+      const updatedRun = {
+        ...currentRun,
+        logs: logs.slice(-10) // Keep only last 10 log entries
+      }
+      
+      await this.saveRun(updatedRun)
+      
+      if (elapsed >= executionDuration) {
+        clearInterval(progressTimer)
+        await this.completeTestRun(run.id, executionDuration)
+      }
+    }, progressInterval)
+  }
+
+  private async completeTestRun(runId: string, executionTimeMs: number): Promise<void> {
+    const run = await this.getRunById(runId)
+    if (!run || run.status !== "running") return
+    
+    // Simulate 90% success rate
+    const isSuccess = Math.random() > 0.1
+    const endTime = new Date().toISOString()
+    const durationInSeconds = Math.floor(executionTimeMs / 1000)
+    
+    const finalLogs = [...(run.logs || [])]
+    if (isSuccess) {
+      finalLogs.push(`> Test completed successfully in ${durationInSeconds}s`)
+      finalLogs.push("> All assertions passed")
+    } else {
+      finalLogs.push(`> Test failed after ${durationInSeconds}s`)
+      finalLogs.push("> One or more assertions failed")
+    }
+    
+    const completedRun: Run = {
+      ...run,
+      status: isSuccess ? "completed" : "failed",
+      duration: durationInSeconds,
+      completed: isSuccess ? endTime : undefined,
+      failed: isSuccess ? undefined : endTime,
+      logs: finalLogs
+    }
+    
+    await this.saveRun(completedRun)
   }
   subscribeToRuns(callback: (payload: { eventType: string; new?: Run; old?: Run }) => void): () => void {
     let previousRuns: Run[] = []
@@ -143,7 +219,7 @@ export class LocalStorageService implements StorageService {
       } catch (err) {
         console.error("Polling error in subscribeToRuns:", err)
       }
-    }, 10000)
+    }, 2000) // Poll every 2 seconds for better real-time feedback
   
     return () => clearInterval(interval)
   }
