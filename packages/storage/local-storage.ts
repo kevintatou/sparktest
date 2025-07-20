@@ -1,7 +1,7 @@
 import type { StorageService } from "./storage"
 import { getFromStorage, setToStorage } from "./generic/utils"
-import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "../core/src/types"
-import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from "../core/src/samples"
+import type { Executor, Definition, Run, TestSuite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@sparktest/core/types"
+import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from "@sparktest/core/samples"
 
 export class LocalStorageService implements StorageService {
   async getExecutors(): Promise<Executor[]> {

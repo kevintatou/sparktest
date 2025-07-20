@@ -14,8 +14,8 @@ import type {
   JobLogs, 
   JobStatus, 
   JobDeleteResponse 
-} from '../core/src/types'
-import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from '../core/src/samples'
+} from '@sparktest/core/types'
+import { sampleExecutors, sampleDefinitions, sampleRuns, sampleTestSuites } from '@sparktest/core/samples'
 
 const API_BASE = 'http://localhost:3001/api'
 
