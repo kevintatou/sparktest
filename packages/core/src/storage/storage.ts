@@ -38,6 +38,7 @@ export interface StorageService {
   getJobLogs(jobName: string): Promise<JobLogs>
   getJobStatus(jobName: string): Promise<JobStatus>
   deleteJob(jobName: string): Promise<JobDeleteResponse>
+  listKubernetesJobs(): Promise<any[]>
 
   // Optional: setup
   initialize(): void

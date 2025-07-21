@@ -318,6 +318,53 @@ impl KubernetesClient {
         Ok(status)
     }
 
+    /// List all SparkTest jobs in the namespace
+    pub async fn list_sparktest_jobs(&self) -> Result<Vec<serde_json::Value>> {
+        let jobs: Api<Job> = Api::namespaced(self.client.clone(), &self.config.namespace);
+        
+        // List jobs with SparkTest labels
+        let label_selector = "app=sparktest,component=test-runner";
+        let list_params = ListParams::default().labels(label_selector);
+        
+        let job_list = jobs.list(&list_params).await
+            .with_context(|| "Failed to list SparkTest jobs from Kubernetes")?;
+
+        let mut result = Vec::new();
+        
+        for job in job_list.items {
+            let job_name = job.metadata.name.unwrap_or_else(|| "unknown".to_string());
+            
+            let status = job.status.as_ref()
+                .and_then(|s| s.conditions.as_ref())
+                .map(|conditions| {
+                    if conditions.iter().any(|c| c.type_ == "Complete" && c.status == "True") {
+                        "completed"
+                    } else if conditions.iter().any(|c| c.type_ == "Failed" && c.status == "True") {
+                        "failed"
+                    } else {
+                        "running"
+                    }
+                })
+                .unwrap_or("pending");
+
+            let created_at = job.metadata.creation_timestamp
+                .map(|ts| ts.0.to_rfc3339())
+                .unwrap_or_else(|| chrono::Utc::now().to_rfc3339());
+
+            let job_info = serde_json::json!({
+                "name": job_name,
+                "status": status,
+                "created_at": created_at,
+                "namespace": &self.config.namespace,
+                "labels": job.metadata.labels.unwrap_or_default(),
+            });
+            
+            result.push(job_info);
+        }
+        
+        Ok(result)
+    }
+
     /// Delete a job and its associated pods
     pub async fn delete_job(&self, job_name: &str) -> Result<()> {
         let jobs: Api<Job> = Api::namespaced(self.client.clone(), &self.config.namespace);

@@ -209,6 +209,13 @@ export class HybridStorageService implements StorageService {
     )
   }
 
+  async listKubernetesJobs(): Promise<any[]> {
+    return this.tryApiWithFallback(
+      () => this.apiStorage.listKubernetesJobs(),
+      () => this.localStorage.listKubernetesJobs()
+    )
+  }
+
   async initialize(): Promise<void> {
     // Initialize both storage services
     await this.apiStorage.initialize()

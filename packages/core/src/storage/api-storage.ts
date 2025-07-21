@@ -285,6 +285,13 @@ export class ApiStorageService implements StorageService {
     return await res.json() as JobDeleteResponse
   }
 
+  async listKubernetesJobs(): Promise<any[]> {
+    const res = await fetch(`${API_BASE}/k8s/jobs`)
+    if (!res.ok) throw new Error("Failed to list Kubernetes jobs")
+    const data = await res.json()
+    return data.jobs || []
+  }
+
   initialize(): void {
     // No-op for API mode
   }

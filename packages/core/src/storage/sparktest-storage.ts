@@ -313,6 +313,17 @@ export class SparkTestStorageService implements StorageService {
     }
   }
 
+  async listKubernetesJobs(): Promise<any[]> {
+    try {
+      const res = await fetch(`${API_BASE}/k8s/jobs`)
+      if (!res.ok) throw new Error('Failed to list Kubernetes jobs')
+      const data = await res.json()
+      return data.jobs || []
+    } catch (error) {
+      throw new Error('Kubernetes integration not available')
+    }
+  }
+
   async initialize(): Promise<void> {
     await this.executorStorage.initialize()
     await this.definitionStorage.initialize()

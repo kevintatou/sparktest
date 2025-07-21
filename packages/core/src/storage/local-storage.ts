@@ -199,6 +199,11 @@ export class LocalStorageService implements StorageService {
     throw new Error("Kubernetes integration not available in local storage mode")
   }
 
+  async listKubernetesJobs(): Promise<any[]> {
+    // In local storage mode, return empty array since we don't have real K8s access
+    return []
+  }
+
   initialize(): void {
     if (typeof window === "undefined") return
     if (!localStorage.getItem("sparktest_executors")) {
