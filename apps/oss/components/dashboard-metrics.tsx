@@ -36,6 +36,7 @@ export function DashboardMetrics() {
         const completedRuns = runs.filter((r) => r.status === "completed").length
         const failedRuns = runs.filter((r) => r.status === "failed").length
         const runningRuns = runs.filter((r) => r.status === "running").length
+        // Pass rate: completed out of all runs
         const passRate = totalRuns > 0 ? Math.round((completedRuns / totalRuns) * 100) : 0
 
         setMetrics({
@@ -117,7 +118,15 @@ export function DashboardMetrics() {
               {metrics.completedRuns} of {metrics.totalRuns} tests passed
             </p>
             <div className="mt-3">
-              <TrendChart data={[65, 70, 75, 80, 85, 90, metrics.passRate]} color="green" />
+              <TrendChart data={[
+                { date: "6d", value: 65 },
+                { date: "5d", value: 70 },
+                { date: "4d", value: 75 },
+                { date: "3d", value: 80 },
+                { date: "2d", value: 85 },
+                { date: "1d", value: 90 },
+                { date: "now", value: metrics.passRate },
+              ]} color="green" />
             </div>
           </CardContent>
         </Card>
@@ -133,7 +142,15 @@ export function DashboardMetrics() {
               {metrics.runningRuns > 0 ? `${metrics.runningRuns} currently running` : "No tests running"}
             </p>
             <div className="mt-3">
-              <TrendChart data={[12, 8, 15, 6, 9, 4, metrics.failedRuns]} color="red" />
+              <TrendChart data={[
+                { date: "6d", value: 12 },
+                { date: "5d", value: 8 },
+                { date: "4d", value: 15 },
+                { date: "3d", value: 6 },
+                { date: "2d", value: 9 },
+                { date: "1d", value: 4 },
+                { date: "now", value: metrics.failedRuns },
+              ]} color="red" />
             </div>
           </CardContent>
         </Card>
@@ -154,7 +171,15 @@ export function DashboardMetrics() {
               </span>
             </p>
             <div className="mt-3">
-              <TrendChart data={[45, 52, 48, 61, 55, 67, metrics.totalRuns]} color="blue" />
+              <TrendChart data={[
+                { date: "6d", value: 45 },
+                { date: "5d", value: 52 },
+                { date: "4d", value: 48 },
+                { date: "3d", value: 61 },
+                { date: "2d", value: 55 },
+                { date: "1d", value: 67 },
+                { date: "now", value: metrics.totalRuns },
+              ]} color="blue" />
             </div>
           </CardContent>
         </Card>

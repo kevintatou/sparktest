@@ -1,12 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { storage } from "@sparktest/storage-service"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, XCircle, Clock, RotateCcw, Filter, MoreHorizontal, Play } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import type { Run } from "@sparktest/core"
+import { useRouter } from "next/navigation"
+import { useToast } from "@/components/ui/use-toast"
 
 const statusConfig = {
   passed: {
@@ -27,6 +31,12 @@ const statusConfig = {
     bg: "bg-blue-50 dark:bg-blue-950/20",
     badge: "bg-blue-100 text-blue-700",
   },
+  completed: {
+    icon: CheckCircle,
+    color: "text-emerald-500",
+    bg: "bg-emerald-50 dark:bg-emerald-950/20",
+    badge: "bg-emerald-100 text-emerald-700",
+  },
   pending: {
     icon: Clock,
     color: "text-amber-500",
@@ -35,51 +45,39 @@ const statusConfig = {
   },
 }
 
-const mockRuns = [
-  {
-    id: "1",
-    name: "API Integration Suite",
-    description: "Full API endpoint validation",
-    status: "passed" as const,
-    executedAt: "2 minutes ago",
-    duration: "1m 23s",
-    runId: "#1247",
-    environment: "production",
-  },
-  {
-    id: "2",
-    name: "Frontend E2E Tests",
-    description: "User journey validation",
-    status: "running" as const,
-    executedAt: "30 seconds ago",
-    duration: "2m 15s",
-    runId: "#1248",
-    environment: "staging",
-  },
-  {
-    id: "3",
-    name: "Database Migration Test",
-    description: "Schema validation and data integrity",
-    status: "failed" as const,
-    executedAt: "5 minutes ago",
-    duration: "45s",
-    runId: "#1246",
-    environment: "development",
-  },
-  {
-    id: "4",
-    name: "Security Scan",
-    description: "Vulnerability assessment",
-    status: "passed" as const,
-    executedAt: "10 minutes ago",
-    duration: "3m 42s",
-    runId: "#1245",
-    environment: "production",
-  },
-]
 
 export function TestRunsList() {
   const [filter, setFilter] = useState("all")
+  const [runs, setRuns] = useState<Run[]>([])
+  const [isRunning, setIsRunning] = useState(false)
+  const router = useRouter()
+  const { toast } = useToast()
+
+  useEffect(() => {
+    let mounted = true
+    storage.getRuns().then((data) => {
+      if (mounted) setRuns(data)
+    })
+    // Optionally, set up polling or subscription here
+    return () => { mounted = false }
+  }, [])
+
+  const filteredRuns = filter === "all" ? runs : runs.filter((run) => run.status === filter)
+
+  const handleRunTest = async () => {
+    setIsRunning(true)
+    toast({ title: "Starting new test run...", description: "Your test is being started.", variant: "default" })
+    try {
+      // Replace with actual run logic as needed
+      await storage.createRun("", { name: "Manual Run" })
+      toast({ title: "Test run started!", description: "Redirecting to Test Runs page...", variant: "default" })
+      router.push("/runs")
+    } catch (err) {
+      toast({ title: "Failed to start test run", description: String(err), variant: "destructive" })
+    } finally {
+      setIsRunning(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -105,17 +103,17 @@ export function TestRunsList() {
                   <DropdownMenuItem onClick={() => setFilter("running")}>Running Only</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button size="sm" className="gap-2">
+              <Button size="sm" className="gap-2" onClick={handleRunTest} disabled={isRunning}>
                 <Play className="h-4 w-4" />
-                <span className="hidden sm:inline">Run Test</span>
+                <span className="hidden sm:inline">{isRunning ? "Running..." : "Run Test"}</span>
               </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y">
-            {mockRuns.map((run) => {
-              const config = statusConfig[run.status]
+            {filteredRuns.map((run) => {
+              const config = statusConfig[run.status] || statusConfig["pending"]
               const StatusIcon = config.icon
 
               return (
@@ -131,23 +129,18 @@ export function TestRunsList() {
                           <h3 className="font-semibold text-base sm:text-lg truncate">{run.name}</h3>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <Badge variant="outline" className="text-xs">
-                              {run.runId}
+                              {run.id}
                             </Badge>
                             <Badge className={cn("text-xs", config.badge)}>{run.status}</Badge>
                           </div>
                         </div>
 
-                        <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{run.description}</p>
-
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-sm text-muted-foreground">
                           <span className="truncate">
-                            Environment: <span className="font-medium">{run.environment}</span>
+                            Duration: <span className="font-medium">{run.duration ?? "-"}</span>
                           </span>
                           <span className="truncate">
-                            Duration: <span className="font-medium">{run.duration}</span>
-                          </span>
-                          <span className="truncate">
-                            Executed: <span className="font-medium">{run.executedAt}</span>
+                            Executed: <span className="font-medium">{run.createdAt ? new Date(run.createdAt).toLocaleString() : "-"}</span>
                           </span>
                         </div>
                       </div>

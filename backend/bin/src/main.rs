@@ -21,7 +21,7 @@ async fn main() -> anyhow::Result<()> {
 
     // Get database URL from environment
     let database_url = std::env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "postgresql://localhost/sparktest".to_string());
+        .unwrap_or_else(|_| "postgresql://sparktest:password@localhost  ".to_string());
 
     // Connect to database
     let pool = PgPoolOptions::new()

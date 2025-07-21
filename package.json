@@ -11,6 +11,9 @@
     "build:packages": "pnpm build:core && pnpm build:storage-service",
     "build:app": "pnpm --filter '@sparktest/oss' build",
     "dev": "pnpm --filter '@sparktest/oss' dev",
+    "dev:backend": "cargo run -p sparktest-bin --manifest-path backend/Cargo.toml",
+    "dev:frontend": "pnpm --filter '@sparktest/oss' dev",
+    "dev:all": "concurrently -k -n backend,frontend -c blue,green \"pnpm dev:backend\" \"pnpm dev:frontend\"",
     "test": "pnpm build:packages && pnpm --filter '@sparktest/oss' test",
     "lint": "pnpm --filter './packages/*' lint && pnpm --filter '@sparktest/oss' lint",
     "type-check": "pnpm --filter './packages/*' type-check && pnpm --filter '@sparktest/oss' type-check",
@@ -24,6 +27,7 @@
     "packages/*"
   ],
   "devDependencies": {
+    "concurrently": "^7.6.0",
     "tsup": "^8.5.0",
     "typescript": "^5"
   }

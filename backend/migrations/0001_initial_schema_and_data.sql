@@ -24,7 +24,8 @@ CREATE TABLE test_definitions (
     image TEXT NOT NULL,
     commands TEXT[] NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    executor_id UUID REFERENCES test_executors(id) ON DELETE SET NULL
+    executor_id UUID REFERENCES test_executors(id) ON DELETE SET NULL,
+    labels TEXT[] DEFAULT '{}'
 );
 
 -- Create table for test runs
