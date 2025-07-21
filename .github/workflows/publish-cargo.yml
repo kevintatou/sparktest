@@ -46,12 +46,39 @@ jobs:
       - name: Wait for crates.io to update
         run: sleep 30
 
+      - name: Update sparktest-api dependencies for publishing
+        run: |
+          # Extract version from core crate
+          CORE_VERSION=$(grep '^version = ' core/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+          echo "Using sparktest-core version: $CORE_VERSION"
+          # Replace path dependency with version dependency for sparktest-core
+          sed -i "s/sparktest-core = { path = \"..\/core\" }/sparktest-core = \"$CORE_VERSION\"/" api/Cargo.toml
+          # Verify the change
+          echo "Updated api/Cargo.toml sparktest-core dependency:"
+          grep 'sparktest-core = ' api/Cargo.toml
+        working-directory: backend
+
       - name: Publish sparktest-api
         run: cargo publish -p sparktest-api --allow-dirty
         working-directory: backend
 
       - name: Wait for crates.io to update
         run: sleep 30
+
+      - name: Update sparktest-bin dependencies for publishing
+        run: |
+          # Extract versions from core and api crates
+          CORE_VERSION=$(grep '^version = ' core/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+          API_VERSION=$(grep '^version = ' api/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+          echo "Using sparktest-core version: $CORE_VERSION"
+          echo "Using sparktest-api version: $API_VERSION"
+          # Replace path dependencies with version dependencies
+          sed -i "s/sparktest-core = { path = \"..\/core\" }/sparktest-core = \"$CORE_VERSION\"/" bin/Cargo.toml
+          sed -i "s/sparktest-api = { path = \"..\/api\" }/sparktest-api = \"$API_VERSION\"/" bin/Cargo.toml
+          # Verify the changes
+          echo "Updated bin/Cargo.toml dependencies:"
+          grep -E 'sparktest-(core|api) = ' bin/Cargo.toml
+        working-directory: backend
 
       - name: Publish sparktest-bin
         run: cargo publish -p sparktest-bin --allow-dirty
