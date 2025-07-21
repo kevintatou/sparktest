@@ -16,8 +16,13 @@ export default defineConfig({
       reporter: ["text", "json", "html", "lcov"],
       include: [
         "lib/**/*.ts",
-        "app/api/**/*.ts",
+        "app/**/*.ts",
+        "app/**/*.tsx",
         "hooks/**/*.ts",
+        "components/**/*.ts",
+        "components/**/*.tsx",
+        "utils/**/*.ts",
+        "contexts/**/*.tsx",
       ],
       exclude: [
         "node_modules/", 
