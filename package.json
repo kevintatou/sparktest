@@ -11,7 +11,7 @@
     "build:packages": "pnpm build:core && pnpm build:storage-service",
     "build:app": "pnpm --filter '@sparktest/oss' build",
     "dev": "pnpm --filter '@sparktest/oss' dev",
-    "dev:backend": "cargo run -p sparktest-bin --manifest-path backend/Cargo.toml",
+    "dev:backend": "cargo run -p sparktest-bin --manifest-path backend/bin/Cargo.toml",
     "dev:frontend": "pnpm --filter '@sparktest/oss' dev",
     "dev:all": "concurrently -k -n backend,frontend -c blue,green \"pnpm dev:backend\" \"pnpm dev:frontend\"",
     "test": "pnpm build:packages && pnpm --filter '@sparktest/oss' test",
