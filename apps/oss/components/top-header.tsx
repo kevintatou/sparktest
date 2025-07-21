@@ -1,15 +1,17 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Moon, Sun, Search, Github } from "lucide-react"
+import { Moon, Sun, Search, Github, Menu } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
 import { storage } from "@sparktest/core/storage"
 import { useRouter } from "next/navigation"
+import { useSidebar } from "@/contexts/sidebar-context"
 
 export function TopHeader() {
   const { setTheme, theme } = useTheme()
+  const { isMobile, isMobileMenuOpen, setIsMobileMenuOpen } = useSidebar()
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [isSearching, setIsSearching] = useState(false)
@@ -77,6 +79,18 @@ export function TopHeader() {
   return (
     <header className="flex h-16 items-center justify-between border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-4 sm:px-6">
       <div className="flex items-center gap-4 sm:gap-6 flex-1">
+        {/* Mobile Menu Button */}
+        {isMobile && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        )}
+        
         {/* Search */}
         <div className="relative flex-1 max-w-sm sm:max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
