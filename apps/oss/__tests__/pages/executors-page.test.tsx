@@ -65,8 +65,10 @@ describe('ExecutorsPage', () => {
     
     render(<ExecutorsPage />)
     
-    expect(screen.getByText('Executors')).toBeInTheDocument()
-    expect(screen.getByText('Manage your reusable test runners')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Executors')).toBeInTheDocument()
+      expect(screen.getByText('Manage your reusable test runners')).toBeInTheDocument()
+    })
   })
 
   it('displays the New Executor button', async () => {
@@ -74,9 +76,11 @@ describe('ExecutorsPage', () => {
     
     render(<ExecutorsPage />)
     
-    const newButton = screen.getByRole('link', { name: /new executor/i })
-    expect(newButton).toBeInTheDocument()
-    expect(newButton).toHaveAttribute('href', '/executors/new')
+    await waitFor(() => {
+      const newButton = screen.getByRole('link', { name: /new executor/i })
+      expect(newButton).toBeInTheDocument()
+      expect(newButton).toHaveAttribute('href', '/executors/new')
+    })
   })
 
   it('renders search input', async () => {
@@ -84,8 +88,10 @@ describe('ExecutorsPage', () => {
     
     render(<ExecutorsPage />)
     
-    const searchInput = screen.getByPlaceholderText('Search executors...')
-    expect(searchInput).toBeInTheDocument()
+    await waitFor(() => {
+      const searchInput = screen.getByPlaceholderText('Search executors...')
+      expect(searchInput).toBeInTheDocument()
+    })
   })
 
   it('displays executors when data is available', async () => {

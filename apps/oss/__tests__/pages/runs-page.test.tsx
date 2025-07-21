@@ -105,8 +105,10 @@ describe('TestRunsPage', () => {
     
     render(<TestRunsPage />)
     
-    expect(screen.getByText('Runs')).toBeInTheDocument()
-    expect(screen.getByText('Monitor and manage your runs')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Runs')).toBeInTheDocument()
+      expect(screen.getByText('Monitor and manage your runs')).toBeInTheDocument()
+    })
   })
 
   it('displays the New Run button', async () => {
@@ -116,9 +118,11 @@ describe('TestRunsPage', () => {
     
     render(<TestRunsPage />)
     
-    const newButton = screen.getByRole('link', { name: /new run/i })
-    expect(newButton).toBeInTheDocument()
-    expect(newButton).toHaveAttribute('href', '/runs/new')
+    await waitFor(() => {
+      const newButton = screen.getByRole('link', { name: /new run/i })
+      expect(newButton).toBeInTheDocument()
+      expect(newButton).toHaveAttribute('href', '/runs/new')
+    })
   })
 
   it('renders search input', async () => {
@@ -128,8 +132,10 @@ describe('TestRunsPage', () => {
     
     render(<TestRunsPage />)
     
-    const searchInput = screen.getByPlaceholderText('Search runs...')
-    expect(searchInput).toBeInTheDocument()
+    await waitFor(() => {
+      const searchInput = screen.getByPlaceholderText('Search runs...')
+      expect(searchInput).toBeInTheDocument()
+    })
   })
 
   it('displays runs when data is available', async () => {
