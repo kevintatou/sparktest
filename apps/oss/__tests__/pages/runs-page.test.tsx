@@ -10,6 +10,7 @@ vi.mock('@sparktest/storage-service', () => ({
     getRuns: vi.fn(),
     getDefinitions: vi.fn(),
     getExecutors: vi.fn(),
+    subscribeToRuns: vi.fn(() => () => {}), // Mock subscription cleanup function
   }
 }))
 
@@ -188,7 +189,7 @@ describe('TestRunsPage', () => {
     // Check run details
     expect(screen.getByText('Run ID: run-1')).toBeInTheDocument()
     expect(screen.getByText('45s')).toBeInTheDocument() // Duration for completed run
-    expect(screen.getByText('Running...')).toBeInTheDocument() // Duration for running run
+    expect(screen.getByText(/\d+s \(running\)/)).toBeInTheDocument() // Duration for running run
     
     // Check definition and executor names (use getAllByText since there are multiple)
     const apiTestsElements = screen.getAllByText('API Tests')
