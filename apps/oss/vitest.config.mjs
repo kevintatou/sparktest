@@ -15,9 +15,11 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
       include: [
-        "lib/**/*.ts",
-        "app/api/**/*.ts",
-        "hooks/**/*.ts",
+        "lib/**/*.{ts,tsx}",
+        "app/**/*.{ts,tsx}",
+        "hooks/**/*.{ts,tsx}",
+        "components/**/*.{ts,tsx}",
+        "utils/**/*.{ts,tsx}",
       ],
       exclude: [
         "node_modules/", 
@@ -31,6 +33,9 @@ export default defineConfig({
         "lib/constants/**", // Constants only
         "lib/storage/storage.ts", // Interface definition only
         "hooks/use-toast.ts", // External library code
+        "components/ui/**", // UI library components
+        "app/globals.css", // CSS files
+        "app/layout.tsx", // Root layout
       ],
     },
   },
