@@ -14,6 +14,31 @@ import type { Run, Definition, Executor } from "@sparktest/core/types"
 import { storage } from "@sparktest/storage-service"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 
+// Component to show live duration for running tests
+const LiveDuration = ({ run }: { run: Run }) => {
+  const [elapsed, setElapsed] = useState(0)
+  
+  useEffect(() => {
+    if (run.status !== "running") return
+    
+    const startTime = new Date(run.createdAt).getTime()
+    
+    const interval = setInterval(() => {
+      const now = new Date().getTime()
+      const elapsedSeconds = Math.floor((now - startTime) / 1000)
+      setElapsed(elapsedSeconds)
+    }, 1000)
+    
+    return () => clearInterval(interval)
+  }, [run.status, run.createdAt])
+  
+  if (run.status === "running") {
+    return <span className="font-medium text-blue-600 animate-pulse">{elapsed}s (running)</span>
+  }
+  
+  return <span className="font-medium">{run.duration || 0}s</span>
+}
+
 const getStatusIcon = (status: string) => {
   switch (status) {
     case "completed":
@@ -21,7 +46,7 @@ const getStatusIcon = (status: string) => {
     case "failed":
       return <XCircle className="h-4 w-4 text-red-500" />
     case "running":
-      return <Clock className="h-4 w-4 text-blue-500" />
+      return <Clock className="h-4 w-4 text-blue-500 animate-pulse" />
     default:
       return <AlertCircle className="h-4 w-4 text-yellow-500" />
   }
@@ -76,6 +101,23 @@ export default function TestRunsPage() {
       })()
     }
   }, [toast])
+
+  // Subscribe to real-time run updates
+  useEffect(() => {
+    if (!initializedRef.current) return
+
+    const unsubscribe = storage.subscribeToRuns(({ eventType, new: newRun, old: oldRun }) => {
+      if (eventType === "INSERT" && newRun) {
+        setTestRuns(prev => [newRun, ...prev])
+      } else if (eventType === "UPDATE" && newRun) {
+        setTestRuns(prev => prev.map(run => run.id === newRun.id ? newRun : run))
+      } else if (eventType === "DELETE" && oldRun) {
+        setTestRuns(prev => prev.filter(run => run.id !== oldRun.id))
+      }
+    })
+
+    return unsubscribe
+  }, [initializedRef.current])
 
   // Helper function to get definition name from ID
   const getDefinitionName = (definitionId?: string) => {
@@ -234,7 +276,7 @@ export default function TestRunsPage() {
                   </div>
                   <div>
                     <span className="text-muted-foreground">Duration:</span>
-                    <p className="font-medium">{run.status === "running" ? "Running..." : `${run.duration || 0}s`}</p>
+                    <p><LiveDuration run={run} /></p>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Test Definition:</span>

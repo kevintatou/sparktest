@@ -89,7 +89,8 @@ export function RunTestForm({ def: definition }: { def: Definition }) {
 
       toast({
         title: "Test started successfully",
-        description: `Test \"${newRun.name}\" is now running.`,
+        description: `Test "${newRun.name}" is now running. You can monitor its progress on the runs page.`,
+        duration: 4000,
       })
 
       router.push(`/runs/${newRun.id}`)
