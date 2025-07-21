@@ -16,8 +16,12 @@ export default defineConfig({
       reporter: ["text", "json", "html", "lcov"],
       include: [
         "lib/**/*.ts",
-        "app/api/**/*.ts",
+        "app/api/**/*.ts", // API routes only
         "hooks/**/*.ts",
+        "components/**/*.ts",
+        "components/**/*.tsx",
+        "utils/**/*.ts",
+        "contexts/**/*.tsx",
       ],
       exclude: [
         "node_modules/", 
@@ -31,6 +35,7 @@ export default defineConfig({
         "lib/constants/**", // Constants only
         "lib/storage/storage.ts", // Interface definition only
         "hooks/use-toast.ts", // External library code
+        "components/ui/**", // UI library components (shadcn/ui, etc.)
       ],
     },
   },
