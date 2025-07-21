@@ -2,6 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { renderHook, act } from "@testing-library/react"
 import { useSidebar } from "@/hooks/use-sidebar"
 
+// Mock the useIsMobile hook
+vi.mock("@/hooks/use-mobile", () => ({
+  useIsMobile: () => false
+}))
+
 describe("useSidebar", () => {
   beforeEach(() => {
     vi.spyOn(document, "addEventListener")
