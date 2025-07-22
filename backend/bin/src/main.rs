@@ -37,7 +37,7 @@ async fn main() -> anyhow::Result<()> {
         .expect("Failed to run migrations");
 
     // Create database instance
-    let db = Database::new(pool);
+    let _db = Database::new(pool);
 
     // Create the application
     let app = create_app();

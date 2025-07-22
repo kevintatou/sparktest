@@ -66,8 +66,10 @@ describe('DefinitionsPage', () => {
     
     render(<DefinitionsPage />)
     
-    expect(screen.getByText('Definitions')).toBeInTheDocument()
-    expect(screen.getByText('Manage your reusable test blueprints')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Definitions')).toBeInTheDocument()
+      expect(screen.getByText('Manage your reusable test blueprints')).toBeInTheDocument()
+    })
   })
 
   it('displays the New Definition button', async () => {
@@ -75,9 +77,11 @@ describe('DefinitionsPage', () => {
     
     render(<DefinitionsPage />)
     
-    const newButton = screen.getByRole('link', { name: /new definition/i })
-    expect(newButton).toBeInTheDocument()
-    expect(newButton).toHaveAttribute('href', '/definitions/new')
+    await waitFor(() => {
+      const newButton = screen.getByRole('link', { name: /new definition/i })
+      expect(newButton).toBeInTheDocument()
+      expect(newButton).toHaveAttribute('href', '/definitions/new')
+    })
   })
 
   it('renders search input', async () => {
@@ -85,8 +89,10 @@ describe('DefinitionsPage', () => {
     
     render(<DefinitionsPage />)
     
-    const searchInput = screen.getByPlaceholderText('Search definitions...')
-    expect(searchInput).toBeInTheDocument()
+    await waitFor(() => {
+      const searchInput = screen.getByPlaceholderText('Search definitions...')
+      expect(searchInput).toBeInTheDocument()
+    })
   })
 
   it('displays definitions when data is available', async () => {

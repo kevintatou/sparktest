@@ -24,7 +24,7 @@ impl Database {
         Ok(run.clone())
     }
 
-    pub async fn get_test_run_by_id(&self, id: Uuid) -> Result<Option<TestRun>> {
+    pub async fn get_test_run_by_id(&self, _id: Uuid) -> Result<Option<TestRun>> {
         // In a real implementation, this would query by ID
         // For now, return None
         Ok(None)
@@ -36,7 +36,7 @@ impl Database {
         Ok(run.clone())
     }
 
-    pub async fn delete_test_run(&self, id: Uuid) -> Result<bool> {
+    pub async fn delete_test_run(&self, _id: Uuid) -> Result<bool> {
         // In a real implementation, this would delete from database
         // For now, return true
         Ok(true)
