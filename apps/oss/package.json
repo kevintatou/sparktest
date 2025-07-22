@@ -14,8 +14,6 @@
     "type-check": "tsc --noEmit || echo 'Type check completed with warnings' && exit 0"
   },
   "dependencies": {
-    "@sparktest/core": "workspace:*",
-    "@sparktest/storage-service": "workspace:*",
     "@edge-runtime/vm": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "latest",
@@ -45,6 +43,9 @@
     "@radix-ui/react-toggle": "latest",
     "@radix-ui/react-toggle-group": "latest",
     "@radix-ui/react-tooltip": "latest",
+    "@sparktest/core": "workspace:*",
+    "@sparktest/storage-service": "workspace:*",
+    "@tanstack/react-query": "^5.83.0",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
@@ -84,6 +85,8 @@
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.3.4",
