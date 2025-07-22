@@ -1,0 +1,84 @@
+# Codecov configuration for SparkTest monorepo
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        base: auto
+    patch:
+      default:
+        target: 80%
+        threshold: 5%
+        
+  ignore:
+    # Build artifacts and dependencies
+    - "node_modules/**/*"
+    - "**/node_modules/**/*"
+    - "**/.next/**/*"
+    - "**/coverage/**/*"
+    - "**/dist/**/*"
+    - "**/target/**/*"
+    
+    # Configuration files
+    - "**/*.config.*"
+    - "**/*.config.ts"
+    - "**/*.config.js"
+    - "**/*.config.mjs"
+    - "**/tsconfig*.json"
+    - "**/.eslintrc*"
+    - "**/tailwind.config.*"
+    - "**/postcss.config.*"
+    - "**/next.config.*"
+    - "**/vitest.config.*"
+    - "**/vite.config.*"
+    
+    # Type definitions and constants
+    - "**/*.d.ts"
+    - "**/types/**/*"
+    - "**/lib/types.ts"
+    - "**/lib/constants/**/*"
+    
+    # Generated or third-party code
+    - "**/components/ui/**/*"  # shadcn/ui components
+    - "**/hooks/use-toast.ts"  # Third-party hook
+    - "**/lib/storage/storage.ts"  # Interface definitions
+    
+    # Test files themselves
+    - "**/__tests__/**/*"
+    - "**/*.test.*"
+    - "**/*.spec.*"
+    - "**/vitest.setup.ts"
+    
+    # Documentation and metadata
+    - "**/*.md"
+    - "**/README.*"
+    - "**/CHANGELOG.*"
+    - "**/LICENSE*"
+
+# Comment configuration for PR reports
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: false
+
+# Flag configuration for different parts of the codebase
+flags:
+  unittests:
+    paths:
+      - apps/oss/
+    carryforward: true
+    
+  backend:
+    paths:
+      - backend/
+    carryforward: true
+
+# Simplified configuration - remove pull request rules that might cause issues
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no

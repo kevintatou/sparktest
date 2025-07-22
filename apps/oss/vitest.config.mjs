@@ -15,13 +15,12 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
       include: [
-        "lib/**/*.ts",
-        "app/api/**/*.ts", // API routes only
-        "hooks/**/*.ts",
-        "components/**/*.ts",
-        "components/**/*.tsx",
-        "utils/**/*.ts",
-        "contexts/**/*.tsx",
+        "app/**/*.{ts,tsx}",
+        "components/**/*.{ts,tsx}",
+        "contexts/**/*.{ts,tsx}",
+        "hooks/**/*.{ts,tsx}",
+        "lib/**/*.{ts,tsx}",
+        "utils/**/*.{ts,tsx}",
       ],
       exclude: [
         "node_modules/", 
@@ -30,12 +29,19 @@ export default defineConfig({
         "**/*.d.ts", 
         "**/*.config.*", 
         "**/types/**",
+        "__tests__/**",
+        "**/*.test.*",
+        "**/*.spec.*",
         "lib/types.ts", // Type definitions only
-        "lib/config.ts", // Simple configuration
+        "lib/config.ts", // Simple configuration  
         "lib/constants/**", // Constants only
         "lib/storage/storage.ts", // Interface definition only
         "hooks/use-toast.ts", // External library code
         "components/ui/**", // UI library components (shadcn/ui, etc.)
+        "vitest.setup.ts", // Test setup file
+        "tailwind.config.ts", // Configuration file
+        "postcss.config.*", // Configuration file
+        "next.config.*", // Configuration file
       ],
     },
   },

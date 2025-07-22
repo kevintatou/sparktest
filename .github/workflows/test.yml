@@ -57,7 +57,7 @@ jobs:
         echo "LCOV file size:"
         wc -l apps/oss/coverage/lcov.info
         echo "Coverage files included in LCOV:"
-        grep "^SF:" apps/oss/coverage/lcov.info
+        grep "^SF:" apps/oss/coverage/lcov.info | head -10
         echo "Local coverage summary calculation:"
         cd apps/oss && node -e "
         const coverage = require('./coverage/coverage-final.json');
@@ -97,15 +97,27 @@ jobs:
         console.log('Functions: ' + (coveredFunctions/totalFunctions*100).toFixed(2) + '% (' + coveredFunctions + '/' + totalFunctions + ')');
         "
 
+    - name: Validate coverage file format
+      run: |
+        echo "Validating LCOV file format..."
+        if head -1 apps/oss/coverage/lcov.info | grep -q "TN:"; then
+          echo "✓ LCOV file format appears valid"
+        else
+          echo "✗ LCOV file format may be invalid"
+        fi
+        echo "Total number of source files in coverage:"
+        grep -c "^SF:" apps/oss/coverage/lcov.info || echo "No source files found"
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
-        file: ./apps/oss/coverage/lcov.info
+        files: ./apps/oss/coverage/lcov.info
         flags: unittests
         name: codecov-umbrella
         token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: false
         verbose: true
+        working-directory: .
 
     - name: Comment PR with coverage
       if: github.event_name == 'pull_request'
@@ -155,17 +167,27 @@ jobs:
       run: |
         echo "Backend Coverage Summary:"
         cargo llvm-cov --all-features --workspace --summary-only
+        echo "Backend LCOV file validation:"
+        if [ -f "./lcov.info" ]; then
+          echo "✓ Backend LCOV file exists"
+          echo "Backend LCOV file size: $(wc -l lcov.info)"
+          echo "Backend source files in coverage:"
+          grep -c "^SF:" lcov.info || echo "No source files found"
+        else
+          echo "✗ Backend LCOV file not found"
+        fi
       working-directory: backend
 
     - name: Upload backend coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
-        file: ./backend/lcov.info
+        files: ./backend/lcov.info
         flags: backend
         name: codecov-backend
         token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: false
         verbose: true
+        working-directory: .
 
     - name: Comment PR with backend coverage
       if: github.event_name == 'pull_request'

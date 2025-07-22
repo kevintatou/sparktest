@@ -77,15 +77,29 @@ SparkTest includes comprehensive demo data with realistic testing scenarios:
 
 📖 [See the complete Demo Data Guide](DEMO_DATA_GUIDE.md)
 
-### Testing
+### Testing & Coverage
+
+SparkTest has comprehensive test coverage across both frontend and backend:
+
+- **Frontend**: 305+ unit tests using Vitest, React Testing Library
+- **Backend**: 14+ tests using Rust's built-in test framework
+- **Coverage**: Automatically tracked and reported via Codecov
 
 ```bash
-cd frontend
+# Frontend testing
+cd apps/oss
 pnpm test          # Run unit tests
-pnpm test:coverage # Run tests with coverage
+pnpm test:coverage # Run tests with coverage report
 pnpm lint          # Run ESLint
 pnpm type-check    # Run TypeScript checks
+
+# Backend testing  
+cd backend
+cargo test          # Run all Rust tests
+cargo llvm-cov      # Generate coverage report
 ```
+
+**Coverage Reports**: Coverage is automatically uploaded to [Codecov](https://codecov.io) on every PR and push to main. The CI also generates detailed coverage reports showing exactly which lines, branches, and functions are covered by tests.
 
 ---
 
