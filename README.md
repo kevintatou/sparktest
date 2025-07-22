@@ -107,7 +107,7 @@ SparkTest follows a modern, cloud-native architecture designed for scalability a
 ### Frontend Development
 
 ```bash
-cd frontend
+cd apps/oss
 pnpm install
 pnpm dev
 ```
