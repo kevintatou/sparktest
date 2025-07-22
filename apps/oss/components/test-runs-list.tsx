@@ -12,7 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { Run } from "@sparktest/core"
 import { useRouter } from "next/navigation"
 import { useRuns, useCreateRun } from "@/hooks/use-queries"
 
@@ -62,7 +61,7 @@ export function TestRunsList() {
       // Replace with actual definition ID selection logic as needed
       await createRunMutation.mutateAsync("")
       router.push("/runs")
-    } catch (err) {
+    } catch {
       // Error is handled by the mutation
     }
   }

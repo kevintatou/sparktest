@@ -1,9 +1,4 @@
-use axum::{
-    extract::Path,
-    http::StatusCode,
-    response::Json,
-    Json as JsonBody,
-};
+use axum::{extract::Path, http::StatusCode, response::Json, Json as JsonBody};
 use serde::{Deserialize, Serialize};
 use sparktest_core::*;
 use uuid::Uuid;
@@ -135,7 +130,7 @@ mod tests {
 
         let result = create_run(JsonBody(request)).await;
         assert!(result.is_ok());
-        
+
         let run = result.unwrap().0;
         assert_eq!(run.name, "Test Run");
         assert_eq!(run.image, "test:latest");
@@ -192,6 +187,9 @@ mod tests {
         let job_name = "test-job".to_string();
         let response = delete_job(Path(job_name.clone())).await;
         let value = response.0;
-        assert_eq!(value["message"], format!("Job {} deleted successfully", job_name));
+        assert_eq!(
+            value["message"],
+            format!("Job {} deleted successfully", job_name)
+        );
     }
 }

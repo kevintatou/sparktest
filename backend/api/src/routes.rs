@@ -1,9 +1,9 @@
+use crate::handlers::*;
 use axum::{
-    routing::{get, delete},
+    routing::{delete, get},
     Router,
 };
 use tower_http::cors::CorsLayer;
-use crate::handlers::*;
 
 pub fn create_app() -> Router {
     Router::new()

@@ -9,7 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "@sparktest/core"
-import type { Run, Definition, Executor } from "@sparktest/core/types"
+import type { Run } from "@sparktest/core/types"
 import { storage } from "@sparktest/storage-service"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 import { useRuns, useDefinitions, useExecutors, useDeleteRun } from "@/hooks/use-queries"
@@ -82,10 +82,12 @@ export default function TestRunsPage() {
   // Subscribe to real-time run updates
   useEffect(() => {
     if (!initializedRef.current && testRuns.length > 0) {
-      const unsubscribe = storage.subscribeToRuns(({ eventType, new: newRun, old: oldRun }) => {
-        // Real-time updates are handled by React Query's refetch functionality
-        // We could invalidate queries here if needed
-      })
+      const unsubscribe = storage.subscribeToRuns(
+        ({ eventType: _eventType, new: _newRun, old: _oldRun }) => {
+          // Real-time updates are handled by React Query's refetch functionality
+          // We could invalidate queries here if needed
+        }
+      )
 
       initializedRef.current = true
       return unsubscribe

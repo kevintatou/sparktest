@@ -1,7 +1,7 @@
+use crate::models::*;
+use anyhow::Result;
 use sqlx::PgPool;
 use uuid::Uuid;
-use anyhow::Result;
-use crate::models::*;
 
 pub struct Database {
     pub pool: PgPool,

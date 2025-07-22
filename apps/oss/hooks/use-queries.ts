@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { storage } from "@sparktest/storage-service"
 import { useToast } from "@/components/ui/use-toast"
-import type { Run, Definition, Executor, Suite } from "@sparktest/core/types"
+import type { Suite } from "@sparktest/core/types"
 
 // Query keys
 export const queryKeys = {
