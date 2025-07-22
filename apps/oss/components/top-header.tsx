@@ -5,7 +5,7 @@ import { Moon, Sun, Search, Github, Menu } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
-import { storage } from "@sparktest/core/storage"
+import { storage } from "@sparktest/storage-service"
 import { useRouter } from "next/navigation"
 import { useSidebar } from "@/contexts/sidebar-context"
 

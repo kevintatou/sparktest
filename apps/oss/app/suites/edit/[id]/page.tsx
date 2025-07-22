@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { SuiteForm } from "@/components/suite-form"
 import { useToast } from "@/components/ui/use-toast"
 import type { TestSuite } from "@sparktest/core/types"
-import { storage } from "@sparktest/core/storage"
+import { storage } from "@sparktest/storage-service"
 
 export default function EditSuitePage({ params }: { params: { id: string } }) {
   const { id } = params
