@@ -16,7 +16,7 @@
     "dev:all": "concurrently -k -n backend,frontend -c blue,green \"pnpm dev:backend\" \"pnpm dev:frontend\"",
     "test": "pnpm build:packages && pnpm --filter '@sparktest/oss' test",
     "lint": "pnpm --filter './packages/*' lint && pnpm --filter '@sparktest/oss' lint",
-    "type-check": "pnpm --filter './packages/*' type-check && pnpm --filter '@sparktest/oss' type-check",
+    "type-check": "pnpm build:core && pnpm --filter './packages/*' type-check && pnpm --filter '@sparktest/oss' type-check",
     "clean": "pnpm --filter './packages/*' clean",
     "cargo-build": "cargo build",
     "cargo-test": "cargo test",
