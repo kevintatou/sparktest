@@ -204,7 +204,7 @@ export class ApiStorageService implements StorageService {
       id: suite.id || "00000000-0000-0000-0000-000000000000", // Use nil UUID if no ID
       execution_mode: suite.executionMode,
       // Convert string IDs to UUIDs
-      test_definition_ids: suite.testDefinitionIds.map((id) => {
+      test_definition_ids: suite.testDefinitionIds.map((id: string) => {
         // Check if ID is already a UUID
         if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
           return id
