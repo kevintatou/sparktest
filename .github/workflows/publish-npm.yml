@@ -32,18 +32,8 @@ jobs:
         run: pnpm build:packages
 
       - name: Publish @sparktest/core
-<<<<<<< Updated upstream
-        run: cd packages/core && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish @sparktest/storage-service
-        run: cd packages/storage-service && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-=======
         run: cd packages/core && npm publish --access public
 
       - name: Publish @sparktest/storage-service
         run: cd packages/storage-service && npm publish --access public
->>>>>>> Stashed changes
+
