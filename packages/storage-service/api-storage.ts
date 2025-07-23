@@ -54,7 +54,23 @@ export class ApiStorageService implements StorageService {
       body: JSON.stringify(def),
     })
     if (!res.ok) throw new Error("Failed to save definition")
-    return (await res.json()) as Definition
+    const result = await res.json()
+    
+    // Build the response manually to ensure proper field mapping
+    const response: Definition = {
+      id: result.id,
+      name: result.name,
+      description: result.description,
+      image: result.image,
+      commands: result.commands,
+      createdAt: result.created_at || result.createdAt,
+      executorId: result.executor_id,
+      variables: result.variables,
+      labels: result.labels,
+      source: result.source,
+    }
+    
+    return response
   }
 
   async deleteDefinition(id: string): Promise<boolean> {

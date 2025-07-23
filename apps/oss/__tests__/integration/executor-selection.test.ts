@@ -44,11 +44,11 @@ describe("Executor Selection in Test Definition", () => {
       body: JSON.stringify(formDataWithExecutor), // Should include executorId
     })
 
-    // Verify the response includes the executor_id
+    // Verify the response includes the executor_id mapped to executorId
     expect(result).toMatchObject({
       id: "test-def-uuid",
       name: "Test with Executor",
-      executor_id: "executor-uuid-123",
+      executorId: "executor-uuid-123",
     })
   })
 

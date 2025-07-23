@@ -30,9 +30,16 @@ export async function POST(request: Request) {
       definitionId: body.testDefinitionId || undefined,
     }
 
+    // Return response with testDefinitionId field for API compatibility
+    const response = {
+      ...newTest,
+      testDefinitionId: newTest.definitionId,
+    }
+    delete response.definitionId
+
     // In a real implementation, we would store this in a database
 
-    return NextResponse.json(newTest, { status: 201 })
+    return NextResponse.json(response, { status: 201 })
   } catch (error) {
     console.error("Error creating test:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
