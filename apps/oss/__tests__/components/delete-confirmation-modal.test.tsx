@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen } from "../test-utils"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 import { vi } from "vitest"
 

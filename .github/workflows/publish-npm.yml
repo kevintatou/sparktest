@@ -31,12 +31,11 @@ jobs:
       - name: Build packages
         run: pnpm build:packages
 
+      - name: Setup NPM auth for publishing
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
+
       - name: Publish @sparktest/core
         run: cd packages/core && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @sparktest/storage-service
         run: cd packages/storage-service && npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
