@@ -19,18 +19,12 @@ interface AllTheProvidersProps {
 
 const AllTheProviders = ({ children }: AllTheProvidersProps) => {
   const queryClient = createTestQueryClient()
-  
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  )
+
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 }
 
-const customRender = (
-  ui: React.ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
-) => render(ui, { wrapper: AllTheProviders, ...options })
+const customRender = (ui: React.ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
+  render(ui, { wrapper: AllTheProviders, ...options })
 
 export * from "@testing-library/react"
 export { customRender as render, createTestQueryClient }

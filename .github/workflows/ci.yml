@@ -1,4 +1,4 @@
-name: CI
+name: Build & Lint
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    name: Build & Lint Check
     runs-on: ubuntu-latest
 
     steps:
@@ -44,10 +45,5 @@ jobs:
       - name: Build application
         run: pnpm --filter "@sparktest/oss" build
 
-      - name: Run tests
-        run: pnpm test
-
-      - name: Run E2E tests
-        run: pnpm --filter "@sparktest/oss" test:e2e
-        env:
-          CI: true
+      # Note: Comprehensive testing with coverage is handled by the 'Test & Coverage' workflow
+      # This workflow focuses on fast build validation and linting feedback

@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   test:
+    name: Test & Coverage
     runs-on: ubuntu-latest
 
     strategy:
@@ -47,8 +48,13 @@ jobs:
       - name: Run type check
         run: pnpm --filter "@sparktest/oss" type-check
 
-      - name: Run tests
+      - name: Run tests with coverage
         run: pnpm --filter "@sparktest/oss" test:coverage
+
+      - name: Run E2E tests
+        run: pnpm --filter "@sparktest/oss" test:e2e
+        env:
+          CI: true
 
       - name: Verify coverage file and show summary
         run: |
@@ -116,6 +122,7 @@ jobs:
           delete-old-comments: true
 
   backend-test:
+    name: Backend Test & Coverage
     runs-on: ubuntu-latest
 
     steps:
