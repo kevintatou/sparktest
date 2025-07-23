@@ -31,11 +31,7 @@ interface DefinitionTestModalProps {
   testDefinition: Definition
 }
 
-export function DefinitionTestModal({
-  isOpen,
-  onClose,
-  testDefinition,
-}: DefinitionTestModalProps) {
+export function DefinitionTestModal({ isOpen, onClose, testDefinition }: DefinitionTestModalProps) {
   const [testing, setTesting] = useState(false)
   const [result, setResult] = useState<TestResult | null>(null)
   const [progress, setProgress] = useState(0)

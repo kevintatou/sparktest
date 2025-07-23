@@ -274,23 +274,23 @@ export function validateTestDefinition(data: unknown): MultiFieldValidationResul
   const errors: ValidationErrors = {}
 
   // Type guard to ensure data is an object
-  if (!data || typeof data !== 'object') {
+  if (!data || typeof data !== "object") {
     return {
       isValid: false,
-      errors: { general: 'Invalid data provided' }
+      errors: { general: "Invalid data provided" },
     }
   }
 
   const testData = data as Record<string, unknown>
 
   // Validate name
-  const nameResult = sanitizeName(typeof testData.name === 'string' ? testData.name : '')
+  const nameResult = sanitizeName(typeof testData.name === "string" ? testData.name : "")
   if (!nameResult.isValid) {
     errors.name = nameResult.error!
   }
 
   // Validate description (optional)
-  if (testData.description && typeof testData.description === 'string') {
+  if (testData.description && typeof testData.description === "string") {
     const descResult = sanitizeDescription(testData.description)
     if (!descResult.isValid) {
       errors.description = descResult.error!
@@ -298,7 +298,7 @@ export function validateTestDefinition(data: unknown): MultiFieldValidationResul
   }
 
   // Validate image
-  const imageResult = validateDockerImage(typeof testData.image === 'string' ? testData.image : '')
+  const imageResult = validateDockerImage(typeof testData.image === "string" ? testData.image : "")
   if (!imageResult.isValid) {
     errors.image = imageResult.error!
   }
@@ -320,23 +320,23 @@ export function validateTestExecutor(data: unknown): MultiFieldValidationResult 
   const errors: ValidationErrors = {}
 
   // Type guard to ensure data is an object
-  if (!data || typeof data !== 'object') {
+  if (!data || typeof data !== "object") {
     return {
       isValid: false,
-      errors: { general: 'Invalid data provided' }
+      errors: { general: "Invalid data provided" },
     }
   }
 
   const executorData = data as Record<string, unknown>
 
   // Validate name
-  const nameResult = sanitizeName(typeof executorData.name === 'string' ? executorData.name : '')
+  const nameResult = sanitizeName(typeof executorData.name === "string" ? executorData.name : "")
   if (!nameResult.isValid) {
     errors.name = nameResult.error!
   }
 
   // Validate description (optional)
-  if (executorData.description && typeof executorData.description === 'string') {
+  if (executorData.description && typeof executorData.description === "string") {
     const descResult = sanitizeDescription(executorData.description)
     if (!descResult.isValid) {
       errors.description = descResult.error!
@@ -344,13 +344,15 @@ export function validateTestExecutor(data: unknown): MultiFieldValidationResult 
   }
 
   // Validate image
-  const imageResult = validateDockerImage(typeof executorData.image === 'string' ? executorData.image : '')
+  const imageResult = validateDockerImage(
+    typeof executorData.image === "string" ? executorData.image : ""
+  )
   if (!imageResult.isValid) {
     errors.image = imageResult.error!
   }
 
   // Validate default_command
-  if (executorData.default_command && typeof executorData.default_command === 'string') {
+  if (executorData.default_command && typeof executorData.default_command === "string") {
     const commandResult = sanitizeCommands([executorData.default_command])
     if (!commandResult.isValid) {
       errors.default_command = commandResult.error!
@@ -368,23 +370,23 @@ export function validateSuite(data: unknown): MultiFieldValidationResult {
   const errors: ValidationErrors = {}
 
   // Type guard to ensure data is an object
-  if (!data || typeof data !== 'object') {
+  if (!data || typeof data !== "object") {
     return {
       isValid: false,
-      errors: { general: 'Invalid data provided' }
+      errors: { general: "Invalid data provided" },
     }
   }
 
   const suiteData = data as Record<string, unknown>
 
   // Validate name
-  const nameResult = sanitizeName(typeof suiteData.name === 'string' ? suiteData.name : '')
+  const nameResult = sanitizeName(typeof suiteData.name === "string" ? suiteData.name : "")
   if (!nameResult.isValid) {
     errors.name = nameResult.error!
   }
 
   // Validate description (optional)
-  if (suiteData.description && typeof suiteData.description === 'string') {
+  if (suiteData.description && typeof suiteData.description === "string") {
     const descResult = sanitizeDescription(suiteData.description)
     if (!descResult.isValid) {
       errors.description = descResult.error!
@@ -392,7 +394,7 @@ export function validateSuite(data: unknown): MultiFieldValidationResult {
   }
 
   // Validate execution_mode
-  if (suiteData.execution_mode && typeof suiteData.execution_mode === 'string') {
+  if (suiteData.execution_mode && typeof suiteData.execution_mode === "string") {
     const modeResult = validateExecutionMode(suiteData.execution_mode)
     if (!modeResult.isValid) {
       errors.execution_mode = modeResult.error!

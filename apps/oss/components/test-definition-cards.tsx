@@ -135,7 +135,7 @@ export function DefinitionCards() {
       // Create a new test run in localStorage
       const definition = testDefinitions.find((def) => def.id === testId)
       if (definition) {
-        const newRun = await storage.createRun(definition)
+        const newRun = await storage.createRun(definition.id)
 
         setTimeout(() => {
           setRunningTests((prev) => prev.filter((id) => id !== testId))

@@ -113,9 +113,14 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
         <Label htmlFor="env">Environment Variables</Label>
         <Input
           id="env"
-          value={Object.entries(formData.env || {}).map(([key, value]) => `${key}=${value}`).join(", ")}
+          value={Object.entries(formData.env || {})
+            .map(([key, value]) => `${key}=${value}`)
+            .join(", ")}
           onChange={(e) => {
-            const envEntries = e.target.value.split(",").map((s) => s.trim()).filter(Boolean)
+            const envEntries = e.target.value
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
             const envObject: Record<string, string> = {}
             envEntries.forEach((entry) => {
               const [key, value] = entry.split("=")

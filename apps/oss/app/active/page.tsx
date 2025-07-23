@@ -42,7 +42,7 @@ export default function ActiveTestsPage() {
         }, 5000)
       }
     }
-    
+
     loadRunningTests()
 
     return () => {

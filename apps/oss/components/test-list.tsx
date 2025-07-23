@@ -83,8 +83,8 @@ export function TestList() {
           if (newValues[test.id] === 100 && currentValue !== 100) {
             setTimeout(() => {
               // Update the test status in localStorage
-              const newStatus = Math.random() > 0.2 ? "completed" : "failed"
-              const updatedTest = {
+              const newStatus: "completed" | "failed" = Math.random() > 0.2 ? "completed" : "failed"
+              const updatedTest: Run = {
                 ...test,
                 status: newStatus,
               }

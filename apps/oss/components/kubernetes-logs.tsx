@@ -56,7 +56,7 @@ export function KubernetesLogs({ runId, jobName: _jobName, className }: Kubernet
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [kubernetesHealth, setKubernetesHealth] = useState<KubernetesHealth | null>(null)
-  const [autoRefresh, setAutoRefresh] = useState(false)
+  const [autoRefresh] = useState(false)
 
   // Check Kubernetes health on mount
   useEffect(() => {
@@ -91,7 +91,7 @@ export function KubernetesLogs({ runId, jobName: _jobName, className }: Kubernet
       try {
         setLoading(true)
         setError(null)
-        const jobLogs = await storage.getJobLogs(jobName)
+        const jobLogs = await storage.getJobLogs(_jobName || runId)
         setLogs(jobLogs)
 
         if (showToast) {
@@ -114,7 +114,7 @@ export function KubernetesLogs({ runId, jobName: _jobName, className }: Kubernet
         setLoading(false)
       }
     },
-    [jobName, kubernetesHealth, toast]
+    [_jobName, kubernetesHealth, toast, runId]
   )
 
   // Auto-refresh logs for running jobs

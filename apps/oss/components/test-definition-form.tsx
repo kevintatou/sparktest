@@ -112,7 +112,8 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: Definition
 
     try {
       // Save to localStorage
-      const submissionData = {
+      const submissionData: Definition = {
+        id: existingTest?.id || crypto.randomUUID(),
         ...formData,
         commands: formData.commands.filter(Boolean),
         createdAt: existingTest?.createdAt || new Date().toISOString(),

@@ -14,7 +14,7 @@ export function TopHeader() {
   const { isMobile, isMobileMenuOpen, setIsMobileMenuOpen } = useSidebar()
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<
-    Array<{ id: string; name: string; type: string }>
+    Array<{ id: string; name: string; type: string; href: string; description?: string }>
   >([])
   const [isSearching, setIsSearching] = useState(false)
   const router = useRouter()

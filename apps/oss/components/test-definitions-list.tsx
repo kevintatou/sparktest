@@ -15,10 +15,6 @@ export function TestDefinitionsList() {
   const [runningTests, setRunningTests] = useState<string[]>([])
   const { toast } = useToast()
 
-  useEffect(() => {
-    loadTestDefinitions()
-  }, [loadTestDefinitions])
-
   const loadTestDefinitions = useCallback(async () => {
     try {
       const data = await storage.getDefinitions()
@@ -33,6 +29,10 @@ export function TestDefinitionsList() {
       setLoading(false)
     }
   }, [toast])
+
+  useEffect(() => {
+    loadTestDefinitions()
+  }, [loadTestDefinitions])
 
   const handleRunTest = async (testId: string) => {
     setRunningTests((prev) => [...prev, testId])

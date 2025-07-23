@@ -234,7 +234,7 @@ describe("DefinitionsPage", () => {
       command: ["npm", "test"],
       status: "running",
       createdAt: new Date().toISOString(),
-      definitionId: "def1"
+      definitionId: "def1",
     })
 
     render(<DefinitionsPage />)
