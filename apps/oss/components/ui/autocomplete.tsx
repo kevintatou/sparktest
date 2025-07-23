@@ -12,7 +12,14 @@ interface AutocompleteProps {
   multiple?: boolean
   value: AutocompleteOption[]
   onChange: (event: React.SyntheticEvent, value: AutocompleteOption[]) => void
-  renderInput: (params: { placeholder?: string; className?: string }) => React.ReactNode
+  renderInput: (params: {
+    placeholder?: string
+    className?: string
+    value?: string
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+    onFocus?: () => void
+    onBlur?: () => void
+  }) => React.ReactNode
   renderOption?: (
     props: React.HTMLAttributes<HTMLElement>,
     option: AutocompleteOption
