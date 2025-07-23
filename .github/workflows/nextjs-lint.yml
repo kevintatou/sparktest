@@ -1,0 +1,67 @@
+name: Next.js Lint
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/oss/**"
+      - ".github/workflows/nextjs-lint.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/oss/**"
+      - ".github/workflows/nextjs-lint.yml"
+
+jobs:
+  nextjs-lint:
+    name: Next.js Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack and install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build workspace packages
+        run: pnpm build:packages
+
+      - name: Next.js Lint Check
+        run: pnpm --filter "@sparktest/oss" lint
+
+      - name: Next.js Type Check
+        run: pnpm --filter "@sparktest/oss" type-check
+
+      - name: Check code formatting
+        run: pnpm format:check
+
+  report-results:
+    name: Report Lint Results
+    runs-on: ubuntu-latest
+    needs: nextjs-lint
+    if: always()
+
+    steps:
+      - name: Report Success
+        if: needs.nextjs-lint.result == 'success'
+        run: echo "✅ Next.js linting passed successfully"
+
+      - name: Report Failure
+        if: needs.nextjs-lint.result == 'failure'
+        run: |
+          echo "❌ ERROR: Linting issues detected in Next.js code."
+          echo "Please fix the linting errors and try again."
+          exit 1
