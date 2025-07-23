@@ -10,7 +10,7 @@
 ## ✨ Features
 
 - 🧪 **Test Definitions** – Reusable test configs with Docker image + command
-- ⚙️ **Executors** – Predefined runners like K6, Postman, Playwright  
+- ⚙️ **Executors** – Predefined runners like K6, Postman, Playwright
 - 🚀 **Test Runs** – Launch containerized tests as Kubernetes Jobs
 - 🧾 **Test Suites** – Group related tests and trigger them together
 - 📂 **Git-backed Definitions** – Auto-register tests from `/tests/*.json`
@@ -21,12 +21,12 @@
 
 ## 🛠 Tech Stack
 
-| Layer      | Tech                                      |
-|------------|-------------------------------------------|
-| Frontend   | Next.js 14 App Router, Tailwind, shadcn/ui |
-| Backend    | Rust (Axum), PostgreSQL, Kubernetes      |
-| Testing    | Vitest, Playwright                       |
-| CI/CD      | GitHub Actions, pnpm                     |
+| Layer    | Tech                                       |
+| -------- | ------------------------------------------ |
+| Frontend | Next.js 14 App Router, Tailwind, shadcn/ui |
+| Backend  | Rust (Axum), PostgreSQL, Kubernetes        |
+| Testing  | Vitest, Playwright                         |
+| CI/CD    | GitHub Actions, pnpm                       |
 
 ---
 
@@ -52,6 +52,7 @@ cargo run
 ### 🎯 Want to Run Tests on Kubernetes?
 
 **Quick Setup (5 minutes):**
+
 ```bash
 # Install k3d (lightweight Kubernetes)
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
@@ -63,7 +64,7 @@ k3d cluster create sparktest
 cd backend && cargo run
 ```
 
-Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI! 
+Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI!
 
 📚 [More details in the Kubernetes guide](backend/KUBERNETES.md)
 

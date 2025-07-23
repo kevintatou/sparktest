@@ -13,7 +13,9 @@ export function TopHeader() {
   const { setTheme, theme } = useTheme()
   const { isMobile, isMobileMenuOpen, setIsMobileMenuOpen } = useSidebar()
   const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searchResults, setSearchResults] = useState<
+    Array<{ id: string; name: string; type: string }>
+  >([])
   const [isSearching, setIsSearching] = useState(false)
   const router = useRouter()
 
@@ -34,7 +36,7 @@ export function TopHeader() {
         ])
 
         const query = searchQuery.toLowerCase()
-        const results: any[] = []
+        const results: Array<{ id: string; name: string; type: string; href: string }> = []
 
         // Search runs
         runs.forEach((run) => {
@@ -45,14 +47,20 @@ export function TopHeader() {
 
         // Search definitions
         definitions.forEach((def) => {
-          if (def.name.toLowerCase().includes(query) || def.description?.toLowerCase().includes(query)) {
+          if (
+            def.name.toLowerCase().includes(query) ||
+            def.description?.toLowerCase().includes(query)
+          ) {
             results.push({ ...def, type: "definition", href: `/definitions/${def.id}` })
           }
         })
 
         // Search executors
         executors.forEach((exec) => {
-          if (exec.name.toLowerCase().includes(query) || exec.description?.toLowerCase().includes(query)) {
+          if (
+            exec.name.toLowerCase().includes(query) ||
+            exec.description?.toLowerCase().includes(query)
+          ) {
             results.push({ ...exec, type: "executor", href: `/executors/${exec.id}` })
           }
         })
@@ -70,7 +78,7 @@ export function TopHeader() {
     return () => clearTimeout(debounceTimer)
   }, [searchQuery])
 
-  const handleSearchSelect = (result: any) => {
+  const handleSearchSelect = (result: { id: string; name: string; type: string; href: string }) => {
     router.push(result.href)
     setSearchQuery("")
     setSearchResults([])
@@ -81,16 +89,16 @@ export function TopHeader() {
       <div className="flex items-center gap-4 sm:gap-6 flex-1">
         {/* Mobile Menu Button */}
         {isMobile && (
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </Button>
         )}
-        
+
         {/* Search */}
         <div className="relative flex-1 max-w-sm sm:max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -107,7 +115,7 @@ export function TopHeader() {
               {isSearching ? (
                 <div className="px-3 py-2 text-sm text-muted-foreground">Searching...</div>
               ) : searchResults.length > 0 ? (
-                searchResults.map((result, index) => (
+                searchResults.map((result) => (
                   <button
                     key={`${result.type}-${result.id}`}
                     className="w-full text-left px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 border-b border-slate-100 dark:border-slate-700 last:border-b-0"
@@ -120,7 +128,9 @@ export function TopHeader() {
                       <span className="font-medium text-sm">{result.name}</span>
                     </div>
                     {result.description && (
-                      <div className="text-xs text-muted-foreground mt-1 truncate">{result.description}</div>
+                      <div className="text-xs text-muted-foreground mt-1 truncate">
+                        {result.description}
+                      </div>
                     )}
                   </button>
                 ))
@@ -136,12 +146,20 @@ export function TopHeader() {
         <Button variant="ghost" size="sm" className="gap-2 hidden sm:flex" asChild></Button>
 
         <Button variant="ghost" size="icon" className="sm:hidden ml-2" asChild>
-          <a href="https://github.com/sparktest/sparktest" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://github.com/sparktest/sparktest"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Github className="h-4 w-4" />
           </a>
         </Button>
 
-        <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
           <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
         </Button>

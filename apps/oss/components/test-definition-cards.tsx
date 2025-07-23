@@ -5,7 +5,14 @@ import Link from "next/link"
 import { Clock, Code, Database, Plus, Server, Shield, Play } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@sparktest/storage-service"
@@ -14,12 +21,12 @@ import { TestDefinitionTestModal } from "@/components/test-definition-test-modal
 import type { TestDefinition } from "@sparktest/core/types"
 
 // Map of icons for different test types
-const iconMap: Record<string, any> = {
-  api: Server,
-  frontend: Code,
-  security: Shield,
-  database: Database,
-}
+// const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+//   api: Server,
+//   frontend: Code,
+//   security: Shield,
+//   database: Database,
+// }
 
 // Function to determine icon based on test name or description
 function getIconForTest(test: TestDefinition) {
@@ -199,7 +206,11 @@ export function TestDefinitionCards() {
                     Test
                   </Button>
                 </div>
-                <Button size="sm" onClick={() => handleQuickRun(test.id)} disabled={runningTests.includes(test.id)}>
+                <Button
+                  size="sm"
+                  onClick={() => handleQuickRun(test.id)}
+                  disabled={runningTests.includes(test.id)}
+                >
                   {runningTests.includes(test.id) ? (
                     <>
                       <svg
@@ -239,7 +250,6 @@ export function TestDefinitionCards() {
               <Plus className="h-6 w-6 text-primary" />
             </div>
             <p className="text-muted-foreground text-center mb-4">Create a new test definition</p>
-
           </div>
         </Card>
       </div>

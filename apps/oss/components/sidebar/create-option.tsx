@@ -18,8 +18,8 @@ export function CreateOptionComponent({ option, onClose, isMobile, isMobileMenuO
         onClick={onClose}
         className={cn(
           "flex items-center rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-muted-foreground transition-colors",
-          isMobile && isMobileMenuOpen 
-            ? "w-full h-10 px-3 gap-3 justify-start" 
+          isMobile && isMobileMenuOpen
+            ? "w-full h-10 px-3 gap-3 justify-start"
             : "justify-center w-10 h-10"
         )}
         aria-label={option.name}

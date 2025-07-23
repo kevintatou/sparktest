@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Plus, Play, Edit, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,9 +17,9 @@ export function TestDefinitionsList() {
 
   useEffect(() => {
     loadTestDefinitions()
-  }, [])
+  }, [loadTestDefinitions])
 
-  const loadTestDefinitions = async () => {
+  const loadTestDefinitions = useCallback(async () => {
     try {
       const data = await storage.getDefinitions()
       setTestDefinitions(data)
@@ -32,7 +32,7 @@ export function TestDefinitionsList() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
 
   const handleRunTest = async (testId: string) => {
     setRunningTests((prev) => [...prev, testId])

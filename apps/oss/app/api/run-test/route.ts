@@ -9,7 +9,10 @@ export async function POST(request: Request) {
 
     // Validate request body
     if (!body.name || !body.image || !Array.isArray(body.command) || body.command.length === 0) {
-      return NextResponse.json({ error: "Missing required fields: name, image, command" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Missing required fields: name, image, command" },
+        { status: 400 }
+      )
     }
 
     // In a real implementation, this would create a Kubernetes job

@@ -40,7 +40,7 @@ export default function DefinitionsPage() {
         title: "Definition deleted",
         description: "The definition has been removed successfully.",
       })
-    } catch (error) {
+    } catch {
       toast({
         title: "Error deleting definition",
         description: "Failed to delete the definition.",
@@ -76,7 +76,7 @@ export default function DefinitionsPage() {
         title: "Test started",
         description: "Your test run has been created and is starting.",
       })
-    } catch (error) {
+    } catch {
       toast({
         title: "Error starting test",
         description: "Failed to create the test run.",
@@ -89,7 +89,7 @@ export default function DefinitionsPage() {
     (def) =>
       def.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       def.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      def.id.toLowerCase().includes(searchQuery.toLowerCase()),
+      def.id.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
@@ -148,7 +148,9 @@ export default function DefinitionsPage() {
                 {searchQuery ? "No definitions match your search" : "No definitions yet"}
               </h3>
               <p className="text-muted-foreground mb-4">
-                {searchQuery ? "Try adjusting your search terms." : "Create your first definition to get started."}
+                {searchQuery
+                  ? "Try adjusting your search terms."
+                  : "Create your first definition to get started."}
               </p>
               {!searchQuery && (
                 <Button
@@ -177,13 +179,17 @@ export default function DefinitionsPage() {
                     <FileText className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900 dark:text-slate-100">{definition.name}</h3>
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+                      {definition.name}
+                    </h3>
                     <p className="text-sm text-muted-foreground">{definition.image}</p>
                   </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground line-clamp-2">{definition.description}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {definition.description}
+                </p>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
@@ -228,7 +234,9 @@ export default function DefinitionsPage() {
                     </div>
                   )}
 
-                  <p className="text-xs text-muted-foreground">Created {formatDistanceToNow(definition.createdAt)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Created {formatDistanceToNow(definition.createdAt)}
+                  </p>
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between border-t pt-4 bg-slate-50/50 dark:bg-slate-800/50">

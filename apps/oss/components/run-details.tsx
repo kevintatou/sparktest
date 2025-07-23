@@ -45,12 +45,13 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
   const { toast } = useToast()
   const [definition, setDefinition] = useState<Definition | null>(null)
   const [executor, setExecutor] = useState<Executor | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
 
   // Defensive: handle undefined run or createdAt
-  const safeCreatedAt = run?.createdAt && !Number.isNaN(Date.parse(run.createdAt))
-    ? run.createdAt
-    : new Date().toISOString();
+  const safeCreatedAt =
+    run?.createdAt && !Number.isNaN(Date.parse(run.createdAt))
+      ? run.createdAt
+      : new Date().toISOString()
 
   const [activeRun] = useState<Run>({
     ...run,
@@ -65,24 +66,25 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
         if (activeRun.definitionId) {
           const def = await storage.getDefinitionById(activeRun.definitionId)
           setDefinition(def || null)
-          
+
           if (def?.executorId) {
             const exec = await storage.getExecutorById(def.executorId)
             setExecutor(exec || null)
           }
         }
       } catch (error) {
-        console.error('Error loading related data:', error)
+        console.error("Error loading related data:", error)
       } finally {
         setLoading(false)
       }
     }
-    
+
     loadRelatedData()
   }, [activeRun.definitionId])
 
   // Utility: safely parse date or return "now"
-  const safeDate = (d: string | undefined) => new Date(d && !Number.isNaN(Date.parse(d)) ? d : Date.now())
+  const safeDate = (d: string | undefined) =>
+    new Date(d && !Number.isNaN(Date.parse(d)) ? d : Date.now())
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -130,7 +132,7 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
                 </Button>
               </div>
             </div>
-            
+
             <div>
               <label className="text-sm font-medium text-muted-foreground">Kubernetes Job</label>
               <div className="flex items-center gap-2 mt-1">
@@ -148,12 +150,11 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
             <div>
               <label className="text-sm font-medium text-muted-foreground">Duration</label>
               <p className="mt-1 font-medium">
-                {activeRun.status === "running" 
-                  ? "Running..." 
-                  : activeRun.duration 
-                    ? `${activeRun.duration}s` 
-                    : "N/A"
-                }
+                {activeRun.status === "running"
+                  ? "Running..."
+                  : activeRun.duration
+                    ? `${activeRun.duration}s`
+                    : "N/A"}
               </p>
             </div>
 
@@ -170,7 +171,7 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
             <div>
               <label className="text-sm font-medium text-muted-foreground">Command</label>
               <p className="mt-1 font-mono text-sm">
-                {Array.isArray(activeRun.command) ? activeRun.command.join(' ') : activeRun.command}
+                {Array.isArray(activeRun.command) ? activeRun.command.join(" ") : activeRun.command}
               </p>
             </div>
           </div>
@@ -197,7 +198,7 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
                 <label className="text-sm font-medium text-muted-foreground">Name</label>
                 <p className="mt-1 font-semibold">{definition.name}</p>
               </div>
-              
+
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Definition ID</label>
                 <div className="flex items-center gap-2 mt-1">
@@ -228,7 +229,10 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
                 <label className="text-sm font-medium text-muted-foreground">Commands</label>
                 <div className="mt-1 space-y-1">
                   {definition.commands.map((cmd, index) => (
-                    <p key={index} className="font-mono text-sm bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded">
+                    <p
+                      key={index}
+                      className="font-mono text-sm bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded"
+                    >
                       {cmd}
                     </p>
                   ))}
@@ -259,7 +263,7 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
                 <label className="text-sm font-medium text-muted-foreground">Name</label>
                 <p className="mt-1 font-semibold">{executor.name}</p>
               </div>
-              
+
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Executor ID</label>
                 <div className="flex items-center gap-2 mt-1">
@@ -288,7 +292,9 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
 
               {executor.supportedFileTypes && executor.supportedFileTypes.length > 0 && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Supported File Types</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Supported File Types
+                  </label>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {executor.supportedFileTypes.map((type) => (
                       <Badge key={type} variant="outline" className="text-xs">
@@ -315,28 +321,38 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
                 <label className="text-sm font-medium text-muted-foreground">Job Created</label>
                 <p className="mt-1">{formatDate(safeDate(activeRun.createdAt).toISOString())}</p>
               </div>
-              
+
               {activeRun.podScheduled && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Pod Scheduled</label>
-                  <p className="mt-1">{formatDate(safeDate(activeRun.podScheduled).toISOString())}</p>
+                  <p className="mt-1">
+                    {formatDate(safeDate(activeRun.podScheduled).toISOString())}
+                  </p>
                 </div>
               )}
-              
+
               {activeRun.containerCreated && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Container Created</label>
-                  <p className="mt-1">{formatDate(safeDate(activeRun.containerCreated).toISOString())}</p>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Container Created
+                  </label>
+                  <p className="mt-1">
+                    {formatDate(safeDate(activeRun.containerCreated).toISOString())}
+                  </p>
                 </div>
               )}
-              
+
               {activeRun.containerStarted && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Container Started</label>
-                  <p className="mt-1">{formatDate(safeDate(activeRun.containerStarted).toISOString())}</p>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Container Started
+                  </label>
+                  <p className="mt-1">
+                    {formatDate(safeDate(activeRun.containerStarted).toISOString())}
+                  </p>
                 </div>
               )}
-              
+
               {(activeRun.completed || activeRun.failed) && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">

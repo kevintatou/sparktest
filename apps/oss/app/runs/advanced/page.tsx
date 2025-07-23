@@ -116,7 +116,9 @@ export default function AdvancedTestsPage() {
                       <Switch
                         id="rbac"
                         checked={testConfig.enableRBAC}
-                        onCheckedChange={(checked) => setTestConfig({ ...testConfig, enableRBAC: checked })}
+                        onCheckedChange={(checked) =>
+                          setTestConfig({ ...testConfig, enableRBAC: checked })
+                        }
                       />
                       <Label htmlFor="rbac">Enable RBAC Testing</Label>
                     </div>
@@ -124,7 +126,9 @@ export default function AdvancedTestsPage() {
                       <Switch
                         id="network-policies"
                         checked={testConfig.enableNetworkPolicies}
-                        onCheckedChange={(checked) => setTestConfig({ ...testConfig, enableNetworkPolicies: checked })}
+                        onCheckedChange={(checked) =>
+                          setTestConfig({ ...testConfig, enableNetworkPolicies: checked })
+                        }
                       />
                       <Label htmlFor="network-policies">Enable Network Policy Testing</Label>
                     </div>
@@ -148,7 +152,9 @@ export default function AdvancedTestsPage() {
                       <Switch
                         id="parallel"
                         checked={testConfig.parallelExecution}
-                        onCheckedChange={(checked) => setTestConfig({ ...testConfig, parallelExecution: checked })}
+                        onCheckedChange={(checked) =>
+                          setTestConfig({ ...testConfig, parallelExecution: checked })
+                        }
                       />
                       <Label htmlFor="parallel">Parallel Execution</Label>
                     </div>
@@ -156,7 +162,9 @@ export default function AdvancedTestsPage() {
                       <Switch
                         id="cleanup"
                         checked={testConfig.cleanupAfterTest}
-                        onCheckedChange={(checked) => setTestConfig({ ...testConfig, cleanupAfterTest: checked })}
+                        onCheckedChange={(checked) =>
+                          setTestConfig({ ...testConfig, cleanupAfterTest: checked })
+                        }
                       />
                       <Label htmlFor="cleanup">Cleanup After Test</Label>
                     </div>
@@ -164,7 +172,9 @@ export default function AdvancedTestsPage() {
                       <Switch
                         id="artifacts"
                         checked={testConfig.collectArtifacts}
-                        onCheckedChange={(checked) => setTestConfig({ ...testConfig, collectArtifacts: checked })}
+                        onCheckedChange={(checked) =>
+                          setTestConfig({ ...testConfig, collectArtifacts: checked })
+                        }
                       />
                       <Label htmlFor="artifacts">Collect Artifacts</Label>
                     </div>
@@ -188,7 +198,9 @@ export default function AdvancedTestsPage() {
                     id="retries"
                     type="number"
                     value={testConfig.retries}
-                    onChange={(e) => setTestConfig({ ...testConfig, retries: Number.parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setTestConfig({ ...testConfig, retries: Number.parseInt(e.target.value) })
+                    }
                     min="0"
                     max="10"
                   />

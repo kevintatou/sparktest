@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { GenericLocalStorageService, GenericApiStorageService, GenericHybridStorageService, storageUtils } from "@sparktest/storage-service/generic"
+import {
+  GenericLocalStorageService,
+  GenericApiStorageService,
+  GenericHybridStorageService,
+  storageUtils,
+} from "@sparktest/storage-service/generic"
 
 // Mock localStorage
 const localStorageMock = {
@@ -126,7 +131,7 @@ describe("Generic Storage Services", () => {
         sampleItems,
         (item) => item.id,
         storageUtils,
-        { insertMode: 'unshift' }
+        { insertMode: "unshift" }
       )
 
       const newItem: TestItem = { id: "3", name: "Item 3", value: 30 }
@@ -180,7 +185,7 @@ describe("Generic Storage Services", () => {
       })
 
       const result = await service.getItems()
-      
+
       expect(result).toEqual(sampleItems)
       expect(mockFetch).toHaveBeenCalledWith("http://localhost:3000/api/test-items")
     })
@@ -204,7 +209,7 @@ describe("Generic Storage Services", () => {
       })
 
       const result = await service.saveItem(newItem)
-      
+
       expect(result).toEqual({ ...newItem, id: "3" })
       expect(mockFetch).toHaveBeenCalledWith("http://localhost:3000/api/test-items", {
         method: "POST",
@@ -222,7 +227,7 @@ describe("Generic Storage Services", () => {
       })
 
       const result = await service.saveItem(updatedItem)
-      
+
       expect(result).toEqual(updatedItem)
       expect(mockFetch).toHaveBeenCalledWith("http://localhost:3000/api/test-items/1", {
         method: "PUT",
@@ -238,7 +243,7 @@ describe("Generic Storage Services", () => {
       })
 
       const result = await service.deleteItem("1")
-      
+
       expect(result).toBe(true)
       expect(mockFetch).toHaveBeenCalledWith("http://localhost:3000/api/test-items/1", {
         method: "DELETE",
@@ -263,10 +268,7 @@ describe("Generic Storage Services", () => {
         (item) => item.id,
         storageUtils
       )
-      hybridService = new GenericHybridStorageService<TestItem>(
-        apiService,
-        localService
-      )
+      hybridService = new GenericHybridStorageService<TestItem>(apiService, localService)
     })
 
     it("should use API service when available", async () => {
@@ -277,7 +279,7 @@ describe("Generic Storage Services", () => {
       })
 
       const result = await hybridService.getItems()
-      
+
       expect(result).toEqual(sampleItems)
       expect(mockFetch).toHaveBeenCalledWith("http://localhost:3000/api/test-items")
     })
@@ -288,7 +290,7 @@ describe("Generic Storage Services", () => {
       localStorageMock.getItem.mockReturnValue(JSON.stringify(sampleItems))
 
       const result = await hybridService.getItems()
-      
+
       expect(result).toEqual(sampleItems)
       expect(localStorageMock.getItem).toHaveBeenCalledWith("test_items")
     })
@@ -306,17 +308,17 @@ describe("Generic Storage Services", () => {
       localStorageMock.getItem.mockReturnValue(JSON.stringify(sampleItems))
 
       await hybridWithCallback.getItems()
-      
+
       expect(onFallback).toHaveBeenCalledWith("Network error")
     })
 
     it("should initialize both services", async () => {
-      vi.spyOn(apiService, 'initialize')
-      vi.spyOn(localService, 'initialize')
+      vi.spyOn(apiService, "initialize")
+      vi.spyOn(localService, "initialize")
       localStorageMock.getItem.mockReturnValue(null)
 
       await hybridService.initialize()
-      
+
       expect(apiService.initialize).toHaveBeenCalled()
       expect(localService.initialize).toHaveBeenCalled()
     })

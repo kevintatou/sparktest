@@ -118,7 +118,9 @@ export function TestList() {
             <div className="flex flex-col sm:flex-row">
               <div className="flex flex-1 items-start gap-4 p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                  {test.status === "completed" && <CheckCircle className="h-5 w-5 text-green-500" />}
+                  {test.status === "completed" && (
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                  )}
                   {test.status === "failed" && <XCircle className="h-5 w-5 text-red-500" />}
                   {test.status === "running" && (
                     <div className="relative flex h-5 w-5 items-center justify-center">
@@ -132,7 +134,11 @@ export function TestList() {
                     <h3 className="font-semibold">{test.name}</h3>
                     <Badge
                       variant={
-                        test.status === "completed" ? "success" : test.status === "failed" ? "destructive" : "default"
+                        test.status === "completed"
+                          ? "success"
+                          : test.status === "failed"
+                            ? "destructive"
+                            : "default"
                       }
                       className="animate-in fade-in"
                     >

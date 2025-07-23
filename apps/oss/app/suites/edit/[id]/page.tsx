@@ -40,7 +40,7 @@ export default function EditSuitePage({ params }: { params: { id: string } }) {
         setLoading(false)
       }
     }
-    
+
     loadSuite()
   }, [id, toast])
 
@@ -75,7 +75,7 @@ export default function EditSuitePage({ params }: { params: { id: string } }) {
       </div>
     )
   }
-  
+
   if (!suite) {
     return (
       <div className="container py-6">

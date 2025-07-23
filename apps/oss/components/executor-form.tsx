@@ -39,7 +39,10 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg border max-w-2xl mx-auto shadow-sm">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 bg-white p-6 rounded-lg border max-w-2xl mx-auto shadow-sm"
+    >
       {isEditMode && (
         <div>
           <Label>ID</Label>
@@ -75,11 +78,16 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
           id="command"
           value={formData.command.join(", ")}
           onChange={(e) =>
-            handleChange("command", e.target.value.split(",").map((s) => s.trim()))
+            handleChange(
+              "command",
+              e.target.value.split(",").map((s) => s.trim())
+            )
           }
           placeholder="e.g. run, /scripts/test.js"
         />
-        <p className="text-xs text-muted-foreground mt-1">Comma-separated. This becomes your container&apos;s command.</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Comma-separated. This becomes your container&apos;s command.
+        </p>
       </div>
 
       <div>
@@ -88,11 +96,16 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
           id="supportedFileTypes"
           value={formData.supportedFileTypes.join(", ")}
           onChange={(e) =>
-            handleChange("supportedFileTypes", e.target.value.split(",").map((s) => s.trim()))
+            handleChange(
+              "supportedFileTypes",
+              e.target.value.split(",").map((s) => s.trim())
+            )
           }
           placeholder="e.g. json, js"
         />
-        <p className="text-xs text-muted-foreground mt-1">Comma-separated file extensions this executor supports.</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Comma-separated file extensions this executor supports.
+        </p>
       </div>
 
       <div>
@@ -101,11 +114,16 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
           id="envVars"
           value={formData.envVars.join(", ")}
           onChange={(e) =>
-            handleChange("envVars", e.target.value.split(",").map((s) => s.trim()))
+            handleChange(
+              "envVars",
+              e.target.value.split(",").map((s) => s.trim())
+            )
           }
           placeholder="e.g. API_KEY, DB_URL"
         />
-        <p className="text-xs text-muted-foreground mt-1">Comma-separated variable names to inject into the test container.</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Comma-separated variable names to inject into the test container.
+        </p>
       </div>
 
       <div>

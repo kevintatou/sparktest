@@ -10,12 +10,13 @@ describe("/api/run-test", () => {
   describe("POST", () => {
     it("should create a test run with valid input", async () => {
       const mockRequest = {
-        json: () => Promise.resolve({
-          name: "Test Job",
-          image: "nginx:latest",
-          command: ["echo", "hello"],
-          testDefinitionId: "def-123"
-        }),
+        json: () =>
+          Promise.resolve({
+            name: "Test Job",
+            image: "nginx:latest",
+            command: ["echo", "hello"],
+            testDefinitionId: "def-123",
+          }),
       } as Request
 
       const response = await POST(mockRequest)
@@ -28,18 +29,19 @@ describe("/api/run-test", () => {
         image: "nginx:latest",
         command: ["echo", "hello"],
         status: "running",
-        testDefinitionId: "def-123"
+        testDefinitionId: "def-123",
       })
       expect(data.createdAt).toBeDefined()
     })
 
     it("should create a test run without testDefinitionId", async () => {
       const mockRequest = {
-        json: () => Promise.resolve({
-          name: "Simple Job",
-          image: "ubuntu:latest",
-          command: ["ls", "-la"]
-        }),
+        json: () =>
+          Promise.resolve({
+            name: "Simple Job",
+            image: "ubuntu:latest",
+            command: ["ls", "-la"],
+          }),
       } as Request
 
       const response = await POST(mockRequest)
@@ -51,17 +53,18 @@ describe("/api/run-test", () => {
         name: "Simple Job",
         image: "ubuntu:latest",
         command: ["ls", "-la"],
-        status: "running"
+        status: "running",
       })
       expect(data.testDefinitionId).toBeUndefined()
     })
 
     it("should return 400 when name is missing", async () => {
       const mockRequest = {
-        json: () => Promise.resolve({
-          image: "nginx:latest",
-          command: ["echo", "hello"]
-        }),
+        json: () =>
+          Promise.resolve({
+            image: "nginx:latest",
+            command: ["echo", "hello"],
+          }),
       } as Request
 
       const response = await POST(mockRequest)
@@ -73,10 +76,11 @@ describe("/api/run-test", () => {
 
     it("should return 400 when image is missing", async () => {
       const mockRequest = {
-        json: () => Promise.resolve({
-          name: "Test Job",
-          command: ["echo", "hello"]
-        }),
+        json: () =>
+          Promise.resolve({
+            name: "Test Job",
+            command: ["echo", "hello"],
+          }),
       } as Request
 
       const response = await POST(mockRequest)
@@ -88,10 +92,11 @@ describe("/api/run-test", () => {
 
     it("should return 400 when command is missing", async () => {
       const mockRequest = {
-        json: () => Promise.resolve({
-          name: "Test Job",
-          image: "nginx:latest"
-        }),
+        json: () =>
+          Promise.resolve({
+            name: "Test Job",
+            image: "nginx:latest",
+          }),
       } as Request
 
       const response = await POST(mockRequest)
@@ -103,11 +108,12 @@ describe("/api/run-test", () => {
 
     it("should return 400 when command is not an array", async () => {
       const mockRequest = {
-        json: () => Promise.resolve({
-          name: "Test Job",
-          image: "nginx:latest",
-          command: "echo hello"
-        }),
+        json: () =>
+          Promise.resolve({
+            name: "Test Job",
+            image: "nginx:latest",
+            command: "echo hello",
+          }),
       } as Request
 
       const response = await POST(mockRequest)
@@ -119,11 +125,12 @@ describe("/api/run-test", () => {
 
     it("should return 400 when command is empty array", async () => {
       const mockRequest = {
-        json: () => Promise.resolve({
-          name: "Test Job",
-          image: "nginx:latest",
-          command: []
-        }),
+        json: () =>
+          Promise.resolve({
+            name: "Test Job",
+            image: "nginx:latest",
+            command: [],
+          }),
       } as Request
 
       const response = await POST(mockRequest)

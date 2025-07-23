@@ -20,7 +20,7 @@ export default function NewRunPage() {
         const defs = await storage.getDefinitions()
         setDefinitions(defs)
       } catch (error) {
-        console.error('Error loading test definitions:', error)
+        console.error("Error loading test definitions:", error)
       } finally {
         setLoading(false)
       }
@@ -49,7 +49,9 @@ export default function NewRunPage() {
                 <p className="mt-4 text-muted-foreground">Loading test definitions...</p>
               </div>
             ) : definitions.length === 0 ? (
-              <p className="text-muted-foreground">No test definitions found. Create one before running tests.</p>
+              <p className="text-muted-foreground">
+                No test definitions found. Create one before running tests.
+              </p>
             ) : selected ? (
               <RunTestForm def={selected} />
             ) : (

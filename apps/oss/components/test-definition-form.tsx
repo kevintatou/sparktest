@@ -7,17 +7,30 @@ import { useRouter } from "next/navigation"
 import { Plus, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { storage } from "@sparktest/storage-service"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import type { Executor } from "@sparktest/core/types"
 
-export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
+export function TestDefinitionForm({ existingTest }: { existingTest?: unknown }) {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -44,7 +57,8 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
         console.error("Failed to fetch executors:", error)
         toast({
           title: "Error fetching executors",
-          description: "Failed to load available executors. You can still create a test definition without selecting an executor.",
+          description:
+            "Failed to load available executors. You can still create a test definition without selecting an executor.",
           variant: "destructive",
         })
       } finally {
@@ -52,19 +66,20 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
       }
     }
     fetchExecutors()
-  }, [])
+  }, [toast])
 
   // Auto-populate image and commands when executor is selected
   useEffect(() => {
     if (formData.executorId && formData.executorId !== "none" && executors.length > 0) {
-      const selectedExecutor = executors.find(e => e.id === formData.executorId)
+      const selectedExecutor = executors.find((e) => e.id === formData.executorId)
       if (selectedExecutor) {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           image: selectedExecutor.image,
-          commands: selectedExecutor.command && selectedExecutor.command.length > 0 
-            ? selectedExecutor.command 
-            : ["echo hello"]
+          commands:
+            selectedExecutor.command && selectedExecutor.command.length > 0
+              ? selectedExecutor.command
+              : ["echo hello"],
         }))
       }
     }
@@ -190,31 +205,44 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
                 <Label htmlFor="executor">Executor (Optional)</Label>
                 <Select
                   value={formData.executorId}
-                  onValueChange={(value) => setFormData({ ...formData, executorId: value === "none" ? "" : value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, executorId: value === "none" ? "" : value })
+                  }
                   disabled={isLoadingExecutors}
                 >
                   <SelectTrigger className="transition-all focus-visible:ring-primary">
-                    <SelectValue placeholder={isLoadingExecutors ? "Loading executors..." : "Select an executor (optional)"} />
+                    <SelectValue
+                      placeholder={
+                        isLoadingExecutors
+                          ? "Loading executors..."
+                          : "Select an executor (optional)"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">
                       <div className="flex flex-col">
                         <span>No executor (custom)</span>
-                        <span className="text-xs text-muted-foreground">Use custom image and commands</span>
+                        <span className="text-xs text-muted-foreground">
+                          Use custom image and commands
+                        </span>
                       </div>
                     </SelectItem>
                     {executors.map((executor) => (
                       <SelectItem key={executor.id} value={executor.id}>
                         <div className="flex flex-col">
                           <span>{executor.name}</span>
-                          <span className="text-xs text-muted-foreground">{executor.description}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {executor.description}
+                          </span>
                         </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-muted-foreground">
-                  Select a pre-configured executor to automatically populate image and commands, or leave empty for custom configuration.
+                  Select a pre-configured executor to automatically populate image and commands, or
+                  leave empty for custom configuration.
                 </p>
               </div>
 
@@ -284,7 +312,14 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
                       fill="none"
                       viewBox="0 0 24 24"
                     >
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
                       <path
                         className="opacity-75"
                         fill="currentColor"
@@ -309,7 +344,8 @@ export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
             <CardHeader>
               <CardTitle>Import from GitHub</CardTitle>
               <CardDescription>
-                Enter a public GitHub repository URL and (optionally) a path to auto-register test definitions from JSON files.
+                Enter a public GitHub repository URL and (optionally) a path to auto-register test
+                definitions from JSON files.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

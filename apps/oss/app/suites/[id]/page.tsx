@@ -32,12 +32,12 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
           })
           return
         }
-        
+
         setSuite(loadedSuite)
-        
+
         // Load the definitions for this suite
         const allDefs = await storage.getDefinitions()
-        const suiteDefinitions = allDefs.filter((def) => 
+        const suiteDefinitions = allDefs.filter((def) =>
           loadedSuite.testDefinitionIds.includes(def.id)
         )
         setDefinitions(suiteDefinitions)
@@ -50,7 +50,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
         })
       }
     }
-    
+
     loadSuiteAndDefinitions()
   }, [id, toast])
 
@@ -60,12 +60,12 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
     setIsRunning(true)
     try {
       // Get all test definitions in the suite
-      const validDefinitions = definitions.filter(def => def !== undefined)
-      
+      const validDefinitions = definitions.filter((def) => def !== undefined)
+
       if (validDefinitions.length === 0) {
         throw new Error("No valid test definitions found in suite")
       }
-      
+
       // Create runs for each definition based on execution mode
       if (suite.executionMode === "sequential") {
         // Run tests one after another
@@ -74,9 +74,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
         }
       } else {
         // Run tests in parallel
-        await Promise.all(
-          validDefinitions.map(def => storage.createRun(def.id))
-        )
+        await Promise.all(validDefinitions.map((def) => storage.createRun(def.id)))
       }
 
       toast({
@@ -136,7 +134,14 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
                   fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
                   <path
                     className="opacity-75"
                     fill="currentColor"
