@@ -10,10 +10,10 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { storage } from "@sparktest/storage-service"
 import { formatDistanceToNow } from "@sparktest/core"
-import type { Test } from "@sparktest/core/types"
+import type { Run } from "@sparktest/core/types"
 
 export function TestList() {
-  const [tests, setTests] = useState<Test[]>([])
+  const [tests, setTests] = useState<Run[]>([])
   const [progressValues, setProgressValues] = useState<Record<string, number>>({})
   const initializedRef = useRef(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)

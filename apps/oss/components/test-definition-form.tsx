@@ -28,9 +28,9 @@ import {
 } from "@/components/ui/select"
 import { storage } from "@sparktest/storage-service"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import type { Executor } from "@sparktest/core/types"
+import type { Executor, Definition } from "@sparktest/core/types"
 
-export function TestDefinitionForm({ existingTest }: { existingTest?: unknown }) {
+export function TestDefinitionForm({ existingTest }: { existingTest?: Definition }) {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)

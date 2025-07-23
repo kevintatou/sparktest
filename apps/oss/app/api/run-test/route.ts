@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { v4 as uuidv4 } from "uuid"
 
-import type { Test } from "@sparktest/core/types"
+import type { Run } from "@sparktest/core/types"
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     // using the Kubernetes JavaScript client
 
     // For the MVP, we'll just mock the response
-    const newTest: Test = {
+    const newTest: Run = {
       id: uuidv4(),
       name: body.name,
       image: body.image,
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       status: "running",
       createdAt: new Date().toISOString(),
       // Add the test definition ID if it exists
-      testDefinitionId: body.testDefinitionId || undefined,
+      definitionId: body.testDefinitionId || undefined,
     }
 
     // In a real implementation, we would store this in a database

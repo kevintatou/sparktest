@@ -10,12 +10,12 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@sparktest/core"
 import { storage } from "@sparktest/storage-service"
-import type { TestSuite, Definition } from "@sparktest/core/types"
+import type { Suite, Definition } from "@sparktest/core/types"
 
 export default function SuiteDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { toast } = useToast()
-  const [suite, setSuite] = useState<TestSuite | null>(null)
+  const [suite, setSuite] = useState<Suite | null>(null)
   const [definitions, setDefinitions] = useState<Definition[]>([])
   const [isRunning, setIsRunning] = useState(false)
 
@@ -23,7 +23,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
     const loadSuiteAndDefinitions = async () => {
       try {
         // Load the suite from storage
-        const loadedSuite = await storage.getTestSuiteById(id)
+        const loadedSuite = await storage.getSuiteById(id)
         if (!loadedSuite) {
           toast({
             title: "Suite not found",

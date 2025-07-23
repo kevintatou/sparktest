@@ -123,9 +123,9 @@ export function TestDefinitionsList() {
                   <p>
                     <strong>Commands:</strong> {test.commands.join(", ")}
                   </p>
-                  {test.executor_id && (
+                  {test.executorId && (
                     <p>
-                      <strong>Executor:</strong> {test.executor_id}
+                      <strong>Executor:</strong> {test.executorId}
                     </p>
                   )}
                 </div>

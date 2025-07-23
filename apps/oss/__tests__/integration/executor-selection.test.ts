@@ -84,7 +84,7 @@ describe("Executor Selection in Test Definition", () => {
     const service = new ApiStorageService()
     const result = await service.saveDefinition(formDataWithoutExecutor as any)
 
-    expect(result.executor_id).toBeNull()
+    expect(result.executorId).toBeNull()
     expect(result.name).toBe("Custom Test")
   })
 })

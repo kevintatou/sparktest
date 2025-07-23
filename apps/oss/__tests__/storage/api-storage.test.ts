@@ -598,7 +598,7 @@ describe("ApiStorageService", () => {
           created_at: "2025-07-07T10:00:00.000Z",
         }
 
-        const savedSuite = { id: "suite123", ...newSuite }
+        const savedSuite = { ...newSuite, id: "suite123" }
         mockFetch.mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve(savedSuite),

@@ -17,8 +17,8 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@sparktest/storage-service"
 import { formatDistanceToNow } from "@sparktest/core/utils"
-import { TestDefinitionTestModal } from "@/components/test-definition-test-modal"
-import type { TestDefinition } from "@sparktest/core/types"
+import { DefinitionTestModal } from "@/components/test-definition-test-modal"
+import type { Definition } from "@sparktest/core/types"
 
 // Map of icons for different test types
 // const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -29,7 +29,7 @@ import type { TestDefinition } from "@sparktest/core/types"
 // }
 
 // Function to determine icon based on test name or description
-function getIconForTest(test: TestDefinition) {
+function getIconForTest(test: Definition) {
   const testNameLower = test.name.toLowerCase()
   const descriptionLower = test.description.toLowerCase()
 
@@ -63,7 +63,7 @@ function getIconForTest(test: TestDefinition) {
 }
 
 // Function to generate tags based on test properties
-function generateTagsForTest(test: TestDefinition): string[] {
+function generateTagsForTest(test: Definition): string[] {
   const tags: string[] = []
   const testNameLower = test.name.toLowerCase()
   const descriptionLower = test.description.toLowerCase()
@@ -110,19 +110,19 @@ function generateTagsForTest(test: TestDefinition): string[] {
   return tags
 }
 
-export function TestDefinitionCards() {
+export function DefinitionCards() {
   const { toast } = useToast()
   const [runningTests, setRunningTests] = useState<string[]>([])
-  const [testDefinitions, setTestDefinitions] = useState<TestDefinition[]>([])
+  const [testDefinitions, setDefinitions] = useState<Definition[]>([])
   const [testModalOpen, setTestModalOpen] = useState(false)
-  const [selectedTest, setSelectedTest] = useState<TestDefinition | null>(null)
+  const [selectedTest, setSelectedTest] = useState<Definition | null>(null)
   const initializedRef = useRef(false)
 
   useEffect(() => {
     if (!initializedRef.current) {
       // Initialize storage on component mount
       storage.getDefinitions().then((data) => {
-        setTestDefinitions(data)
+        setDefinitions(data)
       })
       initializedRef.current = true
     }
@@ -157,7 +157,7 @@ export function TestDefinitionCards() {
     }
   }
 
-  const handleTestWithModal = (test: TestDefinition) => {
+  const handleTestWithModal = (test: Definition) => {
     setSelectedTest(test)
     setTestModalOpen(true)
   }
@@ -255,7 +255,7 @@ export function TestDefinitionCards() {
       </div>
 
       {selectedTest && (
-        <TestDefinitionTestModal
+        <DefinitionTestModal
           isOpen={testModalOpen}
           onClose={() => {
             setTestModalOpen(false)

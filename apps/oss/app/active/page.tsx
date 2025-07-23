@@ -20,25 +20,30 @@ export default function ActiveTestsPage() {
 
   // Load tests from localStorage
   useEffect(() => {
-    if (!initializedRef.current) {
-      const allTests = storage.getRuns()
-      const runningTests = allTests.filter((test) => test.status === "running")
-      setTests(runningTests)
-      initializedRef.current = true
+    const loadRunningTests = async () => {
+      if (!initializedRef.current) {
+        const allTests = await storage.getRuns()
+        const runningTests = allTests.filter((test) => test.status === "running")
+        setTests(runningTests)
+        initializedRef.current = true
 
-      // Initialize progress values for running tests
-      const initialProgress: Record<string, number> = {}
-      runningTests.forEach((test) => {
-        initialProgress[test.id] = Math.floor(Math.random() * 30) + 10 // Start between 10-40%
-      })
-      setProgressValues(initialProgress)
+        // Initialize progress values for running tests
+        const initialProgress: Record<string, number> = {}
+        runningTests.forEach((test) => {
+          initialProgress[test.id] = Math.floor(Math.random() * 30) + 10 // Start between 10-40%
+        })
+        setProgressValues(initialProgress)
 
-      // Set up a refresh interval
-      intervalRef.current = setInterval(() => {
-        const updatedTests = storage.getRuns().filter((test) => test.status === "running")
-        setTests(updatedTests)
-      }, 5000)
+        // Set up a refresh interval
+        intervalRef.current = setInterval(async () => {
+          const updatedTests = await storage.getRuns()
+          const runningTestsUpdate = updatedTests.filter((test) => test.status === "running")
+          setTests(runningTestsUpdate)
+        }, 5000)
+      }
     }
+    
+    loadRunningTests()
 
     return () => {
       if (intervalRef.current) {

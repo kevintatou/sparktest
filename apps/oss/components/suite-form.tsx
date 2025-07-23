@@ -27,11 +27,11 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@sparktest/storage-service"
-import type { TestSuite, Definition } from "@sparktest/core/types"
+import type { Suite, Definition } from "@sparktest/core/types"
 import { Autocomplete } from "@/components/ui/autocomplete"
 
 interface SuiteFormProps {
-  existingSuite?: TestSuite
+  existingSuite?: Suite
 }
 
 export function SuiteForm({ existingSuite }: SuiteFormProps) {
@@ -93,13 +93,13 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
         throw new Error("Please select at least one test definition")
       }
 
-      const suiteData: TestSuite = {
+      const suiteData: Suite = {
         ...formData,
         createdAt: existingSuite?.createdAt || new Date().toISOString(),
       }
 
       // Save the suite using the storage service
-      await storage.saveTestSuite(suiteData)
+      await storage.saveSuite(suiteData)
 
       toast({
         title: existingSuite ? "Suite updated" : "Suite created",

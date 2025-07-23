@@ -71,17 +71,6 @@ export function KubernetesLogs({ runId, jobName: _jobName, className }: Kubernet
     initializeHealth()
   }, [])
 
-  // Auto-refresh logs for running jobs
-  useEffect(() => {
-    if (!autoRefresh || !logs || logs.status !== "running") return
-
-    const interval = setInterval(() => {
-      fetchLogs(false) // Silent refresh
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [autoRefresh, logs, fetchLogs])
-
   const checkKubernetesHealth = async () => {
     try {
       const health = await storage.getKubernetesHealth()
@@ -99,34 +88,24 @@ export function KubernetesLogs({ runId, jobName: _jobName, className }: Kubernet
         return
       }
 
-      setLoading(true)
-      setError(null)
-
       try {
-        // Try to get logs by run ID first, fallback to job name
-        const logData = await storage.getTestRunLogs(runId)
-        setLogs(logData)
-
-        // Enable auto-refresh for running jobs
-        if (logData.status === "running") {
-          setAutoRefresh(true)
-        } else {
-          setAutoRefresh(false)
-        }
+        setLoading(true)
+        setError(null)
+        const jobLogs = await storage.getJobLogs(jobName)
+        setLogs(jobLogs)
 
         if (showToast) {
           toast({
-            title: "Logs retrieved",
-            description: `Successfully fetched logs for ${logData.job_name}`,
+            title: "Logs refreshed",
+            description: "Job logs have been updated",
           })
         }
-      } catch (error: unknown) {
+      } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Failed to fetch logs"
         setError(errorMessage)
-
         if (showToast) {
           toast({
-            title: "Error fetching logs",
+            title: "Error",
             description: errorMessage,
             variant: "destructive",
           })
@@ -135,8 +114,19 @@ export function KubernetesLogs({ runId, jobName: _jobName, className }: Kubernet
         setLoading(false)
       }
     },
-    [kubernetesHealth?.kubernetes_connected, runId, toast]
+    [jobName, kubernetesHealth, toast]
   )
+
+  // Auto-refresh logs for running jobs
+  useEffect(() => {
+    if (!autoRefresh || !logs || logs.status !== "running") return
+
+    const interval = setInterval(() => {
+      fetchLogs(false) // Silent refresh
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [autoRefresh, logs, fetchLogs])
 
   const downloadLogs = () => {
     if (!logs) return

@@ -50,7 +50,7 @@ export default function ExecutorsPage() {
   const filteredExecutors = executors.filter(
     (executor) =>
       executor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      executor.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      executor.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       executor.id.toLowerCase().includes(searchQuery.toLowerCase())
   )
 

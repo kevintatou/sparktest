@@ -15,7 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { formatDistanceToNow } from "@sparktest/core/utils"
-import type { TestDefinition } from "@sparktest/core/types"
+import type { Definition } from "@sparktest/core/types"
 
 interface TestResult {
   success: boolean
@@ -25,17 +25,17 @@ interface TestResult {
   logs?: string[]
 }
 
-interface TestDefinitionTestModalProps {
+interface DefinitionTestModalProps {
   isOpen: boolean
   onClose: () => void
-  testDefinition: TestDefinition
+  testDefinition: Definition
 }
 
-export function TestDefinitionTestModal({
+export function DefinitionTestModal({
   isOpen,
   onClose,
   testDefinition,
-}: TestDefinitionTestModalProps) {
+}: DefinitionTestModalProps) {
   const [testing, setTesting] = useState(false)
   const [result, setResult] = useState<TestResult | null>(null)
   const [progress, setProgress] = useState(0)
