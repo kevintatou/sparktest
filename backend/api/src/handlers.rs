@@ -78,7 +78,7 @@ pub async fn k8s_health() -> Json<serde_json::Value> {
 pub async fn get_job_logs(Path(job_name): Path<String>) -> Json<serde_json::Value> {
     Json(serde_json::json!({
         "job_name": job_name,
-        "pod_name": format!("pod-{}", job_name),
+        "pod_name": format!("pod-{job_name}"),
         "logs": "Sample log output",
         "timestamp": chrono::Utc::now().to_rfc3339(),
         "status": "completed"
@@ -95,7 +95,7 @@ pub async fn get_job_status(Path(job_name): Path<String>) -> Json<serde_json::Va
 
 pub async fn delete_job(Path(job_name): Path<String>) -> Json<serde_json::Value> {
     Json(serde_json::json!({
-        "message": format!("Job {} deleted successfully", job_name),
+        "message": format!("Job {job_name} deleted successfully"),
         "timestamp": chrono::Utc::now().to_rfc3339()
     }))
 }
@@ -168,7 +168,7 @@ mod tests {
         let response = get_job_logs(Path(job_name.clone())).await;
         let value = response.0;
         assert_eq!(value["job_name"], job_name);
-        assert_eq!(value["pod_name"], format!("pod-{}", job_name));
+        assert_eq!(value["pod_name"], format!("pod-{job_name}"));
         assert_eq!(value["logs"], "Sample log output");
         assert_eq!(value["status"], "completed");
     }
@@ -189,7 +189,7 @@ mod tests {
         let value = response.0;
         assert_eq!(
             value["message"],
-            format!("Job {} deleted successfully", job_name)
+            format!("Job {job_name} deleted successfully")
         );
     }
 }
