@@ -25,6 +25,30 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
 
+      - name: Create dynamic .npmrc for publishing
+        run: |
+          echo "Creating .npmrc for publishing..."
+          echo "@sparktest:registry=https://registry.npmjs.org/" > .npmrc
+          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" >> .npmrc
+          echo "access=public" >> .npmrc
+          echo "publish-config.access=public" >> .npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Debug NPM authentication setup
+        run: |
+          echo "Checking environment variables..."
+          echo "NODE_AUTH_TOKEN is set: $([[ -n "$NODE_AUTH_TOKEN" ]] && echo "YES" || echo "NO")"
+          echo "NPM_TOKEN is set: $([[ -n "$NPM_TOKEN" ]] && echo "YES" || echo "NO")"
+          echo "Current .npmrc content:"
+          cat .npmrc
+          echo "npm config list (excluding sensitive data):"
+          npm config list --json | jq 'del(.["//registry.npmjs.org/:_authToken"])'
+          echo "npm whoami test (should succeed if authenticated):"
+          npm whoami || echo "Authentication failed - this will cause publish to fail"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Install dependencies
         run: pnpm install
 
@@ -33,7 +57,11 @@ jobs:
 
       - name: Publish @sparktest/core
         run: cd packages/core && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @sparktest/storage-service
         run: cd packages/storage-service && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
