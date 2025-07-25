@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import type { Executor } from "@sparktest/core/types"
-import { storage } from "@sparktest/storage-service"
+import type { Executor } from "@tatou/core/types"
+import { storage } from "@tatou/storage-service"
 
 interface ExecutorFormProps {
   existingExecutor?: Executor

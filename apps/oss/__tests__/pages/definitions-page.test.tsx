@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import DefinitionsPage from '@/app/definitions/page'
-import { storage } from '@sparktest/storage-service'
-import type { Definition } from '@sparktest/core/types'
+import { storage } from '@tatou/storage-service'
+import type { Definition } from '@tatou/core/types'
 
 // Mock the storage service
-vi.mock('@sparktest/storage-service', () => ({
+vi.mock('@tatou/storage-service', () => ({
   storage: {
     getDefinitions: vi.fn(),
     deleteDefinition: vi.fn(),
@@ -28,7 +28,7 @@ vi.mock('next/link', () => ({
 }))
 
 // Mock formatDistanceToNow
-vi.mock('@sparktest/core', () => ({
+vi.mock('@tatou/core', () => ({
   formatDistanceToNow: vi.fn(() => '2 hours ago')
 }))
 

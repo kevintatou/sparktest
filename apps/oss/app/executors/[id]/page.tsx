@@ -4,8 +4,8 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { storage } from "@sparktest/storage-service"
-import type { Executor } from "@sparktest/core/types"
+import { storage } from "@tatou/storage-service"
+import type { Executor } from "@tatou/core/types"
 import ClientLayout from "@/app/client-layout"
 
 

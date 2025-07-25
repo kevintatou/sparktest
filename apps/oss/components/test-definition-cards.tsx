@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@sparktest/storage-service"
-import { formatDistanceToNow } from "@sparktest/core/utils"
+import { storage } from "@tatou/storage-service"
+import { formatDistanceToNow } from "@tatou/core/utils"
 import { TestDefinitionTestModal } from "@/components/test-definition-test-modal"
-import type { TestDefinition } from "@sparktest/core/types"
+import type { TestDefinition } from "@tatou/core/types"
 
 // Map of icons for different test types
 const iconMap: Record<string, any> = {

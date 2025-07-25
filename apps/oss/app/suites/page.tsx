@@ -9,9 +9,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { formatDistanceToNow } from "@sparktest/core"
-import { storage } from "@sparktest/storage-service"
-import type { Suite } from "@sparktest/core/types"
+import { formatDistanceToNow } from "@tatou/core"
+import { storage } from "@tatou/storage-service"
+import type { Suite } from "@tatou/core/types"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 
 export default function SuitesPage() {

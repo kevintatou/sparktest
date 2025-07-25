@@ -1,6 +1,6 @@
 "use client"
 
-import { Run, Definition, Executor } from "@sparktest/core/types"
+import { Run, Definition, Executor } from "@tatou/core/types"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { KubernetesLogs } from "@/components/kubernetes-logs"
 import { CheckCircle, XCircle, Clock, AlertCircle, ExternalLink, Copy } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@sparktest/storage-service"
+import { storage } from "@tatou/storage-service"
 import type React from "react"
 
 interface TestDetailsProps {

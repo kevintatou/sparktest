@@ -28,7 +28,7 @@ jobs:
       - name: Create dynamic .npmrc for publishing
         run: |
           echo "Creating .npmrc for publishing..."
-          echo "@sparktest:registry=https://registry.npmjs.org/" > .npmrc
+          echo "@tatou:registry=https://registry.npmjs.org/" > .npmrc
           echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" >> .npmrc
           echo "access=public" >> .npmrc
           echo "publish-config.access=public" >> .npmrc
@@ -55,12 +55,12 @@ jobs:
       - name: Build packages
         run: pnpm build:packages
 
-      - name: Publish @sparktest/core
+      - name: Publish @tatou/core
         run: cd packages/core && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish @sparktest/storage-service
+      - name: Publish @tatou/storage-service
         run: cd packages/storage-service && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

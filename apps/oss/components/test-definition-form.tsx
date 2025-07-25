@@ -13,9 +13,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { storage } from "@sparktest/storage-service"
+import { storage } from "@tatou/storage-service"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import type { Executor } from "@sparktest/core/types"
+import type { Executor } from "@tatou/core/types"
 
 export function TestDefinitionForm({ existingTest }: { existingTest?: any }) {
   const router = useRouter()

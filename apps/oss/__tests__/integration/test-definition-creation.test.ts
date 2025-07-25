@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
-import { ApiStorageService } from "@sparktest/storage-service/api-storage"
+import { ApiStorageService } from "@tatou/storage-service/api-storage"
 
 // Test the integration between frontend and backend for test definition creation
 describe("Test Definition Creation Integration", () => {
