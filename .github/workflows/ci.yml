@@ -43,7 +43,7 @@ jobs:
         run: pnpm build:packages
 
       - name: Build application
-        run: pnpm --filter "@sparktest/oss" build
+        run: pnpm --filter "@tatou/oss" build
 
       # Note: Comprehensive testing with coverage is handled by the 'Test & Coverage' workflow
       # This workflow focuses on fast build validation and linting feedback
