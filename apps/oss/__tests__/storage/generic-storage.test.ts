@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { GenericLocalStorageService, GenericApiStorageService, GenericHybridStorageService, storageUtils } from "@tatou/storage-service/generic"
+import {
+  GenericLocalStorageService,
+  GenericApiStorageService,
+  GenericHybridStorageService,
+  storageUtils,
+} from "@tatou/storage-service/generic"
 
 // Mock localStorage
 const localStorageMock = {

@@ -1,6 +1,15 @@
 import type { StorageService } from "./storage"
 import { getFromStorage, setToStorage } from "./generic/utils"
-import type { Executor, Definition, Run, Suite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@tatou/core"
+import type {
+  Executor,
+  Definition,
+  Run,
+  Suite,
+  KubernetesHealth,
+  JobLogs,
+  JobStatus,
+  JobDeleteResponse,
+} from "@tatou/core"
 import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "@tatou/core"
 
 export class LocalStorageService implements StorageService {

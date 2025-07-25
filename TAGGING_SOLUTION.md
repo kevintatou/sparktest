@@ -7,12 +7,14 @@ The v0.2.0 tag creation failed in PR #117 due to authentication issues. While th
 ## Current Status
 
 ✅ **Local tag created successfully**
-- Tag: `v0.2.0` 
+
+- Tag: `v0.2.0`
 - Commit: `22760f9f5b90d68f17f51af0862b04c25b5e4caf` (merge commit from PR #117)
 - Tagger: `copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>`
 - Message: "Release version v0.2.0"
 
 ❌ **Remote push failed**
+
 - Error: "Invalid username or token. Password authentication is not supported"
 - Cause: Missing or insufficient `GITHUB_TOKEN` environment variable
 
@@ -74,9 +76,10 @@ The script is now dynamic and accepts optional parameters for tag name and commi
 To enable automated tagging in future PRs:
 
 1. **For GitHub Actions workflows**: Ensure `GITHUB_TOKEN` has sufficient permissions:
+
    ```yaml
    permissions:
-     contents: write  # Required for pushing tags
+     contents: write # Required for pushing tags
    ```
 
 2. **For Copilot workflows**: Repository settings may need to be updated to grant tag creation permissions to the Copilot bot.
@@ -100,7 +103,7 @@ The tag should appear at: https://github.com/kevintatou/sparktest/tags
 To prevent this issue in future releases:
 
 1. **Test tag pushing** in a separate branch before merging
-2. **Verify GITHUB_TOKEN** availability and permissions in CI environment  
+2. **Verify GITHUB_TOKEN** availability and permissions in CI environment
 3. **Consider using GitHub Releases API** as an alternative to git push for tag creation
 4. **Add tag creation verification** to the CI pipeline
 
