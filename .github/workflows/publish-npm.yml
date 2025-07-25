@@ -35,7 +35,7 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
 
       - name: Publish @sparktest/core
-        run: cd packages/core && npm publish
+        run: cd packages/core && npm publish --access public
 
       - name: Publish @sparktest/storage-service
-        run: cd packages/storage-service && npm publish
+        run: cd packages/storage-service && npm publish --access public
