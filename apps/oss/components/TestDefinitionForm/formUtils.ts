@@ -26,7 +26,10 @@ export function validateFormData(formData: { name: string; image: string; comman
   return errors
 }
 
-export function prepareSubmissionData(formData: FormData, existingTest?: Definition): Omit<Definition, 'id'> {
+export function prepareSubmissionData(
+  formData: FormData,
+  existingTest?: Definition
+): Omit<Definition, "id"> {
   return {
     ...formData,
     commands: formData.commands.filter(Boolean),
