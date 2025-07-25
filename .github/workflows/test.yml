@@ -42,13 +42,13 @@ jobs:
       run: pnpm build:packages
 
     - name: Run linter
-      run: pnpm --filter "@sparktest/oss" lint
+      run: pnpm --filter "@tatou/oss" lint
 
     - name: Run type check
-      run: pnpm --filter "@sparktest/oss" type-check
+      run: pnpm --filter "@tatou/oss" type-check
 
     - name: Run tests
-      run: pnpm --filter "@sparktest/oss" test:coverage
+      run: pnpm --filter "@tatou/oss" test:coverage
 
     - name: Verify coverage file and show summary
       run: |
