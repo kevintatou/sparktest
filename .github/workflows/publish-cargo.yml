@@ -75,9 +75,14 @@ jobs:
           # Replace path dependencies with version dependencies
           sed -i "s/sparktest-core = { path = \"..\/core\" }/sparktest-core = \"$CORE_VERSION\"/" bin/Cargo.toml
           sed -i "s/sparktest-api = { path = \"..\/api\" }/sparktest-api = \"$API_VERSION\"/" bin/Cargo.toml
+          # Copy migrations directory to bin directory to ensure it's available during compilation
+          cp -r migrations bin/
+          echo "Copied migrations directory to bin/"
           # Verify the changes
           echo "Updated bin/Cargo.toml dependencies:"
           grep -E 'sparktest-(core|api) = ' bin/Cargo.toml
+          echo "Migrations directory in bin:"
+          ls -la bin/migrations/
         working-directory: backend
 
       - name: Publish sparktest-bin

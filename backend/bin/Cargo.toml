@@ -6,6 +6,7 @@ description = "SparkTest backend server binary"
 license = "MIT"
 repository = "https://github.com/kevintatou/sparktest"
 homepage = "https://github.com/kevintatou/sparktest"
+include = ["src/**/*", "Cargo.toml", "migrations/**/*"]
 
 [dependencies]
 sparktest-core = { path = "../core" }
