@@ -45,8 +45,20 @@ git push origin v0.2.0
 Run the automated script from this PR:
 
 ```bash
+# Create v0.2.0 tag at current HEAD
 ./scripts/create-tag.sh
+
+# Create v0.2.0 tag at specific commit
+./scripts/create-tag.sh v0.2.0 22760f9f5b90d68f17f51af0862b04c25b5e4caf
+
+# Create a different tag version
+./scripts/create-tag.sh v0.3.0
+
+# View script help
+./scripts/create-tag.sh --help
 ```
+
+The script is now dynamic and accepts optional parameters for tag name and commit hash, making it reusable for future releases.
 
 ### Option 3: GitHub Web Interface
 
