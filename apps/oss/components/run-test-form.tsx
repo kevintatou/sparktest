@@ -18,8 +18,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@sparktest/storage-service"
-import type { Definition } from "@sparktest/core/types"
+import { storage } from "@tatou/storage-service"
+import type { Definition } from "@tatou/core/types"
 
 export function RunTestForm({ def: definition }: { def: Definition }) {
   const router = useRouter()

@@ -1,13 +1,4 @@
-import {
-  Executor,
-  Definition,
-  Run,
-  Suite,
-  KubernetesHealth,
-  JobLogs,
-  JobStatus,
-  JobDeleteResponse,
-} from "@sparktest/core"
+import { Executor, Definition, Run, Suite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@tatou/core"
 
 export interface StorageService {
   // Executors
@@ -33,7 +24,7 @@ export interface StorageService {
   ): Promise<Run>
   subscribeToRuns: (
     callback: (payload: { eventType: string; new?: Run; old?: Run }) => void
-  ) => () => void
+  ) => () => void;
 
   // Suites
   getSuites(): Promise<Suite[]>

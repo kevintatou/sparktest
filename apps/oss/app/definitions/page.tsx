@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { storage } from "@sparktest/storage-service"
+import { storage } from "@tatou/storage-service"
 import { useToast } from "@/components/ui/use-toast"
-import { formatDistanceToNow } from "@sparktest/core"
-import type { Definition } from "@sparktest/core/types"
+import { formatDistanceToNow } from "@tatou/core"
+import type { Definition } from "@tatou/core/types"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 
 export default function DefinitionsPage() {

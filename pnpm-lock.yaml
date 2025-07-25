@@ -110,15 +110,15 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: latest
         version: 1.2.7(@types/react-dom@18.3.7(@types/react@18.3.23))(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@sparktest/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@sparktest/storage-service':
-        specifier: workspace:*
-        version: link:../../packages/storage-service
       '@tanstack/react-query':
         specifier: ^5.83.0
         version: 5.83.0(react@18.3.1)
+      '@tatou/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@tatou/storage-service':
+        specifier: workspace:*
+        version: link:../../packages/storage-service
       '@testing-library/dom':
         specifier: latest
         version: 10.4.0
@@ -277,7 +277,7 @@ importers:
 
   packages/storage-service:
     dependencies:
-      '@sparktest/core':
+      '@tatou/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

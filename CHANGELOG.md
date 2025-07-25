@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [v0.2.0] - 2024-12-19
+### Added
+- Tagged new minor version for release
+
 ## [v0.1.0] - 2025-07-18
 
 ### Added
@@ -36,5 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
-[Unreleased]: https://github.com/kevintatou/sparktest/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kevintatou/sparktest/compare/v0.2.0...HEAD
+[v0.2.0]: https://github.com/kevintatou/sparktest/compare/v0.1.0...v0.2.0
 [v0.1.0]: https://github.com/kevintatou/sparktest/releases/tag/v0.1.0

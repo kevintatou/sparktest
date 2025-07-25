@@ -21,10 +21,10 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@sparktest/core": ["./packages/core/src"],
-      "@sparktest/core/*": ["./packages/core/src/*"],
-      "@sparktest/storage-service": ["./packages/storage-service"],
-      "@sparktest/storage-service/*": ["./packages/storage-service/*"]
+      "@tatou/core": ["./packages/core/src"],
+      "@tatou/core/*": ["./packages/core/src/*"],
+      "@tatou/storage-service": ["./packages/storage-service"],
+      "@tatou/storage-service/*": ["./packages/storage-service/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

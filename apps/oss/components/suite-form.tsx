@@ -26,8 +26,8 @@ import {
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@sparktest/storage-service"
-import type { Suite, Definition } from "@sparktest/core/types"
+import { storage } from "@tatou/storage-service"
+import type { TestSuite, Definition } from "@tatou/core/types"
 import { Autocomplete } from "@/components/ui/autocomplete"
 
 interface SuiteFormProps {

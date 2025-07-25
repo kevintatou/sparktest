@@ -8,9 +8,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { storage } from "@sparktest/storage-service"
-import { formatDistanceToNow } from "@sparktest/core"
-import type { Run } from "@sparktest/core/types"
+import { storage } from "@tatou/storage-service"
+import { formatDistanceToNow } from "@tatou/core"
+import type { Test } from "@tatou/core/types"
 
 export function TestList() {
   const [tests, setTests] = useState<Run[]>([])

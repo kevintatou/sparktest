@@ -1,6 +1,6 @@
 {
-  "name": "@sparktest/core",
-  "version": "0.1.0",
+  "name": "@tatou/core",
+  "version": "0.2.0",
   "description": "Shared TypeScript types and utilities for SparkTest",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
