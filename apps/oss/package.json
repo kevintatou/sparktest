@@ -1,5 +1,5 @@
 {
-  "name": "@sparktest/oss",
+  "name": "@tatou/oss",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,8 +14,8 @@
     "type-check": "tsc --noEmit || echo 'Type check completed with warnings' && exit 0"
   },
   "dependencies": {
-    "@sparktest/core": "workspace:*",
-    "@sparktest/storage-service": "workspace:*",
+    "@tatou/core": "workspace:*",
+    "@tatou/storage-service": "workspace:*",
     "@edge-runtime/vm": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "latest",

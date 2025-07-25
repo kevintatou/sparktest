@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { v4 as uuidv4 } from "uuid"
 
-import type { Test } from "@sparktest/core/types"
+import type { Test } from "@tatou/core/types"
 
 export async function POST(request: Request) {
   try {

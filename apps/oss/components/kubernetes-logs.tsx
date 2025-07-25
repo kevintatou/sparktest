@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { RefreshCw, Download, Terminal, AlertCircle, CheckCircle, XCircle, Clock } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@sparktest/storage-service"
-import type { JobLogs, KubernetesHealth } from "@sparktest/core/types"
+import { storage } from "@tatou/storage-service"
+import type { JobLogs, KubernetesHealth } from "@tatou/core/types"
 
 interface KubernetesLogsProps {
   runId: string

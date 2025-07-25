@@ -1,5 +1,5 @@
 {
-  "name": "@sparktest/storage-service",
+  "name": "@tatou/storage-service",
   "version": "0.1.0",
   "description": "Storage service implementations for SparkTest",
   "main": "dist/index.js",
@@ -62,7 +62,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@sparktest/core": "workspace:*"
+    "@tatou/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5",

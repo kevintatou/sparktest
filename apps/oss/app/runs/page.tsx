@@ -9,9 +9,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { formatDistanceToNow } from "@sparktest/core"
-import type { Run, Definition, Executor } from "@sparktest/core/types"
-import { storage } from "@sparktest/storage-service"
+import { formatDistanceToNow } from "@tatou/core"
+import type { Run, Definition, Executor } from "@tatou/core/types"
+import { storage } from "@tatou/storage-service"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 
 // Component to show live duration for running tests

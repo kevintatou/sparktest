@@ -1,7 +1,7 @@
 // components/sidebar/navigation-item.tsx
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import type { NavigationItem } from "@sparktest/core/constants/navigation"
+import type { NavigationItem } from "@tatou/core/constants/navigation"
 
 interface Props {
   item: NavigationItem

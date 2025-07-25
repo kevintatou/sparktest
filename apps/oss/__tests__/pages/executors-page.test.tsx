@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import ExecutorsPage from '@/app/executors/page'
-import { storage } from '@sparktest/storage-service'
-import type { Executor } from '@sparktest/core/types'
+import { storage } from '@tatou/storage-service'
+import type { Executor } from '@tatou/core/types'
 
 // Mock the storage service
-vi.mock('@sparktest/storage-service', () => ({
+vi.mock('@tatou/storage-service', () => ({
   storage: {
     getExecutors: vi.fn(),
     deleteExecutor: vi.fn(),
@@ -27,7 +27,7 @@ vi.mock('next/link', () => ({
 }))
 
 // Mock formatDistanceToNow
-vi.mock('@sparktest/core', () => ({
+vi.mock('@tatou/core', () => ({
   formatDistanceToNow: vi.fn(() => '3 hours ago')
 }))
 
