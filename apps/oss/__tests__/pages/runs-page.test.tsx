@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { render, screen, fireEvent, waitFor } from "../test-utils"
 import { vi, describe, it, expect, beforeEach } from "vitest"
 import TestRunsPage from "@/app/runs/page"
 import { storage } from "@tatou/storage-service"

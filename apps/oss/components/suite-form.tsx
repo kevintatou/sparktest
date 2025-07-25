@@ -27,7 +27,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@tatou/storage-service"
-import type { TestSuite, Definition } from "@tatou/core/types"
+import type { Definition, Suite } from "@tatou/core/types"
 import { Autocomplete } from "@/components/ui/autocomplete"
 
 interface SuiteFormProps {

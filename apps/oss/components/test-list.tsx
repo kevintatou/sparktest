@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { storage } from "@tatou/storage-service"
 import { formatDistanceToNow } from "@tatou/core"
-import type { Test } from "@tatou/core/types"
+import type { Run } from "@tatou/core/types"
 
 export function TestList() {
   const [tests, setTests] = useState<Run[]>([])

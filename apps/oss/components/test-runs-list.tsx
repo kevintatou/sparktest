@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { storage } from "@tatou/storage-service"
+import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,7 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { Run } from "@tatou/core"
 import { useRouter } from "next/navigation"
 import { useRuns, useCreateRun } from "@/hooks/use-queries"
 

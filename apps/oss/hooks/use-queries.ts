@@ -1,9 +1,9 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { storage } from "@sparktest/storage-service"
+import { storage } from "@tatou/storage-service"
 import { useToast } from "@/components/ui/use-toast"
-import type { Suite } from "@sparktest/core/types"
+import type { Suite } from "@tatou/core/types"
 
 // Query keys
 export const queryKeys = {

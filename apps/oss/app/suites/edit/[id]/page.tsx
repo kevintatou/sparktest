@@ -6,8 +6,8 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SuiteForm } from "@/components/suite-form"
 import { useToast } from "@/components/ui/use-toast"
-import type { TestSuite } from "@tatou/core/types"
 import { storage } from "@tatou/storage-service"
+import type { Suite } from "@tatou/core/types"
 
 export default function EditSuitePage({ params }: { params: { id: string } }) {
   const { id } = params

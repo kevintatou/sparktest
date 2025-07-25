@@ -17,8 +17,8 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@tatou/storage-service"
 import { formatDistanceToNow } from "@tatou/core/utils"
+import type { Definition } from "@tatou/core/types"
 import { TestDefinitionTestModal } from "@/components/test-definition-test-modal"
-import type { TestDefinition } from "@tatou/core/types"
 
 // Map of icons for different test types
 // const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -255,7 +255,7 @@ export function DefinitionCards() {
       </div>
 
       {selectedTest && (
-        <DefinitionTestModal
+        <TestDefinitionTestModal
           isOpen={testModalOpen}
           onClose={() => {
             setTestModalOpen(false)

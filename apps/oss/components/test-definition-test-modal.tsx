@@ -15,7 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { formatDistanceToNow } from "@tatou/core/utils"
-import type { TestDefinition } from "@tatou/core/types"
+import type { Definition } from "@tatou/core/types"
 
 interface TestResult {
   success: boolean
