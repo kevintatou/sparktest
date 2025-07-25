@@ -1,4 +1,14 @@
-import { Home, Play, FileText, Layers, Cpu, PlayCircle, FileTextIcon, LayersIcon, CpuIcon } from "lucide-react"
+import {
+  Home,
+  Play,
+  FileText,
+  Layers,
+  Cpu,
+  PlayCircle,
+  FileTextIcon,
+  LayersIcon,
+  CpuIcon,
+} from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 export interface NavigationItem {

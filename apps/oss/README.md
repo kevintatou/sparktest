@@ -19,11 +19,11 @@
 
 ## 🛠 Tech Stack
 
-| Layer      | Tech                                      |
-|------------|-------------------------------------------|
-| Frontend   | Next.js 14 App Router, Tailwind, shadcn/ui |
-| Backend    | Rust (Axum, SQLx, Kubernetes)             |
-| Database   | PostgreSQL (optional in mock mode)        |
+| Layer    | Tech                                       |
+| -------- | ------------------------------------------ |
+| Frontend | Next.js 14 App Router, Tailwind, shadcn/ui |
+| Backend  | Rust (Axum, SQLx, Kubernetes)              |
+| Database | PostgreSQL (optional in mock mode)         |
 
 ---
 
@@ -35,6 +35,7 @@
 git clone https://github.com/YOUR_ORG/sparktest
 cd sparktest
 npm install
+```
 ````
 
 ### 2. Start Dev Server
@@ -117,9 +118,10 @@ components/                   # shared UI
     "description": "Postman API tests"
   }
 ]
-
 ```
+
 ## 🧱 Database Schema (Rust) (Missing suites!!!!!!!!!)
+
 ```sql
 CREATE TABLE
   public.test_definitions (
@@ -136,39 +138,41 @@ ALTER TABLE
 ADD
   CONSTRAINT test_definitions_pkey PRIMARY KEY (id)
 ```
+
 CREATE TABLE
-  public.test_executors (
-    id uuid NOT NULL,
-    name text NOT NULL,
-    description text NULL,
-    image text NOT NULL,
-    default_command text NOT NULL,
-    supported_file_types text[] NOT NULL,
-    environment_variables text[] NOT NULL DEFAULT ARRAY[]::text[],
-    icon text NULL
-  );
+public.test_executors (
+id uuid NOT NULL,
+name text NOT NULL,
+description text NULL,
+image text NOT NULL,
+default_command text NOT NULL,
+supported_file_types text[] NOT NULL,
+environment_variables text[] NOT NULL DEFAULT ARRAY[]::text[],
+icon text NULL
+);
 
 ALTER TABLE
-  public.test_executors
+public.test_executors
 ADD
-  CONSTRAINT test_executors_pkey PRIMARY KEY (id)
+CONSTRAINT test_executors_pkey PRIMARY KEY (id)
 CREATE TABLE
-  public.test_runs (
-    id uuid NOT NULL DEFAULT gen_random_uuid (),
-    name text NOT NULL,
-    image text NOT NULL,
-    command text[] NOT NULL,
-    status text NOT NULL,
-    created_at timestamp with time zone NULL DEFAULT now(),
-    duration integer NULL,
-    logs text[] NULL,
-    test_definition_id uuid NULL
-  );
+public.test_runs (
+id uuid NOT NULL DEFAULT gen_random_uuid (),
+name text NOT NULL,
+image text NOT NULL,
+command text[] NOT NULL,
+status text NOT NULL,
+created_at timestamp with time zone NULL DEFAULT now(),
+duration integer NULL,
+logs text[] NULL,
+test_definition_id uuid NULL
+);
 
 ALTER TABLE
-  public.test_runs
+public.test_runs
 ADD
-  CONSTRAINT test_runs_pkey PRIMARY KEY (id)
+CONSTRAINT test_runs_pkey PRIMARY KEY (id)
+
 ---
 
 ## 🧾 API Endpoints (Rust)

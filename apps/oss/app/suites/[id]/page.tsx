@@ -8,14 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
-import { formatDistanceToNow } from "@sparktest/core"
-import { storage } from "@sparktest/storage-service"
-import type { TestSuite, Definition } from "@sparktest/core/types"
+import { formatDistanceToNow } from "@tatou/core"
+import { storage } from "@tatou/storage-service"
+import type { Definition, Suite } from "@tatou/core/types"
 
 export default function SuiteDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { toast } = useToast()
-  const [suite, setSuite] = useState<TestSuite | null>(null)
+  const [suite, setSuite] = useState<Suite | null>(null)
   const [definitions, setDefinitions] = useState<Definition[]>([])
   const [isRunning, setIsRunning] = useState(false)
 
@@ -23,7 +23,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
     const loadSuiteAndDefinitions = async () => {
       try {
         // Load the suite from storage
-        const loadedSuite = await storage.getTestSuiteById(id)
+        const loadedSuite = await storage.getSuiteById(id)
         if (!loadedSuite) {
           toast({
             title: "Suite not found",
@@ -32,12 +32,12 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
           })
           return
         }
-        
+
         setSuite(loadedSuite)
-        
+
         // Load the definitions for this suite
         const allDefs = await storage.getDefinitions()
-        const suiteDefinitions = allDefs.filter((def) => 
+        const suiteDefinitions = allDefs.filter((def) =>
           loadedSuite.testDefinitionIds.includes(def.id)
         )
         setDefinitions(suiteDefinitions)
@@ -50,7 +50,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
         })
       }
     }
-    
+
     loadSuiteAndDefinitions()
   }, [id, toast])
 
@@ -60,12 +60,12 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
     setIsRunning(true)
     try {
       // Get all test definitions in the suite
-      const validDefinitions = definitions.filter(def => def !== undefined)
-      
+      const validDefinitions = definitions.filter((def) => def !== undefined)
+
       if (validDefinitions.length === 0) {
         throw new Error("No valid test definitions found in suite")
       }
-      
+
       // Create runs for each definition based on execution mode
       if (suite.executionMode === "sequential") {
         // Run tests one after another
@@ -74,9 +74,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
         }
       } else {
         // Run tests in parallel
-        await Promise.all(
-          validDefinitions.map(def => storage.createRun(def.id))
-        )
+        await Promise.all(validDefinitions.map((def) => storage.createRun(def.id)))
       }
 
       toast({
@@ -136,7 +134,14 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
                   fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
                   <path
                     className="opacity-75"
                     fill="currentColor"

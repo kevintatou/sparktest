@@ -3,7 +3,7 @@
  * This service tries API first and falls back to localStorage on failure
  */
 
-import type { ChangeEvent, GenericStorageService, StorageConfig } from './storage'
+import type { ChangeEvent, GenericStorageService, StorageConfig } from "./storage"
 
 export class GenericHybridStorageService<T> implements GenericStorageService<T> {
   private apiStorage: GenericStorageService<T>
@@ -27,18 +27,18 @@ export class GenericHybridStorageService<T> implements GenericStorageService<T> 
     try {
       return await apiMethod()
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      
+      const errorMessage = error instanceof Error ? error.message : "Unknown error"
+
       if (this.config.onFallback) {
         this.config.onFallback(errorMessage)
       } else {
-        console.warn('API call failed, falling back to local storage:', error)
+        console.warn("API call failed, falling back to local storage:", error)
       }
-      
+
       if (this.config.onError) {
-        this.config.onError(error as Error, 'API call failed')
+        this.config.onError(error as Error, "API call failed")
       }
-      
+
       return await fallbackMethod()
     }
   }
@@ -75,19 +75,19 @@ export class GenericHybridStorageService<T> implements GenericStorageService<T> 
     // Try API subscription first, fallback to local storage if it fails
     try {
       const unsub = this.apiStorage.subscribe(callback)
-      if (typeof unsub === 'function') return unsub
+      if (typeof unsub === "function") return unsub
       // If API returns null/undefined, fallback
       return this.localStorage.subscribe(callback)
     } catch (error) {
       if (this.config.onFallback) {
-        this.config.onFallback('API subscription failed')
+        this.config.onFallback("API subscription failed")
       } else {
-        console.warn('API subscription failed, falling back to local storage:', error)
+        console.warn("API subscription failed, falling back to local storage:", error)
       }
-      
+
       try {
         const unsub = this.localStorage.subscribe(callback)
-        if (typeof unsub === 'function') return unsub
+        if (typeof unsub === "function") return unsub
       } catch (err) {
         // Both failed, return a no-op
         return () => {}

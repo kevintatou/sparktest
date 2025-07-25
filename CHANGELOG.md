@@ -1,4 +1,5 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -6,8 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [v0.1.0] - 2025-07-18
+## [v0.2.0] - 2024-12-19
+
 ### Added
+
+- Tagged new minor version for release
+
+## [v0.1.0] - 2025-07-18
+
+### Added
+
 - **Initial OSS release** of SparkTest with a modular foundation
 - **Frontend app (`apps/oss`)**:
   - Dashboard for managing test definitions, executors, and runs
@@ -27,11 +36,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - Rust Cargo workspace planned (split into `core`, `api`, `bin`)
 
 ### Changed
+
 - Removed legacy “test-” prefix from orchestration models and routes
 - Improved UI layout and loading states (spinners, input focus)
 
-
 ---
 
-[Unreleased]: https://github.com/kevintatou/sparktest/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kevintatou/sparktest/compare/v0.2.0...HEAD
+[v0.2.0]: https://github.com/kevintatou/sparktest/compare/v0.1.0...v0.2.0
 [v0.1.0]: https://github.com/kevintatou/sparktest/releases/tag/v0.1.0

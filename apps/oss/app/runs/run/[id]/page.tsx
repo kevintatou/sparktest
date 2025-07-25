@@ -6,13 +6,12 @@ import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { RunTestForm } from "@/components/run-test-form"
-import { storage } from "@sparktest/storage-service"
-import type { Definition } from "@sparktest/core/types"
+import { storage } from "@tatou/storage-service"
+import type { Definition } from "@tatou/core/types"
 
 export default function RunTestPage({ params }: { params: { id: string } }) {
   const [definition, setDefinition] = useState<Definition | undefined>(undefined)
   const [loading, setLoading] = useState(true)
-
 
   useEffect(() => {
     const loadDefinitionById = async () => {
@@ -20,7 +19,7 @@ export default function RunTestPage({ params }: { params: { id: string } }) {
         const def = await storage.getDefinitionById(params.id)
         setDefinition(def)
       } catch (error) {
-        console.error('Error loading test definition:', error)
+        console.error("Error loading test definition:", error)
       } finally {
         setLoading(false)
       }
@@ -44,7 +43,9 @@ export default function RunTestPage({ params }: { params: { id: string } }) {
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Test definition not found</h1>
-          <p className="text-muted-foreground mb-6">The test definition you are looking for does not exist.</p>
+          <p className="text-muted-foreground mb-6">
+            The test definition you are looking for does not exist.
+          </p>
           <Button asChild className="shadow-sm">
             <Link href="/runs">Go back to runs</Link>
           </Button>

@@ -6,8 +6,8 @@ import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { RunTestForm } from "@/components/run-test-form"
-import { storage } from "@sparktest/storage-service"
-import type { Definition } from "@sparktest/core/types"
+import { storage } from "@tatou/storage-service"
+import type { Definition } from "@tatou/core/types"
 
 export default function NewRunPage() {
   const [definitions, setDefinitions] = useState<Definition[]>([])
@@ -20,7 +20,7 @@ export default function NewRunPage() {
         const defs = await storage.getDefinitions()
         setDefinitions(defs)
       } catch (error) {
-        console.error('Error loading test definitions:', error)
+        console.error("Error loading test definitions:", error)
       } finally {
         setLoading(false)
       }
@@ -49,7 +49,9 @@ export default function NewRunPage() {
                 <p className="mt-4 text-muted-foreground">Loading test definitions...</p>
               </div>
             ) : definitions.length === 0 ? (
-              <p className="text-muted-foreground">No test definitions found. Create one before running tests.</p>
+              <p className="text-muted-foreground">
+                No test definitions found. Create one before running tests.
+              </p>
             ) : selected ? (
               <RunTestForm def={selected} />
             ) : (

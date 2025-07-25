@@ -1,7 +1,16 @@
 import type { StorageService } from "./storage"
 import { getFromStorage, setToStorage } from "./generic/utils"
-import type { Executor, Definition, Run, Suite, KubernetesHealth, JobLogs, JobStatus, JobDeleteResponse } from "@sparktest/core"
-import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "@sparktest/core"
+import type {
+  Executor,
+  Definition,
+  Run,
+  Suite,
+  KubernetesHealth,
+  JobLogs,
+  JobStatus,
+  JobDeleteResponse,
+} from "@tatou/core"
+import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "@tatou/core"
 
 export class LocalStorageService implements StorageService {
   async getExecutors(): Promise<Executor[]> {
@@ -91,7 +100,7 @@ export class LocalStorageService implements StorageService {
 
   async createRun(
     definitionId: string,
-    options?: { name?: string; image?: string; commands?: string[] },
+    options?: { name?: string; image?: string; commands?: string[] }
   ): Promise<Run> {
     const def = await this.getDefinitionById(definitionId)
     if (!def) throw new Error("Definition not found")
@@ -111,10 +120,10 @@ export class LocalStorageService implements StorageService {
     }
 
     const savedRun = await this.saveRun(run)
-    
+
     // Simulate test execution with automatic completion
     this.simulateTestExecution(savedRun)
-    
+
     return savedRun
   }
 
@@ -122,21 +131,21 @@ export class LocalStorageService implements StorageService {
     // Simulate realistic test execution timing (5-15 seconds)
     const executionDuration = Math.floor(Math.random() * 10000) + 5000 // 5-15 seconds
     const progressInterval = 1000 // Update logs every second
-    
+
     let elapsed = 0
-    
+
     const progressTimer = setInterval(async () => {
       elapsed += progressInterval
-      
+
       // Add progress logs
       const currentRun = await this.getRunById(run.id)
       if (!currentRun || currentRun.status !== "running") {
         clearInterval(progressTimer)
         return
       }
-      
+
       const logs = [...(currentRun.logs || [])]
-      
+
       if (elapsed <= executionDuration * 0.3) {
         logs.push(`> Setting up test environment... (${Math.floor(elapsed / 1000)}s)`)
       } else if (elapsed <= executionDuration * 0.7) {
@@ -144,14 +153,14 @@ export class LocalStorageService implements StorageService {
       } else if (elapsed < executionDuration) {
         logs.push(`> Finalizing test results... (${Math.floor(elapsed / 1000)}s)`)
       }
-      
+
       const updatedRun = {
         ...currentRun,
-        logs: logs.slice(-10) // Keep only last 10 log entries
+        logs: logs.slice(-10), // Keep only last 10 log entries
       }
-      
+
       await this.saveRun(updatedRun)
-      
+
       if (elapsed >= executionDuration) {
         clearInterval(progressTimer)
         await this.completeTestRun(run.id, executionDuration)
@@ -162,12 +171,12 @@ export class LocalStorageService implements StorageService {
   private async completeTestRun(runId: string, executionTimeMs: number): Promise<void> {
     const run = await this.getRunById(runId)
     if (!run || run.status !== "running") return
-    
+
     // Simulate 90% success rate
     const isSuccess = Math.random() > 0.1
     const endTime = new Date().toISOString()
     const durationInSeconds = Math.floor(executionTimeMs / 1000)
-    
+
     const finalLogs = [...(run.logs || [])]
     if (isSuccess) {
       finalLogs.push(`> Test completed successfully in ${durationInSeconds}s`)
@@ -176,54 +185,55 @@ export class LocalStorageService implements StorageService {
       finalLogs.push(`> Test failed after ${durationInSeconds}s`)
       finalLogs.push("> One or more assertions failed")
     }
-    
+
     const completedRun: Run = {
       ...run,
       status: isSuccess ? "completed" : "failed",
       duration: durationInSeconds,
       completed: isSuccess ? endTime : undefined,
       failed: isSuccess ? undefined : endTime,
-      logs: finalLogs
+      logs: finalLogs,
     }
-    
+
     await this.saveRun(completedRun)
   }
-  subscribeToRuns(callback: (payload: { eventType: string; new?: Run; old?: Run }) => void): () => void {
+  subscribeToRuns(
+    callback: (payload: { eventType: string; new?: Run; old?: Run }) => void
+  ): () => void {
     let previousRuns: Run[] = []
-  
+
     const interval = setInterval(async () => {
       try {
         const newRuns = await this.getRuns()
-  
+
         // INSERT
-        const inserted = newRuns.filter(r => !previousRuns.some(p => p.id === r.id))
+        const inserted = newRuns.filter((r) => !previousRuns.some((p) => p.id === r.id))
         for (const run of inserted) {
           callback({ eventType: "INSERT", new: run })
         }
-  
+
         // UPDATE
         for (const run of newRuns) {
-          const prev = previousRuns.find(p => p.id === run.id)
+          const prev = previousRuns.find((p) => p.id === run.id)
           if (prev && JSON.stringify(prev) !== JSON.stringify(run)) {
             callback({ eventType: "UPDATE", new: run })
           }
         }
-  
+
         // DELETE
-        const deleted = previousRuns.filter(r => !newRuns.some(n => n.id === r.id))
+        const deleted = previousRuns.filter((r) => !newRuns.some((n) => n.id === r.id))
         for (const run of deleted) {
           callback({ eventType: "DELETE", old: run })
         }
-  
+
         previousRuns = newRuns
       } catch (err) {
         console.error("Polling error in subscribeToRuns:", err)
       }
     }, 2000) // Poll every 2 seconds for better real-time feedback
-  
+
     return () => clearInterval(interval)
   }
-  
 
   // Suites
   async getSuites(): Promise<Suite[]> {

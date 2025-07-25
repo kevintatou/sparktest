@@ -5,12 +5,36 @@
 
 **SparkTest** is a lightweight, developer-focused test orchestrator for Kubernetes. Define tests as Docker containers, run them as Kubernetes Jobs, and view results in a clean, modern UI — no YAML editing required.
 
+## 📋 Table of Contents
+
+- [Features](#-features)
+- [Prerequisites](#-prerequisites)
+- [Tech Stack](#-tech-stack)
+- [Architecture Overview](#-architecture-overview)
+- [Quick Start](#-quick-start)
+  - [Frontend Development](#frontend-development)
+  - [Backend Development](#backend-development)
+  - [Running Tests on Kubernetes](#-want-to-run-tests-on-kubernetes)
+  - [Demo Data](#-want-to-see-demo-data)
+  - [Testing](#testing)
+- [Contributing](#-contributing)
+- [Troubleshooting](#-troubleshooting)
+- [License](#-license)
+
+---
+
+## 📋 Prerequisites
+
+**Required**: Node.js 18+, pnpm 8+, Rust 1.70+, Docker, Git  
+**Optional**: kubectl, k3d/minikube (for Kubernetes), PostgreSQL (production)  
+**System**: 4GB+ RAM, 2GB+ storage, Linux/macOS/Windows+WSL2
+
 ---
 
 ## ✨ Features
 
 - 🧪 **Test Definitions** – Reusable test configs with Docker image + command
-- ⚙️ **Executors** – Predefined runners like K6, Postman, Playwright  
+- ⚙️ **Executors** – Predefined runners like K6, Postman, Playwright
 - 🚀 **Test Runs** – Launch containerized tests as Kubernetes Jobs
 - 🧾 **Test Suites** – Group related tests and trigger them together
 - 📂 **Git-backed Definitions** – Auto-register tests from `/tests/*.json`
@@ -21,12 +45,28 @@
 
 ## 🛠 Tech Stack
 
-| Layer      | Tech                                      |
-|------------|-------------------------------------------|
-| Frontend   | Next.js 14 App Router, Tailwind, shadcn/ui |
-| Backend    | Rust (Axum), PostgreSQL, Kubernetes      |
-| Testing    | Vitest, Playwright                       |
-| CI/CD      | GitHub Actions, pnpm                     |
+| Layer    | Tech                                       |
+| -------- | ------------------------------------------ |
+| Frontend | Next.js 14 App Router, Tailwind, shadcn/ui |
+| Backend  | Rust (Axum), PostgreSQL, Kubernetes        |
+| Testing  | Vitest, Playwright                         |
+| CI/CD    | GitHub Actions, pnpm                       |
+
+---
+
+## 🏗 Architecture Overview
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │   Backend       │    │   Kubernetes    │
+│   (Next.js)     │◄──►│   (Rust/Axum)   │◄──►│   Jobs/Pods     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+- **Frontend**: Next.js 14 UI for test execution monitoring
+- **Backend**: Rust API for job orchestration and data management
+- **Kubernetes**: Native job execution with live log streaming
+- **Storage**: PostgreSQL (production), SQLite (dev), LocalStorage (demo)
 
 ---
 
@@ -35,7 +75,7 @@
 ### Frontend Development
 
 ```bash
-cd frontend
+cd apps/oss
 pnpm install
 pnpm dev
 ```
@@ -52,6 +92,7 @@ cargo run
 ### 🎯 Want to Run Tests on Kubernetes?
 
 **Quick Setup (5 minutes):**
+
 ```bash
 # Install k3d (lightweight Kubernetes)
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
@@ -63,7 +104,7 @@ k3d cluster create sparktest
 cd backend && cargo run
 ```
 
-Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI! 
+Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI!
 
 📚 [More details in the Kubernetes guide](backend/KUBERNETES.md)
 
@@ -80,21 +121,87 @@ SparkTest includes comprehensive demo data with realistic testing scenarios:
 ### Testing
 
 ```bash
-cd frontend
+cd apps/oss
 pnpm test          # Run unit tests
-pnpm test:coverage # Run tests with coverage
+pnpm test:coverage # Run with coverage
 pnpm lint          # Run ESLint
-pnpm type-check    # Run TypeScript checks
+pnpm type-check    # TypeScript checks
 ```
 
 ---
 
-## 👐 Contributing
+## 🤝 Contributing
 
-1. Fork this repo
-2. Create a new branch
-3. Test both mock + Rust API modes
-4. Submit a pull request
+### Quick Start
+
+1. Fork and clone the repository
+2. Set up development environment
+3. Make changes following code standards
+4. Test thoroughly in mock and Kubernetes modes
+5. Submit pull request with clear description
+
+### Development Setup
+
+```bash
+# Clone and install dependencies
+git clone https://github.com/YOUR_USERNAME/sparktest.git
+cd sparktest && pnpm install && pnpm build:packages
+
+# Frontend development
+cd apps/oss && pnpm dev
+
+# Backend development (separate terminal)
+cd backend && cargo run
+
+# Kubernetes (optional)
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+k3d cluster create sparktest-dev
+```
+
+### Code Standards
+
+- **TypeScript**: Use TypeScript, Prettier, ESLint, functional components
+- **Rust**: Use rustfmt, Clippy, comprehensive tests, proper error handling
+- **General**: Clear commit messages, atomic commits, update docs, add tests
+
+### Testing
+
+```bash
+# Frontend
+pnpm test && pnpm lint && pnpm type-check
+
+# Backend
+cargo test && cargo clippy
+```
+
+### Pull Request Requirements
+
+- Update from main and resolve conflicts
+- All tests pass (frontend + backend)
+- Test manually in mock and API modes
+- Clear description linking related issues
+- Screenshots for UI changes
+
+### Issue Reporting
+
+**Bugs**: Steps to reproduce, expected vs actual behavior, environment details  
+**Features**: Clear description, use case, possible implementation approach
+
+For help: [Discussions](https://github.com/kevintatou/sparktest/discussions) | [Issues](https://github.com/kevintatou/sparktest/issues)
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Frontend**: Module not found → `pnpm clean && pnpm build:packages && pnpm dev`  
+**TypeScript errors**: Clear cache → `rm -rf .next node_modules/.cache && pnpm install`  
+**Backend**: Compilation errors → `cargo clean && cargo build`  
+**Kubernetes**: Jobs not appearing → `kubectl cluster-info && kubectl get jobs -A`  
+**Tests failing**: Clear browser cache, restart servers, check port conflicts
+
+For more help: [Issues](https://github.com/kevintatou/sparktest/issues) | [Discussions](https://github.com/kevintatou/sparktest/discussions)
 
 ---
 

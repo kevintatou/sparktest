@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { cn } from "@/lib/utils"
-import { formatDate, formatDistanceToNow, getFromStorage, setToStorage } from "@sparktest/core"
+import { formatDate, formatDistanceToNow, getFromStorage, setToStorage } from "@tatou/core"
 
 describe("utils", () => {
   describe("cn", () => {
@@ -27,7 +27,7 @@ describe("utils", () => {
     it("should format date string correctly", () => {
       const dateString = "2023-12-25T10:30:00Z"
       const result = formatDate(dateString)
-      
+
       // Should contain basic components (timezone-agnostic)
       expect(result).toMatch(/Dec|12/)
       expect(result).toMatch(/25/)
@@ -40,7 +40,7 @@ describe("utils", () => {
     it("should handle ISO date strings", () => {
       const dateString = "2023-01-01T00:00:00.000Z"
       const result = formatDate(dateString)
-      
+
       expect(result).toMatch(/Jan|1/)
       expect(result).toMatch(/2023/)
     })
@@ -58,70 +58,70 @@ describe("utils", () => {
     it("should format seconds correctly", () => {
       const now = new Date("2023-12-25T10:30:00Z")
       vi.setSystemTime(now)
-      
+
       const thirtySecondsAgo = new Date("2023-12-25T10:29:30Z").toISOString()
       const result = formatDistanceToNow(thirtySecondsAgo)
-      
+
       expect(result).toBe("30 seconds ago")
     })
 
     it("should format minutes correctly", () => {
       const now = new Date("2023-12-25T10:30:00Z")
       vi.setSystemTime(now)
-      
+
       const fiveMinutesAgo = new Date("2023-12-25T10:25:00Z").toISOString()
       const result = formatDistanceToNow(fiveMinutesAgo)
-      
+
       expect(result).toBe("5 minutes ago")
     })
 
     it("should format single minute correctly", () => {
       const now = new Date("2023-12-25T10:30:00Z")
       vi.setSystemTime(now)
-      
+
       const oneMinuteAgo = new Date("2023-12-25T10:29:00Z").toISOString()
       const result = formatDistanceToNow(oneMinuteAgo)
-      
+
       expect(result).toBe("1 minute ago")
     })
 
     it("should format hours correctly", () => {
       const now = new Date("2023-12-25T10:30:00Z")
       vi.setSystemTime(now)
-      
+
       const threeHoursAgo = new Date("2023-12-25T07:30:00Z").toISOString()
       const result = formatDistanceToNow(threeHoursAgo)
-      
+
       expect(result).toBe("3 hours ago")
     })
 
     it("should format single hour correctly", () => {
       const now = new Date("2023-12-25T10:30:00Z")
       vi.setSystemTime(now)
-      
+
       const oneHourAgo = new Date("2023-12-25T09:30:00Z").toISOString()
       const result = formatDistanceToNow(oneHourAgo)
-      
+
       expect(result).toBe("1 hour ago")
     })
 
     it("should format days correctly", () => {
       const now = new Date("2023-12-25T10:30:00Z")
       vi.setSystemTime(now)
-      
+
       const twoDaysAgo = new Date("2023-12-23T10:30:00Z").toISOString()
       const result = formatDistanceToNow(twoDaysAgo)
-      
+
       expect(result).toBe("2 days ago")
     })
 
     it("should format single day correctly", () => {
       const now = new Date("2023-12-25T10:30:00Z")
       vi.setSystemTime(now)
-      
+
       const oneDayAgo = new Date("2023-12-24T10:30:00Z").toISOString()
       const result = formatDistanceToNow(oneDayAgo)
-      
+
       expect(result).toBe("1 day ago")
     })
   })
@@ -137,7 +137,7 @@ describe("utils", () => {
     beforeEach(() => {
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
-        writable: true
+        writable: true,
       })
       vi.clearAllMocks()
     })
@@ -203,7 +203,10 @@ describe("utils", () => {
         const value = { test: "data" }
         setToStorage("test-key", value)
 
-        expect(consoleSpy).toHaveBeenCalledWith("Failed to save to localStorage:", expect.any(Error))
+        expect(consoleSpy).toHaveBeenCalledWith(
+          "Failed to save to localStorage:",
+          expect.any(Error)
+        )
         consoleSpy.mockRestore()
       })
 

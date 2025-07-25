@@ -13,30 +13,39 @@ import { CreateOptionComponent } from "./sidebar/create-option"
 
 export function SimpleSidebar() {
   const pathname = usePathname()
-  const { isCreateOpen, setIsCreateOpen, dropdownRef, isMobile, isMobileMenuOpen, setIsMobileMenuOpen } = useSidebar()
+  const {
+    isCreateOpen,
+    setIsCreateOpen,
+    dropdownRef,
+    isMobile,
+    isMobileMenuOpen,
+    setIsMobileMenuOpen,
+  } = useSidebar()
 
   return (
     <>
       {/* Mobile Overlay */}
       {isMobile && isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden" 
+        <div
+          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
-      
+
       {/* Sidebar */}
-      <div className={cn(
-        "flex h-full flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 transition-all duration-300 ease-in-out",
-        // Desktop: always visible with fixed width
-        "lg:w-16 lg:relative lg:translate-x-0",
-        // Mobile: overlay with conditional visibility and width
-        isMobile ? (
-          isMobileMenuOpen 
-            ? "fixed left-0 top-0 z-50 w-64 translate-x-0" 
-            : "fixed left-0 top-0 z-50 w-64 -translate-x-full"
-        ) : "w-16"
-      )}>
+      <div
+        className={cn(
+          "flex h-full flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 transition-all duration-300 ease-in-out",
+          // Desktop: always visible with fixed width
+          "lg:w-16 lg:relative lg:translate-x-0",
+          // Mobile: overlay with conditional visibility and width
+          isMobile
+            ? isMobileMenuOpen
+              ? "fixed left-0 top-0 z-50 w-64 translate-x-0"
+              : "fixed left-0 top-0 z-50 w-64 -translate-x-full"
+            : "w-16"
+        )}
+      >
         {/* Logo Section */}
         <SidebarLogo />
 
@@ -67,7 +76,9 @@ export function SimpleSidebar() {
                 size="sm"
                 className={cn(
                   "relative transition-colors",
-                  isMobile && isMobileMenuOpen ? "w-full h-10 justify-start gap-3" : "w-10 h-10 p-0",
+                  isMobile && isMobileMenuOpen
+                    ? "w-full h-10 justify-start gap-3"
+                    : "w-10 h-10 p-0",
                   isCreateOpen
                     ? "bg-blue-700 text-white shadow-lg"
                     : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
@@ -96,9 +107,9 @@ export function SimpleSidebar() {
               )}
             >
               {CREATE_OPTIONS.map((option) => (
-                <CreateOptionComponent 
-                  key={option.name} 
-                  option={option} 
+                <CreateOptionComponent
+                  key={option.name}
+                  option={option}
                   onClose={() => {
                     setIsCreateOpen(false)
                     if (isMobile) setIsMobileMenuOpen(false)

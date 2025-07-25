@@ -4,7 +4,7 @@ import { useSidebar } from "@/hooks/use-sidebar"
 
 // Mock the useIsMobile hook
 vi.mock("@/hooks/use-mobile", () => ({
-  useIsMobile: () => false
+  useIsMobile: () => false,
 }))
 
 describe("useSidebar", () => {

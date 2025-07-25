@@ -6,8 +6,8 @@ import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { RunDetails } from "@/components/run-details"
-import { storage } from "@sparktest/storage-service"
-import type { Run } from "@sparktest/core/types"
+import { storage } from "@tatou/storage-service"
+import type { Run } from "@tatou/core/types"
 
 export default function TestDetailsPage({ params }: { params: { id: string } }) {
   const [run, setRun] = useState<Run | undefined>(undefined)
@@ -19,14 +19,13 @@ export default function TestDetailsPage({ params }: { params: { id: string } }) 
         const runData = await storage.getRunById(params.id)
         setRun(runData)
       } catch (error) {
-        console.error('Error loading test run:', error)
+        console.error("Error loading test run:", error)
       } finally {
         setLoading(false)
       }
     }
     loadDefinitionById()
   }, [params.id])
-
 
   if (loading) {
     return (

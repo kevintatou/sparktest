@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest"
-import { ApiStorageService } from "@sparktest/storage-service/api-storage"
+import { ApiStorageService } from "@tatou/storage-service/api-storage"
 
 // Mock fetch
 const mockFetch = vi.fn()
@@ -42,11 +42,11 @@ describe("ApiStorageService", () => {
 
   describe("saveExecutor", () => {
     it("should save executor via API", async () => {
-      const mockExecutor = { 
-        id: "1", 
+      const mockExecutor = {
+        id: "1",
         name: "Test Executor",
         image: "test:latest",
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       }
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -64,11 +64,11 @@ describe("ApiStorageService", () => {
     })
 
     it("should throw error when save fails", async () => {
-      const mockExecutor = { 
-        id: "1", 
+      const mockExecutor = {
+        id: "1",
         name: "Test Executor",
         image: "test:latest",
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       }
       mockFetch.mockResolvedValueOnce({
         ok: false,
@@ -87,7 +87,7 @@ describe("ApiStorageService", () => {
       const result = await service.deleteExecutor("1")
 
       expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-executors/1", {
-        method: "DELETE"
+        method: "DELETE",
       })
       expect(result).toBe(true)
     })
@@ -107,7 +107,7 @@ describe("ApiStorageService", () => {
     it("should return specific executor by id", async () => {
       const executors = [
         { id: "1", name: "Executor 1", image: "test1:latest", createdAt: new Date().toISOString() },
-        { id: "2", name: "Executor 2", image: "test2:latest", createdAt: new Date().toISOString() }
+        { id: "2", name: "Executor 2", image: "test2:latest", createdAt: new Date().toISOString() },
       ]
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -157,13 +157,13 @@ describe("ApiStorageService", () => {
 
     describe("saveDefinition", () => {
       it("should save definition via API", async () => {
-        const mockDefinition = { 
-          id: "1", 
+        const mockDefinition = {
+          id: "1",
           name: "Test Definition",
           description: "Test desc",
           image: "test:latest",
           commands: ["echo", "hello"],
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         }
         mockFetch.mockResolvedValueOnce({
           ok: true,
@@ -184,22 +184,22 @@ describe("ApiStorageService", () => {
         // What frontend sends (no id)
         const frontendDefinition = {
           name: "Test Definition",
-          description: "Test desc", 
+          description: "Test desc",
           image: "test:latest",
           commands: ["echo", "hello"],
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         }
-        
+
         // What backend returns (with generated id)
         const backendResponse = {
           id: "generated-uuid-123",
           name: "Test Definition",
           description: "Test desc",
-          image: "test:latest", 
+          image: "test:latest",
           commands: ["echo", "hello"],
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         }
-        
+
         mockFetch.mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve(backendResponse),
@@ -212,25 +212,38 @@ describe("ApiStorageService", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(frontendDefinition),
         })
-        expect(result).toEqual(backendResponse)
-        expect(result.id).toBe("generated-uuid-123") // Verify ID was generated
-      })
-
-      it("should handle 422 error gracefully", async () => {
-        const mockDefinition = { 
+        expect(result).toEqual({
+          id: "generated-uuid-123",
           name: "Test Definition",
           description: "Test desc",
           image: "test:latest",
           commands: ["echo", "hello"],
-          createdAt: new Date().toISOString()
+          createdAt: backendResponse.created_at,
+          executorId: undefined,
+          variables: undefined,
+          labels: undefined,
+          source: undefined,
+        })
+        expect(result.id).toBe("generated-uuid-123") // Verify ID was generated
+      })
+
+      it("should handle 422 error gracefully", async () => {
+        const mockDefinition = {
+          name: "Test Definition",
+          description: "Test desc",
+          image: "test:latest",
+          commands: ["echo", "hello"],
+          createdAt: new Date().toISOString(),
         }
-        
+
         mockFetch.mockResolvedValueOnce({
           ok: false,
           status: 422,
         })
 
-        await expect(service.saveDefinition(mockDefinition as any)).rejects.toThrow("Failed to save definition")
+        await expect(service.saveDefinition(mockDefinition as any)).rejects.toThrow(
+          "Failed to save definition"
+        )
       })
     })
 
@@ -249,7 +262,14 @@ describe("ApiStorageService", () => {
     describe("getDefinitionById", () => {
       it("should return specific definition by id", async () => {
         const definitions = [
-          { id: "1", name: "Definition 1", description: "desc1", image: "test1:latest", commands: ["echo"], createdAt: new Date().toISOString() }
+          {
+            id: "1",
+            name: "Definition 1",
+            description: "desc1",
+            image: "test1:latest",
+            commands: ["echo"],
+            createdAt: new Date().toISOString(),
+          },
         ]
         mockFetch.mockResolvedValueOnce({
           ok: true,
@@ -266,8 +286,12 @@ describe("ApiStorageService", () => {
   describe("runs", () => {
     describe("getRuns", () => {
       it("should fetch runs from API", async () => {
-        const mockRuns = [{ id: "1", name: "Test Run", status: "running", created_at: "2025-07-07T08:20:00.000Z" }]
-        const expectedRuns = [{ id: "1", name: "Test Run", status: "running", createdAt: "2025-07-07T08:20:00.000Z" }]
+        const mockRuns = [
+          { id: "1", name: "Test Run", status: "running", created_at: "2025-07-07T08:20:00.000Z" },
+        ]
+        const expectedRuns = [
+          { id: "1", name: "Test Run", status: "running", createdAt: "2025-07-07T08:20:00.000Z" },
+        ]
         mockFetch.mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve(mockRuns),
@@ -291,9 +315,23 @@ describe("ApiStorageService", () => {
     describe("getRunById", () => {
       it("should return specific run by id", async () => {
         const runs = [
-          { id: "1", name: "Run 1", image: "test1:latest", command: ["echo"], status: "running", created_at: "2025-07-07T08:20:00.000Z" }
+          {
+            id: "1",
+            name: "Run 1",
+            image: "test1:latest",
+            command: ["echo"],
+            status: "running",
+            created_at: "2025-07-07T08:20:00.000Z",
+          },
         ]
-        const expectedRun = { id: "1", name: "Run 1", image: "test1:latest", command: ["echo"], status: "running", createdAt: "2025-07-07T08:20:00.000Z" }
+        const expectedRun = {
+          id: "1",
+          name: "Run 1",
+          image: "test1:latest",
+          command: ["echo"],
+          status: "running",
+          createdAt: "2025-07-07T08:20:00.000Z",
+        }
         mockFetch.mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve(runs),
@@ -320,12 +358,12 @@ describe("ApiStorageService", () => {
     describe("createRun", () => {
       it("should create new run via API", async () => {
         const mockRun = {
-          id: "1", 
+          id: "1",
           name: "Test Run",
-          image: "test:latest", 
-          command: ["echo"], 
-          status: "running", 
-          createdAt: new Date().toISOString()
+          image: "test:latest",
+          command: ["echo"],
+          status: "running",
+          createdAt: new Date().toISOString(),
         }
         mockFetch.mockResolvedValueOnce({
           ok: true,
@@ -339,7 +377,7 @@ describe("ApiStorageService", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             test_definition_id: "def1",
-            name: "Custom Run"
+            name: "Custom Run",
           }),
         })
         expect(result).toEqual(mockRun)
@@ -392,17 +430,17 @@ describe("ApiStorageService", () => {
         status: "pending",
         createdAt: new Date().toISOString(),
         definitionId: "def123",
-        executorId: "exec456"
+        executorId: "exec456",
       }
-      
+
       const expectedPayload = {
         name: "Test Run",
-        image: "test:latest", 
+        image: "test:latest",
         command: ["echo", "hello"],
         status: "pending",
         created_at: newRun.createdAt,
         definition_id: "def123",
-        executor_id: "exec456"
+        executor_id: "exec456",
       }
 
       const savedRun = { id: "run123", ...newRun }
@@ -430,9 +468,9 @@ describe("ApiStorageService", () => {
         status: "completed",
         createdAt: new Date().toISOString(),
         definitionId: "def123",
-        executorId: "exec456"
+        executorId: "exec456",
       }
-      
+
       const expectedPayload = {
         id: "run123",
         name: "Updated Run",
@@ -441,7 +479,7 @@ describe("ApiStorageService", () => {
         status: "completed",
         created_at: existingRun.createdAt,
         definition_id: "def123",
-        executor_id: "exec456"
+        executor_id: "exec456",
       }
 
       mockFetch.mockResolvedValueOnce({
@@ -480,20 +518,20 @@ describe("ApiStorageService", () => {
             test_definition_ids: ["def1", "def2"],
             execution_mode: "sequential",
             created_at: "2025-07-07T10:00:00.000Z",
-            labels: ["tag1", "tag2"]
-          }
+            labels: ["tag1", "tag2"],
+          },
         ]
-        
+
         const expectedResult = [
           {
             id: "suite1",
-            name: "Test Suite 1", 
+            name: "Test Suite 1",
             description: "Suite description",
             testDefinitionIds: ["def1", "def2"],
             executionMode: "sequential",
             createdAt: "2025-07-07T10:00:00.000Z",
-            labels: ["tag1", "tag2"]
-          }
+            labels: ["tag1", "tag2"],
+          },
         ]
 
         mockFetch.mockResolvedValueOnce({
@@ -512,10 +550,10 @@ describe("ApiStorageService", () => {
           {
             id: "suite1",
             name: "Minimal Suite",
-            execution_mode: "parallel"
-          }
+            execution_mode: "parallel",
+          },
         ]
-        
+
         const expectedResult = [
           {
             id: "suite1",
@@ -524,8 +562,8 @@ describe("ApiStorageService", () => {
             testDefinitionIds: [],
             executionMode: "parallel",
             createdAt: expect.any(String),
-            labels: []
-          }
+            labels: [],
+          },
         ]
 
         mockFetch.mockResolvedValueOnce({
@@ -555,20 +593,23 @@ describe("ApiStorageService", () => {
           testDefinitionIds: ["def1", "def2"],
           executionMode: "sequential" as const,
           createdAt: "2025-07-07T10:00:00.000Z",
-          labels: ["tag1"]
+          labels: ["tag1"],
         }
 
         const expectedPayload = {
           id: "00000000-0000-0000-0000-000000000000",
           name: "New Suite",
-          description: "Suite description", 
+          description: "Suite description",
           labels: ["tag1"],
           execution_mode: "sequential",
-          test_definition_ids: ["00000000-0000-0000-0000-00000000def1", "00000000-0000-0000-0000-00000000def2"],
-          created_at: "2025-07-07T10:00:00.000Z"
+          test_definition_ids: [
+            "00000000-0000-0000-0000-00000000def1",
+            "00000000-0000-0000-0000-00000000def2",
+          ],
+          created_at: "2025-07-07T10:00:00.000Z",
         }
 
-        const savedSuite = { id: "suite123", ...newSuite }
+        const savedSuite = { ...newSuite, id: "suite123" }
         mockFetch.mockResolvedValueOnce({
           ok: true,
           json: () => Promise.resolve(savedSuite),
@@ -595,7 +636,7 @@ describe("ApiStorageService", () => {
           testDefinitionIds: ["12345678-1234-1234-1234-123456789012"], // Already UUID
           executionMode: "parallel" as const,
           createdAt: "2025-07-07T10:00:00.000Z",
-          labels: []
+          labels: [],
         }
 
         const expectedPayload = {
@@ -605,7 +646,7 @@ describe("ApiStorageService", () => {
           labels: [],
           execution_mode: "parallel",
           test_definition_ids: ["12345678-1234-1234-1234-123456789012"], // UUID preserved
-          created_at: "2025-07-07T10:00:00.000Z"
+          created_at: "2025-07-07T10:00:00.000Z",
         }
 
         mockFetch.mockResolvedValueOnce({
@@ -627,7 +668,15 @@ describe("ApiStorageService", () => {
       })
 
       it("should throw error when save fails", async () => {
-        const suite = { id: "test-suite", name: "Test Suite", executionMode: "sequential" as const, testDefinitionIds: [], createdAt: "", labels: [], description: "" }
+        const suite = {
+          id: "test-suite",
+          name: "Test Suite",
+          executionMode: "sequential" as const,
+          testDefinitionIds: [],
+          createdAt: "",
+          labels: [],
+          description: "",
+        }
         mockFetch.mockResolvedValueOnce({
           ok: false,
         })
@@ -647,7 +696,7 @@ describe("ApiStorageService", () => {
         expect(mockFetch).toHaveBeenCalledWith(
           "http://localhost:3001/api/test-suites/00000000-0000-0000-0000-00000000def1",
           expect.objectContaining({
-            method: "DELETE"
+            method: "DELETE",
           })
         )
         expect(result).toBe(true)
@@ -664,7 +713,7 @@ describe("ApiStorageService", () => {
         expect(mockFetch).toHaveBeenCalledWith(
           `http://localhost:3001/api/test-suites/${uuidId}`,
           expect.objectContaining({
-            method: "DELETE"
+            method: "DELETE",
           })
         )
         expect(result).toBe(true)
@@ -689,7 +738,7 @@ describe("ApiStorageService", () => {
           test_definition_ids: ["def1"],
           execution_mode: "sequential",
           created_at: "2025-07-07T10:00:00.000Z",
-          labels: ["tag1"]
+          labels: ["tag1"],
         }
 
         const expectedResult = {
@@ -699,7 +748,7 @@ describe("ApiStorageService", () => {
           testDefinitionIds: ["def1"],
           executionMode: "sequential",
           createdAt: "2025-07-07T10:00:00.000Z",
-          labels: ["tag1"]
+          labels: ["tag1"],
         }
 
         mockFetch.mockResolvedValueOnce({
@@ -709,7 +758,9 @@ describe("ApiStorageService", () => {
 
         const result = await service.getSuiteById("suite1")
 
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/test-suites/00000000-0000-0000-0000-000000suite1")
+        expect(mockFetch).toHaveBeenCalledWith(
+          "http://localhost:3001/api/test-suites/00000000-0000-0000-0000-000000suite1"
+        )
         expect(result).toEqual(expectedResult)
       })
 
@@ -718,7 +769,7 @@ describe("ApiStorageService", () => {
         const apiResponse = {
           id: uuidId,
           name: "UUID Suite",
-          execution_mode: "parallel"
+          execution_mode: "parallel",
         }
 
         mockFetch.mockResolvedValueOnce({
@@ -749,8 +800,8 @@ describe("ApiStorageService", () => {
           healthy: true,
           cluster_info: {
             name: "test-cluster",
-            version: "v1.25.0"
-          }
+            version: "v1.25.0",
+          },
         }
 
         mockFetch.mockResolvedValueOnce({
@@ -769,7 +820,9 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.getKubernetesHealth()).rejects.toThrow("Failed to check Kubernetes health")
+        await expect(service.getKubernetesHealth()).rejects.toThrow(
+          "Failed to check Kubernetes health"
+        )
       })
     })
 
@@ -778,7 +831,7 @@ describe("ApiStorageService", () => {
         const logsResponse = {
           job_name: "test-run-123",
           logs: "Pod started\nTest completed successfully",
-          pod_status: "Succeeded"
+          pod_status: "Succeeded",
         }
 
         mockFetch.mockResolvedValueOnce({
@@ -797,7 +850,9 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.getTestRunLogs("run123")).rejects.toThrow("Failed to fetch logs for test run run123")
+        await expect(service.getTestRunLogs("run123")).rejects.toThrow(
+          "Failed to fetch logs for test run run123"
+        )
       })
     })
 
@@ -806,7 +861,7 @@ describe("ApiStorageService", () => {
         const logsResponse = {
           job_name: "test-job-abc",
           logs: "Job execution logs here",
-          pod_status: "Running"
+          pod_status: "Running",
         }
 
         mockFetch.mockResolvedValueOnce({
@@ -816,7 +871,9 @@ describe("ApiStorageService", () => {
 
         const result = await service.getJobLogs("test-job-abc")
 
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/k8s/jobs/test-job-abc/logs")
+        expect(mockFetch).toHaveBeenCalledWith(
+          "http://localhost:3001/api/k8s/jobs/test-job-abc/logs"
+        )
         expect(result).toEqual(logsResponse)
       })
 
@@ -825,7 +882,9 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.getJobLogs("test-job-abc")).rejects.toThrow("Failed to fetch logs for job test-job-abc")
+        await expect(service.getJobLogs("test-job-abc")).rejects.toThrow(
+          "Failed to fetch logs for job test-job-abc"
+        )
       })
     })
 
@@ -836,7 +895,7 @@ describe("ApiStorageService", () => {
           status: "Running",
           active: 1,
           succeeded: 0,
-          failed: 0
+          failed: 0,
         }
 
         mockFetch.mockResolvedValueOnce({
@@ -846,7 +905,9 @@ describe("ApiStorageService", () => {
 
         const result = await service.getJobStatus("test-job-abc")
 
-        expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/k8s/jobs/test-job-abc/status")
+        expect(mockFetch).toHaveBeenCalledWith(
+          "http://localhost:3001/api/k8s/jobs/test-job-abc/status"
+        )
         expect(result).toEqual(statusResponse)
       })
 
@@ -855,7 +916,9 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.getJobStatus("test-job-abc")).rejects.toThrow("Failed to fetch status for job test-job-abc")
+        await expect(service.getJobStatus("test-job-abc")).rejects.toThrow(
+          "Failed to fetch status for job test-job-abc"
+        )
       })
     })
 
@@ -863,7 +926,7 @@ describe("ApiStorageService", () => {
       it("should delete a Kubernetes job", async () => {
         const deleteResponse = {
           success: true,
-          message: "Job deleted successfully"
+          message: "Job deleted successfully",
         }
 
         mockFetch.mockResolvedValueOnce({
@@ -874,7 +937,7 @@ describe("ApiStorageService", () => {
         const result = await service.deleteJob("test-job-abc")
 
         expect(mockFetch).toHaveBeenCalledWith("http://localhost:3001/api/k8s/jobs/test-job-abc", {
-          method: "DELETE"
+          method: "DELETE",
         })
         expect(result).toEqual(deleteResponse)
       })
@@ -884,7 +947,9 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.deleteJob("test-job-abc")).rejects.toThrow("Failed to delete job test-job-abc")
+        await expect(service.deleteJob("test-job-abc")).rejects.toThrow(
+          "Failed to delete job test-job-abc"
+        )
       })
     })
   })
@@ -897,14 +962,14 @@ describe("ApiStorageService", () => {
           name: "Test Run 1",
           status: "completed",
           created_at: "2025-07-07T10:00:00.000Z",
-          other_field: "value"
+          other_field: "value",
         },
         {
           id: "run4",
           name: "Test Run 4",
-          status: "pending", 
-          created_at: "2025-07-07T09:00:00.000Z"
-        }
+          status: "pending",
+          created_at: "2025-07-07T09:00:00.000Z",
+        },
       ]
 
       mockFetch.mockResolvedValueOnce({
@@ -923,7 +988,7 @@ describe("ApiStorageService", () => {
         name: "Test Run 1",
         status: "completed",
         createdAt: "2025-07-07T10:00:00.000Z",
-        other_field: "value"
+        other_field: "value",
       })
     })
   })

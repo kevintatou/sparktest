@@ -191,10 +191,10 @@ describe("Test Definition Utilities", () => {
     it("should handle database variations", () => {
       const test1 = { name: "Database Test", description: "Test description" }
       const test2 = { name: "DB Test", description: "Test description" }
-      
+
       const tags1 = generateTagsForTest(test1)
       const tags2 = generateTagsForTest(test2)
-      
+
       expect(tags1).toContain("database")
       expect(tags2).toContain("database")
     })
@@ -202,10 +202,10 @@ describe("Test Definition Utilities", () => {
     it("should handle security variations", () => {
       const test1 = { name: "Security Test", description: "Test description" }
       const test2 = { name: "Scan Test", description: "Test description" }
-      
+
       const tags1 = generateTagsForTest(test1)
       const tags2 = generateTagsForTest(test2)
-      
+
       expect(tags1).toContain("security")
       expect(tags2).toContain("security")
     })
@@ -213,10 +213,10 @@ describe("Test Definition Utilities", () => {
     it("should handle frontend variations", () => {
       const test1 = { name: "Frontend Test", description: "Test description" }
       const test2 = { name: "UI Test", description: "Test description" }
-      
+
       const tags1 = generateTagsForTest(test1)
       const tags2 = generateTagsForTest(test2)
-      
+
       expect(tags1).toContain("frontend")
       expect(tags2).toContain("frontend")
     })
