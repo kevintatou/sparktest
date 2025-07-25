@@ -22,8 +22,8 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
       try {
         const def = await storage.getDefinitionById(params.id)
         setDefinition(def || null)
-      } catch (error) {
-        console.error('Error loading test definition:', error)
+      } catch (_error) {
+        console.error("Error loading test definition:", _error)
       } finally {
         setLoading(false)
       }
@@ -41,7 +41,7 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
         title: "Test started",
         description: "Your test run has been created and is starting.",
       })
-    } catch (error) {
+    } catch {
       toast({
         title: "Error starting test",
         description: "Failed to create the test run.",
@@ -104,7 +104,14 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
                   fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
                   <path
                     className="opacity-75"
                     fill="currentColor"
@@ -146,7 +153,9 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
                     <Badge variant="outline" className="text-xs w-8 justify-center">
                       {index + 1}
                     </Badge>
-                    <code className="flex-1 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded text-sm">{command}</code>
+                    <code className="flex-1 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded text-sm">
+                      {command}
+                    </code>
                   </div>
                 ))}
               </div>
@@ -157,7 +166,9 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
             <Card>
               <CardHeader>
                 <CardTitle>Environment Variables</CardTitle>
-                <CardDescription>Variables that will be available during test execution</CardDescription>
+                <CardDescription>
+                  Variables that will be available during test execution
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -167,7 +178,9 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
                         {key}
                       </code>
                       <span>=</span>
-                      <code className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-sm">{value}</code>
+                      <code className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-sm">
+                        {value}
+                      </code>
                     </div>
                   ))}
                 </div>

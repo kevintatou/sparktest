@@ -9,7 +9,7 @@ export interface StorageHelpers {
 }
 
 export function getFromStorage<T>(key: string, defaultValue: T): T {
-  if (typeof window === 'undefined') return defaultValue
+  if (typeof window === "undefined") return defaultValue
   try {
     const item = localStorage.getItem(key)
     return item ? JSON.parse(item) : defaultValue
@@ -19,15 +19,15 @@ export function getFromStorage<T>(key: string, defaultValue: T): T {
 }
 
 export function setToStorage<T>(key: string, value: T): void {
-  if (typeof window === 'undefined') return
+  if (typeof window === "undefined") return
   try {
     localStorage.setItem(key, JSON.stringify(value))
   } catch (error) {
-    console.error('Failed to save to localStorage:', error)
+    console.error("Failed to save to localStorage:", error)
   }
 }
 
 export const storageUtils: StorageHelpers = {
   getFromStorage,
-  setToStorage
+  setToStorage,
 }

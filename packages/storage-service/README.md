@@ -36,7 +36,7 @@ frontend/lib/storage/
 A generic localStorage-based storage service that works with any data type.
 
 ```typescript
-import { GenericLocalStorageService, storageUtils } from './generic'
+import { GenericLocalStorageService, storageUtils } from "./generic"
 
 interface User {
   id: string
@@ -45,21 +45,21 @@ interface User {
 }
 
 const userStorage = new GenericLocalStorageService<User>(
-  'app_users',
+  "app_users",
   [], // default items
   (user) => user.id, // ID extractor
   storageUtils,
   {
-    insertMode: 'unshift', // 'push' or 'unshift'
-    maxItems: 100 // optional limit
+    insertMode: "unshift", // 'push' or 'unshift'
+    maxItems: 100, // optional limit
   }
 )
 
 // Usage
 const users = await userStorage.getItems()
-const newUser = await userStorage.saveItem({ id: '1', name: 'John', email: 'john@example.com' })
-const user = await userStorage.getItemById('1')
-await userStorage.deleteItem('1')
+const newUser = await userStorage.saveItem({ id: "1", name: "John", email: "john@example.com" })
+const user = await userStorage.getItemById("1")
+await userStorage.deleteItem("1")
 ```
 
 ### GenericApiStorageService<T>
@@ -67,23 +67,24 @@ await userStorage.deleteItem('1')
 A generic API-based storage service with request/response transformation support.
 
 ```typescript
-import { GenericApiStorageService } from './generic'
+import { GenericApiStorageService } from "./generic"
 
 const userApiStorage = new GenericApiStorageService<User>(
-  'users',
-  'http://localhost:3000/api',
+  "users",
+  "http://localhost:3000/api",
   (user) => user.id,
   {
     transformRequest: (user) => ({
       ...user,
       created_at: user.createdAt,
-      createdAt: undefined
+      createdAt: undefined,
     }),
-    transformResponse: (data) => data.map(user => ({
-      ...user,
-      createdAt: user.created_at,
-      created_at: undefined
-    }))
+    transformResponse: (data) =>
+      data.map((user) => ({
+        ...user,
+        createdAt: user.created_at,
+        created_at: undefined,
+      })),
   }
 )
 
@@ -97,16 +98,12 @@ const newUser = await userApiStorage.saveItem(user)
 A generic hybrid storage service that tries API first and falls back to localStorage.
 
 ```typescript
-import { GenericHybridStorageService } from './generic'
+import { GenericHybridStorageService } from "./generic"
 
-const hybridStorage = new GenericHybridStorageService<User>(
-  userApiStorage,
-  userLocalStorage,
-  {
-    onFallback: (reason) => console.log('Fallback triggered:', reason),
-    onError: (error, context) => console.error('Storage error:', error, context)
-  }
-)
+const hybridStorage = new GenericHybridStorageService<User>(userApiStorage, userLocalStorage, {
+  onFallback: (reason) => console.log("Fallback triggered:", reason),
+  onError: (error, context) => console.error("Storage error:", error, context),
+})
 
 // Usage - automatically handles fallback
 const users = await hybridStorage.getItems()
@@ -120,14 +117,14 @@ All storage services support real-time updates through subscriptions:
 ```typescript
 const unsubscribe = storage.subscribe((event) => {
   switch (event.eventType) {
-    case 'INSERT':
-      console.log('New item:', event.new)
+    case "INSERT":
+      console.log("New item:", event.new)
       break
-    case 'UPDATE':
-      console.log('Updated item:', event.new)
+    case "UPDATE":
+      console.log("Updated item:", event.new)
       break
-    case 'DELETE':
-      console.log('Deleted item:', event.old)
+    case "DELETE":
+      console.log("Deleted item:", event.old)
       break
   }
 })
@@ -144,19 +141,19 @@ interface StorageConfig {
   apiBaseUrl?: string
   apiTimeout?: number
   maxRetries?: number
-  
+
   // LocalStorage Configuration
   storagePrefix?: string
   maxStorageSize?: number
-  
+
   // Fallback Behavior
   fallbackTimeout?: number
   offlineThreshold?: number
-  
+
   // Data Transformation
   transformRequest?: (data: any) => any
   transformResponse?: (data: any) => any
-  
+
   // Error Handling
   onError?: (error: Error, context: string) => void
   onFallback?: (reason: string) => void
@@ -168,7 +165,7 @@ interface StorageConfig {
 The SparkTest application uses these generic storage services through the `SparkTestStorageService` class, which provides SparkTest-specific business logic while leveraging the generic storage infrastructure.
 
 ```typescript
-import { SparkTestStorageService } from './sparktest-storage'
+import { SparkTestStorageService } from "./sparktest-storage"
 
 const storage = new SparkTestStorageService()
 
@@ -185,7 +182,7 @@ These generic storage services are designed to be easily extracted to a separate
 
 - `generic/storage.ts` - Common interfaces and types
 - `generic/local-storage.ts` - Generic localStorage service
-- `generic/api-storage.ts` - Generic API storage service  
+- `generic/api-storage.ts` - Generic API storage service
 - `generic/hybrid-storage.ts` - Generic hybrid storage service
 - `generic/utils.ts` - Storage utilities
 - `generic/index.ts` - Exports

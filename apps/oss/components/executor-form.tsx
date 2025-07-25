@@ -23,11 +23,12 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
     image: existingExecutor?.image || "",
     command: existingExecutor?.command || [],
     supportedFileTypes: existingExecutor?.supportedFileTypes || [],
-    envVars: existingExecutor?.envVars || [],
+    env: existingExecutor?.env || {},
     description: existingExecutor?.description || "",
+    createdAt: existingExecutor?.createdAt || new Date().toISOString(),
   })
 
-  const handleChange = (key: keyof Executor, value: string | string[]) => {
+  const handleChange = (key: keyof Executor, value: string | string[] | Record<string, string>) => {
     setFormData({ ...formData, [key]: value })
   }
 
@@ -39,7 +40,10 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg border max-w-2xl mx-auto shadow-sm">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 bg-white p-6 rounded-lg border max-w-2xl mx-auto shadow-sm"
+    >
       {isEditMode && (
         <div>
           <Label>ID</Label>
@@ -73,39 +77,64 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
         <Label htmlFor="command">Default Command</Label>
         <Input
           id="command"
-          value={formData.command.join(", ")}
+          value={formData.command?.join(", ") || ""}
           onChange={(e) =>
-            handleChange("command", e.target.value.split(",").map((s) => s.trim()))
+            handleChange(
+              "command",
+              e.target.value.split(",").map((s) => s.trim())
+            )
           }
           placeholder="e.g. run, /scripts/test.js"
         />
-        <p className="text-xs text-muted-foreground mt-1">Comma-separated. This becomes your container&apos;s command.</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Comma-separated. This becomes your container&apos;s command.
+        </p>
       </div>
 
       <div>
         <Label htmlFor="supportedFileTypes">Supported File Types</Label>
         <Input
           id="supportedFileTypes"
-          value={formData.supportedFileTypes.join(", ")}
+          value={formData.supportedFileTypes?.join(", ") || ""}
           onChange={(e) =>
-            handleChange("supportedFileTypes", e.target.value.split(",").map((s) => s.trim()))
+            handleChange(
+              "supportedFileTypes",
+              e.target.value.split(",").map((s) => s.trim())
+            )
           }
           placeholder="e.g. json, js"
         />
-        <p className="text-xs text-muted-foreground mt-1">Comma-separated file extensions this executor supports.</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Comma-separated file extensions this executor supports.
+        </p>
       </div>
 
       <div>
-        <Label htmlFor="envVars">Environment Variables</Label>
+        <Label htmlFor="env">Environment Variables</Label>
         <Input
-          id="envVars"
-          value={formData.envVars.join(", ")}
-          onChange={(e) =>
-            handleChange("envVars", e.target.value.split(",").map((s) => s.trim()))
-          }
-          placeholder="e.g. API_KEY, DB_URL"
+          id="env"
+          value={Object.entries(formData.env || {})
+            .map(([key, value]) => `${key}=${value}`)
+            .join(", ")}
+          onChange={(e) => {
+            const envEntries = e.target.value
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+            const envObject: Record<string, string> = {}
+            envEntries.forEach((entry) => {
+              const [key, value] = entry.split("=")
+              if (key && value) {
+                envObject[key.trim()] = value.trim()
+              }
+            })
+            handleChange("env", envObject)
+          }}
+          placeholder="e.g. API_KEY=value1, DB_URL=value2"
         />
-        <p className="text-xs text-muted-foreground mt-1">Comma-separated variable names to inject into the test container.</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Comma-separated variable names to inject into the test container.
+        </p>
       </div>
 
       <div>

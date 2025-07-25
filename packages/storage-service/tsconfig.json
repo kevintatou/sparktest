@@ -13,15 +13,7 @@
     "skipLibCheck": true,
     "noEmit": false
   },
-  "include": [
-    "*.ts",
-    "generic/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
-  "references": [
-    { "path": "../core" }
-  ]
+  "include": ["*.ts", "generic/**/*.ts"],
+  "exclude": ["node_modules", "dist"],
+  "references": [{ "path": "../core" }]
 }

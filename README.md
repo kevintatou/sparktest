@@ -34,7 +34,7 @@
 ## ✨ Features
 
 - 🧪 **Test Definitions** – Reusable test configs with Docker image + command
-- ⚙️ **Executors** – Predefined runners like K6, Postman, Playwright  
+- ⚙️ **Executors** – Predefined runners like K6, Postman, Playwright
 - 🚀 **Test Runs** – Launch containerized tests as Kubernetes Jobs
 - 🧾 **Test Suites** – Group related tests and trigger them together
 - 📂 **Git-backed Definitions** – Auto-register tests from `/tests/*.json`
@@ -45,12 +45,12 @@
 
 ## 🛠 Tech Stack
 
-| Layer      | Tech                                      |
-|------------|-------------------------------------------|
-| Frontend   | Next.js 14 App Router, Tailwind, shadcn/ui |
-| Backend    | Rust (Axum), PostgreSQL, Kubernetes      |
-| Testing    | Vitest, Playwright                       |
-| CI/CD      | GitHub Actions, pnpm                     |
+| Layer    | Tech                                       |
+| -------- | ------------------------------------------ |
+| Frontend | Next.js 14 App Router, Tailwind, shadcn/ui |
+| Backend  | Rust (Axum), PostgreSQL, Kubernetes        |
+| Testing  | Vitest, Playwright                         |
+| CI/CD    | GitHub Actions, pnpm                       |
 
 ---
 
@@ -64,7 +64,7 @@
 ```
 
 - **Frontend**: Next.js 14 UI for test execution monitoring
-- **Backend**: Rust API for job orchestration and data management  
+- **Backend**: Rust API for job orchestration and data management
 - **Kubernetes**: Native job execution with live log streaming
 - **Storage**: PostgreSQL (production), SQLite (dev), LocalStorage (demo)
 
@@ -92,6 +92,7 @@ cargo run
 ### 🎯 Want to Run Tests on Kubernetes?
 
 **Quick Setup (5 minutes):**
+
 ```bash
 # Install k3d (lightweight Kubernetes)
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
@@ -103,7 +104,7 @@ k3d cluster create sparktest
 cd backend && cargo run
 ```
 
-Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI! 
+Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI!
 
 📚 [More details in the Kubernetes guide](backend/KUBERNETES.md)
 
@@ -122,7 +123,7 @@ SparkTest includes comprehensive demo data with realistic testing scenarios:
 ```bash
 cd apps/oss
 pnpm test          # Run unit tests
-pnpm test:coverage # Run with coverage  
+pnpm test:coverage # Run with coverage
 pnpm lint          # Run ESLint
 pnpm type-check    # TypeScript checks
 ```
@@ -132,13 +133,15 @@ pnpm type-check    # TypeScript checks
 ## 🤝 Contributing
 
 ### Quick Start
+
 1. Fork and clone the repository
 2. Set up development environment
 3. Make changes following code standards
-4. Test thoroughly in mock and Kubernetes modes  
+4. Test thoroughly in mock and Kubernetes modes
 5. Submit pull request with clear description
 
 ### Development Setup
+
 ```bash
 # Clone and install dependencies
 git clone https://github.com/YOUR_USERNAME/sparktest.git
@@ -156,20 +159,23 @@ k3d cluster create sparktest-dev
 ```
 
 ### Code Standards
+
 - **TypeScript**: Use TypeScript, Prettier, ESLint, functional components
 - **Rust**: Use rustfmt, Clippy, comprehensive tests, proper error handling
 - **General**: Clear commit messages, atomic commits, update docs, add tests
 
 ### Testing
+
 ```bash
 # Frontend
 pnpm test && pnpm lint && pnpm type-check
 
-# Backend  
+# Backend
 cargo test && cargo clippy
 ```
 
 ### Pull Request Requirements
+
 - Update from main and resolve conflicts
 - All tests pass (frontend + backend)
 - Test manually in mock and API modes
@@ -177,6 +183,7 @@ cargo test && cargo clippy
 - Screenshots for UI changes
 
 ### Issue Reporting
+
 **Bugs**: Steps to reproduce, expected vs actual behavior, environment details  
 **Features**: Clear description, use case, possible implementation approach
 

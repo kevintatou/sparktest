@@ -15,7 +15,7 @@ describe("Executor Selection in Test Definition", () => {
       image: "node:18",
       commands: ["npm", "test"],
       executorId: "executor-uuid-123",
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     }
 
     // Simulate backend response
@@ -23,10 +23,10 @@ describe("Executor Selection in Test Definition", () => {
       id: "test-def-uuid",
       name: "Test with Executor",
       description: "Test created with executor selection",
-      image: "node:18", 
+      image: "node:18",
       commands: ["npm", "test"],
       executor_id: "executor-uuid-123",
-      created_at: "2024-01-15T10:30:00Z"
+      created_at: "2024-01-15T10:30:00Z",
     }
 
     mockFetch.mockResolvedValueOnce({
@@ -44,11 +44,11 @@ describe("Executor Selection in Test Definition", () => {
       body: JSON.stringify(formDataWithExecutor), // Should include executorId
     })
 
-    // Verify the response includes the executor_id
+    // Verify the response includes the executor_id mapped to executorId
     expect(result).toMatchObject({
       id: "test-def-uuid",
       name: "Test with Executor",
-      executor_id: "executor-uuid-123"
+      executorId: "executor-uuid-123",
     })
   })
 
@@ -63,7 +63,7 @@ describe("Executor Selection in Test Definition", () => {
       image: "ubuntu:latest",
       commands: ["echo", "hello"],
       executorId: "", // Empty string means no executor selected
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     }
 
     const backendResponse = {
@@ -73,7 +73,7 @@ describe("Executor Selection in Test Definition", () => {
       image: "ubuntu:latest",
       commands: ["echo", "hello"],
       executor_id: null, // Backend returns null for no executor
-      created_at: "2024-01-15T10:30:00Z"
+      created_at: "2024-01-15T10:30:00Z",
     }
 
     mockFetch.mockResolvedValueOnce({
@@ -84,7 +84,7 @@ describe("Executor Selection in Test Definition", () => {
     const service = new ApiStorageService()
     const result = await service.saveDefinition(formDataWithoutExecutor as any)
 
-    expect(result.executor_id).toBeNull()
+    expect(result.executorId).toBeNull()
     expect(result.name).toBe("Custom Test")
   })
 })

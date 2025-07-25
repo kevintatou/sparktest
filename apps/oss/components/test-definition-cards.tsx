@@ -5,24 +5,31 @@ import Link from "next/link"
 import { Clock, Code, Database, Plus, Server, Shield, Play } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@tatou/storage-service"
 import { formatDistanceToNow } from "@tatou/core/utils"
+import type { Definition } from "@tatou/core/types"
 import { TestDefinitionTestModal } from "@/components/test-definition-test-modal"
-import type { TestDefinition } from "@tatou/core/types"
 
 // Map of icons for different test types
-const iconMap: Record<string, any> = {
-  api: Server,
-  frontend: Code,
-  security: Shield,
-  database: Database,
-}
+// const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+//   api: Server,
+//   frontend: Code,
+//   security: Shield,
+//   database: Database,
+// }
 
 // Function to determine icon based on test name or description
-function getIconForTest(test: TestDefinition) {
+function getIconForTest(test: Definition) {
   const testNameLower = test.name.toLowerCase()
   const descriptionLower = test.description.toLowerCase()
 
@@ -56,7 +63,7 @@ function getIconForTest(test: TestDefinition) {
 }
 
 // Function to generate tags based on test properties
-function generateTagsForTest(test: TestDefinition): string[] {
+function generateTagsForTest(test: Definition): string[] {
   const tags: string[] = []
   const testNameLower = test.name.toLowerCase()
   const descriptionLower = test.description.toLowerCase()
@@ -103,19 +110,19 @@ function generateTagsForTest(test: TestDefinition): string[] {
   return tags
 }
 
-export function TestDefinitionCards() {
+export function DefinitionCards() {
   const { toast } = useToast()
   const [runningTests, setRunningTests] = useState<string[]>([])
-  const [testDefinitions, setTestDefinitions] = useState<TestDefinition[]>([])
+  const [testDefinitions, setDefinitions] = useState<Definition[]>([])
   const [testModalOpen, setTestModalOpen] = useState(false)
-  const [selectedTest, setSelectedTest] = useState<TestDefinition | null>(null)
+  const [selectedTest, setSelectedTest] = useState<Definition | null>(null)
   const initializedRef = useRef(false)
 
   useEffect(() => {
     if (!initializedRef.current) {
       // Initialize storage on component mount
       storage.getDefinitions().then((data) => {
-        setTestDefinitions(data)
+        setDefinitions(data)
       })
       initializedRef.current = true
     }
@@ -128,7 +135,7 @@ export function TestDefinitionCards() {
       // Create a new test run in localStorage
       const definition = testDefinitions.find((def) => def.id === testId)
       if (definition) {
-        const newRun = await storage.createRun(definition)
+        const newRun = await storage.createRun(definition.id)
 
         setTimeout(() => {
           setRunningTests((prev) => prev.filter((id) => id !== testId))
@@ -150,7 +157,7 @@ export function TestDefinitionCards() {
     }
   }
 
-  const handleTestWithModal = (test: TestDefinition) => {
+  const handleTestWithModal = (test: Definition) => {
     setSelectedTest(test)
     setTestModalOpen(true)
   }
@@ -199,7 +206,11 @@ export function TestDefinitionCards() {
                     Test
                   </Button>
                 </div>
-                <Button size="sm" onClick={() => handleQuickRun(test.id)} disabled={runningTests.includes(test.id)}>
+                <Button
+                  size="sm"
+                  onClick={() => handleQuickRun(test.id)}
+                  disabled={runningTests.includes(test.id)}
+                >
                   {runningTests.includes(test.id) ? (
                     <>
                       <svg
@@ -239,7 +250,6 @@ export function TestDefinitionCards() {
               <Plus className="h-6 w-6 text-primary" />
             </div>
             <p className="text-muted-foreground text-center mb-4">Create a new test definition</p>
-
           </div>
         </Card>
       </div>

@@ -211,35 +211,45 @@ describe("SparkTestStorageService", () => {
       const mockFetch = global.fetch as any
       mockFetch.mockRejectedValueOnce(new Error("Network error"))
 
-      await expect(service.getKubernetesHealth()).rejects.toThrow("Kubernetes integration not available")
+      await expect(service.getKubernetesHealth()).rejects.toThrow(
+        "Kubernetes integration not available"
+      )
     })
 
     it("should throw error for test run logs when API fails", async () => {
       const mockFetch = global.fetch as any
       mockFetch.mockRejectedValueOnce(new Error("Network error"))
 
-      await expect(service.getTestRunLogs("run1")).rejects.toThrow("Kubernetes integration not available")
+      await expect(service.getTestRunLogs("run1")).rejects.toThrow(
+        "Kubernetes integration not available"
+      )
     })
 
     it("should throw error for job logs when API fails", async () => {
       const mockFetch = global.fetch as any
       mockFetch.mockRejectedValueOnce(new Error("Network error"))
 
-      await expect(service.getJobLogs("job1")).rejects.toThrow("Kubernetes integration not available")
+      await expect(service.getJobLogs("job1")).rejects.toThrow(
+        "Kubernetes integration not available"
+      )
     })
 
     it("should throw error for job status when API fails", async () => {
       const mockFetch = global.fetch as any
       mockFetch.mockRejectedValueOnce(new Error("Network error"))
 
-      await expect(service.getJobStatus("job1")).rejects.toThrow("Kubernetes integration not available")
+      await expect(service.getJobStatus("job1")).rejects.toThrow(
+        "Kubernetes integration not available"
+      )
     })
 
     it("should throw error for delete job when API fails", async () => {
       const mockFetch = global.fetch as any
       mockFetch.mockRejectedValueOnce(new Error("Network error"))
 
-      await expect(service.deleteJob("job1")).rejects.toThrow("Kubernetes integration not available")
+      await expect(service.deleteJob("job1")).rejects.toThrow(
+        "Kubernetes integration not available"
+      )
     })
   })
 
@@ -258,10 +268,7 @@ describe("SparkTestStorageService", () => {
         "sparktest_definitions",
         expect.any(String)
       )
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        "sparktest_runs",
-        expect.any(String)
-      )
+      expect(localStorageMock.setItem).toHaveBeenCalledWith("sparktest_runs", expect.any(String))
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         "sparktest_test_suites",
         expect.any(String)

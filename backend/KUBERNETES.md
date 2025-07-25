@@ -5,6 +5,7 @@ SparkTest can run your tests as Kubernetes Jobs and show you the logs in real-ti
 ## 🏃‍♂️ Quick Setup (5 minutes)
 
 ### Option 1: Local Development with k3d (Recommended)
+
 ```bash
 # Install k3d (lightweight Kubernetes)
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
@@ -16,7 +17,9 @@ k3d cluster create sparktest
 ```
 
 ### Option 2: Using an Existing Cluster
+
 If you already have `kubectl` working:
+
 ```bash
 # Just make sure this works:
 kubectl get pods
@@ -40,6 +43,7 @@ kubectl get pods
 ## 🔧 Authentication (It Just Works™)
 
 SparkTest automatically tries these methods in order:
+
 1. **In-cluster** (if running inside Kubernetes)
 2. **Kubeconfig** (your local `~/.kube/config`)
 3. **Environment variables** (for custom setups)
@@ -49,15 +53,18 @@ Most users don't need to worry about this!
 ## 🐛 Common Issues
 
 **"Kubernetes not available"**
+
 - Make sure `kubectl get pods` works
 - Try restarting the SparkTest backend
 
 **"Pod is pending"**
+
 - Check disk space: `kubectl describe nodes`
 - Your cluster might be out of resources
 
-**Need help?** 
-- Check the [main README](../README.md) 
+**Need help?**
+
+- Check the [main README](../README.md)
 - Open an issue on GitHub
 
 ## 🔗 API Endpoints (for developers)

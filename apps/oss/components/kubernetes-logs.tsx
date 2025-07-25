@@ -1,11 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { RefreshCw, Download, Terminal, AlertCircle, CheckCircle, XCircle, Clock } from "lucide-react"
+import {
+  RefreshCw,
+  Download,
+  Terminal,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Clock,
+} from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@tatou/storage-service"
 import type { JobLogs, KubernetesHealth } from "@tatou/core/types"
@@ -42,13 +50,13 @@ const getStatusColor = (status: string) => {
   }
 }
 
-export function KubernetesLogs({ runId, jobName, className }: KubernetesLogsProps) {
+export function KubernetesLogs({ runId, jobName: _jobName, className }: KubernetesLogsProps) {
   const { toast } = useToast()
   const [logs, setLogs] = useState<JobLogs | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [kubernetesHealth, setKubernetesHealth] = useState<KubernetesHealth | null>(null)
-  const [autoRefresh, setAutoRefresh] = useState(false)
+  const [autoRefresh] = useState(false)
 
   // Check Kubernetes health on mount
   useEffect(() => {
@@ -59,20 +67,9 @@ export function KubernetesLogs({ runId, jobName, className }: KubernetesLogsProp
         console.error("Failed to initialize Kubernetes health check:", error)
       }
     }
-    
+
     initializeHealth()
   }, [])
-
-  // Auto-refresh logs for running jobs
-  useEffect(() => {
-    if (!autoRefresh || !logs || logs.status !== "running") return
-
-    const interval = setInterval(() => {
-      fetchLogs(false) // Silent refresh
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [autoRefresh, logs?.status])
 
   const checkKubernetesHealth = async () => {
     try {
@@ -84,48 +81,52 @@ export function KubernetesLogs({ runId, jobName, className }: KubernetesLogsProp
     }
   }
 
-  const fetchLogs = async (showToast = true) => {
-    if (!kubernetesHealth?.kubernetes_connected) {
-      setError("Kubernetes is not available")
-      return
-    }
-
-    setLoading(true)
-    setError(null)
-
-    try {
-      // Try to get logs by run ID first, fallback to job name
-      const logData = await storage.getTestRunLogs(runId)
-      setLogs(logData)
-      
-      // Enable auto-refresh for running jobs
-      if (logData.status === "running") {
-        setAutoRefresh(true)
-      } else {
-        setAutoRefresh(false)
+  const fetchLogs = useCallback(
+    async (showToast = true) => {
+      if (!kubernetesHealth?.kubernetes_connected) {
+        setError("Kubernetes is not available")
+        return
       }
 
-      if (showToast) {
-        toast({
-          title: "Logs retrieved",
-          description: `Successfully fetched logs for ${logData.job_name}`,
-        })
+      try {
+        setLoading(true)
+        setError(null)
+        const jobLogs = await storage.getJobLogs(_jobName || runId)
+        setLogs(jobLogs)
+
+        if (showToast) {
+          toast({
+            title: "Logs refreshed",
+            description: "Job logs have been updated",
+          })
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Failed to fetch logs"
+        setError(errorMessage)
+        if (showToast) {
+          toast({
+            title: "Error",
+            description: errorMessage,
+            variant: "destructive",
+          })
+        }
+      } finally {
+        setLoading(false)
       }
-    } catch (error: any) {
-      const errorMessage = error.message || "Failed to fetch logs"
-      setError(errorMessage)
-      
-      if (showToast) {
-        toast({
-          title: "Error fetching logs",
-          description: errorMessage,
-          variant: "destructive",
-        })
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    [_jobName, kubernetesHealth, toast, runId]
+  )
+
+  // Auto-refresh logs for running jobs
+  useEffect(() => {
+    if (!autoRefresh || !logs || logs.status !== "running") return
+
+    const interval = setInterval(() => {
+      fetchLogs(false) // Silent refresh
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [autoRefresh, logs, fetchLogs])
 
   const downloadLogs = () => {
     if (!logs) return
@@ -158,7 +159,9 @@ export function KubernetesLogs({ runId, jobName, className }: KubernetesLogsProp
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            <span className="ml-2 text-sm text-muted-foreground">Checking Kubernetes status...</span>
+            <span className="ml-2 text-sm text-muted-foreground">
+              Checking Kubernetes status...
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -210,23 +213,13 @@ export function KubernetesLogs({ runId, jobName, className }: KubernetesLogsProp
                     {logs.status}
                   </div>
                 </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={downloadLogs}
-                  disabled={!logs.logs}
-                >
+                <Button variant="outline" size="sm" onClick={downloadLogs} disabled={!logs.logs}>
                   <Download className="h-4 w-4 mr-2" />
                   Download
                 </Button>
               </>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fetchLogs()}
-              disabled={loading}
-            >
+            <Button variant="outline" size="sm" onClick={() => fetchLogs()} disabled={loading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               {loading ? "Loading..." : "Refresh"}
             </Button>

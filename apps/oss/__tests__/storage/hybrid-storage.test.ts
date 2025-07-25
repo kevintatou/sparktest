@@ -107,7 +107,12 @@ describe("HybridStorageService", () => {
 
   describe("executors", () => {
     it("should handle saveExecutor with fallback", async () => {
-      const mockExecutor = { id: "1", name: "Test Executor", image: "test", createdAt: "2023-01-01" }
+      const mockExecutor = {
+        id: "1",
+        name: "Test Executor",
+        image: "test",
+        createdAt: "2023-01-01",
+      }
       apiInstance.saveExecutor.mockRejectedValue(new Error("Network Error"))
       localInstance.saveExecutor.mockResolvedValue(mockExecutor)
 
@@ -130,7 +135,12 @@ describe("HybridStorageService", () => {
     })
 
     it("should handle getExecutorById with fallback", async () => {
-      const mockExecutor = { id: "1", name: "Test Executor", image: "test", createdAt: "2023-01-01" }
+      const mockExecutor = {
+        id: "1",
+        name: "Test Executor",
+        image: "test",
+        createdAt: "2023-01-01",
+      }
       apiInstance.getExecutorById.mockRejectedValue(new Error("Network Error"))
       localInstance.getExecutorById.mockResolvedValue(mockExecutor)
 
@@ -213,7 +223,17 @@ describe("HybridStorageService", () => {
 
   describe("test suites", () => {
     it("should handle getSuites with fallback", async () => {
-      const mockSuites = [{ id: "1", name: "Test Suite", description: "", testDefinitionIds: [], executionMode: "sequential" as const, createdAt: "2023-01-01", labels: [] }]
+      const mockSuites = [
+        {
+          id: "1",
+          name: "Test Suite",
+          description: "",
+          testDefinitionIds: [],
+          executionMode: "sequential" as const,
+          createdAt: "2023-01-01",
+          labels: [],
+        },
+      ]
       apiInstance.getSuites.mockRejectedValue(new Error("Network Error"))
       localInstance.getSuites.mockResolvedValue(mockSuites)
 
@@ -236,7 +256,14 @@ describe("HybridStorageService", () => {
 
   describe("missing API methods with fallback", () => {
     it("should handle saveDefinition with fallback", async () => {
-      const mockDefinition = { id: "1", name: "Test Definition", description: "desc", image: "test", commands: ["echo"], createdAt: "2023-01-01" }
+      const mockDefinition = {
+        id: "1",
+        name: "Test Definition",
+        description: "desc",
+        image: "test",
+        commands: ["echo"],
+        createdAt: "2023-01-01",
+      }
       apiInstance.saveDefinition.mockRejectedValue(new Error("Network Error"))
       localInstance.saveDefinition.mockResolvedValue(mockDefinition)
 
@@ -259,7 +286,14 @@ describe("HybridStorageService", () => {
     })
 
     it("should handle getDefinitionById with fallback", async () => {
-      const mockDefinition = { id: "1", name: "Test Definition", description: "desc", image: "test", commands: ["echo"], createdAt: "2023-01-01" }
+      const mockDefinition = {
+        id: "1",
+        name: "Test Definition",
+        description: "desc",
+        image: "test",
+        commands: ["echo"],
+        createdAt: "2023-01-01",
+      }
       apiInstance.getDefinitionById.mockRejectedValue(new Error("Network Error"))
       localInstance.getDefinitionById.mockResolvedValue(mockDefinition)
 
@@ -271,13 +305,13 @@ describe("HybridStorageService", () => {
     })
 
     it("should handle saveRun with fallback", async () => {
-      const mockRun = { 
-        id: "1", 
-        name: "Test Run", 
-        status: "running" as const, 
-        createdAt: "2023-01-01", 
-        image: "test:latest", 
-        command: ["echo", "test"] 
+      const mockRun = {
+        id: "1",
+        name: "Test Run",
+        status: "running" as const,
+        createdAt: "2023-01-01",
+        image: "test:latest",
+        command: ["echo", "test"],
       }
       apiInstance.saveRun.mockRejectedValue(new Error("Network Error"))
       localInstance.saveRun.mockResolvedValue(mockRun)
@@ -301,13 +335,13 @@ describe("HybridStorageService", () => {
     })
 
     it("should handle getRunById with fallback", async () => {
-      const mockRun = { 
-        id: "1", 
-        name: "Test Run", 
-        status: "running" as const, 
-        createdAt: "2023-01-01", 
-        image: "test:latest", 
-        command: ["echo", "test"] 
+      const mockRun = {
+        id: "1",
+        name: "Test Run",
+        status: "running" as const,
+        createdAt: "2023-01-01",
+        image: "test:latest",
+        command: ["echo", "test"],
       }
       apiInstance.getRunById.mockRejectedValue(new Error("Network Error"))
       localInstance.getRunById.mockResolvedValue(mockRun)
@@ -320,14 +354,14 @@ describe("HybridStorageService", () => {
     })
 
     it("should handle saveSuite with fallback", async () => {
-      const mockSuite = { 
-        id: "1", 
-        name: "Test Suite", 
-        description: "", 
-        testDefinitionIds: [], 
-        executionMode: "sequential" as const, 
-        createdAt: "2023-01-01", 
-        labels: [] 
+      const mockSuite = {
+        id: "1",
+        name: "Test Suite",
+        description: "",
+        testDefinitionIds: [],
+        executionMode: "sequential" as const,
+        createdAt: "2023-01-01",
+        labels: [],
       }
       apiInstance.saveSuite.mockRejectedValue(new Error("Network Error"))
       localInstance.saveSuite.mockResolvedValue(mockSuite)
@@ -351,14 +385,14 @@ describe("HybridStorageService", () => {
     })
 
     it("should handle getSuiteById with fallback", async () => {
-      const mockSuite = { 
-        id: "1", 
-        name: "Test Suite", 
-        description: "", 
-        testDefinitionIds: [], 
-        executionMode: "sequential" as const, 
-        createdAt: "2023-01-01", 
-        labels: [] 
+      const mockSuite = {
+        id: "1",
+        name: "Test Suite",
+        description: "",
+        testDefinitionIds: [],
+        executionMode: "sequential" as const,
+        createdAt: "2023-01-01",
+        labels: [],
       }
       apiInstance.getSuiteById.mockRejectedValue(new Error("Network Error"))
       localInstance.getSuiteById.mockResolvedValue(mockSuite)
@@ -409,7 +443,13 @@ describe("HybridStorageService", () => {
     })
 
     it("should handle getJobStatus with fallback", async () => {
-      const mockStatus = { job_name: "test-job", status: "Running", active: 1, succeeded: 0, failed: 0 }
+      const mockStatus = {
+        job_name: "test-job",
+        status: "Running",
+        active: 1,
+        succeeded: 0,
+        failed: 0,
+      }
       apiInstance.getJobStatus.mockRejectedValue(new Error("Network Error"))
       localInstance.getJobStatus.mockResolvedValue(mockStatus)
 
@@ -435,7 +475,9 @@ describe("HybridStorageService", () => {
 
   describe("error handling", () => {
     it("should try API first and only fallback on failure", async () => {
-      const mockExecutors = [{ id: "1", name: "Test Executor", image: "test", createdAt: "2023-01-01" }]
+      const mockExecutors = [
+        { id: "1", name: "Test Executor", image: "test", createdAt: "2023-01-01" },
+      ]
       apiInstance.getExecutors.mockResolvedValue(mockExecutors)
 
       const result = await service.getExecutors()
@@ -456,7 +498,7 @@ describe("HybridStorageService", () => {
 
     it("should handle different types of API errors", async () => {
       const mockExecutors = [{ id: "1", name: "Test", image: "test", createdAt: "2023-01-01" }]
-      
+
       // Test network timeout
       apiInstance.getExecutors.mockRejectedValue(new Error("ETIMEDOUT"))
       localInstance.getExecutors.mockResolvedValue(mockExecutors)
@@ -464,7 +506,7 @@ describe("HybridStorageService", () => {
       const result = await service.getExecutors()
       expect(result).toEqual(mockExecutors)
 
-      // Test 500 error  
+      // Test 500 error
       apiInstance.getExecutors.mockRejectedValue(new Error("Internal Server Error"))
       localInstance.getExecutors.mockResolvedValue(mockExecutors)
 
@@ -480,7 +522,7 @@ describe("HybridStorageService", () => {
         throw new Error("API Error")
       })
       localInstance.subscribeToRuns.mockImplementation(() => {
-        throw new Error("Local Error") 
+        throw new Error("Local Error")
       })
 
       const unsubscribe = service.subscribeToRuns(mockCallback)

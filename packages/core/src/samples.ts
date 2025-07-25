@@ -5,7 +5,8 @@ export const sampleSuites: Suite[] = [
   {
     id: "frontend-test-suite",
     name: "Frontend Test Suite",
-    description: "Comprehensive frontend testing including React components, E2E user journeys, and visual regression tests",
+    description:
+      "Comprehensive frontend testing including React components, E2E user journeys, and visual regression tests",
     testDefinitionIds: ["react-component-tests", "e2e-user-journey", "cypress-e2e-tests"],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     executionMode: "sequential",
@@ -14,7 +15,8 @@ export const sampleSuites: Suite[] = [
   {
     id: "backend-api-suite",
     name: "Backend API Test Suite",
-    description: "Complete backend API testing including REST endpoints, authentication, and database operations",
+    description:
+      "Complete backend API testing including REST endpoints, authentication, and database operations",
     testDefinitionIds: ["api-integration-tests", "python-backend-tests", "postman-api-tests"],
     createdAt: new Date(Date.now() - 172800000).toISOString(),
     executionMode: "parallel",
@@ -32,7 +34,8 @@ export const sampleSuites: Suite[] = [
   {
     id: "security-suite",
     name: "Security Test Suite",
-    description: "Comprehensive security testing including vulnerability scanning and penetration testing",
+    description:
+      "Comprehensive security testing including vulnerability scanning and penetration testing",
     testDefinitionIds: ["security-scan-owasp"],
     createdAt: new Date(Date.now() - 345600000).toISOString(),
     executionMode: "sequential",
@@ -59,7 +62,8 @@ export const sampleSuites: Suite[] = [
   {
     id: "regression-suite",
     name: "Regression Test Suite",
-    description: "Automated regression testing to ensure new changes don't break existing functionality",
+    description:
+      "Automated regression testing to ensure new changes don't break existing functionality",
     testDefinitionIds: ["react-component-tests", "api-integration-tests", "e2e-user-journey"],
     createdAt: new Date(Date.now() - 604800000).toISOString(),
     executionMode: "parallel",
@@ -68,10 +72,11 @@ export const sampleSuites: Suite[] = [
   {
     id: "working-examples-suite",
     name: "Working Examples Suite",
-    description: "Collection of simple, self-contained tests that demonstrate the platform capabilities and will actually run successfully",
+    description:
+      "Collection of simple, self-contained tests that demonstrate the platform capabilities and will actually run successfully",
     testDefinitionIds: [
       "simple-health-check",
-      "basic-python-test", 
+      "basic-python-test",
       "node-version-test",
       "shell-script-test",
       "network-connectivity-test",
@@ -79,7 +84,7 @@ export const sampleSuites: Suite[] = [
       "date-time-test",
       "file-system-test",
       "environment-test",
-      "json-processing-test"
+      "json-processing-test",
     ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     executionMode: "parallel",
@@ -95,7 +100,8 @@ export const sampleDefinitions: Definition[] = [
   {
     id: "react-component-tests",
     name: "React Component Unit Tests",
-    description: "Test React components with Jest and React Testing Library including hooks, state management, and user interactions",
+    description:
+      "Test React components with Jest and React Testing Library including hooks, state management, and user interactions",
     image: "node:18-alpine",
     commands: ["npm ci", "npm run test:unit -- --coverage --watchAll=false"],
     createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
@@ -110,7 +116,8 @@ export const sampleDefinitions: Definition[] = [
   {
     id: "api-integration-tests",
     name: "REST API Integration Tests",
-    description: "Test REST API endpoints with authentication, CRUD operations, validation, and error handling",
+    description:
+      "Test REST API endpoints with authentication, CRUD operations, validation, and error handling",
     image: "node:18-alpine",
     commands: ["npm ci", "npm run test:api -- --reporter=json --output=api-test-results.json"],
     createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
@@ -126,7 +133,8 @@ export const sampleDefinitions: Definition[] = [
   {
     id: "e2e-user-journey",
     name: "E2E User Journey Tests",
-    description: "Complete user journey testing: signup, login, product browsing, checkout, and order management",
+    description:
+      "Complete user journey testing: signup, login, product browsing, checkout, and order management",
     image: "mcr.microsoft.com/playwright:v1.40.0-focal",
     commands: ["npm ci", "npx playwright install", "npx playwright test --reporter=html"],
     createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
@@ -159,9 +167,13 @@ export const sampleDefinitions: Definition[] = [
   {
     id: "python-backend-tests",
     name: "Python Backend API Tests",
-    description: "Test Django/Flask backend APIs with pytest including database transactions and async operations",
+    description:
+      "Test Django/Flask backend APIs with pytest including database transactions and async operations",
     image: "python:3.11-slim",
-    commands: ["pip install -r requirements.txt", "pytest --cov=app --cov-report=html --junit-xml=test-results.xml"],
+    commands: [
+      "pip install -r requirements.txt",
+      "pytest --cov=app --cov-report=html --junit-xml=test-results.xml",
+    ],
     createdAt: new Date(Date.now() - 432000000).toISOString(), // 5 days ago
     executorId: "pytest-executor",
     variables: {
@@ -175,7 +187,8 @@ export const sampleDefinitions: Definition[] = [
   {
     id: "k6-load-tests",
     name: "K6 Performance Load Tests",
-    description: "Load testing with K6 to simulate real user traffic and measure performance metrics",
+    description:
+      "Load testing with K6 to simulate real user traffic and measure performance metrics",
     image: "grafana/k6:latest",
     commands: ["k6 run --vus 100 --duration 10m --out json=load-test-results.json load-test.js"],
     createdAt: new Date(Date.now() - 518400000).toISOString(), // 6 days ago
@@ -192,9 +205,12 @@ export const sampleDefinitions: Definition[] = [
   {
     id: "postman-api-tests",
     name: "Postman API Collection Tests",
-    description: "Run comprehensive API tests using Postman collections with Newman including authentication flows",
+    description:
+      "Run comprehensive API tests using Postman collections with Newman including authentication flows",
     image: "postman/newman:alpine",
-    commands: ["newman run api-tests.postman_collection.json -e staging.postman_environment.json --reporters cli,json"],
+    commands: [
+      "newman run api-tests.postman_collection.json -e staging.postman_environment.json --reporters cli,json",
+    ],
     createdAt: new Date(Date.now() - 604800000).toISOString(), // 7 days ago
     executorId: "postman-executor",
     variables: {
@@ -207,7 +223,8 @@ export const sampleDefinitions: Definition[] = [
   {
     id: "security-scan-owasp",
     name: "OWASP Security Scan",
-    description: "Automated security testing using OWASP ZAP for vulnerability detection and penetration testing",
+    description:
+      "Automated security testing using OWASP ZAP for vulnerability detection and penetration testing",
     image: "owasp/zap2docker-stable",
     commands: ["zap-baseline.py -t $TARGET_URL -r security-report.html -J security-report.json"],
     createdAt: new Date(Date.now() - 691200000).toISOString(), // 8 days ago
@@ -221,7 +238,8 @@ export const sampleDefinitions: Definition[] = [
   {
     id: "github-actions-ci",
     name: "GitHub Actions CI Pipeline",
-    description: "Complete CI/CD pipeline with GitHub Actions including linting, testing, building, and deployment",
+    description:
+      "Complete CI/CD pipeline with GitHub Actions including linting, testing, building, and deployment",
     image: "ghcr.io/actions/actions-runner:latest",
     commands: ["./run-ci-pipeline.sh"],
     createdAt: new Date(Date.now() - 777600000).toISOString(), // 9 days ago
@@ -236,7 +254,8 @@ export const sampleDefinitions: Definition[] = [
   {
     id: "docker-integration-tests",
     name: "Docker Integration Tests",
-    description: "Test Docker containers and microservices integration with docker-compose and health checks",
+    description:
+      "Test Docker containers and microservices integration with docker-compose and health checks",
     image: "docker:latest",
     commands: ["docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit"],
     createdAt: new Date(Date.now() - 864000000).toISOString(), // 10 days ago
@@ -269,7 +288,9 @@ export const sampleDefinitions: Definition[] = [
     name: "Simple Health Check",
     description: "Basic system health check using curl to test network connectivity",
     image: "curlimages/curl:latest",
-    commands: ["curl -f -s -o /dev/null -w \"%{http_code}\" https://httpbin.org/status/200 && echo \"Health check passed\""],
+    commands: [
+      'curl -f -s -o /dev/null -w "%{http_code}" https://httpbin.org/status/200 && echo "Health check passed"',
+    ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     labels: ["working", "examples", "demo", "health"],
   },
@@ -278,7 +299,9 @@ export const sampleDefinitions: Definition[] = [
     name: "Basic Python Test",
     description: "Simple Python test that runs without external dependencies",
     image: "python:3.9-slim",
-    commands: ["python -c \"import sys; print(f'Python version: {sys.version}'); assert 2 + 2 == 4; print('Basic math test passed')\""],
+    commands: [
+      "python -c \"import sys; print(f'Python version: {sys.version}'); assert 2 + 2 == 4; print('Basic math test passed')\"",
+    ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     labels: ["working", "examples", "demo", "python"],
   },
@@ -287,7 +310,9 @@ export const sampleDefinitions: Definition[] = [
     name: "Node.js Version Test",
     description: "Test Node.js installation and basic functionality",
     image: "node:18-alpine",
-    commands: ["node -e \"console.log('Node.js version:', process.version); console.log('Test passed: 2 + 2 =', 2 + 2); process.exit(0)\""],
+    commands: [
+      "node -e \"console.log('Node.js version:', process.version); console.log('Test passed: 2 + 2 =', 2 + 2); process.exit(0)\"",
+    ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     labels: ["working", "examples", "demo", "nodejs"],
   },
@@ -296,7 +321,9 @@ export const sampleDefinitions: Definition[] = [
     name: "Shell Script Test",
     description: "Basic shell script test with system commands",
     image: "alpine:latest",
-    commands: ["sh -c \"echo 'Starting shell test'; whoami; pwd; ls -la /; echo 'Shell test completed successfully'\""],
+    commands: [
+      "sh -c \"echo 'Starting shell test'; whoami; pwd; ls -la /; echo 'Shell test completed successfully'\"",
+    ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     labels: ["working", "examples", "demo", "shell"],
   },
@@ -305,7 +332,9 @@ export const sampleDefinitions: Definition[] = [
     name: "Network Connectivity Test",
     description: "Test network connectivity to external services",
     image: "alpine:latest",
-    commands: ["sh -c \"apk add --no-cache curl && curl -f -s https://httpbin.org/json && echo 'Network test passed'\""],
+    commands: [
+      "sh -c \"apk add --no-cache curl && curl -f -s https://httpbin.org/json && echo 'Network test passed'\"",
+    ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     labels: ["working", "examples", "demo", "network"],
   },
@@ -314,7 +343,9 @@ export const sampleDefinitions: Definition[] = [
     name: "Basic Math Test",
     description: "Simple mathematical computation test using bc",
     image: "alpine:latest",
-    commands: ["sh -c \"apk add --no-cache bc && echo 'scale=2; 22/7' | bc && echo 'Math test completed'\""],
+    commands: [
+      "sh -c \"apk add --no-cache bc && echo 'scale=2; 22/7' | bc && echo 'Math test completed'\"",
+    ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     labels: ["working", "examples", "demo", "math"],
   },
@@ -323,7 +354,9 @@ export const sampleDefinitions: Definition[] = [
     name: "Date Time Test",
     description: "Test system date and time functionality",
     image: "alpine:latest",
-    commands: ["sh -c \"date && echo 'Timezone: $(date +%Z)' && echo 'Epoch: $(date +%s)' && echo 'Date test passed'\""],
+    commands: [
+      "sh -c \"date && echo 'Timezone: $(date +%Z)' && echo 'Epoch: $(date +%s)' && echo 'Date test passed'\"",
+    ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     labels: ["working", "examples", "demo", "datetime"],
   },
@@ -332,7 +365,9 @@ export const sampleDefinitions: Definition[] = [
     name: "File System Test",
     description: "Test file system operations and permissions",
     image: "alpine:latest",
-    commands: ["sh -c \"mkdir -p /tmp/test && echo 'Hello World' > /tmp/test/file.txt && cat /tmp/test/file.txt && rm -rf /tmp/test && echo 'File system test passed'\""],
+    commands: [
+      "sh -c \"mkdir -p /tmp/test && echo 'Hello World' > /tmp/test/file.txt && cat /tmp/test/file.txt && rm -rf /tmp/test && echo 'File system test passed'\"",
+    ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     labels: ["working", "examples", "demo", "filesystem"],
   },
@@ -341,7 +376,9 @@ export const sampleDefinitions: Definition[] = [
     name: "Environment Test",
     description: "Test environment variables and system information",
     image: "alpine:latest",
-    commands: ["sh -c \"echo 'Hostname: $(hostname)'; echo 'User: $(whoami)'; echo 'Home: $HOME'; echo 'Path: $PATH'; echo 'Environment test passed'\""],
+    commands: [
+      "sh -c \"echo 'Hostname: $(hostname)'; echo 'User: $(whoami)'; echo 'Home: $HOME'; echo 'Path: $PATH'; echo 'Environment test passed'\"",
+    ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     labels: ["working", "examples", "demo", "environment"],
   },
@@ -350,7 +387,9 @@ export const sampleDefinitions: Definition[] = [
     name: "JSON Processing Test",
     description: "Test JSON processing using jq",
     image: "alpine:latest",
-    commands: ["sh -c \"apk add --no-cache jq && echo '{\\\"name\\\":\\\"SparkTest\\\",\\\"version\\\":\\\"1.0\\\",\\\"working\\\":true}' | jq '.name' && echo 'JSON test passed'\""],
+    commands: [
+      'sh -c "apk add --no-cache jq && echo \'{\\"name\\":\\"SparkTest\\",\\"version\\":\\"1.0\\",\\"working\\":true}\' | jq \'.name\' && echo \'JSON test passed\'"',
+    ],
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     labels: ["working", "examples", "demo", "json"],
   },
@@ -578,7 +617,10 @@ export const sampleRuns: Run[] = [
     id: "run-python-backend",
     name: "Python Backend API Tests - Django",
     image: "python:3.11-slim",
-    command: ["pip install -r requirements.txt", "pytest --cov=app --cov-report=html --junit-xml=test-results.xml"],
+    command: [
+      "pip install -r requirements.txt",
+      "pytest --cov=app --cov-report=html --junit-xml=test-results.xml",
+    ],
     status: "completed",
     createdAt: new Date(Date.now() - 10800000).toISOString(), // 3 hours ago
     definitionId: "python-backend-tests",
@@ -726,7 +768,9 @@ export const sampleRuns: Run[] = [
     id: "run-security-owasp",
     name: "OWASP Security Vulnerability Scan",
     image: "owasp/zap2docker-stable",
-    command: ["zap-baseline.py -t https://staging.example.com -r security-report.html -J security-report.json"],
+    command: [
+      "zap-baseline.py -t https://staging.example.com -r security-report.html -J security-report.json",
+    ],
     status: "failed",
     createdAt: new Date(Date.now() - 18000000).toISOString(), // 5 hours ago
     definitionId: "security-scan-owasp",
@@ -778,7 +822,7 @@ export const sampleRuns: Run[] = [
       "PASS: Directory Browsing [10033]",
       "PASS: Heartbleed OpenSSL Vulnerability (Indicative) [10034]",
       "PASS: Strict-Transport-Security Header [10035]",
-      "PASS: Server Leaks Information via \"X-Powered-By\" HTTP Response Header Field(s) [10037]",
+      'PASS: Server Leaks Information via "X-Powered-By" HTTP Response Header Field(s) [10037]',
       "PASS: Content Security Policy (CSP) Header Not Set [10038]",
       "PASS: X-Backend-Server Header Information Leak [10039]",
       "",
@@ -820,23 +864,27 @@ export const sampleRuns: Run[] = [
     id: "working-health-check-run",
     name: "Health Check - Working Example",
     image: "curlimages/curl:latest",
-    command: ["curl -f -s -o /dev/null -w \"%{http_code}\" https://httpbin.org/status/200 && echo \"Health check passed\""],
+    command: [
+      'curl -f -s -o /dev/null -w "%{http_code}" https://httpbin.org/status/200 && echo "Health check passed"',
+    ],
     status: "completed",
     createdAt: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
     definitionId: "simple-health-check",
     duration: 5000, // 5 seconds
     logs: [
-      "> curl -f -s -o /dev/null -w \"%{http_code}\" https://httpbin.org/status/200 && echo \"Health check passed\"",
+      '> curl -f -s -o /dev/null -w "%{http_code}" https://httpbin.org/status/200 && echo "Health check passed"',
       "200Health check passed",
       "",
-      "✅ Test completed successfully"
+      "✅ Test completed successfully",
     ],
   },
   {
     id: "working-python-test-run",
     name: "Python Test - Working Example",
     image: "python:3.9-slim",
-    command: ["python -c \"import sys; print(f'Python version: {sys.version}'); assert 2 + 2 == 4; print('Basic math test passed')\""],
+    command: [
+      "python -c \"import sys; print(f'Python version: {sys.version}'); assert 2 + 2 == 4; print('Basic math test passed')\"",
+    ],
     status: "completed",
     createdAt: new Date(Date.now() - 600000).toISOString(), // 10 minutes ago
     definitionId: "basic-python-test",
@@ -846,14 +894,16 @@ export const sampleRuns: Run[] = [
       "Python version: 3.9.18 (main, Jan 24 2024, 22:56:09) [GCC 12.2.0]",
       "Basic math test passed",
       "",
-      "✅ Test completed successfully"
+      "✅ Test completed successfully",
     ],
   },
   {
     id: "working-node-test-run",
     name: "Node.js Test - Working Example",
     image: "node:18-alpine",
-    command: ["node -e \"console.log('Node.js version:', process.version); console.log('Test passed: 2 + 2 =', 2 + 2); process.exit(0)\""],
+    command: [
+      "node -e \"console.log('Node.js version:', process.version); console.log('Test passed: 2 + 2 =', 2 + 2); process.exit(0)\"",
+    ],
     status: "completed",
     createdAt: new Date(Date.now() - 900000).toISOString(), // 15 minutes ago
     definitionId: "node-version-test",
@@ -863,14 +913,16 @@ export const sampleRuns: Run[] = [
       "Node.js version: v18.18.2",
       "Test passed: 2 + 2 = 4",
       "",
-      "✅ Test completed successfully"
+      "✅ Test completed successfully",
     ],
   },
   {
     id: "working-shell-test-run",
     name: "Shell Script Test - Working Example",
     image: "alpine:latest",
-    command: ["sh -c \"echo 'Starting shell test'; whoami; pwd; ls -la /; echo 'Shell test completed successfully'\""],
+    command: [
+      "sh -c \"echo 'Starting shell test'; whoami; pwd; ls -la /; echo 'Shell test completed successfully'\"",
+    ],
     status: "completed",
     createdAt: new Date(Date.now() - 1200000).toISOString(), // 20 minutes ago
     definitionId: "shell-script-test",
@@ -902,14 +954,16 @@ export const sampleRuns: Run[] = [
       "drwxr-xr-x   12 root     root          4096 Jun 14 14:30 var",
       "Shell test completed successfully",
       "",
-      "✅ Test completed successfully"
+      "✅ Test completed successfully",
     ],
   },
   {
     id: "working-network-test-run",
     name: "Network Connectivity Test - Working Example",
     image: "alpine:latest",
-    command: ["sh -c \"apk add --no-cache curl && curl -f -s https://httpbin.org/json && echo 'Network test passed'\""],
+    command: [
+      "sh -c \"apk add --no-cache curl && curl -f -s https://httpbin.org/json && echo 'Network test passed'\"",
+    ],
     status: "completed",
     createdAt: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
     definitionId: "network-connectivity-test",
@@ -927,29 +981,29 @@ export const sampleRuns: Run[] = [
       "Executing ca-certificates-20230506-r0.trigger",
       "OK: 11 MiB in 20 packages",
       "{",
-      "  \"slideshow\": {",
-      "    \"author\": \"Yours Truly\",",
-      "    \"date\": \"date of publication\",",
-      "    \"slides\": [",
+      '  "slideshow": {',
+      '    "author": "Yours Truly",',
+      '    "date": "date of publication",',
+      '    "slides": [',
       "      {",
-      "        \"title\": \"Wake up to WonderWidgets!\",",
-      "        \"type\": \"all\"",
+      '        "title": "Wake up to WonderWidgets!",',
+      '        "type": "all"',
       "      },",
       "      {",
-      "        \"items\": [",
-      "          \"Why <em>WonderWidgets</em> are great\",",
-      "          \"Who <em>buys</em> WonderWidgets\"",
+      '        "items": [',
+      '          "Why <em>WonderWidgets</em> are great",',
+      '          "Who <em>buys</em> WonderWidgets"',
       "        ],",
-      "        \"title\": \"Overview\",",
-      "        \"type\": \"all\"",
+      '        "title": "Overview",',
+      '        "type": "all"',
       "      }",
       "    ],",
-      "    \"title\": \"Sample Slide Show\"",
+      '    "title": "Sample Slide Show"',
       "  }",
       "}",
       "Network test passed",
       "",
-      "✅ Test completed successfully"
+      "✅ Test completed successfully",
     ],
   },
 ]

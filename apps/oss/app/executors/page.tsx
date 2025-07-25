@@ -36,7 +36,7 @@ export default function ExecutorsPage() {
         title: "Executor deleted",
         description: "The executor has been removed successfully.",
       })
-    } catch (error) {
+    } catch {
       toast({
         title: "Error deleting executor",
         description: "Failed to delete the executor.",
@@ -50,8 +50,8 @@ export default function ExecutorsPage() {
   const filteredExecutors = executors.filter(
     (executor) =>
       executor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      executor.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      executor.id.toLowerCase().includes(searchQuery.toLowerCase()),
+      executor.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      executor.id.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
@@ -141,7 +141,9 @@ export default function ExecutorsPage() {
                     <Cpu className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900 dark:text-slate-100">{executor.name}</h3>
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+                      {executor.name}
+                    </h3>
                     <p className="text-sm text-muted-foreground">{executor.image}</p>
                   </div>
                 </CardTitle>
@@ -152,7 +154,9 @@ export default function ExecutorsPage() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Command:</span>
-                    <code className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">{executor.command}</code>
+                    <code className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                      {executor.command}
+                    </code>
                   </div>
 
                   {executor.supportedFileTypes && executor.supportedFileTypes.length > 0 && (
@@ -165,7 +169,9 @@ export default function ExecutorsPage() {
                     </div>
                   )}
 
-                  <p className="text-xs text-muted-foreground">Created {formatDistanceToNow(executor.createdAt)}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Created {formatDistanceToNow(executor.createdAt)}
+                  </p>
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between border-t pt-4 bg-slate-50/50 dark:bg-slate-800/50">

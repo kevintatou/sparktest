@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowLeft, Zap } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { NewTestForm } from "@/components/new-test-form"

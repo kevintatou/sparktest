@@ -12,8 +12,18 @@ interface AutocompleteProps {
   multiple?: boolean
   value: AutocompleteOption[]
   onChange: (event: React.SyntheticEvent, value: AutocompleteOption[]) => void
-  renderInput: (params: any) => React.ReactNode
-  renderOption?: (props: any, option: AutocompleteOption) => React.ReactNode
+  renderInput: (params: {
+    placeholder?: string
+    className?: string
+    value?: string
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+    onFocus?: () => void
+    onBlur?: () => void
+  }) => React.ReactNode
+  renderOption?: (
+    props: React.HTMLAttributes<HTMLElement>,
+    option: AutocompleteOption
+  ) => React.ReactNode
 }
 
 export function Autocomplete({
@@ -36,12 +46,15 @@ export function Autocomplete({
   const handleSelect = (option: AutocompleteOption) => {
     if (multiple) {
       if (value.some((v) => v.id === option.id)) {
-        onChange(null as any, value.filter((v) => v.id !== option.id))
+        onChange(
+          {} as React.SyntheticEvent,
+          value.filter((v) => v.id !== option.id)
+        )
       } else {
-        onChange(null as any, [...value, option])
+        onChange({} as React.SyntheticEvent, [...value, option])
       }
     } else {
-      onChange(null as any, [option])
+      onChange({} as React.SyntheticEvent, [option])
       setOpen(false)
     }
   }

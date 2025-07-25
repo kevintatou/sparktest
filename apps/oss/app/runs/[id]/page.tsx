@@ -19,14 +19,13 @@ export default function TestDetailsPage({ params }: { params: { id: string } }) 
         const runData = await storage.getRunById(params.id)
         setRun(runData)
       } catch (error) {
-        console.error('Error loading test run:', error)
+        console.error("Error loading test run:", error)
       } finally {
         setLoading(false)
       }
     }
     loadDefinitionById()
   }, [params.id])
-
 
   if (loading) {
     return (

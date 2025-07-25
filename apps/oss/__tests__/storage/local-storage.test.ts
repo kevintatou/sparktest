@@ -40,11 +40,11 @@ describe("LocalStorageService", () => {
 
   describe("saveExecutor", () => {
     it("should save executor to localStorage", async () => {
-      const mockExecutor = { 
-        id: "1", 
+      const mockExecutor = {
+        id: "1",
         name: "Test Executor",
         image: "test:latest",
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       }
       localStorageMock.getItem.mockReturnValue("[]")
 
@@ -52,22 +52,22 @@ describe("LocalStorageService", () => {
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         "sparktest_executors",
-        expect.stringContaining(mockExecutor.name),
+        expect.stringContaining(mockExecutor.name)
       )
     })
 
     it("should update existing executor", async () => {
-      const existingExecutor = { 
-        id: "1", 
+      const existingExecutor = {
+        id: "1",
         name: "Old Executor",
         image: "old:latest",
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       }
-      const updatedExecutor = { 
-        id: "1", 
+      const updatedExecutor = {
+        id: "1",
         name: "Updated Executor",
         image: "new:latest",
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       }
       localStorageMock.getItem.mockReturnValue(JSON.stringify([existingExecutor]))
 
@@ -75,7 +75,7 @@ describe("LocalStorageService", () => {
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         "sparktest_executors",
-        expect.stringContaining(updatedExecutor.name),
+        expect.stringContaining(updatedExecutor.name)
       )
     })
   })
@@ -84,7 +84,7 @@ describe("LocalStorageService", () => {
     it("should remove executor from localStorage", async () => {
       const executors = [
         { id: "1", name: "Executor 1", image: "test1:latest", createdAt: new Date().toISOString() },
-        { id: "2", name: "Executor 2", image: "test2:latest", createdAt: new Date().toISOString() }
+        { id: "2", name: "Executor 2", image: "test2:latest", createdAt: new Date().toISOString() },
       ]
       localStorageMock.getItem.mockReturnValue(JSON.stringify(executors))
 
@@ -102,7 +102,7 @@ describe("LocalStorageService", () => {
     it("should return specific executor by id", async () => {
       const executors = [
         { id: "1", name: "Executor 1", image: "test1:latest", createdAt: new Date().toISOString() },
-        { id: "2", name: "Executor 2", image: "test2:latest", createdAt: new Date().toISOString() }
+        { id: "2", name: "Executor 2", image: "test2:latest", createdAt: new Date().toISOString() },
       ]
       localStorageMock.getItem.mockReturnValue(JSON.stringify(executors))
 
@@ -140,13 +140,13 @@ describe("LocalStorageService", () => {
 
     describe("saveDefinition", () => {
       it("should save definition to localStorage", async () => {
-        const mockDefinition = { 
-          id: "1", 
+        const mockDefinition = {
+          id: "1",
           name: "Test Definition",
           description: "Test desc",
           image: "test:latest",
           commands: ["echo", "hello"],
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         }
         localStorageMock.getItem.mockReturnValue("[]")
 
@@ -154,7 +154,7 @@ describe("LocalStorageService", () => {
 
         expect(localStorageMock.setItem).toHaveBeenCalledWith(
           "sparktest_definitions",
-          expect.stringContaining(mockDefinition.name),
+          expect.stringContaining(mockDefinition.name)
         )
       })
     })
@@ -162,7 +162,14 @@ describe("LocalStorageService", () => {
     describe("deleteDefinition", () => {
       it("should remove definition from localStorage", async () => {
         const definitions = [
-          { id: "1", name: "Definition 1", description: "desc1", image: "test1:latest", commands: ["echo"], createdAt: new Date().toISOString() }
+          {
+            id: "1",
+            name: "Definition 1",
+            description: "desc1",
+            image: "test1:latest",
+            commands: ["echo"],
+            createdAt: new Date().toISOString(),
+          },
         ]
         localStorageMock.getItem.mockReturnValue(JSON.stringify(definitions))
 
@@ -175,7 +182,14 @@ describe("LocalStorageService", () => {
     describe("getDefinitionById", () => {
       it("should return specific definition by id", async () => {
         const definitions = [
-          { id: "1", name: "Definition 1", description: "desc1", image: "test1:latest", commands: ["echo"], createdAt: new Date().toISOString() }
+          {
+            id: "1",
+            name: "Definition 1",
+            description: "desc1",
+            image: "test1:latest",
+            commands: ["echo"],
+            createdAt: new Date().toISOString(),
+          },
         ]
         localStorageMock.getItem.mockReturnValue(JSON.stringify(definitions))
 
@@ -200,7 +214,14 @@ describe("LocalStorageService", () => {
     describe("getRunById", () => {
       it("should return specific run by id", async () => {
         const runs = [
-          { id: "1", name: "Run 1", image: "test1:latest", command: ["echo"], status: "running", createdAt: new Date().toISOString() }
+          {
+            id: "1",
+            name: "Run 1",
+            image: "test1:latest",
+            command: ["echo"],
+            status: "running",
+            createdAt: new Date().toISOString(),
+          },
         ]
         localStorageMock.getItem.mockReturnValue(JSON.stringify(runs))
 
@@ -213,7 +234,14 @@ describe("LocalStorageService", () => {
     describe("deleteRun", () => {
       it("should remove run from localStorage", async () => {
         const runs = [
-          { id: "1", name: "Run 1", image: "test1:latest", command: ["echo"], status: "running", createdAt: new Date().toISOString() }
+          {
+            id: "1",
+            name: "Run 1",
+            image: "test1:latest",
+            command: ["echo"],
+            status: "running",
+            createdAt: new Date().toISOString(),
+          },
         ]
         localStorageMock.getItem.mockReturnValue(JSON.stringify(runs))
 
@@ -226,7 +254,14 @@ describe("LocalStorageService", () => {
     describe("createRun", () => {
       it("should create new run from definition", async () => {
         const definitions = [
-          { id: "def1", name: "Definition 1", description: "desc1", image: "test1:latest", commands: ["echo", "hello"], createdAt: new Date().toISOString() }
+          {
+            id: "def1",
+            name: "Definition 1",
+            description: "desc1",
+            image: "test1:latest",
+            commands: ["echo", "hello"],
+            createdAt: new Date().toISOString(),
+          },
         ]
         localStorageMock.getItem.mockReturnValueOnce(JSON.stringify(definitions)) // getDefinitions
         localStorageMock.getItem.mockReturnValueOnce("[]") // getRuns

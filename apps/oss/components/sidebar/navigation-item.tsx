@@ -11,7 +11,13 @@ interface Props {
   onMobileNavigate?: () => void
 }
 
-export function NavigationItemComponent({ item, isActive, isMobile, isMobileMenuOpen, onMobileNavigate }: Props) {
+export function NavigationItemComponent({
+  item,
+  isActive,
+  isMobile,
+  isMobileMenuOpen,
+  onMobileNavigate,
+}: Props) {
   return (
     <div className="group relative">
       <Link
@@ -19,8 +25,8 @@ export function NavigationItemComponent({ item, isActive, isMobile, isMobileMenu
         onClick={isMobile ? onMobileNavigate : undefined}
         className={cn(
           "flex items-center transition-colors rounded-md",
-          isMobile && isMobileMenuOpen 
-            ? "w-full h-10 px-3 gap-3 justify-start" 
+          isMobile && isMobileMenuOpen
+            ? "w-full h-10 px-3 gap-3 justify-start"
             : "justify-center w-10 h-10",
           isActive
             ? "bg-blue-700 text-white"

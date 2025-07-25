@@ -15,7 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { formatDistanceToNow } from "@tatou/core/utils"
-import type { TestDefinition } from "@tatou/core/types"
+import type { Definition } from "@tatou/core/types"
 
 interface TestResult {
   success: boolean
@@ -25,13 +25,13 @@ interface TestResult {
   logs?: string[]
 }
 
-interface TestDefinitionTestModalProps {
+interface DefinitionTestModalProps {
   isOpen: boolean
   onClose: () => void
-  testDefinition: TestDefinition
+  testDefinition: Definition
 }
 
-export function TestDefinitionTestModal({ isOpen, onClose, testDefinition }: TestDefinitionTestModalProps) {
+export function DefinitionTestModal({ isOpen, onClose, testDefinition }: DefinitionTestModalProps) {
   const [testing, setTesting] = useState(false)
   const [result, setResult] = useState<TestResult | null>(null)
   const [progress, setProgress] = useState(0)
@@ -97,7 +97,7 @@ export function TestDefinitionTestModal({ isOpen, onClose, testDefinition }: Tes
         duration,
         logs,
       })
-    } catch (error) {
+    } catch {
       setResult({
         success: false,
         message: "Test execution failed",
@@ -125,7 +125,9 @@ export function TestDefinitionTestModal({ isOpen, onClose, testDefinition }: Tes
             <Play className="h-5 w-5" />
             Test: {testDefinition.name}
           </DialogTitle>
-          <DialogDescription>Execute this test definition and view real-time results</DialogDescription>
+          <DialogDescription>
+            Execute this test definition and view real-time results
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -177,14 +179,20 @@ export function TestDefinitionTestModal({ isOpen, onClose, testDefinition }: Tes
                 ) : (
                   <XCircle className="h-5 w-5 text-red-500" />
                 )}
-                <span className={`font-medium ${result.success ? "text-green-700" : "text-red-700"}`}>
+                <span
+                  className={`font-medium ${result.success ? "text-green-700" : "text-red-700"}`}
+                >
                   {result.message}
                 </span>
               </div>
 
               <div className="space-y-2 text-sm">
-                {result.duration && <p className="text-muted-foreground">Duration: {result.duration}s</p>}
-                <p className="text-muted-foreground">Completed {formatDistanceToNow(result.timestamp)}</p>
+                {result.duration && (
+                  <p className="text-muted-foreground">Duration: {result.duration}s</p>
+                )}
+                <p className="text-muted-foreground">
+                  Completed {formatDistanceToNow(result.timestamp)}
+                </p>
 
                 {result.logs && (
                   <div className="mt-3">
@@ -203,7 +211,8 @@ export function TestDefinitionTestModal({ isOpen, onClose, testDefinition }: Tes
           {!testing && !result && (
             <div className="p-4 bg-muted/30 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                This will create a Kubernetes job to execute your test definition and show real-time progress.
+                This will create a Kubernetes job to execute your test definition and show real-time
+                progress.
               </p>
             </div>
           )}

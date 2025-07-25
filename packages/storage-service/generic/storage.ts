@@ -4,7 +4,7 @@
  */
 
 export interface ChangeEvent<T> {
-  eventType: 'INSERT' | 'UPDATE' | 'DELETE'
+  eventType: "INSERT" | "UPDATE" | "DELETE"
   new?: T
   old?: T
 }
@@ -23,19 +23,19 @@ export interface StorageConfig {
   apiBaseUrl?: string
   apiTimeout?: number
   maxRetries?: number
-  
+
   // LocalStorage Configuration
   storagePrefix?: string
   maxStorageSize?: number
-  
+
   // Fallback Behavior
   fallbackTimeout?: number
   offlineThreshold?: number
-  
+
   // Data Transformation
   transformRequest?: (data: any) => any
   transformResponse?: (data: any) => any
-  
+
   // Error Handling
   onError?: (error: Error, context: string) => void
   onFallback?: (reason: string) => void

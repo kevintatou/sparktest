@@ -10,10 +10,10 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { storage } from "@tatou/storage-service"
 import { formatDistanceToNow } from "@tatou/core"
-import type { Test } from "@tatou/core/types"
+import type { Run } from "@tatou/core/types"
 
 export function TestList() {
-  const [tests, setTests] = useState<Test[]>([])
+  const [tests, setTests] = useState<Run[]>([])
   const [progressValues, setProgressValues] = useState<Record<string, number>>({})
   const initializedRef = useRef(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -83,8 +83,8 @@ export function TestList() {
           if (newValues[test.id] === 100 && currentValue !== 100) {
             setTimeout(() => {
               // Update the test status in localStorage
-              const newStatus = Math.random() > 0.2 ? "completed" : "failed"
-              const updatedTest = {
+              const newStatus: "completed" | "failed" = Math.random() > 0.2 ? "completed" : "failed"
+              const updatedTest: Run = {
                 ...test,
                 status: newStatus,
               }
@@ -118,7 +118,9 @@ export function TestList() {
             <div className="flex flex-col sm:flex-row">
               <div className="flex flex-1 items-start gap-4 p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                  {test.status === "completed" && <CheckCircle className="h-5 w-5 text-green-500" />}
+                  {test.status === "completed" && (
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                  )}
                   {test.status === "failed" && <XCircle className="h-5 w-5 text-red-500" />}
                   {test.status === "running" && (
                     <div className="relative flex h-5 w-5 items-center justify-center">
@@ -132,7 +134,11 @@ export function TestList() {
                     <h3 className="font-semibold">{test.name}</h3>
                     <Badge
                       variant={
-                        test.status === "completed" ? "success" : test.status === "failed" ? "destructive" : "default"
+                        test.status === "completed"
+                          ? "success"
+                          : test.status === "failed"
+                            ? "destructive"
+                            : "default"
                       }
                       className="animate-in fade-in"
                     >

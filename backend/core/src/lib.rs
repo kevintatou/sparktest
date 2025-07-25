@@ -1,14 +1,14 @@
-pub mod models;
 pub mod db;
+pub mod models;
 
-pub use models::*;
 pub use db::*;
+pub use models::*;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use uuid::Uuid;
     use chrono::Utc;
+    use uuid::Uuid;
 
     #[tokio::test]
     async fn test_test_run_creation() {

@@ -6,20 +6,20 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SuiteForm } from "@/components/suite-form"
 import { useToast } from "@/components/ui/use-toast"
-import type { TestSuite } from "@tatou/core/types"
 import { storage } from "@tatou/storage-service"
+import type { Suite } from "@tatou/core/types"
 
 export default function EditSuitePage({ params }: { params: { id: string } }) {
   const { id } = params
   const { toast } = useToast()
-  const [suite, setSuite] = useState<TestSuite | null>(null)
+  const [suite, setSuite] = useState<Suite | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadSuite = async () => {
       setLoading(true)
       try {
-        const loadedSuite = await storage.getTestSuiteById(id)
+        const loadedSuite = await storage.getSuiteById(id)
         if (!loadedSuite) {
           toast({
             title: "Suite not found",
@@ -40,7 +40,7 @@ export default function EditSuitePage({ params }: { params: { id: string } }) {
         setLoading(false)
       }
     }
-    
+
     loadSuite()
   }, [id, toast])
 
@@ -75,7 +75,7 @@ export default function EditSuitePage({ params }: { params: { id: string } }) {
       </div>
     )
   }
-  
+
   if (!suite) {
     return (
       <div className="container py-6">

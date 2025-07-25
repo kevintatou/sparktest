@@ -24,11 +24,11 @@ export default defineConfig({
         "contexts/**/*.tsx",
       ],
       exclude: [
-        "node_modules/", 
-        ".next/", 
-        "coverage/", 
-        "**/*.d.ts", 
-        "**/*.config.*", 
+        "node_modules/",
+        ".next/",
+        "coverage/",
+        "**/*.d.ts",
+        "**/*.config.*",
         "**/types/**",
         "lib/types.ts", // Type definitions only
         "lib/config.ts", // Simple configuration

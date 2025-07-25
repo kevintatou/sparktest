@@ -20,7 +20,11 @@
     "clean": "pnpm --filter './packages/*' clean",
     "cargo-build": "cargo build",
     "cargo-test": "cargo test",
-    "cargo-run": "cargo run -p sparktest-bin"
+    "cargo-run": "cargo run -p sparktest-bin",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:all": "pnpm lint && pnpm format:check",
+    "fix": "pnpm format && pnpm lint"
   },
   "workspaces": [
     "apps/*",
@@ -28,6 +32,7 @@
   ],
   "devDependencies": {
     "concurrently": "^7.6.0",
+    "prettier": "^3.6.2",
     "tsup": "^8.5.0",
     "typescript": "^5"
   }

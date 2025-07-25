@@ -6,20 +6,32 @@ import { useRouter } from "next/navigation"
 import { Plus, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@tatou/storage-service"
-import type { TestSuite, Definition } from "@tatou/core/types"
+import type { Definition, Suite } from "@tatou/core/types"
 import { Autocomplete } from "@/components/ui/autocomplete"
 
 interface SuiteFormProps {
-  existingSuite?: TestSuite
+  existingSuite?: Suite
 }
 
 export function SuiteForm({ existingSuite }: SuiteFormProps) {
@@ -62,14 +74,14 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
     }))
   }
 
-  const toggleDefinition = (definitionId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      testDefinitionIds: prev.testDefinitionIds.includes(definitionId)
-        ? prev.testDefinitionIds.filter((id) => id !== definitionId)
-        : [...prev.testDefinitionIds, definitionId],
-    }))
-  }
+  // const toggleDefinition = (definitionId: string) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     testDefinitionIds: prev.testDefinitionIds.includes(definitionId)
+  //       ? prev.testDefinitionIds.filter((id) => id !== definitionId)
+  //       : [...prev.testDefinitionIds, definitionId],
+  //   }))
+  // }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -80,14 +92,14 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
       if (formData.testDefinitionIds.length === 0) {
         throw new Error("Please select at least one test definition")
       }
-      
-      const suiteData: TestSuite = {
+
+      const suiteData: Suite = {
         ...formData,
         createdAt: existingSuite?.createdAt || new Date().toISOString(),
       }
 
       // Save the suite using the storage service
-      await storage.saveTestSuite(suiteData)
+      await storage.saveSuite(suiteData)
 
       toast({
         title: existingSuite ? "Suite updated" : "Suite created",
@@ -161,7 +173,9 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
             <Label>Execution Mode</Label>
             <Select
               value={formData.executionMode}
-              onValueChange={(value: "sequential" | "parallel") => setFormData({ ...formData, executionMode: value })}
+              onValueChange={(value: "sequential" | "parallel") =>
+                setFormData({ ...formData, executionMode: value })
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -180,10 +194,12 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
               getOptionLabel={(option) => option.name}
               multiple
               value={definitions.filter((d) => formData.testDefinitionIds.includes(d.id))}
-              onChange={(_, value) => setFormData((prev) => ({
-                ...prev,
-                testDefinitionIds: value.map((d) => d.id),
-              }))}
+              onChange={(_, value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  testDefinitionIds: value.map((d) => d.id),
+                }))
+              }
               renderInput={(params) => (
                 <Input {...params} placeholder="Search and select test definitions..." />
               )}
@@ -217,7 +233,10 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
                 {formData.labels.map((label) => (
                   <Badge key={label} variant="secondary" className="flex items-center gap-1">
                     {label}
-                    <X className="h-3 w-3 cursor-pointer hover:text-red-500" onClick={() => removeLabel(label)} />
+                    <X
+                      className="h-3 w-3 cursor-pointer hover:text-red-500"
+                      onClick={() => removeLabel(label)}
+                    />
                   </Badge>
                 ))}
               </div>
@@ -237,7 +256,14 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
                   fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
                   <path
                     className="opacity-75"
                     fill="currentColor"

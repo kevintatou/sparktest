@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Plus, Play, Edit, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,11 +15,7 @@ export function TestDefinitionsList() {
   const [runningTests, setRunningTests] = useState<string[]>([])
   const { toast } = useToast()
 
-  useEffect(() => {
-    loadTestDefinitions()
-  }, [])
-
-  const loadTestDefinitions = async () => {
+  const loadTestDefinitions = useCallback(async () => {
     try {
       const data = await storage.getDefinitions()
       setTestDefinitions(data)
@@ -32,7 +28,11 @@ export function TestDefinitionsList() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    loadTestDefinitions()
+  }, [loadTestDefinitions])
 
   const handleRunTest = async (testId: string) => {
     setRunningTests((prev) => [...prev, testId])
@@ -123,9 +123,9 @@ export function TestDefinitionsList() {
                   <p>
                     <strong>Commands:</strong> {test.commands.join(", ")}
                   </p>
-                  {test.executor_id && (
+                  {test.executorId && (
                     <p>
-                      <strong>Executor:</strong> {test.executor_id}
+                      <strong>Executor:</strong> {test.executorId}
                     </p>
                   )}
                 </div>

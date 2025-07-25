@@ -16,4 +16,4 @@ export const dummyDefinitions = [
     description: "Another dummy test for local dev.",
     createdAt: new Date().toISOString(),
   },
-];
+]
