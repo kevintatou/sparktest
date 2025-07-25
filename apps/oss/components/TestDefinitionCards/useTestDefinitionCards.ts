@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from "react"
-import { storage } from "@sparktest/storage-service"
+import { useState, useEffect, useRef, useCallback } from "react"
+import { storage } from "@tatou/storage-service"
 import { useToast } from "@/components/ui/use-toast"
-import type { TestDefinition } from "@sparktest/core/types"
+import type { Definition } from "@tatou/core/types"
 
 export function useTestDefinitionCards() {
   const { toast } = useToast()
   const [runningTests, setRunningTests] = useState<string[]>([])
-  const [testDefinitions, setTestDefinitions] = useState<TestDefinition[]>([])
+  const [testDefinitions, setTestDefinitions] = useState<Definition[]>([])
   const [testModalOpen, setTestModalOpen] = useState(false)
-  const [selectedTest, setSelectedTest] = useState<TestDefinition | null>(null)
+  const [selectedTest, setSelectedTest] = useState<Definition | null>(null)
   const initializedRef = useRef(false)
 
   useEffect(() => {
@@ -21,36 +21,39 @@ export function useTestDefinitionCards() {
     }
   }, [])
 
-  const handleQuickRun = useCallback(async (testId: string) => {
-    setRunningTests((prev) => [...prev, testId])
+  const handleQuickRun = useCallback(
+    async (testId: string) => {
+      setRunningTests((prev) => [...prev, testId])
 
-    try {
-      // Create a new test run in localStorage
-      const definition = testDefinitions.find((def) => def.id === testId)
-      if (definition) {
-        const newRun = await storage.createRun(definition)
+      try {
+        // Create a new test run in localStorage
+        const definition = testDefinitions.find((def) => def.id === testId)
+        if (definition) {
+          const newRun = await storage.createRun(definition.id)
 
-        setTimeout(() => {
-          setRunningTests((prev) => prev.filter((id) => id !== testId))
+          setTimeout(() => {
+            setRunningTests((prev) => prev.filter((id) => id !== testId))
 
-          toast({
-            title: "Test started successfully",
-            description: `Test "${newRun.name}" is now running.`,
-          })
-        }, 1500)
+            toast({
+              title: "Test started successfully",
+              description: `Test "${newRun.name}" is now running.`,
+            })
+          }, 1500)
+        }
+      } catch (error) {
+        setRunningTests((prev) => prev.filter((id) => id !== testId))
+
+        toast({
+          title: "Error starting test",
+          description: error instanceof Error ? error.message : "Unknown error occurred",
+          variant: "destructive",
+        })
       }
-    } catch (error) {
-      setRunningTests((prev) => prev.filter((id) => id !== testId))
+    },
+    [testDefinitions, toast]
+  )
 
-      toast({
-        title: "Error starting test",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive",
-      })
-    }
-  }, [testDefinitions, toast])
-
-  const handleTestWithModal = useCallback((test: TestDefinition) => {
+  const handleTestWithModal = useCallback((test: Definition) => {
     setSelectedTest(test)
     setTestModalOpen(true)
   }, [])

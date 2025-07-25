@@ -1,8 +1,9 @@
-import { Clock, Code, Database, Server, Shield } from "lucide-react"
-import type { TestDefinition } from "@sparktest/core/types"
+import { Code, Database, Server, Shield } from "lucide-react"
+import type { Definition } from "@tatou/core/types"
+import type { LucideIcon } from "lucide-react"
 
 // Map of icons for different test types
-export const iconMap: Record<string, any> = {
+export const iconMap: Record<string, LucideIcon> = {
   api: Server,
   frontend: Code,
   security: Shield,
@@ -10,7 +11,7 @@ export const iconMap: Record<string, any> = {
 }
 
 // Function to determine icon based on test name or description
-export function getIconForTest(test: TestDefinition) {
+export function getIconForTest(test: Definition) {
   const testNameLower = test.name.toLowerCase()
   const descriptionLower = test.description.toLowerCase()
 
@@ -44,7 +45,7 @@ export function getIconForTest(test: TestDefinition) {
 }
 
 // Function to generate tags based on test properties
-export function generateTagsForTest(test: TestDefinition): string[] {
+export function generateTagsForTest(test: Definition): string[] {
   const tags: string[] = []
   const testNameLower = test.name.toLowerCase()
   const descriptionLower = test.description.toLowerCase()

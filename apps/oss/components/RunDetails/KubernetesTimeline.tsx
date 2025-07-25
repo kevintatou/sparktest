@@ -20,28 +20,32 @@ export function KubernetesTimeline({ run, formatDate, safeDate }: KubernetesTime
               <label className="text-sm font-medium text-muted-foreground">Job Created</label>
               <p className="mt-1">{formatDate(safeDate(run.createdAt).toISOString())}</p>
             </div>
-            
+
             {run.podScheduled && (
               <div>
                 <label className="text-sm font-medium text-muted-foreground">Pod Scheduled</label>
                 <p className="mt-1">{formatDate(safeDate(run.podScheduled).toISOString())}</p>
               </div>
             )}
-            
+
             {run.containerCreated && (
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Container Created</label>
+                <label className="text-sm font-medium text-muted-foreground">
+                  Container Created
+                </label>
                 <p className="mt-1">{formatDate(safeDate(run.containerCreated).toISOString())}</p>
               </div>
             )}
-            
+
             {run.containerStarted && (
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Container Started</label>
+                <label className="text-sm font-medium text-muted-foreground">
+                  Container Started
+                </label>
                 <p className="mt-1">{formatDate(safeDate(run.containerStarted).toISOString())}</p>
               </div>
             )}
-            
+
             {(run.completed || run.failed) && (
               <div>
                 <label className="text-sm font-medium text-muted-foreground">

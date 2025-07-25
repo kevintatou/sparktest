@@ -21,15 +21,15 @@ export function validateRunData(formData: {
   useCustomSettings: boolean
 }) {
   const errors: string[] = []
-  
+
   if (!formData.name.trim()) {
     errors.push("Run name is required")
   }
-  
-  if (formData.useCustomSettings && !formData.commands.some(cmd => cmd.trim())) {
+
+  if (formData.useCustomSettings && !formData.commands.some((cmd) => cmd.trim())) {
     errors.push("At least one command is required when using custom settings")
   }
-  
+
   return errors
 }
 

@@ -1,6 +1,11 @@
+import type { Definition } from "@tatou/core/types"
 import type { TestResult } from "./useTestDefinitionTestModal"
 
-export function generateTestLogs(testDefinition: any, success: boolean, duration: number): string[] {
+export function generateTestLogs(
+  testDefinition: Definition,
+  success: boolean,
+  duration: number
+): string[] {
   if (success) {
     return [
       `> Starting test: ${testDefinition.name}`,
@@ -27,7 +32,7 @@ export function generateTestLogs(testDefinition: any, success: boolean, duration
   }
 }
 
-export function getSimulatedTestResult(testDefinition: any): TestResult {
+export function getSimulatedTestResult(testDefinition: Definition): TestResult {
   // Simulate test result (80% success rate)
   const success = Math.random() > 0.2
   const duration = Math.floor(Math.random() * 120) + 30 // 30-150 seconds

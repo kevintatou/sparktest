@@ -14,15 +14,8 @@ interface TestDetailsProps {
 }
 
 export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
-  const {
-    activeRun,
-    definition,
-    executor,
-    loading,
-    safeDate,
-    formatDate,
-    copyToClipboard,
-  } = useRunDetails({ run })
+  const { activeRun, definition, executor, loading, safeDate, formatDate, copyToClipboard } =
+    useRunDetails({ run })
 
   if (loading) {
     return <div className="space-y-6">Loading...</div>
@@ -31,7 +24,7 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
   return (
     <div className="space-y-6">
       {/* Run Overview */}
-      <RunOverview 
+      <RunOverview
         run={activeRun}
         formatDate={formatDate}
         safeDate={safeDate}
@@ -40,26 +33,14 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
 
       {/* Test Definition Details */}
       {definition && (
-        <DefinitionDetails
-          definition={definition}
-          copyToClipboard={copyToClipboard}
-        />
+        <DefinitionDetails definition={definition} copyToClipboard={copyToClipboard} />
       )}
 
       {/* Executor Details */}
-      {executor && (
-        <ExecutorDetails
-          executor={executor}
-          copyToClipboard={copyToClipboard}
-        />
-      )}
+      {executor && <ExecutorDetails executor={executor} copyToClipboard={copyToClipboard} />}
 
       {/* Kubernetes Timeline */}
-      <KubernetesTimeline
-        run={activeRun}
-        formatDate={formatDate}
-        safeDate={safeDate}
-      />
+      <KubernetesTimeline run={activeRun} formatDate={formatDate} safeDate={safeDate} />
 
       {/* Kubernetes Logs */}
       <KubernetesLogs runId={activeRun.id} jobName={activeRun.k8sJobName} />

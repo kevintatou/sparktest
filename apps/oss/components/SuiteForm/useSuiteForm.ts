@@ -18,7 +18,7 @@ interface FormData {
 export function useSuiteForm(existingSuite?: TestSuite) {
   const router = useRouter()
   const { toast } = useToast()
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [definitions, setDefinitions] = useState<Definition[]>([])
   const [formData, setFormData] = useState<FormData>({
@@ -66,41 +66,44 @@ export function useSuiteForm(existingSuite?: TestSuite) {
     }))
   }, [])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setIsSubmitting(true)
 
-    try {
-      // Validate form data
-      if (formData.testDefinitionIds.length === 0) {
-        throw new Error("Please select at least one test definition")
+      try {
+        // Validate form data
+        if (formData.testDefinitionIds.length === 0) {
+          throw new Error("Please select at least one test definition")
+        }
+
+        const suiteData: TestSuite = {
+          ...formData,
+          createdAt: existingSuite?.createdAt || new Date().toISOString(),
+        }
+
+        // Save the suite using the storage service
+        await storage.saveTestSuite(suiteData)
+
+        toast({
+          title: existingSuite ? "Suite updated" : "Suite created",
+          description: `Test suite "${formData.name}" has been ${existingSuite ? "updated" : "created"} successfully.`,
+        })
+
+        router.push("/suites")
+      } catch (error) {
+        console.error("Error saving test suite:", error)
+        toast({
+          title: `Error ${existingSuite ? "updating" : "creating"} suite`,
+          description: error instanceof Error ? error.message : "Unknown error occurred",
+          variant: "destructive",
+        })
+      } finally {
+        setIsSubmitting(false)
       }
-      
-      const suiteData: TestSuite = {
-        ...formData,
-        createdAt: existingSuite?.createdAt || new Date().toISOString(),
-      }
-
-      // Save the suite using the storage service
-      await storage.saveTestSuite(suiteData)
-
-      toast({
-        title: existingSuite ? "Suite updated" : "Suite created",
-        description: `Test suite "${formData.name}" has been ${existingSuite ? "updated" : "created"} successfully.`,
-      })
-
-      router.push("/suites")
-    } catch (error) {
-      console.error("Error saving test suite:", error)
-      toast({
-        title: `Error ${existingSuite ? "updating" : "creating"} suite`,
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }, [formData, existingSuite, toast, router])
+    },
+    [formData, existingSuite, toast, router]
+  )
 
   return {
     // State
@@ -110,7 +113,7 @@ export function useSuiteForm(existingSuite?: TestSuite) {
     setFormData,
     newLabel,
     setNewLabel,
-    
+
     // Actions
     addLabel,
     removeLabel,

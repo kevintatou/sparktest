@@ -19,7 +19,8 @@ export const METRIC_ICONS = {
 
 export const COLOR_SCHEMES = {
   green: {
-    cardBg: "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20",
+    cardBg:
+      "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20",
     border: "border-green-200 dark:border-green-800",
     title: "text-green-700 dark:text-green-300",
     value: "text-green-700 dark:text-green-300",
@@ -35,7 +36,8 @@ export const COLOR_SCHEMES = {
     icon: "text-red-600 dark:text-red-400",
   },
   blue: {
-    cardBg: "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20",
+    cardBg:
+      "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20",
     border: "border-blue-200 dark:border-blue-800",
     title: "text-blue-700 dark:text-blue-300",
     value: "text-blue-700 dark:text-blue-300",
@@ -51,16 +53,26 @@ export function formatMetricValue(value: number, type: "percentage" | "count"): 
   return value.toString()
 }
 
+interface MetricsData {
+  totalRuns: number
+  completedRuns: number
+  failedRuns: number
+  runningRuns: number
+  totalDefinitions: number
+  totalExecutors: number
+  passRate: number
+}
+
 export function generateSubtitle(
   type: "passRate" | "failedRuns" | "totalRuns",
-  metrics: any
+  metrics: MetricsData
 ): string {
   switch (type) {
     case "passRate":
       return `${metrics.completedRuns} of ${metrics.totalRuns} tests passed`
     case "failedRuns":
-      return metrics.runningRuns > 0 
-        ? `${metrics.runningRuns} currently running` 
+      return metrics.runningRuns > 0
+        ? `${metrics.runningRuns} currently running`
         : "No tests running"
     case "totalRuns":
       return `${metrics.totalDefinitions} definitions • ${metrics.totalExecutors} executors`
@@ -71,7 +83,7 @@ export function generateSubtitle(
 
 export function generateMobileSubtitle(
   type: "passRate" | "failedRuns" | "totalRuns",
-  metrics: any
+  metrics: MetricsData
 ): string {
   switch (type) {
     case "totalRuns":

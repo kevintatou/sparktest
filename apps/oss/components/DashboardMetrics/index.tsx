@@ -5,48 +5,51 @@ import { useDashboardMetrics } from "./useDashboardMetrics"
 import { LoadingState } from "./LoadingState"
 import { MetricCard } from "./MetricCard"
 import { MetricsSummary } from "./MetricsSummary"
-import { 
-  METRIC_ICONS, 
-  formatMetricValue, 
-  generateSubtitle, 
-  generateMobileSubtitle 
+import {
+  METRIC_ICONS,
+  formatMetricValue,
+  generateSubtitle,
+  generateMobileSubtitle,
 } from "./metricsUtils"
 
 export function DashboardMetrics() {
   const { metrics, loading, trendData } = useDashboardMetrics()
 
   // Memoize metric card configurations
-  const metricCards = useMemo(() => [
-    {
-      id: "passRate",
-      title: "Pass Rate",
-      value: formatMetricValue(metrics.passRate, "percentage"),
-      subtitle: generateSubtitle("passRate", metrics),
-      icon: METRIC_ICONS.passRate,
-      color: "green" as const,
-      trendData: trendData.passRate,
-    },
-    {
-      id: "failedRuns",
-      title: "Failed Runs",
-      value: formatMetricValue(metrics.failedRuns, "count"),
-      subtitle: generateSubtitle("failedRuns", metrics),
-      icon: METRIC_ICONS.failedRuns,
-      color: "red" as const,
-      trendData: trendData.failedRuns,
-    },
-    {
-      id: "totalRuns",
-      title: "Total Runs",
-      value: formatMetricValue(metrics.totalRuns, "count"),
-      subtitle: generateSubtitle("totalRuns", metrics),
-      mobileSubtitle: generateMobileSubtitle("totalRuns", metrics),
-      icon: METRIC_ICONS.totalRuns,
-      color: "blue" as const,
-      className: "sm:col-span-2 lg:col-span-1",
-      trendData: trendData.totalRuns,
-    },
-  ], [metrics, trendData])
+  const metricCards = useMemo(
+    () => [
+      {
+        id: "passRate",
+        title: "Pass Rate",
+        value: formatMetricValue(metrics.passRate, "percentage"),
+        subtitle: generateSubtitle("passRate", metrics),
+        icon: METRIC_ICONS.passRate,
+        color: "green" as const,
+        trendData: trendData.passRate,
+      },
+      {
+        id: "failedRuns",
+        title: "Failed Runs",
+        value: formatMetricValue(metrics.failedRuns, "count"),
+        subtitle: generateSubtitle("failedRuns", metrics),
+        icon: METRIC_ICONS.failedRuns,
+        color: "red" as const,
+        trendData: trendData.failedRuns,
+      },
+      {
+        id: "totalRuns",
+        title: "Total Runs",
+        value: formatMetricValue(metrics.totalRuns, "count"),
+        subtitle: generateSubtitle("totalRuns", metrics),
+        mobileSubtitle: generateMobileSubtitle("totalRuns", metrics),
+        icon: METRIC_ICONS.totalRuns,
+        color: "blue" as const,
+        className: "sm:col-span-2 lg:col-span-1",
+        trendData: trendData.totalRuns,
+      },
+    ],
+    [metrics, trendData]
+  )
 
   if (loading) {
     return <LoadingState />

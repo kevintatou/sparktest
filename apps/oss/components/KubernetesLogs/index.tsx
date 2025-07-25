@@ -18,15 +18,8 @@ interface KubernetesLogsProps {
 }
 
 export function KubernetesLogs({ runId, jobName, className }: KubernetesLogsProps) {
-  const {
-    logs,
-    loading,
-    error,
-    kubernetesHealth,
-    fetchLogs,
-    downloadLogs,
-    checkKubernetesHealth,
-  } = useKubernetesLogs({ runId, jobName })
+  const { logs, loading, error, kubernetesHealth, fetchLogs, downloadLogs, checkKubernetesHealth } =
+    useKubernetesLogs({ runId, jobName })
 
   if (!kubernetesHealth) {
     return <LoadingState className={className} />
@@ -53,23 +46,13 @@ export function KubernetesLogs({ runId, jobName, className }: KubernetesLogsProp
                     {logs.status}
                   </div>
                 </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={downloadLogs}
-                  disabled={!logs.logs}
-                >
+                <Button variant="outline" size="sm" onClick={downloadLogs} disabled={!logs.logs}>
                   <Download className="h-4 w-4 mr-2" />
                   Download
                 </Button>
               </>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fetchLogs()}
-              disabled={loading}
-            >
+            <Button variant="outline" size="sm" onClick={() => fetchLogs()} disabled={loading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
               {loading ? "Loading..." : "Refresh"}
             </Button>

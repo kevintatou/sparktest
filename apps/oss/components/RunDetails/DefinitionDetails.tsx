@@ -28,7 +28,7 @@ export function DefinitionDetails({ definition, copyToClipboard }: DefinitionDet
             <label className="text-sm font-medium text-muted-foreground">Name</label>
             <p className="mt-1 font-semibold">{definition.name}</p>
           </div>
-          
+
           <div>
             <label className="text-sm font-medium text-muted-foreground">Definition ID</label>
             <div className="flex items-center gap-2 mt-1">
@@ -59,7 +59,10 @@ export function DefinitionDetails({ definition, copyToClipboard }: DefinitionDet
             <label className="text-sm font-medium text-muted-foreground">Commands</label>
             <div className="mt-1 space-y-1">
               {definition.commands.map((cmd, index) => (
-                <p key={index} className="font-mono text-sm bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded">
+                <p
+                  key={index}
+                  className="font-mono text-sm bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded"
+                >
                   {cmd}
                 </p>
               ))}

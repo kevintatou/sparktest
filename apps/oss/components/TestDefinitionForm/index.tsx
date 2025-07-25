@@ -5,8 +5,10 @@ import { useTestDefinitionForm } from "./useTestDefinitionForm"
 import { ManualForm } from "./ManualForm"
 import { GitHubForm } from "./GitHubForm"
 
+import type { Definition } from "@tatou/core/types"
+
 interface TestDefinitionFormProps {
-  existingTest?: any
+  existingTest?: Definition
 }
 
 export function TestDefinitionForm({ existingTest }: TestDefinitionFormProps) {

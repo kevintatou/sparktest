@@ -1,7 +1,14 @@
 import Link from "next/link"
 import { Clock, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "@sparktest/core/utils"
 import { getIconForTest, generateTagsForTest } from "./testUtils"
@@ -14,11 +21,11 @@ interface TestDefinitionCardProps {
   onTestWithModal: (test: TestDefinition) => void
 }
 
-export function TestDefinitionCard({ 
-  test, 
-  isRunning, 
-  onQuickRun, 
-  onTestWithModal 
+export function TestDefinitionCard({
+  test,
+  isRunning,
+  onQuickRun,
+  onTestWithModal,
 }: TestDefinitionCardProps) {
   const Icon = getIconForTest(test)
   const tags = generateTagsForTest(test)

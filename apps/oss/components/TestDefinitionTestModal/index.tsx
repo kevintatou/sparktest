@@ -23,15 +23,13 @@ interface TestDefinitionTestModalProps {
   testDefinition: TestDefinition
 }
 
-export function TestDefinitionTestModal({ isOpen, onClose, testDefinition }: TestDefinitionTestModalProps) {
-  const {
-    testing,
-    result,
-    progress,
-    currentStep,
-    runTest,
-    resetTest,
-  } = useTestDefinitionTestModal()
+export function TestDefinitionTestModal({
+  isOpen,
+  onClose,
+  testDefinition,
+}: TestDefinitionTestModalProps) {
+  const { testing, result, progress, currentStep, runTest, resetTest } =
+    useTestDefinitionTestModal()
 
   const handleClose = () => {
     resetTest()
@@ -50,23 +48,19 @@ export function TestDefinitionTestModal({ isOpen, onClose, testDefinition }: Tes
             <Play className="h-5 w-5" />
             Test: {testDefinition.name}
           </DialogTitle>
-          <DialogDescription>Execute this test definition and view real-time results</DialogDescription>
+          <DialogDescription>
+            Execute this test definition and view real-time results
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <TestDefinitionInfo testDefinition={testDefinition} />
 
-          {testing && (
-            <TestProgress currentStep={currentStep} progress={progress} />
-          )}
+          {testing && <TestProgress currentStep={currentStep} progress={progress} />}
 
-          {result && (
-            <TestResultDisplay result={result} />
-          )}
+          {result && <TestResultDisplay result={result} />}
 
-          {!testing && !result && (
-            <EmptyTestState />
-          )}
+          {!testing && !result && <EmptyTestState />}
         </div>
 
         <DialogFooter className="flex gap-2">

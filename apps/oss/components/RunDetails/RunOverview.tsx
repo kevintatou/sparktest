@@ -35,16 +35,12 @@ export function RunOverview({ run, formatDate, safeDate, copyToClipboard }: RunO
             <label className="text-sm font-medium text-muted-foreground">Run ID</label>
             <div className="flex items-center gap-2 mt-1">
               <p className="font-mono text-sm">{run.id}</p>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => copyToClipboard(run.id, "Run ID")}
-              >
+              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(run.id, "Run ID")}>
                 <Copy className="h-3 w-3" />
               </Button>
             </div>
           </div>
-          
+
           <div>
             <label className="text-sm font-medium text-muted-foreground">Kubernetes Job</label>
             <div className="flex items-center gap-2 mt-1">
@@ -62,12 +58,7 @@ export function RunOverview({ run, formatDate, safeDate, copyToClipboard }: RunO
           <div>
             <label className="text-sm font-medium text-muted-foreground">Duration</label>
             <p className="mt-1 font-medium">
-              {run.status === "running" 
-                ? "Running..." 
-                : run.duration 
-                  ? `${run.duration}s` 
-                  : "N/A"
-              }
+              {run.status === "running" ? "Running..." : run.duration ? `${run.duration}s` : "N/A"}
             </p>
           </div>
 
@@ -84,7 +75,7 @@ export function RunOverview({ run, formatDate, safeDate, copyToClipboard }: RunO
           <div>
             <label className="text-sm font-medium text-muted-foreground">Command</label>
             <p className="mt-1 font-mono text-sm">
-              {Array.isArray(run.command) ? run.command.join(' ') : run.command}
+              {Array.isArray(run.command) ? run.command.join(" ") : run.command}
             </p>
           </div>
         </div>

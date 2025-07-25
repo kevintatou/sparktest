@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import type { TestDefinition } from "@sparktest/core/types"
+import type { Definition } from "@tatou/core/types"
 
 export interface TestResult {
   success: boolean
@@ -17,7 +17,7 @@ export function useTestDefinitionTestModal() {
   const [progress, setProgress] = useState(0)
   const [currentStep, setCurrentStep] = useState("")
 
-  const runTest = useCallback(async (testDefinition: TestDefinition) => {
+  const runTest = useCallback(async (testDefinition: Definition) => {
     setTesting(true)
     setResult(null)
     setProgress(0)
@@ -77,7 +77,7 @@ export function useTestDefinitionTestModal() {
         duration,
         logs,
       })
-    } catch (error) {
+    } catch {
       setResult({
         success: false,
         message: "Test execution failed",
@@ -102,7 +102,7 @@ export function useTestDefinitionTestModal() {
     result,
     progress,
     currentStep,
-    
+
     // Actions
     runTest,
     resetTest,

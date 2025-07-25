@@ -73,35 +73,38 @@ export function useDashboardMetrics() {
   }, [calculateMetrics])
 
   // Memoize trend data to prevent unnecessary recalculations
-  const trendData = useMemo(() => ({
-    passRate: [
-      { date: "6d", value: 65 },
-      { date: "5d", value: 70 },
-      { date: "4d", value: 75 },
-      { date: "3d", value: 80 },
-      { date: "2d", value: 85 },
-      { date: "1d", value: 90 },
-      { date: "now", value: metrics.passRate },
-    ],
-    failedRuns: [
-      { date: "6d", value: 12 },
-      { date: "5d", value: 8 },
-      { date: "4d", value: 15 },
-      { date: "3d", value: 6 },
-      { date: "2d", value: 9 },
-      { date: "1d", value: 4 },
-      { date: "now", value: metrics.failedRuns },
-    ],
-    totalRuns: [
-      { date: "6d", value: 45 },
-      { date: "5d", value: 52 },
-      { date: "4d", value: 48 },
-      { date: "3d", value: 61 },
-      { date: "2d", value: 55 },
-      { date: "1d", value: 67 },
-      { date: "now", value: metrics.totalRuns },
-    ],
-  }), [metrics.passRate, metrics.failedRuns, metrics.totalRuns])
+  const trendData = useMemo(
+    () => ({
+      passRate: [
+        { date: "6d", value: 65 },
+        { date: "5d", value: 70 },
+        { date: "4d", value: 75 },
+        { date: "3d", value: 80 },
+        { date: "2d", value: 85 },
+        { date: "1d", value: 90 },
+        { date: "now", value: metrics.passRate },
+      ],
+      failedRuns: [
+        { date: "6d", value: 12 },
+        { date: "5d", value: 8 },
+        { date: "4d", value: 15 },
+        { date: "3d", value: 6 },
+        { date: "2d", value: 9 },
+        { date: "1d", value: 4 },
+        { date: "now", value: metrics.failedRuns },
+      ],
+      totalRuns: [
+        { date: "6d", value: 45 },
+        { date: "5d", value: 52 },
+        { date: "4d", value: 48 },
+        { date: "3d", value: 61 },
+        { date: "2d", value: 55 },
+        { date: "1d", value: 67 },
+        { date: "now", value: metrics.totalRuns },
+      ],
+    }),
+    [metrics.passRate, metrics.failedRuns, metrics.totalRuns]
+  )
 
   return {
     metrics,

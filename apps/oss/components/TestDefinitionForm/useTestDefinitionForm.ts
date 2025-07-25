@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@sparktest/storage-service"
-import type { Executor } from "@sparktest/core/types"
+import { storage } from "@tatou/storage-service"
+import type { Executor, Definition } from "@tatou/core/types"
 
 interface FormData {
   name: string
@@ -14,10 +14,10 @@ interface FormData {
   executorId: string
 }
 
-export function useTestDefinitionForm(existingTest?: any) {
+export function useTestDefinitionForm(existingTest?: Definition) {
   const router = useRouter()
   const { toast } = useToast()
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [tab, setTab] = useState("manual")
   const [executors, setExecutors] = useState<Executor[]>([])
@@ -43,7 +43,8 @@ export function useTestDefinitionForm(existingTest?: any) {
         console.error("Failed to fetch executors:", error)
         toast({
           title: "Error fetching executors",
-          description: "Failed to load available executors. You can still create a test definition without selecting an executor.",
+          description:
+            "Failed to load available executors. You can still create a test definition without selecting an executor.",
           variant: "destructive",
         })
       } finally {
@@ -56,14 +57,15 @@ export function useTestDefinitionForm(existingTest?: any) {
   // Auto-populate image and commands when executor is selected
   useEffect(() => {
     if (formData.executorId && formData.executorId !== "none" && executors.length > 0) {
-      const selectedExecutor = executors.find(e => e.id === formData.executorId)
+      const selectedExecutor = executors.find((e) => e.id === formData.executorId)
       if (selectedExecutor) {
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           image: selectedExecutor.image,
-          commands: selectedExecutor.command && selectedExecutor.command.length > 0 
-            ? selectedExecutor.command 
-            : ["echo hello"]
+          commands:
+            selectedExecutor.command && selectedExecutor.command.length > 0
+              ? selectedExecutor.command
+              : ["echo hello"],
         }))
       }
     }
@@ -90,58 +92,65 @@ export function useTestDefinitionForm(existingTest?: any) {
     }))
   }, [])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setIsSubmitting(true)
 
-    try {
-      // Save to localStorage
-      const submissionData = {
-        ...formData,
-        commands: formData.commands.filter(Boolean),
-        createdAt: existingTest?.createdAt || new Date().toISOString(),
-        executorId: formData.executorId === "none" ? undefined : formData.executorId,
+      try {
+        // Save to localStorage
+        const submissionData: Definition = {
+          ...formData,
+          id: existingTest?.id || Date.now().toString(),
+          commands: formData.commands.filter(Boolean),
+          createdAt: existingTest?.createdAt || new Date().toISOString(),
+          executorId: formData.executorId === "none" ? undefined : formData.executorId,
+        }
+        storage.saveDefinition(submissionData)
+
+        toast({
+          title: existingTest ? "Test definition updated" : "Test definition created",
+          description: `Test "${formData.name}" has been ${existingTest ? "updated" : "created"} successfully.`,
+        })
+
+        router.push("/definitions")
+      } catch (error) {
+        toast({
+          title: `Error ${existingTest ? "updating" : "creating"} test definition`,
+          description: error instanceof Error ? error.message : "Unknown error occurred",
+          variant: "destructive",
+        })
+      } finally {
+        setIsSubmitting(false)
       }
-      storage.saveDefinition(submissionData)
+    },
+    [formData, existingTest, toast, router]
+  )
 
-      toast({
-        title: existingTest ? "Test definition updated" : "Test definition created",
-        description: `Test "${formData.name}" has been ${existingTest ? "updated" : "created"} successfully.`,
-      })
-
-      router.push("/definitions")
-    } catch (error) {
-      toast({
-        title: `Error ${existingTest ? "updating" : "creating"} test definition`,
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }, [formData, existingTest, toast, router])
-
-  const handleGithubSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    try {
-      // Here you would call your backend API to trigger a sync for this repo
-      // For now, just show a toast
-      toast({
-        title: "GitHub Sync Triggered",
-        description: `Syncing definitions from ${githubUrl}${githubPath}`,
-      })
-      router.push("/definitions")
-    } catch (error) {
-      toast({
-        title: "Error syncing from GitHub",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }, [githubUrl, githubPath, toast, router])
+  const handleGithubSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setIsSubmitting(true)
+      try {
+        // Here you would call your backend API to trigger a sync for this repo
+        // For now, just show a toast
+        toast({
+          title: "GitHub Sync Triggered",
+          description: `Syncing definitions from ${githubUrl}${githubPath}`,
+        })
+        router.push("/definitions")
+      } catch (error) {
+        toast({
+          title: "Error syncing from GitHub",
+          description: error instanceof Error ? error.message : "Unknown error occurred",
+          variant: "destructive",
+        })
+      } finally {
+        setIsSubmitting(false)
+      }
+    },
+    [githubUrl, githubPath, toast, router]
+  )
 
   return {
     // State
@@ -156,7 +165,7 @@ export function useTestDefinitionForm(existingTest?: any) {
     setGithubUrl,
     githubPath,
     setGithubPath,
-    
+
     // Actions
     addCommand,
     removeCommand,

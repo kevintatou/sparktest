@@ -3,19 +3,32 @@
 import { useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useSuiteForm } from "./useSuiteForm"
 import { LabelsSection } from "./LabelsSection"
 import { TestDefinitionsSelector } from "./TestDefinitionsSelector"
 import { getExecutionModeDescription } from "./suiteUtils"
-import type { TestSuite } from "@sparktest/core/types"
+import type { Suite, Definition } from "@tatou/core/types"
 
 interface SuiteFormProps {
-  existingSuite?: TestSuite
+  existingSuite?: Suite
 }
 
 export function SuiteForm({ existingSuite }: SuiteFormProps) {
@@ -33,12 +46,15 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
   } = useSuiteForm(existingSuite)
 
   // Memoize execution mode options
-  const executionModeOptions = useMemo(() => [
-    { value: "sequential", label: getExecutionModeDescription("sequential") },
-    { value: "parallel", label: getExecutionModeDescription("parallel") },
-  ], [])
+  const executionModeOptions = useMemo(
+    () => [
+      { value: "sequential", label: getExecutionModeDescription("sequential") },
+      { value: "parallel", label: getExecutionModeDescription("parallel") },
+    ],
+    []
+  )
 
-  const handleDefinitionsChange = (selectedDefinitions: any[]) => {
+  const handleDefinitionsChange = (selectedDefinitions: Definition[]) => {
     setFormData((prev) => ({
       ...prev,
       testDefinitionIds: selectedDefinitions.map((d) => d.id),
@@ -85,7 +101,9 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
             <Label>Execution Mode</Label>
             <Select
               value={formData.executionMode}
-              onValueChange={(value: "sequential" | "parallel") => setFormData({ ...formData, executionMode: value })}
+              onValueChange={(value: "sequential" | "parallel") =>
+                setFormData({ ...formData, executionMode: value })
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -127,7 +145,14 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
                   fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
                   <path
                     className="opacity-75"
                     fill="currentColor"

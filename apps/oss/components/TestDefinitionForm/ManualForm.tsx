@@ -2,23 +2,38 @@
 
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { CommandsSection } from "./CommandsSection"
-import type { Executor } from "@sparktest/core/types"
+import type { Executor, Definition } from "@tatou/core/types"
+
+interface FormData {
+  name: string
+  description: string
+  image: string
+  commands: string[]
+  executorId: string
+}
 
 interface ManualFormProps {
-  formData: {
-    name: string
-    description: string
-    image: string
-    commands: string[]
-    executorId: string
-  }
-  setFormData: (data: any) => void
+  formData: FormData
+  setFormData: (data: FormData) => void
   executors: Executor[]
   isLoadingExecutors: boolean
   isSubmitting: boolean
@@ -26,7 +41,7 @@ interface ManualFormProps {
   addCommand: () => void
   removeCommand: (index: number) => void
   updateCommand: (index: number, value: string) => void
-  existingTest?: any
+  existingTest?: Definition
 }
 
 export function ManualForm({
@@ -83,17 +98,25 @@ export function ManualForm({
             <Label htmlFor="executor">Executor (Optional)</Label>
             <Select
               value={formData.executorId}
-              onValueChange={(value) => setFormData({ ...formData, executorId: value === "none" ? "" : value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, executorId: value === "none" ? "" : value })
+              }
               disabled={isLoadingExecutors}
             >
               <SelectTrigger className="transition-all focus-visible:ring-primary">
-                <SelectValue placeholder={isLoadingExecutors ? "Loading executors..." : "Select an executor (optional)"} />
+                <SelectValue
+                  placeholder={
+                    isLoadingExecutors ? "Loading executors..." : "Select an executor (optional)"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">
                   <div className="flex flex-col">
                     <span>No executor (custom)</span>
-                    <span className="text-xs text-muted-foreground">Use custom image and commands</span>
+                    <span className="text-xs text-muted-foreground">
+                      Use custom image and commands
+                    </span>
                   </div>
                 </SelectItem>
                 {executors.map((executor) => (
@@ -107,7 +130,8 @@ export function ManualForm({
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">
-              Select a pre-configured executor to automatically populate image and commands, or leave empty for custom configuration.
+              Select a pre-configured executor to automatically populate image and commands, or
+              leave empty for custom configuration.
             </p>
           </div>
 
@@ -146,7 +170,14 @@ export function ManualForm({
                   fill="none"
                   viewBox="0 0 24 24"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
                   <path
                     className="opacity-75"
                     fill="currentColor"

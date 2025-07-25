@@ -47,7 +47,10 @@ export function LabelsSection({
           {labels.map((label) => (
             <Badge key={label} variant="secondary" className="flex items-center gap-1">
               {label}
-              <X className="h-3 w-3 cursor-pointer hover:text-red-500" onClick={() => removeLabel(label)} />
+              <X
+                className="h-3 w-3 cursor-pointer hover:text-red-500"
+                onClick={() => removeLabel(label)}
+              />
             </Badge>
           ))}
         </div>

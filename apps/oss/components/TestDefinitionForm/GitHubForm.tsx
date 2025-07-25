@@ -2,7 +2,14 @@
 
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
@@ -31,7 +38,8 @@ export function GitHubForm({
         <CardHeader>
           <CardTitle>Import from GitHub</CardTitle>
           <CardDescription>
-            Enter a public GitHub repository URL and (optionally) a path to auto-register test definitions from JSON files.
+            Enter a public GitHub repository URL and (optionally) a path to auto-register test
+            definitions from JSON files.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

@@ -16,7 +16,7 @@ interface FormData {
 export function useRunTestForm(definition: Definition) {
   const router = useRouter()
   const { toast } = useToast()
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<FormData | null>(null)
 
@@ -39,74 +39,83 @@ export function useRunTestForm(definition: Definition) {
     })
   }, [formData])
 
-  const removeCommand = useCallback((index: number) => {
-    if (!formData) return
-    setFormData({
-      ...formData,
-      commands: formData.commands.filter((_, i) => i !== index),
-    })
-  }, [formData])
+  const removeCommand = useCallback(
+    (index: number) => {
+      if (!formData) return
+      setFormData({
+        ...formData,
+        commands: formData.commands.filter((_, i) => i !== index),
+      })
+    },
+    [formData]
+  )
 
-  const updateCommand = useCallback((index: number, value: string) => {
-    if (!formData) return
-    setFormData({
-      ...formData,
-      commands: formData.commands.map((cmd, i) => (i === index ? value : cmd)),
-    })
-  }, [formData])
+  const updateCommand = useCallback(
+    (index: number, value: string) => {
+      if (!formData) return
+      setFormData({
+        ...formData,
+        commands: formData.commands.map((cmd, i) => (i === index ? value : cmd)),
+      })
+    },
+    [formData]
+  )
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formData) return
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      if (!formData) return
 
-    setIsSubmitting(true)
+      setIsSubmitting(true)
 
-    try {
-      const options = formData.useCustomSettings
-        ? {
-            name: formData.name,
-            image: formData.image,
-            commands: formData.commands.filter(Boolean),
-          }
-        : { name: formData.name }
+      try {
+        const options = formData.useCustomSettings
+          ? {
+              name: formData.name,
+              image: formData.image,
+              commands: formData.commands.filter(Boolean),
+            }
+          : { name: formData.name }
 
-      const newRun = await storage.createRun(definition.id, options)
+        const newRun = await storage.createRun(definition.id, options)
 
-      if (!newRun || !newRun.id) {
-        console.error("createRun did not return a valid run object:", newRun)
+        if (!newRun || !newRun.id) {
+          console.error("createRun did not return a valid run object:", newRun)
+          toast({
+            title: "Error starting test",
+            description: "Failed to create test run: missing run ID.",
+            variant: "destructive",
+          })
+          setIsSubmitting(false)
+          return
+        }
+
+        toast({
+          title: "Test started successfully",
+          description: `Test "${newRun.name}" is now running. You can monitor its progress on the runs page.`,
+          duration: 4000,
+        })
+
+        router.push(`/runs/${newRun.id}`)
+      } catch (error) {
         toast({
           title: "Error starting test",
-          description: "Failed to create test run: missing run ID.",
+          description: error instanceof Error ? error.message : "Unknown error occurred",
           variant: "destructive",
         })
+      } finally {
         setIsSubmitting(false)
-        return
       }
-
-      toast({
-        title: "Test started successfully",
-        description: `Test "${newRun.name}" is now running. You can monitor its progress on the runs page.`,
-        duration: 4000,
-      })
-
-      router.push(`/runs/${newRun.id}`)
-    } catch (error) {
-      toast({
-        title: "Error starting test",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }, [formData, definition.id, toast, router])
+    },
+    [formData, definition.id, toast, router]
+  )
 
   return {
     // State
     isSubmitting,
     formData,
     setFormData,
-    
+
     // Actions
     addCommand,
     removeCommand,

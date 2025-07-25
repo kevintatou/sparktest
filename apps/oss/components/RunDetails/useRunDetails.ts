@@ -15,9 +15,10 @@ export function useRunDetails({ run }: UseRunDetailsProps) {
 
   // Memoize the safe run object to prevent unnecessary re-renders
   const activeRun = useMemo<Run>(() => {
-    const safeCreatedAt = run?.createdAt && !Number.isNaN(Date.parse(run.createdAt))
-      ? run.createdAt
-      : new Date().toISOString()
+    const safeCreatedAt =
+      run?.createdAt && !Number.isNaN(Date.parse(run.createdAt))
+        ? run.createdAt
+        : new Date().toISOString()
 
     return {
       ...run,
@@ -33,38 +34,38 @@ export function useRunDetails({ run }: UseRunDetailsProps) {
         if (activeRun.definitionId) {
           const def = await storage.getDefinitionById(activeRun.definitionId)
           setDefinition(def || null)
-          
+
           if (def?.executorId) {
             const exec = await storage.getExecutorById(def.executorId)
             setExecutor(exec || null)
           }
         }
       } catch (error) {
-        console.error('Error loading related data:', error)
+        console.error("Error loading related data:", error)
       } finally {
         setLoading(false)
       }
     }
-    
+
     loadRelatedData()
   }, [activeRun.definitionId])
 
   // Memoized utility functions
-  const safeDate = useMemo(() => 
-    (d: string | undefined) => new Date(d && !Number.isNaN(Date.parse(d)) ? d : Date.now()),
+  const safeDate = useMemo(
+    () => (d: string | undefined) => new Date(d && !Number.isNaN(Date.parse(d)) ? d : Date.now()),
     []
   )
 
-  const formatDate = useMemo(() => 
-    (dateString: string) => {
+  const formatDate = useMemo(
+    () => (dateString: string) => {
       const date = new Date(dateString)
       return date.toLocaleString()
     },
     []
   )
 
-  const copyToClipboard = useMemo(() => 
-    (text: string, label: string) => {
+  const copyToClipboard = useMemo(
+    () => (text: string, label: string) => {
       navigator.clipboard.writeText(text)
       toast({
         title: "Copied to clipboard",

@@ -29,7 +29,7 @@ export function ExecutorDetails({ executor, copyToClipboard }: ExecutorDetailsPr
             <label className="text-sm font-medium text-muted-foreground">Name</label>
             <p className="mt-1 font-semibold">{executor.name}</p>
           </div>
-          
+
           <div>
             <label className="text-sm font-medium text-muted-foreground">Executor ID</label>
             <div className="flex items-center gap-2 mt-1">
@@ -58,7 +58,9 @@ export function ExecutorDetails({ executor, copyToClipboard }: ExecutorDetailsPr
 
           {executor.supportedFileTypes && executor.supportedFileTypes.length > 0 && (
             <div>
-              <label className="text-sm font-medium text-muted-foreground">Supported File Types</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                Supported File Types
+              </label>
               <div className="mt-1 flex flex-wrap gap-1">
                 {executor.supportedFileTypes.map((type) => (
                   <Badge key={type} variant="outline" className="text-xs">

@@ -12,7 +12,12 @@ interface CommandsSectionProps {
   updateCommand: (index: number, value: string) => void
 }
 
-export function CommandsSection({ commands, addCommand, removeCommand, updateCommand }: CommandsSectionProps) {
+export function CommandsSection({
+  commands,
+  addCommand,
+  removeCommand,
+  updateCommand,
+}: CommandsSectionProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">

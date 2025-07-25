@@ -1,23 +1,20 @@
-import type { TestSuite } from "@sparktest/core/types"
+import type { Suite } from "@tatou/core/types"
 
-export function validateSuiteData(formData: {
-  name: string
-  testDefinitionIds: string[]
-}) {
+export function validateSuiteData(formData: { name: string; testDefinitionIds: string[] }) {
   const errors: string[] = []
-  
+
   if (!formData.name.trim()) {
     errors.push("Suite name is required")
   }
-  
+
   if (formData.testDefinitionIds.length === 0) {
     errors.push("Please select at least one test definition")
   }
-  
+
   return errors
 }
 
-export function prepareSuiteData(formData: any, existingSuite?: TestSuite): TestSuite {
+export function prepareSuiteData(formData: Suite, existingSuite?: Suite): Suite {
   return {
     ...formData,
     createdAt: existingSuite?.createdAt || new Date().toISOString(),
