@@ -55,7 +55,7 @@ export class ApiStorageService implements StorageService {
     })
     if (!res.ok) throw new Error("Failed to save definition")
     const result = await res.json()
-    
+
     // Build the response manually to ensure proper field mapping
     const response: Definition = {
       id: result.id,
@@ -69,7 +69,7 @@ export class ApiStorageService implements StorageService {
       labels: result.labels,
       source: result.source,
     }
-    
+
     return response
   }
 
