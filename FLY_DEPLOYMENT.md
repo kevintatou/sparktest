@@ -4,12 +4,12 @@ This guide explains how to deploy SparkTest to Fly.io for demo purposes.
 
 ## Overview
 
-This deployment configuration creates a demo instance of SparkTest on Fly.io that runs both the Next.js frontend and Rust backend in a single container.
+This deployment configuration creates a simple demo instance of SparkTest on Fly.io using the frontend-only approach with mock data mode. This provides a lightweight demonstration without requiring external database or backend infrastructure.
 
 ## Files Added
 
-- **`Dockerfile`** - Multi-stage build that creates a production image with both frontend and backend
-- **`fly.toml`** - Fly.io application configuration
+- **`Dockerfile`** - Multi-stage build that creates a production Next.js standalone application
+- **`fly.toml`** - Fly.io application configuration optimized for frontend deployment
 - **`.github/workflows/deploy-fly.yml`** - GitHub Actions workflow for automatic deployment on release
 - **`.dockerignore`** - Optimizes Docker build by excluding unnecessary files
 
@@ -17,9 +17,20 @@ This deployment configuration creates a demo instance of SparkTest on Fly.io tha
 
 The deployed application includes:
 - **Frontend**: Next.js application running on port 3000
-- **Backend**: Rust (Axum) API server running on port 8080  
-- **Database**: SQLite for persistent storage (mounted volume)
-- **Health Checks**: Both services have health endpoints for monitoring
+- **Mock Data**: Uses localStorage for demo data (no external dependencies)
+- **Health Checks**: Health endpoint for monitoring
+- **Standalone Mode**: Self-contained deployment with all dependencies included
+
+## Demo Features
+
+The demo deployment showcases:
+- Test Definition management
+- Test Executor configuration  
+- Test Run orchestration (mock mode)
+- Test Suite organization
+- Modern UI built with Next.js, Tailwind, and shadcn/ui
+
+All data is stored in browser localStorage, making it perfect for demonstrations and trying out the interface.
 
 ## Manual Deployment
 
@@ -40,12 +51,7 @@ To deploy manually:
    fly launch --no-deploy
    ```
 
-4. **Create a volume for persistent storage**:
-   ```bash
-   fly volumes create sparktest_data --size 1
-   ```
-
-5. **Deploy**:
+4. **Deploy**:
    ```bash
    fly deploy
    ```
@@ -67,36 +73,33 @@ The GitHub Actions workflow automatically deploys on new releases:
 
 The application supports these environment variables:
 
-- `DATABASE_URL` - Database connection string (defaults to SQLite)
-- `PORT` - Backend server port (defaults to 8080)
 - `NODE_ENV` - Node.js environment (set to 'production')
-- `RUST_LOG` - Rust logging level
+- `NEXT_TELEMETRY_DISABLED` - Disables Next.js telemetry
+- `PORT` - Application port (defaults to 3000)
 
 ## Health Checks
 
-- **Frontend**: `GET /` - Returns the Next.js application
-- **Backend**: `GET /health` - Returns JSON health status
-- **K8s**: `GET /k8s/health` - Returns Kubernetes connectivity status
+- **Application**: `GET /` - Returns the Next.js application homepage
+- **API**: `GET /api/run-test` - Mock API endpoint for testing
 
 ## Accessing the Application
 
 After deployment:
-- **Web UI**: `https://sparktest-demo.fly.dev` (or your app name)
-- **API**: `https://sparktest-demo.fly.dev:8080` (backend endpoints)
-
-## Storage
-
-The application uses a persistent volume mounted at `/data` for SQLite database storage. This ensures data persists across deployments.
+- **Web UI**: `https://sparktest-demo.fly.dev` (or your configured app name)
 
 ## Scaling
 
-This is configured as a demo deployment with:
-- 1 GB RAM
+This is configured as a lightweight demo deployment with:
+- 512 MB RAM
 - 1 shared CPU
 - Auto-stop when idle
 - Auto-start on traffic
 
-For production use, adjust the machine configuration in `fly.toml`.
+For production use with the full backend, you would need to:
+1. Deploy the Rust backend separately or include it in the container
+2. Set up a PostgreSQL database
+3. Configure Kubernetes connectivity
+4. Adjust resource allocation accordingly
 
 ## Troubleshooting
 
@@ -114,3 +117,14 @@ SSH into the running machine:
 ```bash
 fly ssh console
 ```
+
+## Extending to Full Stack
+
+To upgrade from this demo to a full deployment:
+
+1. **Add the Rust backend** - Modify the Dockerfile to include the backend build steps
+2. **Database** - Add PostgreSQL as a Fly.io addon
+3. **Kubernetes** - Configure K8s connectivity for test execution
+4. **Persistent Storage** - Add volumes for data persistence
+
+The current demo provides the complete frontend experience and is perfect for showcasing the SparkTest interface and workflow.
