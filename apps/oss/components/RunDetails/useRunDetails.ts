@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react"
-import { Run, Definition, Executor } from "@sparktest/core/types"
-import { storage } from "@sparktest/storage-service"
+import { Run, Definition, Executor } from "@tatou/core/types"
+import { storage } from "@tatou/storage-service"
 import { useToast } from "@/components/ui/use-toast"
 
 interface UseRunDetailsProps {

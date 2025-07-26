@@ -5,7 +5,7 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { TestDefinitionForm } from "@/components/test-definition-form"
+import { DefinitionForm } from "@/components/test-definition-form"
 import { storage } from "@tatou/storage-service"
 import type { Definition } from "@tatou/core/types"
 
@@ -68,7 +68,7 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
               </Button>
               <h1 className="text-2xl font-bold">Edit Test: {definition.name}</h1>
             </div>
-            <TestDefinitionForm existingTest={definition} />
+            <DefinitionForm existingTest={definition} />
           </div>
         </div>
       </main>

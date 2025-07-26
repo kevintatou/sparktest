@@ -1,6 +1,6 @@
 "use client"
 
-import type { Definition } from "@sparktest/core/types"
+import type { Definition } from "@tatou/core/types"
 
 interface DefaultSettingsDisplayProps {
   definition: Definition

@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
-export function AddTestDefinitionCard() {
+export function AddDefinitionCard() {
   return (
     <Card className="flex flex-col border-dashed border-2 bg-muted/20 hover:bg-muted/30 transition-colors">
       <div className="flex flex-col items-center justify-center h-full p-6">

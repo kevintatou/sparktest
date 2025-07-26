@@ -270,7 +270,7 @@ export function validateExecutionMode(mode: string): ValidationResult {
 }
 
 // Validate test definition
-export function validateTestDefinition(data: unknown): MultiFieldValidationResult {
+export function validateDefinition(data: unknown): MultiFieldValidationResult {
   const errors: ValidationErrors = {}
 
   // Type guard to ensure data is an object

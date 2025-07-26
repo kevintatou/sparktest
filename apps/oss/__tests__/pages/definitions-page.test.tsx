@@ -227,7 +227,15 @@ describe("DefinitionsPage", () => {
 
   it("calls createRun when Run button is clicked", async () => {
     vi.mocked(storage.getDefinitions).mockResolvedValue(mockDefinitions)
-    vi.mocked(storage.createRun).mockResolvedValue(undefined)
+    vi.mocked(storage.createRun).mockResolvedValue({
+      id: "test-run-id",
+      name: "Test Run",
+      image: "test-image",
+      command: ["test"],
+      status: "running",
+      createdAt: new Date().toISOString(),
+      definitionId: "def-1",
+    })
 
     render(<DefinitionsPage />)
 
@@ -245,7 +253,7 @@ describe("DefinitionsPage", () => {
 
   it("handles delete confirmation correctly", async () => {
     vi.mocked(storage.getDefinitions).mockResolvedValue(mockDefinitions)
-    vi.mocked(storage.deleteDefinition).mockResolvedValue(undefined)
+    vi.mocked(storage.deleteDefinition).mockResolvedValue(true)
 
     render(<DefinitionsPage />)
 

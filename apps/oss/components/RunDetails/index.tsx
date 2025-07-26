@@ -1,6 +1,6 @@
 "use client"
 
-import { Run } from "@sparktest/core/types"
+import { Run } from "@tatou/core/types"
 import { KubernetesLogs } from "@/components/kubernetes-logs"
 import { useRunDetails } from "./useRunDetails"
 import { RunOverview } from "./RunOverview"

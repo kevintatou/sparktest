@@ -17,7 +17,7 @@ import { useRunTestForm } from "./useRunTestForm"
 import { LoadingState } from "./LoadingState"
 import { DefaultSettingsDisplay } from "./DefaultSettingsDisplay"
 import { CustomSettingsSection } from "./CustomSettingsSection"
-import type { Definition } from "@sparktest/core/types"
+import type { Definition } from "@tatou/core/types"
 
 interface RunTestFormProps {
   def: Definition

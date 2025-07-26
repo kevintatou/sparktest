@@ -1,7 +1,7 @@
 "use client"
 
 import { CheckCircle, XCircle } from "lucide-react"
-import { formatDistanceToNow } from "@sparktest/core/utils"
+import { formatDistanceToNow } from "@tatou/core/utils"
 import type { TestResult } from "./useTestDefinitionTestModal"
 
 interface TestResultDisplayProps {
@@ -34,7 +34,7 @@ export function TestResultDisplay({ result }: TestResultDisplayProps) {
           <div className="mt-3">
             <p className="font-medium mb-2">Logs:</p>
             <div className="bg-black text-green-400 p-3 rounded text-xs font-mono max-h-32 overflow-y-auto">
-              {result.logs.map((log, i) => (
+              {result.logs.map((log: string, i: number) => (
                 <div key={i}>{log}</div>
               ))}
             </div>

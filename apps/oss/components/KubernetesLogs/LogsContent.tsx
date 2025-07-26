@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Clock } from "lucide-react"
-import type { JobLogs } from "@sparktest/core/types"
+import type { JobLogs } from "@tatou/core/types"
 
 interface LogsContentProps {
   logs: JobLogs

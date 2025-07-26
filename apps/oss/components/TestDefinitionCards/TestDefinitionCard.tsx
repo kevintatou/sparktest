@@ -10,23 +10,23 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { formatDistanceToNow } from "@sparktest/core/utils"
+import { formatDistanceToNow } from "@tatou/core/utils"
 import { getIconForTest, generateTagsForTest } from "./testUtils"
-import type { TestDefinition } from "@sparktest/core/types"
+import type { Definition } from "@tatou/core/types"
 
-interface TestDefinitionCardProps {
-  test: TestDefinition
+interface DefinitionCardProps {
+  test: Definition
   isRunning: boolean
   onQuickRun: (testId: string) => void
-  onTestWithModal: (test: TestDefinition) => void
+  onTestWithModal: (test: Definition) => void
 }
 
-export function TestDefinitionCard({
+export function DefinitionCard({
   test,
   isRunning,
   onQuickRun,
   onTestWithModal,
-}: TestDefinitionCardProps) {
+}: DefinitionCardProps) {
   const Icon = getIconForTest(test)
   const tags = generateTagsForTest(test)
 

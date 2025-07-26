@@ -3,19 +3,19 @@
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Autocomplete } from "@/components/ui/autocomplete"
-import type { Definition } from "@sparktest/core/types"
+import type { Definition } from "@tatou/core/types"
 
-interface TestDefinitionsSelectorProps {
+interface DefinitionsSelectorProps {
   definitions: Definition[]
   selectedIds: string[]
   onSelectionChange: (selectedDefinitions: Definition[]) => void
 }
 
-export function TestDefinitionsSelector({
+export function DefinitionsSelector({
   definitions,
   selectedIds,
   onSelectionChange,
-}: TestDefinitionsSelectorProps) {
+}: DefinitionsSelectorProps) {
   const selectedDefinitions = definitions.filter((d) => selectedIds.includes(d.id))
 
   return (

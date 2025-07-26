@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Run } from "@sparktest/core/types"
+import { Run } from "@tatou/core/types"
 
 interface KubernetesTimelineProps {
   run: Run

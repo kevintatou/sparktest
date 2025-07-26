@@ -1,17 +1,17 @@
 "use client"
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { useTestDefinitionForm } from "./useTestDefinitionForm"
+import { useDefinitionForm } from "./useTestDefinitionForm"
 import { ManualForm } from "./ManualForm"
 import { GitHubForm } from "./GitHubForm"
 
 import type { Definition } from "@tatou/core/types"
 
-interface TestDefinitionFormProps {
+interface DefinitionFormProps {
   existingTest?: Definition
 }
 
-export function TestDefinitionForm({ existingTest }: TestDefinitionFormProps) {
+export function DefinitionForm({ existingTest }: DefinitionFormProps) {
   const {
     isSubmitting,
     tab,
@@ -29,7 +29,7 @@ export function TestDefinitionForm({ existingTest }: TestDefinitionFormProps) {
     updateCommand,
     handleSubmit,
     handleGithubSubmit,
-  } = useTestDefinitionForm(existingTest)
+  } = useDefinitionForm(existingTest)
 
   return (
     <Tabs value={tab} onValueChange={setTab} className="w-full">
@@ -66,4 +66,4 @@ export function TestDefinitionForm({ existingTest }: TestDefinitionFormProps) {
 }
 
 // Re-export for backward compatibility
-export default TestDefinitionForm
+export default DefinitionForm

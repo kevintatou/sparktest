@@ -230,7 +230,7 @@ describe("ExecutorsPage", () => {
 
   it("calls deleteExecutor when delete button is clicked", async () => {
     vi.mocked(storage.getExecutors).mockResolvedValue(mockExecutors)
-    vi.mocked(storage.deleteExecutor).mockResolvedValue(undefined)
+    vi.mocked(storage.deleteExecutor).mockResolvedValue(true)
 
     render(<ExecutorsPage />)
 

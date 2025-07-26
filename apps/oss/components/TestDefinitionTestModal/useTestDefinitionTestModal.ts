@@ -11,7 +11,7 @@ export interface TestResult {
   logs?: string[]
 }
 
-export function useTestDefinitionTestModal() {
+export function useDefinitionTestModal() {
   const [testing, setTesting] = useState(false)
   const [result, setResult] = useState<TestResult | null>(null)
   const [progress, setProgress] = useState(0)

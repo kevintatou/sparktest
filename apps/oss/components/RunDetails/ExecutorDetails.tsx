@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Copy, ExternalLink } from "lucide-react"
-import { Executor } from "@sparktest/core/types"
+import { Executor } from "@tatou/core/types"
 
 interface ExecutorDetailsProps {
   executor: Executor

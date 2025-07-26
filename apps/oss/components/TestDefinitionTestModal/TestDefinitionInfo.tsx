@@ -1,13 +1,13 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-import type { TestDefinition } from "@sparktest/core/types"
+import type { Definition } from "@tatou/core/types"
 
-interface TestDefinitionInfoProps {
-  testDefinition: TestDefinition
+interface DefinitionInfoProps {
+  testDefinition: Definition
 }
 
-export function TestDefinitionInfo({ testDefinition }: TestDefinitionInfoProps) {
+export function DefinitionInfo({ testDefinition }: DefinitionInfoProps) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4 text-sm">
@@ -24,7 +24,7 @@ export function TestDefinitionInfo({ testDefinition }: TestDefinitionInfoProps) 
       <div>
         <span className="text-sm font-medium">Commands:</span>
         <div className="mt-1 space-y-1">
-          {testDefinition.commands.map((cmd, i) => (
+          {testDefinition.commands.map((cmd: string, i: number) => (
             <div key={i} className="flex items-center gap-2">
               <Badge variant="outline" className="font-mono text-xs">
                 {i + 1}

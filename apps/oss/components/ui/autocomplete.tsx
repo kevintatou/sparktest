@@ -6,12 +6,12 @@ export interface AutocompleteOption {
   description?: string
 }
 
-interface AutocompleteProps {
-  options: AutocompleteOption[]
-  getOptionLabel: (option: AutocompleteOption) => string
+interface AutocompleteProps<T extends { id: string; name: string }> {
+  options: T[]
+  getOptionLabel: (option: T) => string
   multiple?: boolean
-  value: AutocompleteOption[]
-  onChange: (event: React.SyntheticEvent, value: AutocompleteOption[]) => void
+  value: T[]
+  onChange: (event: React.SyntheticEvent, value: T[]) => void
   renderInput: (params: {
     placeholder?: string
     className?: string
@@ -20,13 +20,10 @@ interface AutocompleteProps {
     onFocus?: () => void
     onBlur?: () => void
   }) => React.ReactNode
-  renderOption?: (
-    props: React.HTMLAttributes<HTMLElement>,
-    option: AutocompleteOption
-  ) => React.ReactNode
+  renderOption?: (props: React.HTMLAttributes<HTMLElement>, option: T) => React.ReactNode
 }
 
-export function Autocomplete({
+export function Autocomplete<T extends { id: string; name: string }>({
   options,
   getOptionLabel,
   multiple = false,
@@ -34,7 +31,7 @@ export function Autocomplete({
   onChange,
   renderInput,
   renderOption,
-}: AutocompleteProps) {
+}: AutocompleteProps<T>) {
   const [inputValue, setInputValue] = React.useState("")
   const [open, setOpen] = React.useState(false)
 
@@ -43,7 +40,7 @@ export function Autocomplete({
     getOptionLabel(option).toLowerCase().includes(inputValue.toLowerCase())
   )
 
-  const handleSelect = (option: AutocompleteOption) => {
+  const handleSelect = (option: T) => {
     if (multiple) {
       if (value.some((v) => v.id === option.id)) {
         onChange(

@@ -3,10 +3,10 @@ import { storage } from "@tatou/storage-service"
 import { useToast } from "@/components/ui/use-toast"
 import type { Definition } from "@tatou/core/types"
 
-export function useTestDefinitionCards() {
+export function useDefinitionCards() {
   const { toast } = useToast()
   const [runningTests, setRunningTests] = useState<string[]>([])
-  const [testDefinitions, setTestDefinitions] = useState<Definition[]>([])
+  const [testDefinitions, setDefinitions] = useState<Definition[]>([])
   const [testModalOpen, setTestModalOpen] = useState(false)
   const [selectedTest, setSelectedTest] = useState<Definition | null>(null)
   const initializedRef = useRef(false)
@@ -15,7 +15,7 @@ export function useTestDefinitionCards() {
     if (!initializedRef.current) {
       // Initialize storage on component mount
       storage.getDefinitions().then((data) => {
-        setTestDefinitions(data)
+        setDefinitions(data)
       })
       initializedRef.current = true
     }

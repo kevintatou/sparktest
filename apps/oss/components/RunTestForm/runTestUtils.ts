@@ -1,4 +1,4 @@
-import type { Definition } from "@sparktest/core/types"
+import type { Definition } from "@tatou/core/types"
 
 export function prepareRunOptions(formData: {
   name: string

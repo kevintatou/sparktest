@@ -1,11 +1,12 @@
 "use client"
 
-import { TestDefinitionTestModal } from "@/components/test-definition-test-modal"
-import { useTestDefinitionCards } from "./useTestDefinitionCards"
-import { TestDefinitionCard } from "./TestDefinitionCard"
-import { AddTestDefinitionCard } from "./AddTestDefinitionCard"
+import { DefinitionTestModal } from "@/components/test-definition-test-modal"
+import { useDefinitionCards } from "./useTestDefinitionCards"
+import { DefinitionCard } from "./TestDefinitionCard"
+import { AddDefinitionCard } from "./AddTestDefinitionCard"
+import type { Definition } from "@tatou/core/types"
 
-export function TestDefinitionCards() {
+export function DefinitionCards() {
   const {
     runningTests,
     testDefinitions,
@@ -14,13 +15,13 @@ export function TestDefinitionCards() {
     handleQuickRun,
     handleTestWithModal,
     closeModal,
-  } = useTestDefinitionCards()
+  } = useDefinitionCards()
 
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {testDefinitions.map((test) => (
-          <TestDefinitionCard
+        {testDefinitions.map((test: Definition) => (
+          <DefinitionCard
             key={test.id}
             test={test}
             isRunning={runningTests.includes(test.id)}
@@ -29,11 +30,11 @@ export function TestDefinitionCards() {
           />
         ))}
 
-        <AddTestDefinitionCard />
+        <AddDefinitionCard />
       </div>
 
       {selectedTest && (
-        <TestDefinitionTestModal
+        <DefinitionTestModal
           isOpen={testModalOpen}
           onClose={closeModal}
           testDefinition={selectedTest}
