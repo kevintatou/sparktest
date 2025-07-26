@@ -30,7 +30,7 @@ export function NewTestForm() {
   const router = useRouter()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [testDefinitions, setTestDefinitions] = useState<{ id: string; name: string }[]>([])
+  const [testDefinitions, setDefinitions] = useState<{ id: string; name: string }[]>([])
   const [selectedTestDefId, setSelectedTestDefId] = useState<string>("")
 
   const [formData, setFormData] = useState({
@@ -43,7 +43,7 @@ export function NewTestForm() {
     const fetchDefs = async () => {
       const res = await fetch("http://localhost:3001/api/test-definitions")
       const defs = await res.json()
-      setTestDefinitions(defs)
+      setDefinitions(defs)
     }
     fetchDefs()
   }, [])

@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select"
 import { useSuiteForm } from "./useSuiteForm"
 import { LabelsSection } from "./LabelsSection"
-import { TestDefinitionsSelector } from "./TestDefinitionsSelector"
+import { DefinitionsSelector } from "./TestDefinitionsSelector"
 import { getExecutionModeDescription } from "./suiteUtils"
 import type { Suite, Definition } from "@tatou/core/types"
 
@@ -118,7 +118,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
             </Select>
           </div>
 
-          <TestDefinitionsSelector
+          <DefinitionsSelector
             definitions={definitions}
             selectedIds={formData.testDefinitionIds}
             onSelectionChange={handleDefinitionsChange}

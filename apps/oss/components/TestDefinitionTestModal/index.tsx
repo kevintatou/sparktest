@@ -10,26 +10,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { useTestDefinitionTestModal } from "./useTestDefinitionTestModal"
-import { TestDefinitionInfo } from "./TestDefinitionInfo"
+import { useDefinitionTestModal } from "./useTestDefinitionTestModal"
+import { DefinitionInfo } from "./TestDefinitionInfo"
 import { TestProgress } from "./TestProgress"
 import { TestResultDisplay } from "./TestResultDisplay"
 import { EmptyTestState } from "./EmptyTestState"
-import type { TestDefinition } from "@sparktest/core/types"
+import type { Definition } from "@tatou/core/types"
 
-interface TestDefinitionTestModalProps {
+interface DefinitionTestModalProps {
   isOpen: boolean
   onClose: () => void
-  testDefinition: TestDefinition
+  testDefinition: Definition
 }
 
-export function TestDefinitionTestModal({
-  isOpen,
-  onClose,
-  testDefinition,
-}: TestDefinitionTestModalProps) {
-  const { testing, result, progress, currentStep, runTest, resetTest } =
-    useTestDefinitionTestModal()
+export function DefinitionTestModal({ isOpen, onClose, testDefinition }: DefinitionTestModalProps) {
+  const { testing, result, progress, currentStep, runTest, resetTest } = useDefinitionTestModal()
 
   const handleClose = () => {
     resetTest()
@@ -54,7 +49,7 @@ export function TestDefinitionTestModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          <TestDefinitionInfo testDefinition={testDefinition} />
+          <DefinitionInfo testDefinition={testDefinition} />
 
           {testing && <TestProgress currentStep={currentStep} progress={progress} />}
 
@@ -87,4 +82,4 @@ export function TestDefinitionTestModal({
 }
 
 // Re-export for backward compatibility
-export default TestDefinitionTestModal
+export default DefinitionTestModal

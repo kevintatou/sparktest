@@ -31,7 +31,7 @@ async fn main() -> anyhow::Result<()> {
         .expect("Failed to connect to database");
 
     // Run migrations
-    sqlx::migrate!("../migrations")
+    sqlx::migrate!("./migrations")
         .run(&pool)
         .await
         .expect("Failed to run migrations");

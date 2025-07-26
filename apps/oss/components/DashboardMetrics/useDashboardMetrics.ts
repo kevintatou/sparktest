@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback, useMemo } from "react"
-import { storage } from "@sparktest/storage-service"
+import { storage } from "@tatou/storage-service"
 
 interface Metrics {
   totalRuns: number

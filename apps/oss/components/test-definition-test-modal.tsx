@@ -1,2 +1,2 @@
 // Re-export for backward compatibility
-export { TestDefinitionTestModal } from "./TestDefinitionTestModal"
+export { DefinitionTestModal } from "./TestDefinitionTestModal"

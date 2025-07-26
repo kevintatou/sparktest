@@ -9,16 +9,16 @@ import { useToast } from "@/components/ui/use-toast"
 import { storage } from "@tatou/storage-service"
 import type { Definition } from "@tatou/core/types"
 
-export function TestDefinitionsList() {
-  const [testDefinitions, setTestDefinitions] = useState<Definition[]>([])
+export function DefinitionsList() {
+  const [testDefinitions, setDefinitions] = useState<Definition[]>([])
   const [loading, setLoading] = useState(true)
   const [runningTests, setRunningTests] = useState<string[]>([])
   const { toast } = useToast()
 
-  const loadTestDefinitions = useCallback(async () => {
+  const loadDefinitions = useCallback(async () => {
     try {
       const data = await storage.getDefinitions()
-      setTestDefinitions(data)
+      setDefinitions(data)
     } catch (error) {
       toast({
         title: "Error loading test definitions",
@@ -31,8 +31,8 @@ export function TestDefinitionsList() {
   }, [toast])
 
   useEffect(() => {
-    loadTestDefinitions()
-  }, [loadTestDefinitions])
+    loadDefinitions()
+  }, [loadDefinitions])
 
   const handleRunTest = async (testId: string) => {
     setRunningTests((prev) => [...prev, testId])
@@ -57,7 +57,7 @@ export function TestDefinitionsList() {
   const handleDeleteTest = async (testId: string) => {
     try {
       await storage.deleteDefinition(testId)
-      setTestDefinitions((prev) => prev.filter((test) => test.id !== testId))
+      setDefinitions((prev) => prev.filter((test) => test.id !== testId))
       toast({
         title: "Test definition deleted",
         description: "The test definition has been removed",

@@ -300,7 +300,7 @@ export function validateExecutionMode(mode: string): ValidationResult {
 /**
  * Validate form data for test definition
  */
-export function validateTestDefinition(data: {
+export function validateDefinition(data: {
   name: string
   description?: string
   image: string

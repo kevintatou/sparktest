@@ -3,7 +3,7 @@ import { CheckCircle, XCircle, Clock, Play } from "lucide-react"
 export interface MetricCardProps {
   title: string
   value: string | number
-  subtitle: string
+  subtitle: string | React.ReactNode
   icon: React.ComponentType<{ className?: string }>
   color: "green" | "red" | "blue"
   className?: string

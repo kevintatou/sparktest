@@ -14,7 +14,7 @@ interface FormData {
   executorId: string
 }
 
-export function useTestDefinitionForm(existingTest?: Definition) {
+export function useDefinitionForm(existingTest?: Definition) {
   const router = useRouter()
   const { toast } = useToast()
 

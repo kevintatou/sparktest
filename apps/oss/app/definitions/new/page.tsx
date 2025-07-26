@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { TestDefinitionForm } from "@/components/test-definition-form"
+import { DefinitionForm } from "@/components/test-definition-form"
 
 export default function NewDefinitionPage() {
   return (
@@ -19,7 +19,7 @@ export default function NewDefinitionPage() {
           </div>
         </div>
         <div className="max-w-2xl">
-          <TestDefinitionForm />
+          <DefinitionForm />
         </div>
       </main>
     </div>

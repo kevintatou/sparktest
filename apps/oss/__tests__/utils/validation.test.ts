@@ -6,7 +6,7 @@ import {
   sanitizeCommands,
   sanitizeLabels,
   validateExecutionMode,
-  validateTestDefinition,
+  validateDefinition,
   validateTestExecutor,
   validateSuite,
 } from "../../utils/validation"
@@ -201,7 +201,7 @@ describe("Frontend Validation Utilities", () => {
     })
   })
 
-  describe("validateTestDefinition", () => {
+  describe("validateDefinition", () => {
     it("should accept valid test definition", () => {
       const data = {
         name: "Test Definition",
@@ -209,7 +209,7 @@ describe("Frontend Validation Utilities", () => {
         image: "nginx:latest",
         commands: ["echo", "hello"],
       }
-      expect(validateTestDefinition(data)).toEqual({
+      expect(validateDefinition(data)).toEqual({
         isValid: true,
         errors: {},
       })
@@ -222,7 +222,7 @@ describe("Frontend Validation Utilities", () => {
         image: "invalid@image",
         commands: ["rm -rf /"],
       }
-      const result = validateTestDefinition(data)
+      const result = validateDefinition(data)
       expect(result.isValid).toBe(false)
       expect(result.errors).toHaveProperty("name")
       expect(result.errors).toHaveProperty("image")

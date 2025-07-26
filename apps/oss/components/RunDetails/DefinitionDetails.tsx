@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Copy, ExternalLink } from "lucide-react"
-import { Definition } from "@sparktest/core/types"
+import { Definition } from "@tatou/core/types"
 
 interface DefinitionDetailsProps {
   definition: Definition

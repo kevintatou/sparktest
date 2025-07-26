@@ -1,2 +1,2 @@
-// Re-export the modularized TestDefinitionCards component
-export { TestDefinitionCards } from "./TestDefinitionCards"
+// Re-export the modularized DefinitionCards component
+export { DefinitionCards } from "./TestDefinitionCards"

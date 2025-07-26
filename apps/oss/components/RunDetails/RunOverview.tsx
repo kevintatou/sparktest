@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Copy } from "lucide-react"
-import { Run } from "@sparktest/core/types"
+import { Run } from "@tatou/core/types"
 import { getStatusIcon, getStatusColor } from "./statusUtils"
 
 interface RunOverviewProps {
