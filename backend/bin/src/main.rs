@@ -26,7 +26,7 @@ async fn main() -> anyhow::Result<()> {
 
     // Get database URL from environment
     let database_url =
-        std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite:///data/sparktest.db".to_string());
+        std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite:../data/sparktest.db".to_string());
 
     tracing::info!("Connecting to database: {}", database_url);
 
@@ -50,7 +50,7 @@ async fn main() -> anyhow::Result<()> {
         } else {
             tracing::info!("Using SQLite database");
             // Create data directory if it doesn't exist
-            std::fs::create_dir_all("/data").ok();
+            std::fs::create_dir_all("../data").ok();
 
             let sqlite_pool = SqlitePoolOptions::new()
                 .max_connections(5)
