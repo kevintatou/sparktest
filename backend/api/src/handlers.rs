@@ -1,8 +1,8 @@
+use crate::k8s::KubernetesClient;
 use axum::{extract::Path, http::StatusCode, response::Json, Json as JsonBody};
 use serde::{Deserialize, Serialize};
 use sparktest_core::*;
 use uuid::Uuid;
-use crate::k8s::KubernetesClient;
 
 #[derive(Serialize)]
 pub struct HealthResponse {
@@ -72,102 +72,94 @@ pub async fn delete_run(Path(_id): Path<Uuid>) -> Result<StatusCode, StatusCode>
 pub async fn k8s_health() -> Json<serde_json::Value> {
     // Attempt to create Kubernetes client and check health
     match KubernetesClient::new().await {
-        Ok(client) => {
-            match client.health_check().await {
-                Ok(is_healthy) => Json(serde_json::json!({
-                    "kubernetes_connected": is_healthy,
-                    "timestamp": chrono::Utc::now().to_rfc3339()
-                })),
-                Err(_) => Json(serde_json::json!({
-                    "kubernetes_connected": false,
-                    "timestamp": chrono::Utc::now().to_rfc3339(),
-                    "error": "Kubernetes health check failed"
-                }))
-            }
+        Ok(client) => match client.health_check().await {
+            Ok(is_healthy) => Json(serde_json::json!({
+                "kubernetes_connected": is_healthy,
+                "timestamp": chrono::Utc::now().to_rfc3339()
+            })),
+            Err(_) => Json(serde_json::json!({
+                "kubernetes_connected": false,
+                "timestamp": chrono::Utc::now().to_rfc3339(),
+                "error": "Kubernetes health check failed"
+            })),
         },
         Err(_) => Json(serde_json::json!({
             "kubernetes_connected": false,
             "timestamp": chrono::Utc::now().to_rfc3339(),
             "error": "Could not create Kubernetes client"
-        }))
+        })),
     }
 }
 
 pub async fn get_job_logs(Path(job_name): Path<String>) -> Json<serde_json::Value> {
     // Attempt to get real job logs from Kubernetes
     match KubernetesClient::new().await {
-        Ok(client) => {
-            match client.get_job_logs(&job_name).await {
-                Ok(job_logs) => Json(serde_json::json!({
-                    "job_name": job_logs.job_name,
-                    "pod_name": job_logs.pod_name,
-                    "logs": job_logs.logs,
-                    "timestamp": job_logs.timestamp.to_rfc3339(),
-                    "status": job_logs.status
-                })),
-                Err(e) => Json(serde_json::json!({
-                    "job_name": job_name,
-                    "error": format!("Failed to get job logs: {}", e),
-                    "timestamp": chrono::Utc::now().to_rfc3339(),
-                    "status": "error"
-                }))
-            }
+        Ok(client) => match client.get_job_logs(&job_name).await {
+            Ok(job_logs) => Json(serde_json::json!({
+                "job_name": job_logs.job_name,
+                "pod_name": job_logs.pod_name,
+                "logs": job_logs.logs,
+                "timestamp": job_logs.timestamp.to_rfc3339(),
+                "status": job_logs.status
+            })),
+            Err(e) => Json(serde_json::json!({
+                "job_name": job_name,
+                "error": format!("Failed to get job logs: {}", e),
+                "timestamp": chrono::Utc::now().to_rfc3339(),
+                "status": "error"
+            })),
         },
         Err(_) => Json(serde_json::json!({
             "job_name": job_name,
             "error": "Kubernetes client unavailable",
             "timestamp": chrono::Utc::now().to_rfc3339(),
             "status": "error"
-        }))
+        })),
     }
 }
 
 pub async fn get_job_status(Path(job_name): Path<String>) -> Json<serde_json::Value> {
     // Attempt to get real job status from Kubernetes
     match KubernetesClient::new().await {
-        Ok(client) => {
-            match client.get_job_status(&job_name).await {
-                Ok(status) => Json(serde_json::json!({
-                    "job_name": job_name,
-                    "status": status,
-                    "timestamp": chrono::Utc::now().to_rfc3339()
-                })),
-                Err(e) => Json(serde_json::json!({
-                    "job_name": job_name,
-                    "status": "error",
-                    "error": format!("Failed to get job status: {}", e),
-                    "timestamp": chrono::Utc::now().to_rfc3339()
-                }))
-            }
+        Ok(client) => match client.get_job_status(&job_name).await {
+            Ok(status) => Json(serde_json::json!({
+                "job_name": job_name,
+                "status": status,
+                "timestamp": chrono::Utc::now().to_rfc3339()
+            })),
+            Err(e) => Json(serde_json::json!({
+                "job_name": job_name,
+                "status": "error",
+                "error": format!("Failed to get job status: {}", e),
+                "timestamp": chrono::Utc::now().to_rfc3339()
+            })),
         },
         Err(_) => Json(serde_json::json!({
             "job_name": job_name,
             "status": "error",
             "error": "Kubernetes client unavailable",
             "timestamp": chrono::Utc::now().to_rfc3339()
-        }))
+        })),
     }
 }
 
 pub async fn delete_job(Path(job_name): Path<String>) -> Json<serde_json::Value> {
     // Attempt to delete real job from Kubernetes
     match KubernetesClient::new().await {
-        Ok(client) => {
-            match client.delete_job(&job_name).await {
-                Ok(_) => Json(serde_json::json!({
-                    "message": format!("Job {} deleted successfully", job_name),
-                    "timestamp": chrono::Utc::now().to_rfc3339()
-                })),
-                Err(e) => Json(serde_json::json!({
-                    "error": format!("Failed to delete job {}: {}", job_name, e),
-                    "timestamp": chrono::Utc::now().to_rfc3339()
-                }))
-            }
+        Ok(client) => match client.delete_job(&job_name).await {
+            Ok(_) => Json(serde_json::json!({
+                "message": format!("Job {} deleted successfully", job_name),
+                "timestamp": chrono::Utc::now().to_rfc3339()
+            })),
+            Err(e) => Json(serde_json::json!({
+                "error": format!("Failed to delete job {}: {}", job_name, e),
+                "timestamp": chrono::Utc::now().to_rfc3339()
+            })),
         },
         Err(_) => Json(serde_json::json!({
             "error": format!("Kubernetes client unavailable - cannot delete job {}", job_name),
             "timestamp": chrono::Utc::now().to_rfc3339()
-        }))
+        })),
     }
 }
 
