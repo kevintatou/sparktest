@@ -16,6 +16,7 @@ This deployment configuration creates a simple demo instance of SparkTest on Fly
 ## Architecture
 
 The deployed application includes:
+
 - **Frontend**: Next.js application running on port 3000
 - **Mock Data**: Uses localStorage for demo data (no external dependencies)
 - **Health Checks**: Health endpoint for monitoring
@@ -24,8 +25,9 @@ The deployed application includes:
 ## Demo Features
 
 The demo deployment showcases:
+
 - Test Definition management
-- Test Executor configuration  
+- Test Executor configuration
 - Test Run orchestration (mock mode)
 - Test Suite organization
 - Modern UI built with Next.js, Tailwind, and shadcn/ui
@@ -36,17 +38,20 @@ All data is stored in browser localStorage, making it perfect for demonstrations
 
 To deploy manually:
 
-1. **Install Fly CLI**: 
+1. **Install Fly CLI**:
+
    ```bash
    curl -L https://fly.io/install.sh | sh
    ```
 
 2. **Login to Fly.io**:
+
    ```bash
    fly auth login
    ```
 
 3. **Launch the application** (first time):
+
    ```bash
    fly launch --no-deploy
    ```
@@ -85,17 +90,20 @@ The application supports these environment variables:
 ## Accessing the Application
 
 After deployment:
+
 - **Web UI**: `https://sparktest-demo.fly.dev` (or your configured app name)
 
 ## Scaling
 
 This is configured as a lightweight demo deployment with:
+
 - 512 MB RAM
 - 1 shared CPU
 - Auto-stop when idle
 - Auto-start on traffic
 
 For production use with the full backend, you would need to:
+
 1. Deploy the Rust backend separately or include it in the container
 2. Set up a PostgreSQL database
 3. Configure Kubernetes connectivity
@@ -104,16 +112,19 @@ For production use with the full backend, you would need to:
 ## Troubleshooting
 
 Check application logs:
+
 ```bash
 fly logs
 ```
 
 Check app status:
+
 ```bash
 fly status
 ```
 
 SSH into the running machine:
+
 ```bash
 fly ssh console
 ```
