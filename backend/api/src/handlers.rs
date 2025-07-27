@@ -2,6 +2,7 @@ use axum::{extract::Path, http::StatusCode, response::Json, Json as JsonBody};
 use serde::{Deserialize, Serialize};
 use sparktest_core::*;
 use uuid::Uuid;
+use crate::k8s::KubernetesClient;
 
 #[derive(Serialize)]
 pub struct HealthResponse {
@@ -69,35 +70,120 @@ pub async fn delete_run(Path(_id): Path<Uuid>) -> Result<StatusCode, StatusCode>
 }
 
 pub async fn k8s_health() -> Json<serde_json::Value> {
-    Json(serde_json::json!({
-        "kubernetes_connected": true,
-        "timestamp": chrono::Utc::now().to_rfc3339()
-    }))
+    // Attempt to create Kubernetes client and check health
+    match KubernetesClient::new().await {
+        Ok(client) => {
+            match client.health_check().await {
+                Ok(is_healthy) => Json(serde_json::json!({
+                    "kubernetes_connected": is_healthy,
+                    "timestamp": chrono::Utc::now().to_rfc3339()
+                })),
+                Err(_) => Json(serde_json::json!({
+                    "kubernetes_connected": false,
+                    "timestamp": chrono::Utc::now().to_rfc3339(),
+                    "error": "Kubernetes health check failed"
+                }))
+            }
+        },
+        Err(_) => Json(serde_json::json!({
+            "kubernetes_connected": false,
+            "timestamp": chrono::Utc::now().to_rfc3339(),
+            "error": "Could not create Kubernetes client"
+        }))
+    }
 }
 
 pub async fn get_job_logs(Path(job_name): Path<String>) -> Json<serde_json::Value> {
-    Json(serde_json::json!({
-        "job_name": job_name,
-        "pod_name": format!("pod-{}", job_name),
-        "logs": "Sample log output",
-        "timestamp": chrono::Utc::now().to_rfc3339(),
-        "status": "completed"
-    }))
+    // Attempt to get real job logs from Kubernetes
+    match KubernetesClient::new().await {
+        Ok(client) => {
+            match client.get_job_logs(&job_name).await {
+                Ok(job_logs) => Json(serde_json::json!({
+                    "job_name": job_logs.job_name,
+                    "pod_name": job_logs.pod_name,
+                    "logs": job_logs.logs,
+                    "timestamp": job_logs.timestamp.to_rfc3339(),
+                    "status": job_logs.status
+                })),
+                Err(e) => Json(serde_json::json!({
+                    "job_name": job_name,
+                    "error": format!("Failed to get job logs: {}", e),
+                    "timestamp": chrono::Utc::now().to_rfc3339(),
+                    "status": "error"
+                }))
+            }
+        },
+        Err(_) => Json(serde_json::json!({
+            "job_name": job_name,
+            "error": "Kubernetes client unavailable",
+            "timestamp": chrono::Utc::now().to_rfc3339(),
+            "status": "error"
+        }))
+    }
 }
 
 pub async fn get_job_status(Path(job_name): Path<String>) -> Json<serde_json::Value> {
-    Json(serde_json::json!({
-        "job_name": job_name,
-        "status": "completed",
-        "timestamp": chrono::Utc::now().to_rfc3339()
-    }))
+    // Attempt to get real job status from Kubernetes
+    match KubernetesClient::new().await {
+        Ok(client) => {
+            match client.get_job_status(&job_name).await {
+                Ok(status) => Json(serde_json::json!({
+                    "job_name": job_name,
+                    "status": status,
+                    "timestamp": chrono::Utc::now().to_rfc3339()
+                })),
+                Err(e) => Json(serde_json::json!({
+                    "job_name": job_name,
+                    "status": "error",
+                    "error": format!("Failed to get job status: {}", e),
+                    "timestamp": chrono::Utc::now().to_rfc3339()
+                }))
+            }
+        },
+        Err(_) => Json(serde_json::json!({
+            "job_name": job_name,
+            "status": "error",
+            "error": "Kubernetes client unavailable",
+            "timestamp": chrono::Utc::now().to_rfc3339()
+        }))
+    }
 }
 
 pub async fn delete_job(Path(job_name): Path<String>) -> Json<serde_json::Value> {
-    Json(serde_json::json!({
-        "message": format!("Job {} deleted successfully", job_name),
-        "timestamp": chrono::Utc::now().to_rfc3339()
-    }))
+    // Attempt to delete real job from Kubernetes
+    match KubernetesClient::new().await {
+        Ok(client) => {
+            match client.delete_job(&job_name).await {
+                Ok(_) => Json(serde_json::json!({
+                    "message": format!("Job {} deleted successfully", job_name),
+                    "timestamp": chrono::Utc::now().to_rfc3339()
+                })),
+                Err(e) => Json(serde_json::json!({
+                    "error": format!("Failed to delete job {}: {}", job_name, e),
+                    "timestamp": chrono::Utc::now().to_rfc3339()
+                }))
+            }
+        },
+        Err(_) => Json(serde_json::json!({
+            "error": format!("Kubernetes client unavailable - cannot delete job {}", job_name),
+            "timestamp": chrono::Utc::now().to_rfc3339()
+        }))
+    }
+}
+
+pub async fn get_definitions() -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
+    // For this demo, return empty list since we're focusing on the K8s integration
+    Ok(Json(vec![]))
+}
+
+pub async fn get_executors() -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
+    // For this demo, return empty list since we're focusing on the K8s integration
+    Ok(Json(vec![]))
+}
+
+pub async fn get_suites() -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
+    // For this demo, return empty list since we're focusing on the K8s integration
+    Ok(Json(vec![]))
 }
 
 #[cfg(test)]
@@ -158,8 +244,10 @@ mod tests {
     async fn test_k8s_health() {
         let response = k8s_health().await;
         let value = response.0;
-        assert_eq!(value["kubernetes_connected"], true);
+        // In test environment, Kubernetes is typically not available
+        assert_eq!(value["kubernetes_connected"], false);
         assert!(value["timestamp"].is_string());
+        assert!(value["error"].is_string());
     }
 
     #[tokio::test]
@@ -168,9 +256,10 @@ mod tests {
         let response = get_job_logs(Path(job_name.clone())).await;
         let value = response.0;
         assert_eq!(value["job_name"], job_name);
-        assert_eq!(value["pod_name"], format!("pod-{}", job_name));
-        assert_eq!(value["logs"], "Sample log output");
-        assert_eq!(value["status"], "completed");
+        // In test environment, Kubernetes is not available, so expect error
+        assert_eq!(value["status"], "error");
+        assert!(value["error"].is_string());
+        assert!(value["timestamp"].is_string());
     }
 
     #[tokio::test]
@@ -179,7 +268,10 @@ mod tests {
         let response = get_job_status(Path(job_name.clone())).await;
         let value = response.0;
         assert_eq!(value["job_name"], job_name);
-        assert_eq!(value["status"], "completed");
+        // In test environment, Kubernetes is not available, so expect error
+        assert_eq!(value["status"], "error");
+        assert!(value["error"].is_string());
+        assert!(value["timestamp"].is_string());
     }
 
     #[tokio::test]
@@ -187,9 +279,10 @@ mod tests {
         let job_name = "test-job".to_string();
         let response = delete_job(Path(job_name.clone())).await;
         let value = response.0;
-        assert_eq!(
-            value["message"],
-            format!("Job {} deleted successfully", job_name)
-        );
+        // In test environment, Kubernetes is not available, so expect error
+        assert!(value["error"].is_string());
+        assert!(value["timestamp"].is_string());
+        let error_msg = value["error"].as_str().unwrap();
+        assert!(error_msg.contains("Kubernetes client unavailable"));
     }
 }
