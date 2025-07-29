@@ -3,21 +3,8 @@ name: Build & Lint
 on:
   push:
     branches: [main]
-    paths:
-      - "apps/**"
-      - "packages/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
-    paths:
-      - "apps/**"
-      - "packages/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - ".github/workflows/ci.yml"
-    types: [opened, synchronize, reopened]  # Only run on important PR events
 
 jobs:
   build:
@@ -49,11 +36,11 @@ jobs:
       - name: Run linting
         run: pnpm lint
 
-      - name: Build workspace packages
-        run: pnpm build:packages
-
       - name: Type check
         run: pnpm type-check
+
+      - name: Build workspace packages
+        run: pnpm build:packages
 
       - name: Build application
         run: pnpm --filter "@tatou/oss" build
