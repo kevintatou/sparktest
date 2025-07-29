@@ -1,0 +1,50 @@
+name: Build & Lint (Self-Hosted)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  build:
+    name: Build & Lint Check
+    runs-on: [self-hosted, linux] # Use your self-hosted runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Skip setup steps since they're already on your machine
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check code formatting
+        run: pnpm format:check
+
+      - name: Run linting
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Build workspace packages
+        run: pnpm build:packages
+
+      - name: Build application
+        run: pnpm --filter "@tatou/oss" build
+
+      - name: Run tests
+        run: pnpm test
