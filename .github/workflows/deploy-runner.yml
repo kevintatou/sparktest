@@ -18,6 +18,33 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Validate required secrets
+        run: |
+          echo "🔍 Validating deployment configuration..."
+          
+          # Check if required secrets are set
+          if [ -z "${{ secrets.DROPLET_IP }}" ]; then
+            echo "❌ Error: DROPLET_IP secret is not set"
+            echo "Set it at: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            exit 1
+          fi
+          
+          if [ -z "${{ secrets.DROPLET_SSH_KEY }}" ]; then
+            echo "❌ Error: DROPLET_SSH_KEY secret is not set"  
+            echo "Set it at: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            exit 1
+          fi
+          
+          if [ -z "${{ secrets.GH_RUNNER_TOKEN }}" ]; then
+            echo "❌ Error: GH_RUNNER_TOKEN secret is not set"
+            echo "Get token from: https://github.com/${{ github.repository }}/settings/actions/runners/new"
+            echo "Set it at: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            exit 1
+          fi
+          
+          echo "✅ All required secrets are configured"
+          echo "📍 Deploying to: ${{ secrets.DROPLET_IP }}"
+
       - name: Copy runner files to droplet
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -34,24 +61,77 @@ jobs:
           username: root
           key: ${{ secrets.DROPLET_SSH_KEY }}
           script: |
+            set -e
             cd ~/sparktest/.deploy
 
+            echo "🧹 Cleaning up existing runner..."
             # Stop existing runner if running
             docker stop github-runner || true
             docker rm github-runner || true
 
+            # Check Docker availability
+            if ! command -v docker &> /dev/null; then
+              echo "❌ Error: Docker is not installed on the droplet"
+              exit 1
+            fi
+
+            if ! docker info &> /dev/null; then
+              echo "❌ Error: Docker service is not running"
+              exit 1
+            fi
+
             # Build the runner image
-            docker build -f Dockerfile.runner -t gh-runner .
+            echo "📦 Building runner Docker image..."
+            if ! docker build -f Dockerfile.runner -t gh-runner .; then
+              echo "❌ Error: Failed to build Docker image"
+              exit 1
+            fi
 
             # Run the runner container with the token from secrets
-            docker run -d \
+            echo "🏃 Starting GitHub Actions runner..."
+            if ! docker run -d \
               --name github-runner \
               --restart unless-stopped \
-              -e GH_REPO_URL="https://github.com/kevintatou/sparktest" \
+              -e GH_REPO_URL="https://github.com/${{ github.repository }}" \
               -e GH_RUNNER_TOKEN="${{ secrets.GH_RUNNER_TOKEN }}" \
-              gh-runner
+              gh-runner; then
+              echo "❌ Error: Failed to start runner container"
+              exit 1
+            fi
 
-            # Show status
-            echo "Runner deployment complete!"
-            docker ps | grep github-runner || echo "Runner not found"
-            docker logs github-runner --tail 20 || echo "No logs yet"
+            # Verify deployment
+            sleep 5
+            if docker ps | grep github-runner > /dev/null; then
+              echo "✅ Runner deployment successful!"
+              echo "📋 Container status:"
+              docker ps | grep github-runner
+              echo "📋 Recent logs:"
+              docker logs github-runner --tail 10
+            else
+              echo "❌ Warning: Runner container not found"
+              docker logs github-runner --tail 20 || echo "No logs available"
+              exit 1
+            fi
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "🎉 Runner deployment workflow completed!"
+          echo ""
+          echo "📊 Check runner status at:"
+          echo "https://github.com/${{ github.repository }}/settings/actions/runners"
+          echo ""
+          echo "💡 The runner should appear as 'docker-runner' with 'spark-runner' label"
+          echo ""
+          if [ "${{ job.status }}" != "success" ]; then
+            echo "❌ Deployment failed. Common issues:"
+            echo "- GitHub token expired (tokens last 1 hour)"
+            echo "- SSH connection problems" 
+            echo "- Docker not available on droplet"
+            echo "- Insufficient resources on droplet"
+            echo ""
+            echo "🔧 To troubleshoot:"
+            echo "- Get a fresh token: https://github.com/${{ github.repository }}/settings/actions/runners/new"
+            echo "- Check droplet connectivity and Docker status"
+            echo "- Review action logs above for specific errors"
+          fi

@@ -2,9 +2,31 @@
 
 This repository includes automated deployment of a self-hosted GitHub Actions runner to Digital Ocean droplets.
 
-## Overview
+## Quick Start
 
-The self-hosted runner allows you to run GitHub Actions workflows on your own infrastructure, providing more control over the environment and potentially reducing costs for compute-intensive workloads.
+⚠️ **Important**: Before proceeding, you must configure the required GitHub repository secrets. See the [Secrets Setup Guide](SECRETS_SETUP.md) for detailed instructions.
+
+### Prerequisites
+
+1. **Digital Ocean Droplet** with Docker installed
+2. **SSH Key Access** to the droplet  
+3. **GitHub Repository Secrets** configured (see [setup guide](SECRETS_SETUP.md))
+
+### Validate Your Setup
+
+Before deploying, validate your configuration:
+
+```bash
+# Set your environment variables locally
+export DROPLET_IP="your.droplet.ip.address"
+export DROPLET_SSH_KEY="-----BEGIN OPENSSH PRIVATE KEY-----
+your-private-key-content
+-----END OPENSSH PRIVATE KEY-----"
+export GH_RUNNER_TOKEN="your_github_runner_token"
+
+# Run validation
+./scripts/validate-secrets.sh
+```
 
 ## Automatic Deployment (Recommended)
 
@@ -12,17 +34,28 @@ The runner is automatically deployed via GitHub Actions when changes are made to
 
 ### Required Secrets
 
-Set these in your GitHub repository secrets:
+Set these in your GitHub repository secrets at: `https://github.com/kevintatou/sparktest/settings/secrets/actions`
 
 - `DROPLET_IP` - Your Digital Ocean droplet IP address
 - `DROPLET_SSH_KEY` - Private SSH key for accessing the droplet
 - `GH_RUNNER_TOKEN` - GitHub runner registration token
 
+📚 **For detailed setup instructions, see [SECRETS_SETUP.md](SECRETS_SETUP.md)**
+
 ### Getting a GitHub Runner Token
+
+⚠️ **Important**: Runner tokens expire after 1 hour and are single-use.
 
 1. Go to: https://github.com/kevintatou/sparktest/settings/actions/runners/new
 2. Copy the token from the configuration command
 3. Add it as the `GH_RUNNER_TOKEN` secret in your repository
+4. If deployment fails, generate a fresh token and update the secret
+
+**Example**: In the GitHub UI, you'll see:
+```bash
+./config.sh --url https://github.com/kevintatou/sparktest --token ABCDEF123456789
+```
+The token is the value after `--token` (e.g., `ABCDEF123456789`).
 
 ### Triggering Deployment
 
