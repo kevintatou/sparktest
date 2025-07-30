@@ -12,57 +12,125 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Install Docker if needed
+        run: |
+          echo "🐳 Ensuring Docker is available..."
+
+          # Check if Docker is already installed
+          if command -v docker &> /dev/null; then
+            echo "✅ Docker is already installed"
+            docker --version
+          else
+            echo "📦 Installing Docker..."
+            # Install Docker using the official installation script
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
+
+            # Add current user to docker group to run without sudo
+            sudo usermod -aG docker $USER
+
+            # Start and enable Docker service
+            sudo systemctl start docker
+            sudo systemctl enable docker
+
+            echo "✅ Docker installation completed"
+            docker --version
+          fi
+
+          # Ensure Docker service is running
+          if ! sudo systemctl is-active --quiet docker; then
+            echo "🔧 Starting Docker service..."
+            sudo systemctl start docker
+          fi
+
+          echo "✅ Docker is ready"
+
       - name: Validate deployment environment
         run: |
           echo "🔍 Validating deployment configuration..."
-          
+
           # Check Docker availability
           if ! command -v docker &> /dev/null; then
             echo "❌ Error: Docker is not installed"
             exit 1
           fi
-          
-          if ! docker info &> /dev/null; then
-            echo "❌ Error: Docker service is not running"
-            exit 1
+
+          # Try Docker without sudo first, then with sudo if needed
+          if docker info &> /dev/null; then
+            echo "✅ Docker is available and running"
+          elif sudo docker info &> /dev/null; then
+            echo "✅ Docker is available and running (with sudo)"
+            echo "⚠️  Note: Docker commands will require sudo"
+          else
+            echo "❌ Error: Docker service is not running or not accessible"
+            echo "🔧 Attempting to start Docker service..."
+            sudo systemctl start docker
+            sleep 5
+            if sudo docker info &> /dev/null; then
+              echo "✅ Docker service started successfully"
+            else
+              echo "❌ Error: Failed to start Docker service"
+              exit 1
+            fi
           fi
-          
-          echo "✅ Docker is available and running"
+
           echo "📍 Deploying SparkTest MVP from release: ${{ github.event.release.tag_name || 'manual-deploy' }}"
 
       - name: Deploy SparkTest MVP
         run: |
           set -e
-          
+
+          # Function to run docker commands with fallback to sudo
+          run_docker() {
+            if docker "$@" 2>/dev/null; then
+              return 0
+            elif sudo docker "$@"; then
+              return 0
+            else
+              return 1
+            fi
+          }
+
+          # Function to run docker compose commands with fallback to sudo
+          run_docker_compose() {
+            if docker compose "$@" 2>/dev/null; then
+              return 0
+            elif sudo docker compose "$@"; then
+              return 0
+            else
+              return 1
+            fi
+          }
+
           echo "🧹 Cleaning up existing deployment..."
           # Stop and remove existing containers
-          docker compose -f docker-compose.prod.yml down --remove-orphans || echo "No existing deployment found"
-          
+          run_docker_compose -f docker-compose.prod.yml down --remove-orphans || echo "No existing deployment found"
+
           # Remove old images to free space (keep last 2 versions)
-          docker image prune -f || echo "No images to prune"
-          
+          run_docker image prune -f || echo "No images to prune"
+
           echo "📦 Building and deploying SparkTest MVP..."
           # Build and start services
-          if ! docker compose -f docker-compose.prod.yml up --build -d; then
+          if ! run_docker_compose -f docker-compose.prod.yml up --build -d; then
             echo "❌ Error: Failed to deploy SparkTest MVP"
             echo "📋 Checking logs for errors..."
-            docker compose -f docker-compose.prod.yml logs --tail 50
+            run_docker_compose -f docker-compose.prod.yml logs --tail 50
             exit 1
           fi
-          
+
           echo "⏳ Waiting for services to be healthy..."
           sleep 45
-          
+
           # Check service health
           echo "📋 Service status:"
-          docker compose -f docker-compose.prod.yml ps
-          
+          run_docker_compose -f docker-compose.prod.yml ps
+
           echo "📋 Recent logs:"
-          docker compose -f docker-compose.prod.yml logs --tail 20
-          
+          run_docker_compose -f docker-compose.prod.yml logs --tail 20
+
           # Get server IP
           SERVER_IP=$(hostname -I | awk '{print $1}')
-          
+
           echo "✅ SparkTest MVP deployed successfully!"
           echo "🌐 Frontend: http://$SERVER_IP"
           echo "🔧 Backend API: http://$SERVER_IP:8080"
