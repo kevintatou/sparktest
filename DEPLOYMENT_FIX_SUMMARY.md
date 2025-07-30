@@ -6,7 +6,7 @@ This document summarizes the improvements made to fix the deployment process tha
 
 **Issue**: GitHub Actions workflows "Copy to Droplet" (deploy-runner.yml) and "Deploy to Droplet" (deploy.yml) were failing due to missing secrets configuration.
 
-**Root Cause**: Required secrets (`DROPLET_IP`, `DROPLET_SSH_KEY`, `GH_RUNNER_TOKEN`) were not configured in the GitHub repository settings.
+**Root Cause**: Required secrets (`DROPLET_IP`, `SSH_PRIVATE_KEY`, `GH_RUNNER_TOKEN`) were not configured in the GitHub repository settings.
 
 ## ✅ Solution Implemented
 
@@ -79,7 +79,7 @@ This document summarizes the improvements made to fix the deployment process tha
    ```bash
    # Set your values
    export DROPLET_IP="your.droplet.ip"
-   export DROPLET_SSH_KEY="your-private-key"
+   export SSH_PRIVATE_KEY="your-private-key"
    export GH_RUNNER_TOKEN="your-github-token"
    
    # Run validation
