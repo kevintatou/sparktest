@@ -14,5 +14,7 @@ services:
       context: ./
       dockerfile: Dockerfile.runner
     environment:
+      GH_REPO_URL: "https://github.com/kevintatou/sparktest"
       GH_RUNNER_TOKEN: ${GH_RUNNER_TOKEN}
-    restart: always
+    restart: unless-stopped
+    container_name: github-runner

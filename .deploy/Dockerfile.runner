@@ -16,7 +16,8 @@ RUN apt-get update && apt-get install -y \
     libcurl4 \
     jq \
     ca-certificates && \
-    apt-get clean
+    apt-get clean && \
+    update-ca-certificates
 
 # Download and extract GitHub runner
 ENV RUNNER_VERSION=2.326.0
