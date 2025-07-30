@@ -2,8 +2,17 @@
 
 # GitHub Self-Hosted Runner Setup Script
 # Run this on your droplet to start the self-hosted runner
+# Make sure GH_RUNNER_TOKEN environment variable is set
 
 echo "🚀 Setting up GitHub Self-Hosted Runner in Docker..."
+
+# Check if GH_RUNNER_TOKEN is set
+if [ -z "$GH_RUNNER_TOKEN" ]; then
+    echo "❌ Error: GH_RUNNER_TOKEN environment variable is not set"
+    echo "Please set it with: export GH_RUNNER_TOKEN=your_token_here"
+    echo "Get your token from: https://github.com/kevintatou/sparktest/settings/actions/runners/new"
+    exit 1
+fi
 
 # Navigate to the deploy directory
 cd /root/sparktest/.deploy
@@ -12,23 +21,21 @@ cd /root/sparktest/.deploy
 echo "📦 Building runner Docker image..."
 docker build -f Dockerfile.runner -t gh-runner .
 
-# Get the GitHub token from user
-echo "🔑 You need to get the GitHub runner token:"
-echo "1. Go to: https://github.com/YOUR-USERNAME/sparktest/settings/actions/runners/new"
-echo "2. Copy the token from the configuration command"
-echo ""
-read -p "Enter your GitHub runner token: " GH_TOKEN
+# Set the GitHub repo URL
+GH_REPO_URL="https://github.com/kevintatou/sparktest"
 
-# Set your GitHub repo URL
-GH_REPO_URL="https://github.com/kevintatou/sparktest"  # Replace YOUR-USERNAME
-GH_TOKEN=""
+# Stop existing runner if running
+echo "🔄 Stopping existing runner..."
+docker stop github-runner 2>/dev/null || true
+docker rm github-runner 2>/dev/null || true
+
 # Run the runner container
 echo "🏃 Starting GitHub Actions runner..."
 docker run -d \
   --name github-runner \
   --restart unless-stopped \
   -e GH_REPO_URL="$GH_REPO_URL" \
-  -e GH_RUNNER_TOKEN="$GH_TOKEN" \
+  -e GH_RUNNER_TOKEN="$GH_RUNNER_TOKEN" \
   gh-runner
 
 echo "✅ Runner started! Check status with:"

@@ -1,0 +1,57 @@
+---
+name: Deploy Self-Hosted Runner
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - ".deploy/Dockerfile.runner"
+      - ".deploy/entrypoint.sh"
+      - ".deploy/docker-compose.yml"
+      - ".github/workflows/deploy-runner.yml"
+
+jobs:
+  deploy-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Copy runner files to droplet
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: root
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          source: ".deploy"
+          target: "~/sparktest"
+
+      - name: Deploy runner on droplet
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: root
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          script: |
+            cd ~/sparktest/.deploy
+
+            # Stop existing runner if running
+            docker stop github-runner || true
+            docker rm github-runner || true
+
+            # Build the runner image
+            docker build -f Dockerfile.runner -t gh-runner .
+
+            # Run the runner container with the token from secrets
+            docker run -d \
+              --name github-runner \
+              --restart unless-stopped \
+              -e GH_REPO_URL="https://github.com/kevintatou/sparktest" \
+              -e GH_RUNNER_TOKEN="${{ secrets.GH_RUNNER_TOKEN }}" \
+              gh-runner
+
+            # Show status
+            echo "Runner deployment complete!"
+            docker ps | grep github-runner || echo "Runner not found"
+            docker logs github-runner --tail 20 || echo "No logs yet"
