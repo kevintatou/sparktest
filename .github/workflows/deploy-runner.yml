@@ -23,8 +23,8 @@ jobs:
           echo "🔍 Validating deployment configuration..."
           
           # Check if required secrets are set
-          if [ -z "${{ secrets.SERVER_HOST }}" ]; then
-            echo "❌ Error: SERVER_HOST secret is not set"
+          if [ -z "${{ secrets.DROPLET_IP }}" ]; then
+            echo "❌ Error: DROPLET_IP secret is not set"
             echo "Set it at: https://github.com/${{ github.repository }}/settings/secrets/actions"
             exit 1
           fi
@@ -43,12 +43,12 @@ jobs:
           fi
           
           echo "✅ All required secrets are configured"
-          echo "📍 Deploying to: ${{ secrets.SERVER_HOST }}"
+          echo "📍 Deploying to: ${{ secrets.DROPLET_IP }}"
 
       - name: Copy runner files to droplet
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.SERVER_HOST }}
+          host: ${{ secrets.DROPLET_IP }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: ".deploy"
@@ -57,7 +57,7 @@ jobs:
       - name: Deploy runner on droplet
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SERVER_HOST }}
+          host: ${{ secrets.DROPLET_IP }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
