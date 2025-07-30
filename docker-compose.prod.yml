@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Frontend Next.js application
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sparktest-frontend
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_USE_RUST_API=true
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+    depends_on:
+      - backend
+    networks:
+      - sparktest
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Rust backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: sparktest-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - RUST_ENV=production
+      - RUST_LOG=info
+      - DATABASE_URL=sqlite:///app/data/sparktest.db
+    volumes:
+      - backend_data:/app/data
+    networks:
+      - sparktest
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  sparktest:
+    driver: bridge
+
+volumes:
+  backend_data:
+    driver: local

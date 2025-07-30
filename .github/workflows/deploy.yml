@@ -1,111 +1,101 @@
-name: Deploy to Droplet
+name: Deploy SparkTest MVP to Droplet
 
 on:
   release:
     types: [published]
+  workflow_dispatch:  # Allow manual deployment
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, spark-runner]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Validate required secrets
+      - name: Validate deployment environment
         run: |
           echo "🔍 Validating deployment configuration..."
           
-          # Check if required secrets are set
-          if [ -z "${{ secrets.DROPLET_IP }}" ]; then
-            echo "❌ Error: DROPLET_IP secret is not set"
-            echo "Set it at: https://github.com/${{ github.repository }}/settings/secrets/actions"
+          # Check Docker availability
+          if ! command -v docker &> /dev/null; then
+            echo "❌ Error: Docker is not installed"
             exit 1
           fi
           
-          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
-            echo "❌ Error: SSH_PRIVATE_KEY secret is not set"  
-            echo "Set it at: https://github.com/${{ github.repository }}/settings/secrets/actions"
+          if ! docker info &> /dev/null; then
+            echo "❌ Error: Docker service is not running"
             exit 1
           fi
           
-          # DROPLET_USER is optional, defaults to root
-          DROPLET_USER="${{ secrets.DROPLET_USER }}"
-          if [ -z "$DROPLET_USER" ]; then
-            DROPLET_USER="root"
-            echo "⚠️  DROPLET_USER not set, using default: root"
-          else
-            echo "✅ DROPLET_USER configured: $DROPLET_USER"
+          echo "✅ Docker is available and running"
+          echo "📍 Deploying SparkTest MVP from release: ${{ github.event.release.tag_name || 'manual-deploy' }}"
+
+      - name: Deploy SparkTest MVP
+        run: |
+          set -e
+          
+          echo "🧹 Cleaning up existing deployment..."
+          # Stop and remove existing containers
+          docker compose -f docker-compose.prod.yml down --remove-orphans || echo "No existing deployment found"
+          
+          # Remove old images to free space (keep last 2 versions)
+          docker image prune -f || echo "No images to prune"
+          
+          echo "📦 Building and deploying SparkTest MVP..."
+          # Build and start services
+          if ! docker compose -f docker-compose.prod.yml up --build -d; then
+            echo "❌ Error: Failed to deploy SparkTest MVP"
+            echo "📋 Checking logs for errors..."
+            docker compose -f docker-compose.prod.yml logs --tail 50
+            exit 1
           fi
           
-          echo "✅ All required secrets are configured"
-          echo "📍 Deploying to: $DROPLET_USER@${{ secrets.DROPLET_IP }}"
-
-      - name: Copy files to droplet
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.DROPLET_IP }}
-          username: ${{ secrets.DROPLET_USER || 'root' }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "."
-          target: "~/sparktest"
-
-      - name: Deploy on droplet
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DROPLET_IP }}
-          username: ${{ secrets.DROPLET_USER || 'root' }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            set -e
-            cd ~/sparktest
-
-            echo "🔍 Checking Docker availability..."
-            if ! command -v docker &> /dev/null; then
-              echo "❌ Error: Docker is not installed on the droplet"
-              exit 1
-            fi
-
-            if ! docker info &> /dev/null; then
-              echo "❌ Error: Docker service is not running"
-              exit 1
-            fi
-
-            echo "📦 Deploying application..."
-            # Pull latest images if available
-            docker compose -f .deploy/docker-compose.yml pull || echo "⚠️  Could not pull latest images"
-            
-            # Deploy with build and detached mode
-            if ! docker compose -f .deploy/docker-compose.yml up --build -d; then
-              echo "❌ Error: Failed to deploy application"
-              echo "📋 Checking logs for errors..."
-              docker compose -f .deploy/docker-compose.yml logs --tail 20
-              exit 1
-            fi
-
-            echo "✅ Application deployed successfully!"
-            echo "📋 Container status:"
-            docker compose -f .deploy/docker-compose.yml ps
+          echo "⏳ Waiting for services to be healthy..."
+          sleep 45
+          
+          # Check service health
+          echo "📋 Service status:"
+          docker compose -f docker-compose.prod.yml ps
+          
+          echo "📋 Recent logs:"
+          docker compose -f docker-compose.prod.yml logs --tail 20
+          
+          # Get server IP
+          SERVER_IP=$(hostname -I | awk '{print $1}')
+          
+          echo "✅ SparkTest MVP deployed successfully!"
+          echo "🌐 Frontend: http://$SERVER_IP"
+          echo "🔧 Backend API: http://$SERVER_IP:8080"
 
       - name: Deployment summary
         if: always()
         run: |
-          echo "🎉 Application deployment workflow completed!"
+          echo "🎉 SparkTest MVP deployment workflow completed!"
           echo ""
           echo "📊 Deployment status: ${{ job.status }}"
+          echo "🏷️  Release version: ${{ github.event.release.tag_name }}"
           echo ""
           if [ "${{ job.status }}" != "success" ]; then
             echo "❌ Deployment failed. Common issues:"
-            echo "- SSH connection problems"
-            echo "- Docker not available on droplet"
-            echo "- Insufficient resources on droplet"
-            echo "- Docker Compose configuration issues"
+            echo "- Docker not available or not running"
+            echo "- Insufficient resources (CPU/Memory/Disk)"
+            echo "- Port conflicts (80, 8080 already in use)"
+            echo "- Build failures in Rust or Node.js"
             echo ""
             echo "🔧 To troubleshoot:"
-            echo "- Check droplet connectivity and Docker status"
-            echo "- Verify Docker Compose file exists and is valid"
+            echo "- Check runner system resources"
+            echo "- Verify Docker and Docker Compose installation"
             echo "- Review action logs above for specific errors"
-            echo "- Check available disk space and memory on droplet"
+            echo "- Check available ports: sudo netstat -tlnp | grep ':80\\|:8080'"
           else
-            echo "✅ Application should now be running on the droplet"
-            echo "🔗 Check your application at the configured domain/IP"
+            echo "✅ SparkTest MVP is now running!"
+            echo ""
+            echo "🌐 Access your application:"
+            echo "   Frontend: http://$(hostname -I | awk '{print $1}'):80"
+            echo "   Backend API: http://$(hostname -I | awk '{print $1}'):8080"
+            echo ""
+            echo "🔧 Management commands:"
+            echo "   View logs: docker compose -f .deploy/docker-compose.yml logs -f"
+            echo "   Stop services: docker compose -f .deploy/docker-compose.yml down"
+            echo "   Restart: docker compose -f .deploy/docker-compose.yml restart"
           fi

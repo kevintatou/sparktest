@@ -1,0 +1,76 @@
+# Production Dockerfile for SparkTest Rust Backend
+FROM rust:1.75-slim as builder
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy Cargo workspace files
+COPY backend/Cargo.toml backend/Cargo.lock ./
+COPY backend/api/Cargo.toml ./api/
+COPY backend/core/Cargo.toml ./core/
+COPY backend/bin/Cargo.toml ./bin/
+
+# Create dummy src files to cache dependencies
+RUN mkdir -p api/src core/src bin/src && \
+    echo "pub fn main() {}" > api/src/lib.rs && \
+    echo "pub fn main() {}" > core/src/lib.rs && \
+    echo "fn main() {}" > bin/src/main.rs
+
+# Build dependencies
+RUN cargo build --release && rm -rf api/src core/src bin/src
+
+# Copy source code
+COPY backend/api/src ./api/src
+COPY backend/core/src ./core/src
+COPY backend/bin/src ./bin/src
+COPY backend/bin/migrations ./bin/migrations
+
+# Build the application
+RUN touch bin/src/main.rs && cargo build --release
+
+# Runtime stage
+FROM debian:bookworm-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libssl3 \
+    sqlite3 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app user
+RUN groupadd -r sparktest && useradd -r -g sparktest sparktest
+
+WORKDIR /app
+
+# Create data directory
+RUN mkdir -p /app/data && chown sparktest:sparktest /app/data
+
+# Copy the binary
+COPY --from=builder /app/target/release/sparktest-bin /app/sparktest-backend
+COPY --from=builder /app/bin/migrations /app/migrations
+
+# Set permissions
+RUN chown -R sparktest:sparktest /app
+
+USER sparktest
+
+# Expose port
+EXPOSE 8080
+
+# Environment variables
+ENV RUST_LOG=info
+ENV DATABASE_URL=sqlite:./data/sparktest.db
+ENV PORT=8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8080/api/health || exit 1
+
+CMD ["./sparktest-backend"]

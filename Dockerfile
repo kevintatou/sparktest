@@ -45,6 +45,7 @@ EXPOSE 3000
 # Environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_PUBLIC_USE_RUST_API=false
+ENV NEXT_PUBLIC_USE_RUST_API=true
+ENV NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
 
 CMD ["dumb-init", "node", "apps/oss/server.js"]
