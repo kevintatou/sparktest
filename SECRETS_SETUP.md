@@ -6,13 +6,13 @@ This guide explains how to configure the required GitHub repository secrets for 
 
 The following secrets must be configured in your GitHub repository to enable automated deployment:
 
-### 1. DROPLET_IP (Required)
-- **Description**: IP address of your Digital Ocean droplet
-- **Format**: IPv4 address (e.g., `192.168.1.100`)
+### 1. SERVER_HOST (Required)
+- **Description**: IP address or hostname of your server
+- **Format**: IPv4 address (e.g., `192.168.1.100`) or hostname (e.g., `myserver.example.com`)
 - **Used by**: All deployment workflows
 
-### 2. DROPLET_SSH_KEY (Required)
-- **Description**: Private SSH key for accessing the droplet
+### 2. SSH_PRIVATE_KEY (Required)
+- **Description**: Private SSH key for accessing the server
 - **Format**: Complete private key including headers
 - **Used by**: All deployment workflows
 
@@ -56,8 +56,8 @@ Use the validation script to check your local environment matches what you'll se
 
 ```bash
 # Set environment variables locally to test
-export DROPLET_IP="your.droplet.ip.address"
-export DROPLET_SSH_KEY="-----BEGIN OPENSSH PRIVATE KEY-----
+export SERVER_HOST="your.server.ip.address"
+export SSH_PRIVATE_KEY="-----BEGIN OPENSSH PRIVATE KEY-----
 your-private-key-content
 -----END OPENSSH PRIVATE KEY-----"
 export GH_RUNNER_TOKEN="your_github_runner_token"
@@ -68,14 +68,15 @@ export GH_RUNNER_TOKEN="your_github_runner_token"
 
 ## Getting Required Values
 
-### Getting DROPLET_IP
-Your Digital Ocean droplet IP address can be found:
-- In the Digital Ocean control panel
-- By running `curl ifconfig.me` on the droplet
-- In the droplet details page
+### Getting SERVER_HOST
+Your server IP address or hostname can be found:
+- In your server provider's control panel
+- By running `curl ifconfig.me` on the server
+- In the server details page
+- From your DNS configuration if using a hostname
 
-### Getting DROPLET_SSH_KEY
-This is the private key that corresponds to the public key added to your droplet:
+### Getting SSH_PRIVATE_KEY
+This is the private key that corresponds to the public key added to your server:
 
 1. **If you have the key locally:**
    ```bash
@@ -88,9 +89,9 @@ This is the private key that corresponds to the public key added to your droplet
    cat ~/.ssh/id_rsa  # Copy this content
    ```
 
-3. **Add the public key to your droplet:**
+3. **Add the public key to your server:**
    ```bash
-   cat ~/.ssh/id_rsa.pub  # Copy this to droplet's ~/.ssh/authorized_keys
+   cat ~/.ssh/id_rsa.pub  # Copy this to server's ~/.ssh/authorized_keys
    ```
 
 ### Getting GH_RUNNER_TOKEN
@@ -108,14 +109,14 @@ Example token location in the GitHub UI:
 ## Workflows That Use These Secrets
 
 ### deploy-runner.yml (Deploy Self-Hosted Runner)
-- **Secrets used**: `DROPLET_IP`, `DROPLET_SSH_KEY`, `GH_RUNNER_TOKEN`
+- **Secrets used**: `SERVER_HOST`, `SSH_PRIVATE_KEY`, `GH_RUNNER_TOKEN`
 - **Trigger**: Push to main (runner files changed) or manual dispatch
-- **Purpose**: Deploys GitHub Actions runner to your droplet
+- **Purpose**: Deploys GitHub Actions runner to your server
 
 ### deploy.yml (Deploy Application)
-- **Secrets used**: `DROPLET_IP`, `DROPLET_SSH_KEY`, `DROPLET_USER` (optional)
+- **Secrets used**: `SERVER_HOST`, `SSH_PRIVATE_KEY`, `DROPLET_USER` (optional)
 - **Trigger**: Release published
-- **Purpose**: Deploys the SparkTest application to your droplet
+- **Purpose**: Deploys the SparkTest application to your server
 
 ## Troubleshooting
 
@@ -125,9 +126,9 @@ Example token location in the GitHub UI:
 - Ensure you're in the correct repository
 
 ### SSH Connection Failures
-- Verify DROPLET_IP is correct and reachable
-- Test SSH connection manually: `ssh root@your-droplet-ip`
-- Check that the private key corresponds to a public key on the droplet
+- Verify SERVER_HOST is correct and reachable
+- Test SSH connection manually: `ssh root@your-server-host`
+- Check that the private key corresponds to a public key on the server
 - Ensure the private key includes the complete content with headers
 
 ### GitHub Token Issues
@@ -138,7 +139,7 @@ Example token location in the GitHub UI:
 ### Permission Errors
 - Ensure the SSH user has Docker permissions
 - Check that the user can write to the target directory
-- Verify Docker and Docker Compose are installed on the droplet
+- Verify Docker and Docker Compose are installed on the server
 
 ## Security Best Practices
 
@@ -154,7 +155,7 @@ Example token location in the GitHub UI:
    - Check workflow logs for unexpected access
    - Review deployment history regularly
 
-4. **Secure your droplet**
+4. **Secure your server**
    - Disable password authentication
    - Use SSH key authentication only
    - Keep the system updated
@@ -183,7 +184,7 @@ If you encounter issues:
 1. **Check the validation script output**
 2. **Review GitHub Actions logs**
 3. **Test SSH connection manually**
-4. **Verify Docker is running on the droplet**
-5. **Check droplet resources (disk space, memory)**
+4. **Verify Docker is running on the server**
+5. **Check server resources (disk space, memory)**
 
 For more detailed troubleshooting, see the workflow-specific error messages in the GitHub Actions logs.

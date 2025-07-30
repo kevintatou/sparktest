@@ -29,8 +29,8 @@ jobs:
             exit 1
           fi
           
-          if [ -z "${{ secrets.DROPLET_SSH_KEY }}" ]; then
-            echo "❌ Error: DROPLET_SSH_KEY secret is not set"  
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+            echo "❌ Error: SSH_PRIVATE_KEY secret is not set"  
             echo "Set it at: https://github.com/${{ github.repository }}/settings/secrets/actions"
             exit 1
           fi
@@ -50,7 +50,7 @@ jobs:
         with:
           host: ${{ secrets.DROPLET_IP }}
           username: root
-          key: ${{ secrets.DROPLET_SSH_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: ".deploy"
           target: "~/sparktest"
 
@@ -59,7 +59,7 @@ jobs:
         with:
           host: ${{ secrets.DROPLET_IP }}
           username: root
-          key: ${{ secrets.DROPLET_SSH_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
             cd ~/sparktest/.deploy
