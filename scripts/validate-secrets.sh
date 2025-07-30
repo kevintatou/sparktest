@@ -97,9 +97,9 @@ fi
 
 echo ""
 
-# Check DROPLET_SSH_KEY
-if check_env_var "DROPLET_SSH_KEY" "Private SSH key for droplet access"; then
-    validate_ssh_key "$DROPLET_SSH_KEY" || VALIDATION_FAILED=1
+# Check SSH_PRIVATE_KEY
+if check_env_var "SSH_PRIVATE_KEY" "Private SSH key for droplet access"; then
+    validate_ssh_key "$SSH_PRIVATE_KEY" || VALIDATION_FAILED=1
 else
     VALIDATION_FAILED=1
 fi
@@ -144,7 +144,7 @@ else
     echo "   Description: IP address of your Digital Ocean droplet"
     echo "   Example: 192.168.1.100"
     echo ""
-    echo "🔑 DROPLET_SSH_KEY"
+    echo "🔑 SSH_PRIVATE_KEY"
     echo "   Description: Private SSH key for droplet access"
     echo "   Format: Full private key including headers"
     echo "   Example:"

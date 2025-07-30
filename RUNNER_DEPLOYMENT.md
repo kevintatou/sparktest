@@ -19,7 +19,7 @@ Before deploying, validate your configuration:
 ```bash
 # Set your environment variables locally
 export DROPLET_IP="your.droplet.ip.address"
-export DROPLET_SSH_KEY="-----BEGIN OPENSSH PRIVATE KEY-----
+export SSH_PRIVATE_KEY="-----BEGIN OPENSSH PRIVATE KEY-----
 your-private-key-content
 -----END OPENSSH PRIVATE KEY-----"
 export GH_RUNNER_TOKEN="your_github_runner_token"
@@ -37,7 +37,7 @@ The runner is automatically deployed via GitHub Actions when changes are made to
 Set these in your GitHub repository secrets at: `https://github.com/kevintatou/sparktest/settings/secrets/actions`
 
 - `DROPLET_IP` - Your Digital Ocean droplet IP address
-- `DROPLET_SSH_KEY` - Private SSH key for accessing the droplet
+- `SSH_PRIVATE_KEY` - Private SSH key for accessing the droplet
 - `GH_RUNNER_TOKEN` - GitHub runner registration token
 
 📚 **For detailed setup instructions, see [SECRETS_SETUP.md](SECRETS_SETUP.md)**
@@ -71,7 +71,7 @@ The runner deploys automatically when:
 ```bash
 # Set required environment variables
 export DROPLET_IP="your.droplet.ip.address"
-export DROPLET_SSH_KEY="-----BEGIN OPENSSH PRIVATE KEY-----
+export SSH_PRIVATE_KEY="-----BEGIN OPENSSH PRIVATE KEY-----
 your-private-key-content
 -----END OPENSSH PRIVATE KEY-----"
 export GH_RUNNER_TOKEN="your_github_runner_token"

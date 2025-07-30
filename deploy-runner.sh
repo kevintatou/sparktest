@@ -2,7 +2,7 @@
 
 # Deploy Self-Hosted Runner to Digital Ocean Droplet
 # This script can be run locally to deploy the runner manually
-# Requires: DROPLET_IP, DROPLET_SSH_KEY, GH_RUNNER_TOKEN environment variables
+# Requires: DROPLET_IP, SSH_PRIVATE_KEY, GH_RUNNER_TOKEN environment variables
 
 set -e
 
@@ -23,15 +23,15 @@ validate_environment() {
         echo "✅ DROPLET_IP is set: $DROPLET_IP"
     fi
 
-    if [ -z "$DROPLET_SSH_KEY" ]; then
-        echo "❌ Error: DROPLET_SSH_KEY environment variable is not set"
+    if [ -z "$SSH_PRIVATE_KEY" ]; then
+        echo "❌ Error: SSH_PRIVATE_KEY environment variable is not set"
         echo "   Set it with your private SSH key content"
         ((errors++))
     else
-        echo "✅ DROPLET_SSH_KEY is set (${#DROPLET_SSH_KEY} characters)"
+        echo "✅ SSH_PRIVATE_KEY is set (${#SSH_PRIVATE_KEY} characters)"
         
         # Validate SSH key format
-        if [[ "$DROPLET_SSH_KEY" =~ ^-----BEGIN\ (OPENSSH\ )?PRIVATE\ KEY----- ]] && [[ "$DROPLET_SSH_KEY" =~ -----END\ (OPENSSH\ )?PRIVATE\ KEY-----$ ]]; then
+        if [[ "$SSH_PRIVATE_KEY" =~ ^-----BEGIN\ (OPENSSH\ )?PRIVATE\ KEY----- ]] && [[ "$SSH_PRIVATE_KEY" =~ -----END\ (OPENSSH\ )?PRIVATE\ KEY-----$ ]]; then
             echo "✅ SSH key format appears valid"
         else
             echo "❌ Warning: SSH key format may be invalid"
@@ -76,7 +76,7 @@ validate_environment
 # Create temporary SSH key file with proper error handling
 echo "🔧 Setting up SSH connection..."
 TEMP_KEY_FILE=$(mktemp)
-echo "$DROPLET_SSH_KEY" > "$TEMP_KEY_FILE"
+echo "$SSH_PRIVATE_KEY" > "$TEMP_KEY_FILE"
 chmod 600 "$TEMP_KEY_FILE"
 
 # Test SSH connection first

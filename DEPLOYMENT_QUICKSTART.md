@@ -12,7 +12,7 @@ This file provides a quick reference for setting up the required GitHub reposito
 curl ifconfig.me
 ```
 
-**DROPLET_SSH_KEY**: Your private SSH key
+**SSH_PRIVATE_KEY**: Your private SSH key
 ```bash
 # Display your private key (usually ~/.ssh/id_rsa):
 cat ~/.ssh/id_rsa
@@ -32,7 +32,7 @@ cat ~/.ssh/id_rsa
 | Secret Name | Value | Required For |
 |-------------|-------|--------------|
 | `DROPLET_IP` | `192.168.1.100` (your IP) | All deployments |
-| `DROPLET_SSH_KEY` | Complete private key with headers | All deployments |
+| `SSH_PRIVATE_KEY` | Complete private key with headers | All deployments |
 | `GH_RUNNER_TOKEN` | GitHub runner token | Runner deployment only |
 | `DROPLET_USER` | `root` or your username | App deployment (optional) |
 
@@ -41,7 +41,7 @@ cat ~/.ssh/id_rsa
 ```bash
 # Set environment variables to match your secrets
 export DROPLET_IP="your.droplet.ip.address"
-export DROPLET_SSH_KEY="-----BEGIN OPENSSH PRIVATE KEY-----
+export SSH_PRIVATE_KEY="-----BEGIN OPENSSH PRIVATE KEY-----
 your-private-key-content
 -----END OPENSSH PRIVATE KEY-----"
 export GH_RUNNER_TOKEN="your_github_runner_token"

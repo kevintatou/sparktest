@@ -6,13 +6,13 @@ This guide explains how to configure the required GitHub repository secrets for 
 
 The following secrets must be configured in your GitHub repository to enable automated deployment:
 
-### 1. SERVER_HOST (Required)
-- **Description**: IP address or hostname of your server
+### 1. DROPLET_IP (Required)
+- **Description**: IP address or hostname of your droplet
 - **Format**: IPv4 address (e.g., `192.168.1.100`) or hostname (e.g., `myserver.example.com`)
 - **Used by**: All deployment workflows
 
 ### 2. SSH_PRIVATE_KEY (Required)
-- **Description**: Private SSH key for accessing the server
+- **Description**: Private SSH key for accessing the droplet
 - **Format**: Complete private key including headers
 - **Used by**: All deployment workflows
 
@@ -56,7 +56,7 @@ Use the validation script to check your local environment matches what you'll se
 
 ```bash
 # Set environment variables locally to test
-export SERVER_HOST="your.server.ip.address"
+export DROPLET_IP="your.droplet.ip.address"
 export SSH_PRIVATE_KEY="-----BEGIN OPENSSH PRIVATE KEY-----
 your-private-key-content
 -----END OPENSSH PRIVATE KEY-----"
@@ -68,15 +68,15 @@ export GH_RUNNER_TOKEN="your_github_runner_token"
 
 ## Getting Required Values
 
-### Getting SERVER_HOST
-Your server IP address or hostname can be found:
+### Getting DROPLET_IP
+Your droplet IP address or hostname can be found:
 - In your server provider's control panel
-- By running `curl ifconfig.me` on the server
-- In the server details page
+- By running `curl ifconfig.me` on the droplet
+- In the droplet details page
 - From your DNS configuration if using a hostname
 
 ### Getting SSH_PRIVATE_KEY
-This is the private key that corresponds to the public key added to your server:
+This is the private key that corresponds to the public key added to your droplet:
 
 1. **If you have the key locally:**
    ```bash
@@ -89,9 +89,9 @@ This is the private key that corresponds to the public key added to your server:
    cat ~/.ssh/id_rsa  # Copy this content
    ```
 
-3. **Add the public key to your server:**
+3. **Add the public key to your droplet:**
    ```bash
-   cat ~/.ssh/id_rsa.pub  # Copy this to server's ~/.ssh/authorized_keys
+   cat ~/.ssh/id_rsa.pub  # Copy this to droplet's ~/.ssh/authorized_keys
    ```
 
 ### Getting GH_RUNNER_TOKEN
@@ -109,14 +109,14 @@ Example token location in the GitHub UI:
 ## Workflows That Use These Secrets
 
 ### deploy-runner.yml (Deploy Self-Hosted Runner)
-- **Secrets used**: `SERVER_HOST`, `SSH_PRIVATE_KEY`, `GH_RUNNER_TOKEN`
+- **Secrets used**: `DROPLET_IP`, `SSH_PRIVATE_KEY`, `GH_RUNNER_TOKEN`
 - **Trigger**: Push to main (runner files changed) or manual dispatch
-- **Purpose**: Deploys GitHub Actions runner to your server
+- **Purpose**: Deploys GitHub Actions runner to your droplet
 
 ### deploy.yml (Deploy Application)
-- **Secrets used**: `SERVER_HOST`, `SSH_PRIVATE_KEY`, `DROPLET_USER` (optional)
+- **Secrets used**: `DROPLET_IP`, `SSH_PRIVATE_KEY`, `DROPLET_USER` (optional)
 - **Trigger**: Release published
-- **Purpose**: Deploys the SparkTest application to your server
+- **Purpose**: Deploys the SparkTest application to your droplet
 
 ## Troubleshooting
 
@@ -126,9 +126,9 @@ Example token location in the GitHub UI:
 - Ensure you're in the correct repository
 
 ### SSH Connection Failures
-- Verify SERVER_HOST is correct and reachable
-- Test SSH connection manually: `ssh root@your-server-host`
-- Check that the private key corresponds to a public key on the server
+- Verify DROPLET_IP is correct and reachable
+- Test SSH connection manually: `ssh root@your-droplet-ip`
+- Check that the private key corresponds to a public key on the droplet
 - Ensure the private key includes the complete content with headers
 
 ### GitHub Token Issues
@@ -139,7 +139,7 @@ Example token location in the GitHub UI:
 ### Permission Errors
 - Ensure the SSH user has Docker permissions
 - Check that the user can write to the target directory
-- Verify Docker and Docker Compose are installed on the server
+- Verify Docker and Docker Compose are installed on the droplet
 
 ## Security Best Practices
 
@@ -184,7 +184,7 @@ If you encounter issues:
 1. **Check the validation script output**
 2. **Review GitHub Actions logs**
 3. **Test SSH connection manually**
-4. **Verify Docker is running on the server**
-5. **Check server resources (disk space, memory)**
+4. **Verify Docker is running on the droplet**
+5. **Check droplet resources (disk space, memory)**
 
 For more detailed troubleshooting, see the workflow-specific error messages in the GitHub Actions logs.

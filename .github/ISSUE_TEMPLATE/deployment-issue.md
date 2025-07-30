@@ -29,7 +29,7 @@ A clear description of what you expected.
 
 **GitHub Secrets Status:**
 - [ ] DROPLET_IP is set
-- [ ] DROPLET_SSH_KEY is set  
+- [ ] SSH_PRIVATE_KEY is set  
 - [ ] GH_RUNNER_TOKEN is set (for runner deployment)
 - [ ] DROPLET_USER is set (optional, for app deployment)
 
