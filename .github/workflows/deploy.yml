@@ -49,17 +49,21 @@ jobs:
         run: |
           echo "🔍 Validating deployment configuration..."
 
-          # Check Docker availability
-          if ! command -v docker &> /dev/null; then
-            echo "❌ Error: Docker is not installed"
-            exit 1
+          # Check Docker availability with robust detection
+          if command -v docker &> /dev/null; then
+            echo "✅ Docker command found in PATH"
+          else
+            echo "⚠️  Docker command not found in PATH, will try with sudo"
           fi
 
           # Try Docker without sudo first, then with sudo if needed
-          if docker info &> /dev/null; then
+          if command -v docker &> /dev/null && docker info &> /dev/null; then
             echo "✅ Docker is available and running"
-          elif sudo docker info &> /dev/null; then
+          elif command -v docker &> /dev/null && sudo docker info &> /dev/null; then
             echo "✅ Docker is available and running (with sudo)"
+            echo "⚠️  Note: Docker commands will require sudo"
+          elif sudo docker info &> /dev/null; then
+            echo "✅ Docker is available and running (with sudo, command not in PATH)"
             echo "⚠️  Note: Docker commands will require sudo"
           else
             echo "❌ Error: Docker service is not running or not accessible"
@@ -163,7 +167,7 @@ jobs:
             echo "   Backend API: http://$(hostname -I | awk '{print $1}'):8080"
             echo ""
             echo "🔧 Management commands:"
-            echo "   View logs: docker compose -f .deploy/docker-compose.yml logs -f"
-            echo "   Stop services: docker compose -f .deploy/docker-compose.yml down"
-            echo "   Restart: docker compose -f .deploy/docker-compose.yml restart"
+            echo "   View logs: docker compose -f docker-compose.prod.yml logs -f"
+            echo "   Stop services: docker compose -f docker-compose.prod.yml down"
+            echo "   Restart: docker compose -f docker-compose.prod.yml restart"
           fi
