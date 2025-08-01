@@ -135,21 +135,18 @@ jobs:
           fi
           
           echo "📍 Deploying SparkTest MVP from release: ${{ github.event.release.tag_name || 'manual-deploy' }}"
-          
-          # Verify docker compose is available
-          if command -v docker &> /dev/null; then
-            if docker compose version &> /dev/null; then
-              echo "✅ Docker Compose is available (integrated)"
-              docker compose version
-            elif sudo docker compose version &> /dev/null; then
-              echo "✅ Docker Compose is available (with sudo)"
-              sudo docker compose version
-            else
-              echo "❌ Docker Compose not found"
-              exit 1
-            fi
+      - name: Ensure Docker is installed
+        run: |
+          if ! command -v docker &> /dev/null; then
+            echo "Docker not found. Installing..."
+            sudo apt-get update
+            sudo apt-get install -y docker.io
+            sudo systemctl start docker
+            sudo systemctl enable docker
+            sudo usermod -aG docker $USER
+          else
+            echo "Docker is already installed."
           fi
-
       - name: Deploy SparkTest MVP
         run: |
           set -e
@@ -306,4 +303,4 @@ jobs:
             echo "   View logs: docker compose -f docker-compose.prod.yml logs -f"
             echo "   Stop services: docker compose -f docker-compose.prod.yml down"
             echo "   Restart: docker compose -f docker-compose.prod.yml restart"
-          fi
+            fi
