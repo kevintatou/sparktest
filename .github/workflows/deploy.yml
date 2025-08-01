@@ -12,225 +12,86 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install Docker if needed
+      - name: Check Docker availability
         run: |
-          echo "🐳 Ensuring Docker is available..."
+          echo "🐳 Checking Docker availability..."
 
-          # Check if Docker is already installed and working
-          if command -v docker &> /dev/null && docker info &> /dev/null 2>&1; then
-            echo "✅ Docker is already installed and working"
+          # Check if Docker is installed and accessible
+          if command -v docker &> /dev/null; then
+            echo "✅ Docker command found"
             docker --version
-          elif command -v docker &> /dev/null && sudo docker info &> /dev/null 2>&1; then
-            echo "✅ Docker is installed but requires sudo access"
-            docker --version
-          else
-            echo "📦 Installing Docker..."
             
-            # Update package index
-            sudo apt-get update -y
-            
-            # Install prerequisites
-            sudo apt-get install -y \
-              ca-certificates \
-              curl \
-              gnupg \
-              lsb-release
-            
-            # Install Docker using the official installation script
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sudo sh get-docker.sh
-            rm get-docker.sh
-
-            echo "✅ Docker installation completed"
-            docker --version || sudo docker --version
-          fi
-
-          # Add current user to docker group (always run this to ensure membership)
-          echo "👥 Ensuring user is in docker group..."
-          sudo usermod -aG docker $USER
-          
-          # Start and enable Docker service
-          echo "🔧 Starting Docker service..."
-          sudo systemctl start docker
-          sudo systemctl enable docker
-          
-          # Wait for Docker service to be fully ready
-          echo "⏳ Waiting for Docker service to be ready..."
-          for i in {1..30}; do
-            if sudo docker info &> /dev/null; then
-              echo "✅ Docker service is ready after $i seconds"
-              break
-            fi
-            if [ $i -eq 30 ]; then
-              echo "❌ Docker service failed to start within 30 seconds"
-              sudo systemctl status docker
+            # Test if Docker works without sudo
+            if docker info &> /dev/null 2>&1; then
+              echo "✅ Docker works without sudo - user is in docker group"
+              echo "DOCKER_SUDO=false" >> $GITHUB_ENV
+            else
+              echo "⚠️  Docker requires elevated permissions"
+              echo "💡 This usually means Docker is installed but user needs to be in docker group"
+              echo "💡 Manual setup required on the runner machine:"
+              echo "   sudo usermod -aG docker \$USER"
+              echo "   newgrp docker  # or logout/login"
+              echo "   sudo systemctl start docker"
+              echo "   sudo systemctl enable docker"
+              echo ""
+              echo "❌ Cannot proceed with deployment without proper Docker access"
               exit 1
             fi
-            sleep 1
-          done
-
-          echo "✅ Docker setup completed"
+          else
+            echo "❌ Docker not found. Please install Docker on the runner machine:"
+            echo "   curl -fsSL https://get.docker.com -o get-docker.sh"
+            echo "   sudo sh get-docker.sh"
+            echo "   sudo usermod -aG docker \$USER"
+            echo "   sudo systemctl start docker"
+            echo "   sudo systemctl enable docker"
+            exit 1
+          fi
 
       - name: Validate deployment environment
         run: |
           echo "🔍 Validating deployment configuration..."
-
-          # Test Docker availability with comprehensive detection
-          echo "🐳 Testing Docker access methods..."
           
-          DOCKER_WORKS_WITHOUT_SUDO=false
-          DOCKER_WORKS_WITH_SUDO=false
-          
-          # Test Docker without sudo
-          if command -v docker &> /dev/null && timeout 10 docker info &> /dev/null; then
-            echo "✅ Docker works without sudo"
-            DOCKER_WORKS_WITHOUT_SUDO=true
+          # Test Docker functionality
+          echo "🐳 Testing Docker functionality..."
+          if docker info &> /dev/null; then
+            echo "✅ Docker is working correctly"
+            docker version --format 'Docker version: {{.Server.Version}}'
           else
-            echo "⚠️  Docker doesn't work without sudo (expected after fresh installation)"
+            echo "❌ Docker is not working properly"
+            exit 1
           fi
           
-          # Test Docker with sudo
-          if command -v docker &> /dev/null && timeout 10 sudo docker info &> /dev/null; then
-            echo "✅ Docker works with sudo"
-            DOCKER_WORKS_WITH_SUDO=true
-          elif timeout 10 sudo docker info &> /dev/null; then
-            echo "✅ Docker works with sudo (command not in PATH for current user)"
-            DOCKER_WORKS_WITH_SUDO=true
+          # Test Docker Compose
+          echo "� Testing Docker Compose..."
+          if docker compose version &> /dev/null; then
+            echo "✅ Docker Compose is available"
+            docker compose version
           else
-            echo "❌ Docker doesn't work even with sudo"
-          fi
-          
-          # Ensure at least one method works
-          if [ "$DOCKER_WORKS_WITHOUT_SUDO" = false ] && [ "$DOCKER_WORKS_WITH_SUDO" = false ]; then
-            echo "❌ Error: Docker is not accessible through any method"
-            echo "🔧 Attempting to diagnose and fix..."
-            
-            # Check if Docker daemon is running
-            sudo systemctl status docker --no-pager
-            
-            # Try to start Docker service
-            echo "🔧 Restarting Docker service..."
-            sudo systemctl restart docker
-            sleep 10
-            
-            # Test again after restart
-            if timeout 10 sudo docker info &> /dev/null; then
-              echo "✅ Docker service started successfully after restart"
-              DOCKER_WORKS_WITH_SUDO=true
-            else
-              echo "❌ Error: Docker service still not working after restart"
-              sudo journalctl -u docker --no-pager --lines=20
-              exit 1
-            fi
-          fi
-          
-          # Show Docker version and system info
-          echo "📋 Docker information:"
-          if [ "$DOCKER_WORKS_WITHOUT_SUDO" = true ]; then
-            docker --version
-            docker system info --format "{{.ServerVersion}}" || echo "Could not get server version"
-          else
-            sudo docker --version
-            sudo docker system info --format "{{.ServerVersion}}" || echo "Could not get server version"
+            echo "❌ Docker Compose not found or not working"
+            exit 1
           fi
           
           echo "📍 Deploying SparkTest MVP from release: ${{ github.event.release.tag_name || 'manual-deploy' }}"
-      - name: Ensure Docker is installed
-        run: |
-          if ! command -v docker &> /dev/null; then
-            echo "Docker not found. Installing..."
-            sudo apt-get update
-            sudo apt-get install -y docker.io
-            sudo systemctl start docker
-            sudo systemctl enable docker
-            sudo usermod -aG docker $USER
-          else
-            echo "Docker is already installed."
-          fi
       - name: Deploy SparkTest MVP
         run: |
           set -e
 
-          # Function to run docker commands with proper fallback handling
-          run_docker() {
-            local max_attempts=3
-            local attempt=1
-            
-            while [ $attempt -le $max_attempts ]; do
-              echo "🐳 Running: docker $* (attempt $attempt/$max_attempts)"
-              
-              # Try without sudo first
-              if command -v docker &> /dev/null && docker "$@" 2>/dev/null; then
-                echo "✅ Docker command succeeded without sudo"
-                return 0
-              fi
-              
-              # Try with sudo
-              if sudo docker "$@" 2>/dev/null; then
-                echo "✅ Docker command succeeded with sudo"
-                return 0
-              fi
-              
-              echo "⚠️  Docker command failed (attempt $attempt/$max_attempts)"
-              if [ $attempt -lt $max_attempts ]; then
-                echo "⏳ Waiting 5 seconds before retry..."
-                sleep 5
-              fi
-              attempt=$((attempt + 1))
-            done
-            
-            echo "❌ Docker command failed after $max_attempts attempts: docker $*"
-            return 1
-          }
-
-          # Function to run docker compose commands with proper fallback handling
-          run_docker_compose() {
-            local max_attempts=3
-            local attempt=1
-            
-            while [ $attempt -le $max_attempts ]; do
-              echo "🐳 Running: docker compose $* (attempt $attempt/$max_attempts)"
-              
-              # Try without sudo first
-              if command -v docker &> /dev/null && docker compose "$@" 2>/dev/null; then
-                echo "✅ Docker compose command succeeded without sudo"
-                return 0
-              fi
-              
-              # Try with sudo
-              if sudo docker compose "$@" 2>/dev/null; then
-                echo "✅ Docker compose command succeeded with sudo"
-                return 0
-              fi
-              
-              echo "⚠️  Docker compose command failed (attempt $attempt/$max_attempts)"
-              if [ $attempt -lt $max_attempts ]; then
-                echo "⏳ Waiting 5 seconds before retry..."
-                sleep 5
-              fi
-              attempt=$((attempt + 1))
-            done
-            
-            echo "❌ Docker compose command failed after $max_attempts attempts: docker compose $*"
-            return 1
-          }
-
           echo "🧹 Cleaning up existing deployment..."
           # Stop and remove existing containers (don't fail if nothing exists)
-          run_docker_compose -f docker-compose.prod.yml down --remove-orphans || echo "ℹ️  No existing deployment found to clean up"
+          docker compose -f docker-compose.prod.yml down --remove-orphans || echo "ℹ️  No existing deployment found to clean up"
 
           # Remove old images to free space (keep last 2 versions)
           echo "🗑️  Cleaning up old Docker images..."
-          run_docker image prune -f || echo "ℹ️  No images to prune"
+          docker image prune -f || echo "ℹ️  No images to prune"
 
           echo "📦 Building and deploying SparkTest MVP..."
           # Build and start services with better error handling
-          if ! run_docker_compose -f docker-compose.prod.yml up --build -d; then
+          if ! docker compose -f docker-compose.prod.yml up --build -d; then
             echo "❌ Error: Failed to deploy SparkTest MVP"
             echo "🔧 Attempting diagnosis..."
             
             # Show docker compose version for debugging
-            run_docker_compose version || echo "Could not get docker compose version"
+            docker compose version || echo "Could not get docker compose version"
             
             # Check if docker-compose.prod.yml exists and is valid
             if [ ! -f "docker-compose.prod.yml" ]; then
@@ -240,10 +101,10 @@ jobs:
             fi
             
             echo "📋 Docker compose config validation:"
-            run_docker_compose -f docker-compose.prod.yml config --quiet || echo "Config validation failed"
+            docker compose -f docker-compose.prod.yml config --quiet || echo "Config validation failed"
             
             echo "📋 Checking logs for errors..."
-            run_docker_compose -f docker-compose.prod.yml logs --tail 50 || echo "Could not get logs"
+            docker compose -f docker-compose.prod.yml logs --tail 50 || echo "Could not get logs"
             
             echo "📋 System resources:"
             df -h || echo "Could not check disk space"
@@ -257,13 +118,13 @@ jobs:
 
           # Check service health with timeout
           echo "📋 Service status:"
-          if ! run_docker_compose -f docker-compose.prod.yml ps; then
+          if ! docker compose -f docker-compose.prod.yml ps; then
             echo "⚠️  Could not get service status, trying with different approach..."
-            run_docker ps -a || echo "Could not list containers"
+            docker ps -a || echo "Could not list containers"
           fi
 
           echo "📋 Recent logs:"
-          run_docker_compose -f docker-compose.prod.yml logs --tail 20 || echo "Could not get recent logs"
+          docker compose -f docker-compose.prod.yml logs --tail 20 || echo "Could not get recent logs"
 
           # Get server IP
           SERVER_IP=$(hostname -I | awk '{print $1}' || echo "localhost")
