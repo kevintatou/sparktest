@@ -15,35 +15,48 @@ jobs:
       - name: Check Docker availability
         run: |
           echo "🐳 Checking Docker availability..."
-
-          # Check if Docker is installed and accessible
+          echo "Current user: $(whoami)"
+          echo "Current directory: $(pwd)"
+          echo "PATH: $PATH"
+          echo ""
+          
+          # Check multiple locations for docker
+          DOCKER_PATH=""
           if command -v docker &> /dev/null; then
-            echo "✅ Docker command found"
-            docker --version
-            
-            # Test if Docker works without sudo
-            if docker info &> /dev/null 2>&1; then
-              echo "✅ Docker works without sudo - user is in docker group"
-              echo "DOCKER_SUDO=false" >> $GITHUB_ENV
-            else
-              echo "⚠️  Docker requires elevated permissions"
-              echo "💡 This usually means Docker is installed but user needs to be in docker group"
-              echo "💡 Manual setup required on the runner machine:"
-              echo "   sudo usermod -aG docker \$USER"
-              echo "   newgrp docker  # or logout/login"
-              echo "   sudo systemctl start docker"
-              echo "   sudo systemctl enable docker"
-              echo ""
-              echo "❌ Cannot proceed with deployment without proper Docker access"
-              exit 1
-            fi
+            DOCKER_PATH=$(which docker)
+            echo "✅ Docker found at: $DOCKER_PATH"
+          elif [ -f "/usr/bin/docker" ]; then
+            DOCKER_PATH="/usr/bin/docker"
+            echo "✅ Docker found at: $DOCKER_PATH"
+          elif [ -f "/usr/local/bin/docker" ]; then
+            DOCKER_PATH="/usr/local/bin/docker"
+            echo "✅ Docker found at: $DOCKER_PATH"
           else
-            echo "❌ Docker not found. Please install Docker on the runner machine:"
-            echo "   curl -fsSL https://get.docker.com -o get-docker.sh"
-            echo "   sudo sh get-docker.sh"
-            echo "   sudo usermod -aG docker \$USER"
-            echo "   sudo systemctl start docker"
-            echo "   sudo systemctl enable docker"
+            echo "❌ Docker not found in any standard location"
+            echo "Checking system paths:"
+            ls -la /usr/bin/docker* 2>/dev/null || echo "No docker in /usr/bin/"
+            ls -la /usr/local/bin/docker* 2>/dev/null || echo "No docker in /usr/local/bin/"
+            exit 1
+          fi
+          
+          # Test Docker version
+          echo "Docker version:"
+          $DOCKER_PATH --version || { echo "❌ Cannot get Docker version"; exit 1; }
+          
+          # Test Docker access
+          echo "Testing Docker daemon access..."
+          if $DOCKER_PATH info &> /dev/null; then
+            echo "✅ Docker daemon accessible without sudo"
+          else
+            echo "❌ Docker daemon not accessible"
+            echo "User groups: $(groups)"
+            echo "Docker socket permissions:"
+            ls -la /var/run/docker.sock 2>/dev/null || echo "Docker socket not found"
+            echo ""
+            echo "💡 Possible solutions:"
+            echo "1. Add user to docker group: sudo usermod -aG docker $(whoami)"
+            echo "2. Apply group membership: newgrp docker"
+            echo "3. Restart the runner process"
             exit 1
           fi
 
