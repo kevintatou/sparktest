@@ -1,0 +1,102 @@
+# GitHub Actions Self-Hosted Runner in Docker
+FROM ubuntu:22.04
+
+# Avoid interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    unzip \
+    git \
+    jq \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    python3 \
+    python3-pip \
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Docker CLI (needed for workflows that use Docker)
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y docker-ce-cli \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js and npm (needed for your frontend builds)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+# Install pnpm (your package manager)
+RUN npm install -g pnpm
+
+# Install Rust (needed for your backend builds)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+    && echo 'source $HOME/.cargo/env' >> ~/.bashrc
+
+# Create a non-root user for the runner
+RUN useradd -m -s /bin/bash runner \
+    && usermod -aG sudo runner \
+    && echo 'runner ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Switch to runner user
+USER runner
+WORKDIR /home/runner
+
+# Set up Rust environment for runner user
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/home/runner/.cargo/bin:${PATH}"
+
+# Download and extract GitHub Actions runner
+ARG RUNNER_VERSION="2.311.0"
+RUN curl -o actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
+    && tar xzf actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
+    && rm actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
+
+# Install runner dependencies
+RUN sudo ./bin/installdependencies.sh
+
+# Create entrypoint script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+echo "🔧 Configuring GitHub Actions runner..."\n\
+\n\
+# Remove existing configuration if it exists\n\
+./config.sh remove --token "$GH_RUNNER_TOKEN" 2>/dev/null || echo "No existing config to remove"\n\
+\n\
+# Configure the runner\n\
+./config.sh \\\n\
+    --url "$GH_REPO_URL" \\\n\
+    --token "$GH_RUNNER_TOKEN" \\\n\
+    --labels "${GH_RUNNER_LABELS:-self-hosted}" \\\n\
+    --name "${GH_RUNNER_NAME:-docker-runner}" \\\n\
+    --work "_work" \\\n\
+    --unattended \\\n\
+    --replace\n\
+\n\
+echo "✅ Runner configured successfully"\n\
+echo "🏃 Starting runner..."\n\
+\n\
+# Start the runner\n\
+./run.sh\n\
+' > entrypoint.sh && chmod +x entrypoint.sh
+
+# Set environment variables
+ENV GH_REPO_URL=""
+ENV GH_RUNNER_TOKEN=""
+ENV GH_RUNNER_LABELS="self-hosted"
+ENV GH_RUNNER_NAME="docker-runner"
+
+# Expose the working directory
+VOLUME ["/home/runner/_work"]
+
+# Run the entrypoint script
+CMD ["./entrypoint.sh"]

@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, spark-runner]
+    runs-on: [self-hosted, ubuntu-s-1vcpu-2gb-ams3-01]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
