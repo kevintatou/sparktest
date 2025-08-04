@@ -12,9 +12,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Check Docker availability
+      - name: Setup Docker access and validate environment
         run: |
-          echo "🐳 Checking Docker availability..."
+          echo "🐳 Setting up Docker access..."
           echo "Current user: $(whoami)"
           echo "User groups: $(groups)"
           echo ""
@@ -32,55 +32,74 @@ jobs:
           echo "🔍 Docker socket information:"
           if [ -S /var/run/docker.sock ]; then
             ls -la /var/run/docker.sock
-            echo "Docker socket group ID: $(stat -c '%g' /var/run/docker.sock)"
+            DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+            echo "Docker socket group ID: $DOCKER_GID"
           else
             echo "❌ Docker socket not found"
             exit 1
           fi
           
-          # Test Docker daemon access
-          echo "🔌 Testing Docker daemon access..."
-          if docker info > /dev/null 2>&1; then
-            echo "✅ Docker daemon accessible"
-          else
-            echo "🔧 Docker access issue detected, attempting to fix..."
-            
-            # Get the docker socket group ID and add user to it
-            DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
-            echo "Adding user to group with GID: $DOCKER_GID"
-            
-            # Add user to docker group with correct GID
-            sudo groupadd -f -g $DOCKER_GID docker_sock || true
-            sudo usermod -aG docker_sock $(whoami) || true
-            
-            # Test again with newgrp
-            if newgrp docker_sock <<< 'docker info > /dev/null 2>&1'; then
-              echo "✅ Docker access working after group fix"
-            else
-              echo "⚠️  Still having Docker access issues, but continuing..."
-              echo "This might work during the actual deployment steps"
-            fi
-          fi
-
-      - name: Validate deployment environment
-        run: |
-          echo "🔍 Validating deployment configuration..."
+          # Fix Docker access permanently
+          echo "� Fixing Docker access..."
           
-          # Test Docker functionality
+          # Method 1: Add user to existing docker group and create one with correct GID
+          sudo groupadd -f -g $DOCKER_GID docker_host || true
+          sudo usermod -aG docker $(whoami) || true
+          sudo usermod -aG docker_host $(whoami) || true
+          
+          # Method 2: Fix socket permissions as backup
+          sudo chown :docker /var/run/docker.sock || true
+          sudo chmod 666 /var/run/docker.sock || true
+          
+          # Method 3: Use newgrp to apply group membership immediately
+          echo "🔌 Testing Docker access..."
+          
+          # Test Docker access with different methods
+          if docker info > /dev/null 2>&1; then
+            echo "✅ Docker accessible directly"
+          elif newgrp docker <<< 'docker info > /dev/null 2>&1' 2>/dev/null; then
+            echo "✅ Docker accessible via newgrp docker"
+            # Export this for other steps
+            echo "DOCKER_ACCESS_METHOD=newgrp_docker" >> $GITHUB_ENV
+          elif newgrp docker_host <<< 'docker info > /dev/null 2>&1' 2>/dev/null; then
+            echo "✅ Docker accessible via newgrp docker_host"
+            echo "DOCKER_ACCESS_METHOD=newgrp_docker_host" >> $GITHUB_ENV
+          else
+            echo "⚠️  Direct Docker access still not working, but container should handle this"
+            echo "Continuing with deployment..."
+          fi
+          
+          echo ""
+          echo "🔍 Validating deployment environment..."
+          
+          # Test Docker functionality with fallback methods
           echo "🐳 Testing Docker functionality..."
+          DOCKER_CMD="docker info"
+          
           if docker info &> /dev/null; then
             echo "✅ Docker is working correctly"
             docker version --format 'Docker version: {{.Server.Version}}'
+          elif [ "$DOCKER_ACCESS_METHOD" = "newgrp_docker" ] && newgrp docker <<< 'docker info' &> /dev/null; then
+            echo "✅ Docker working with newgrp docker"
+            DOCKER_CMD="newgrp docker <<< 'docker'"
+          elif [ "$DOCKER_ACCESS_METHOD" = "newgrp_docker_host" ] && newgrp docker_host <<< 'docker info' &> /dev/null; then
+            echo "✅ Docker working with newgrp docker_host"  
+            DOCKER_CMD="newgrp docker_host <<< 'docker'"
           else
             echo "❌ Docker is not working properly"
+            echo "Debug info:"
+            echo "Current groups: $(groups)"
+            echo "Docker socket: $(ls -la /var/run/docker.sock 2>/dev/null || echo 'not found')"
             exit 1
           fi
           
           # Test Docker Compose
-          echo "� Testing Docker Compose..."
+          echo "📦 Testing Docker Compose..."
           if docker compose version &> /dev/null; then
             echo "✅ Docker Compose is available"
             docker compose version
+          elif newgrp docker <<< 'docker compose version' &> /dev/null; then
+            echo "✅ Docker Compose working with newgrp"
           else
             echo "❌ Docker Compose not found or not working"
             exit 1
@@ -91,22 +110,35 @@ jobs:
         run: |
           set -e
 
+          # Function to run Docker commands with proper access
+          run_docker() {
+            if docker "$@" 2>/dev/null; then
+              return 0
+            elif [ "$DOCKER_ACCESS_METHOD" = "newgrp_docker" ]; then
+              newgrp docker <<< "docker $*"
+            elif [ "$DOCKER_ACCESS_METHOD" = "newgrp_docker_host" ]; then
+              newgrp docker_host <<< "docker $*"
+            else
+              docker "$@"
+            fi
+          }
+
           echo "🧹 Cleaning up existing deployment..."
           # Stop and remove existing containers (don't fail if nothing exists)
-          docker compose -f docker-compose.prod.yml down --remove-orphans || echo "ℹ️  No existing deployment found to clean up"
+          run_docker compose -f docker-compose.prod.yml down --remove-orphans || echo "ℹ️  No existing deployment found to clean up"
 
           # Remove old images to free space (keep last 2 versions)
           echo "🗑️  Cleaning up old Docker images..."
-          docker image prune -f || echo "ℹ️  No images to prune"
+          run_docker image prune -f || echo "ℹ️  No images to prune"
 
           echo "📦 Building and deploying SparkTest MVP..."
           # Build and start services with better error handling
-          if ! docker compose -f docker-compose.prod.yml up --build -d; then
+          if ! run_docker compose -f docker-compose.prod.yml up --build -d; then
             echo "❌ Error: Failed to deploy SparkTest MVP"
             echo "🔧 Attempting diagnosis..."
             
             # Show docker compose version for debugging
-            docker compose version || echo "Could not get docker compose version"
+            run_docker compose version || echo "Could not get docker compose version"
             
             # Check if docker-compose.prod.yml exists and is valid
             if [ ! -f "docker-compose.prod.yml" ]; then
@@ -116,10 +148,10 @@ jobs:
             fi
             
             echo "📋 Docker compose config validation:"
-            docker compose -f docker-compose.prod.yml config --quiet || echo "Config validation failed"
+            run_docker compose -f docker-compose.prod.yml config --quiet || echo "Config validation failed"
             
             echo "📋 Checking logs for errors..."
-            docker compose -f docker-compose.prod.yml logs --tail 50 || echo "Could not get logs"
+            run_docker compose -f docker-compose.prod.yml logs --tail 50 || echo "Could not get logs"
             
             echo "📋 System resources:"
             df -h || echo "Could not check disk space"
@@ -133,13 +165,13 @@ jobs:
 
           # Check service health with timeout
           echo "📋 Service status:"
-          if ! docker compose -f docker-compose.prod.yml ps; then
+          if ! run_docker compose -f docker-compose.prod.yml ps; then
             echo "⚠️  Could not get service status, trying with different approach..."
-            docker ps -a || echo "Could not list containers"
+            run_docker ps -a || echo "Could not list containers"
           fi
 
           echo "📋 Recent logs:"
-          docker compose -f docker-compose.prod.yml logs --tail 20 || echo "Could not get recent logs"
+          run_docker compose -f docker-compose.prod.yml logs --tail 20 || echo "Could not get recent logs"
 
           # Get server IP
           SERVER_IP=$(hostname -I | awk '{print $1}' || echo "localhost")
