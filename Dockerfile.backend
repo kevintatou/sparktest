@@ -9,6 +9,16 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+# Debug: List available files in build context
+RUN echo "=== DEBUG: Files available in build context ===" && \
+    ls -la / && \
+    echo "=== Root Cargo files ===" && \
+    ls -la Cargo.* || echo "No Cargo files in root" && \
+    echo "=== Backend directory ===" && \
+    ls -la backend/ || echo "No backend directory" && \
+    echo "=== Backend subdirectories ===" && \
+    ls -la backend/api/ backend/core/ backend/bin/ || echo "Backend subdirs not found"
+
 # Copy Cargo workspace files
 COPY Cargo.toml Cargo.lock ./
 COPY backend/api/Cargo.toml ./api/
