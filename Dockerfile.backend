@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy Cargo workspace files
-COPY backend/Cargo.toml backend/Cargo.lock ./
+COPY Cargo.toml Cargo.lock ./
 COPY backend/api/Cargo.toml ./api/
 COPY backend/core/Cargo.toml ./core/
 COPY backend/bin/Cargo.toml ./bin/
