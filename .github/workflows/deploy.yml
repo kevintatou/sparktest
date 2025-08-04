@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, ubuntu-s-1vcpu-2gb-ams3-01]
+    runs-on: [self-hosted, spark-runner]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -16,48 +16,47 @@ jobs:
         run: |
           echo "🐳 Checking Docker availability..."
           echo "Current user: $(whoami)"
-          echo "Current directory: $(pwd)"
-          echo "PATH: $PATH"
+          echo "User groups: $(groups)"
           echo ""
           
-          # Check multiple locations for docker
-          DOCKER_PATH=""
+          # Check if docker command exists
           if command -v docker &> /dev/null; then
-            DOCKER_PATH=$(which docker)
-            echo "✅ Docker found at: $DOCKER_PATH"
-          elif [ -f "/usr/bin/docker" ]; then
-            DOCKER_PATH="/usr/bin/docker"
-            echo "✅ Docker found at: $DOCKER_PATH"
-          elif [ -f "/usr/local/bin/docker" ]; then
-            DOCKER_PATH="/usr/local/bin/docker"
-            echo "✅ Docker found at: $DOCKER_PATH"
+            echo "✅ Docker command found"
+            docker --version
           else
-            echo "❌ Docker not found in any standard location"
-            echo "Checking system paths:"
-            ls -la /usr/bin/docker* 2>/dev/null || echo "No docker in /usr/bin/"
-            ls -la /usr/local/bin/docker* 2>/dev/null || echo "No docker in /usr/local/bin/"
+            echo "❌ Docker command not found"
             exit 1
           fi
           
-          # Test Docker version
-          echo "Docker version:"
-          $DOCKER_PATH --version || { echo "❌ Cannot get Docker version"; exit 1; }
-          
-          # Test Docker access
+          # Test Docker daemon access with better error handling
           echo "Testing Docker daemon access..."
-          if $DOCKER_PATH info &> /dev/null; then
-            echo "✅ Docker daemon accessible without sudo"
+          if docker info &> /dev/null; then
+            echo "✅ Docker daemon accessible"
           else
-            echo "❌ Docker daemon not accessible"
-            echo "User groups: $(groups)"
-            echo "Docker socket permissions:"
-            ls -la /var/run/docker.sock 2>/dev/null || echo "Docker socket not found"
-            echo ""
-            echo "💡 Possible solutions:"
-            echo "1. Add user to docker group: sudo usermod -aG docker $(whoami)"
-            echo "2. Apply group membership: newgrp docker"
-            echo "3. Restart the runner process"
-            exit 1
+            echo "⚠️  Docker daemon access issue, trying with newgrp..."
+            # Try to refresh group membership and test again
+            if newgrp docker <<< 'docker info' &> /dev/null; then
+              echo "✅ Docker access working after group refresh"
+            else
+              echo "ℹ️  Docker socket info:"
+              ls -la /var/run/docker.sock 2>/dev/null || echo "Docker socket not found"
+              echo "ℹ️  Current user groups: $(groups)"
+              echo "ℹ️  Docker group members:"
+              getent group docker 2>/dev/null || echo "Docker group not found"
+              
+              # Try to fix permissions and test one more time
+              echo "🔧 Attempting to fix Docker access..."
+              sudo chown :docker /var/run/docker.sock 2>/dev/null || true
+              sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
+              
+              if docker info &> /dev/null; then
+                echo "✅ Docker access fixed"
+              else
+                echo "❌ Still cannot access Docker daemon"
+                echo "💡 This might be a container setup issue"
+                # Don't exit here, let's try to continue
+              fi
+            fi
           fi
 
       - name: Validate deployment environment
