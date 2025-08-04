@@ -28,34 +28,37 @@ jobs:
             exit 1
           fi
           
-          # Test Docker daemon access with better error handling
-          echo "Testing Docker daemon access..."
-          if docker info &> /dev/null; then
+          # Check Docker socket info
+          echo "🔍 Docker socket information:"
+          if [ -S /var/run/docker.sock ]; then
+            ls -la /var/run/docker.sock
+            echo "Docker socket group ID: $(stat -c '%g' /var/run/docker.sock)"
+          else
+            echo "❌ Docker socket not found"
+            exit 1
+          fi
+          
+          # Test Docker daemon access
+          echo "🔌 Testing Docker daemon access..."
+          if docker info > /dev/null 2>&1; then
             echo "✅ Docker daemon accessible"
           else
-            echo "⚠️  Docker daemon access issue, trying with newgrp..."
-            # Try to refresh group membership and test again
-            if newgrp docker <<< 'docker info' &> /dev/null; then
-              echo "✅ Docker access working after group refresh"
+            echo "🔧 Docker access issue detected, attempting to fix..."
+            
+            # Get the docker socket group ID and add user to it
+            DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+            echo "Adding user to group with GID: $DOCKER_GID"
+            
+            # Add user to docker group with correct GID
+            sudo groupadd -f -g $DOCKER_GID docker_sock || true
+            sudo usermod -aG docker_sock $(whoami) || true
+            
+            # Test again with newgrp
+            if newgrp docker_sock <<< 'docker info > /dev/null 2>&1'; then
+              echo "✅ Docker access working after group fix"
             else
-              echo "ℹ️  Docker socket info:"
-              ls -la /var/run/docker.sock 2>/dev/null || echo "Docker socket not found"
-              echo "ℹ️  Current user groups: $(groups)"
-              echo "ℹ️  Docker group members:"
-              getent group docker 2>/dev/null || echo "Docker group not found"
-              
-              # Try to fix permissions and test one more time
-              echo "🔧 Attempting to fix Docker access..."
-              sudo chown :docker /var/run/docker.sock 2>/dev/null || true
-              sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
-              
-              if docker info &> /dev/null; then
-                echo "✅ Docker access fixed"
-              else
-                echo "❌ Still cannot access Docker daemon"
-                echo "💡 This might be a container setup issue"
-                # Don't exit here, let's try to continue
-              fi
+              echo "⚠️  Still having Docker access issues, but continuing..."
+              echo "This might work during the actual deployment steps"
             fi
           fi
 

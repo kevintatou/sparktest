@@ -46,12 +46,17 @@ validate_setup() {
         ((errors++))
     fi
     
-    # Check if we're in a SparkTest project directory and have the Docker runner files
-    if [ ! -f "$LOCAL_PROJECT_PATH/.deploy/Dockerfile.runner" ] || [ ! -f "$LOCAL_PROJECT_PATH/.deploy/start-runner.sh" ]; then
-        echo "❌ Error: Required Docker runner files not found"
-        echo "   Missing files in .deploy directory:"
-        echo "   - Dockerfile.runner"
-        echo "   - start-runner.sh"
+    # Check if we're in a SparkTest project directory and have the required files
+    missing_files=()
+    [ ! -f "$LOCAL_PROJECT_PATH/.deploy/Dockerfile.runner" ] && missing_files+=("Dockerfile.runner")
+    [ ! -f "$LOCAL_PROJECT_PATH/.deploy/start-runner.sh" ] && missing_files+=("start-runner.sh")
+    [ ! -f "$LOCAL_PROJECT_PATH/.deploy/deploy-mvp.sh" ] && missing_files+=("deploy-mvp.sh")
+    
+    if [ ${#missing_files[@]} -gt 0 ]; then
+        echo "❌ Error: Required files not found in .deploy directory:"
+        for file in "${missing_files[@]}"; do
+            echo "   - $file"
+        done
         echo "   Make sure you're running this from the SparkTest root directory"
         ((errors++))
     fi
@@ -85,8 +90,8 @@ if ! ssh -o ConnectTimeout=10 -o BatchMode=yes "$DROPLET_USER@$DROPLET_IP" "echo
 fi
 echo "✅ SSH connection successful!"
 
-# Copy only the Docker runner files
-echo "📤 Copying Docker runner files to $DROPLET_USER@$DROPLET_IP:~/"
+# Copy the deploy files to droplet
+echo "📤 Copying deployment files to $DROPLET_USER@$DROPLET_IP:~/"
 
 # Create the target directory on the droplet
 if ! ssh "$DROPLET_USER@$DROPLET_IP" "mkdir -p ~/runner-setup"; then
@@ -94,11 +99,12 @@ if ! ssh "$DROPLET_USER@$DROPLET_IP" "mkdir -p ~/runner-setup"; then
     exit 1
 fi
 
-# Copy only the Docker runner files that exist
+# Copy the Docker runner and deployment files
 if ! scp "$LOCAL_PROJECT_PATH/.deploy/Dockerfile.runner" \
         "$LOCAL_PROJECT_PATH/.deploy/start-runner.sh" \
+        "$LOCAL_PROJECT_PATH/.deploy/deploy-mvp.sh" \
         "$DROPLET_USER@$DROPLET_IP:~/runner-setup/"; then
-    echo "❌ Error: Failed to copy Docker runner files to droplet"
+    echo "❌ Error: Failed to copy deployment files to droplet"
     echo "   Please check:"
     echo "   - Available disk space on droplet"
     echo "   - File permissions"
@@ -107,7 +113,7 @@ if ! scp "$LOCAL_PROJECT_PATH/.deploy/Dockerfile.runner" \
     exit 1
 fi
 
-echo "✅ Docker runner files copied to droplet successfully!"
+echo "✅ Deployment files copied to droplet successfully!"
 echo ""
 echo "🚀 Next steps:"
 echo ""
