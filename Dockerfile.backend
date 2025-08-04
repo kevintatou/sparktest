@@ -9,39 +9,18 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Debug: List available files in build context
-RUN echo "=== DEBUG: Files available in build context ===" && \
-    ls -la / && \
-    echo "=== Root Cargo files ===" && \
-    ls -la Cargo.* || echo "No Cargo files in root" && \
-    echo "=== Backend directory ===" && \
-    ls -la backend/ || echo "No backend directory" && \
-    echo "=== Backend subdirectories ===" && \
-    ls -la backend/api/ backend/core/ backend/bin/ || echo "Backend subdirs not found"
+# Copy the entire workspace - this is simpler and ensures we get everything
+COPY Cargo.toml ./
+COPY backend/ ./backend/
 
-# Copy Cargo workspace files
-COPY Cargo.toml Cargo.lock ./
-COPY backend/api/Cargo.toml ./api/
-COPY backend/core/Cargo.toml ./core/
-COPY backend/bin/Cargo.toml ./bin/
-
-# Create dummy src files to cache dependencies
-RUN mkdir -p api/src core/src bin/src && \
-    echo "pub fn main() {}" > api/src/lib.rs && \
-    echo "pub fn main() {}" > core/src/lib.rs && \
-    echo "fn main() {}" > bin/src/main.rs
-
-# Build dependencies
-RUN cargo build --release && rm -rf api/src core/src bin/src
-
-# Copy source code
-COPY backend/api/src ./api/src
-COPY backend/core/src ./core/src
-COPY backend/bin/src ./bin/src
-COPY backend/bin/migrations ./bin/migrations
+# Check if Cargo.lock exists, if not generate it
+RUN if [ ! -f Cargo.lock ]; then \
+        echo "Cargo.lock not found, generating it..." && \
+        cargo generate-lockfile; \
+    fi
 
 # Build the application
-RUN touch bin/src/main.rs && cargo build --release
+RUN cargo build --release --bin sparktest-bin
 
 # Runtime stage
 FROM debian:bookworm-slim
@@ -62,9 +41,9 @@ WORKDIR /app
 # Create data directory
 RUN mkdir -p /app/data && chown sparktest:sparktest /app/data
 
-# Copy the binary
+# Copy the binary from builder stage
 COPY --from=builder /app/target/release/sparktest-bin /app/sparktest-backend
-COPY --from=builder /app/bin/migrations /app/migrations
+COPY --from=builder /app/backend/bin/migrations /app/migrations
 
 # Set permissions
 RUN chown -R sparktest:sparktest /app
