@@ -61,15 +61,7 @@ export function ManualForm({
   return (
     <form onSubmit={handleSubmit}>
       <Card className="shadow-sm">
-        <CardHeader>
-          <CardTitle>{existingTest ? "Edit" : "Create"} Test Definition</CardTitle>
-          <CardDescription>
-            {existingTest
-              ? "Update this test definition"
-              : "Create a reusable test definition that can be executed on demand or scheduled."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-8">
           <div className="space-y-2">
             <Label htmlFor="name">Test Name</Label>
             <Input

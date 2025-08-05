@@ -6,7 +6,6 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { storage } from "@tatou/storage-service"
 import type { Executor } from "@tatou/core/types"
-import ClientLayout from "@/app/client-layout"
 
 export default function ExecutorDetailsPage({ params }: { params: { id: string } }) {
   const [executor, setExecutor] = useState<Executor | null>(null)
@@ -46,33 +45,29 @@ export default function ExecutorDetailsPage({ params }: { params: { id: string }
   }
 
   return (
-    <ClientLayout>
-      <div className="flex min-h-screen flex-col">
-        <main className="container py-6">
-          <div className="flex items-center gap-2 mb-6">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/executors">
-                <ArrowLeft className="h-4 w-4" />
-                <span className="sr-only">Back</span>
-              </Link>
-            </Button>
-            <h1 className="text-2xl font-bold">{executor.name}</h1>
-          </div>
-
-          <p>
-            <strong>Description:</strong> {executor.description}
-          </p>
-          <p>
-            <strong>Image:</strong> {executor.image}
-          </p>
-          <p>
-            <strong>Command:</strong> {executor.command}
-          </p>
-          <p>
-            <strong>Supported File Types:</strong> {executor.supportedFileTypes?.join(", ")}
-          </p>
-        </main>
+    <div className="container py-6">
+      <div className="flex items-center gap-2 mb-6">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/executors">
+            <ArrowLeft className="h-4 w-4" />
+            <span className="sr-only">Back</span>
+          </Link>
+        </Button>
+        <h1 className="text-2xl font-bold">{executor.name}</h1>
       </div>
-    </ClientLayout>
+
+      <p>
+        <strong>Description:</strong> {executor.description}
+      </p>
+      <p>
+        <strong>Image:</strong> {executor.image}
+      </p>
+      <p>
+        <strong>Command:</strong> {executor.command}
+      </p>
+      <p>
+        <strong>Supported File Types:</strong> {executor.supportedFileTypes?.join(", ")}
+      </p>
+    </div>
   )
 }

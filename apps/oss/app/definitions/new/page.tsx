@@ -5,23 +5,17 @@ import { DefinitionForm } from "@/components/test-definition-form"
 
 export default function NewDefinitionPage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <main className="flex-1 space-y-6 p-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/definitions">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Create Test Definition</h1>
-            <p className="text-muted-foreground">Define a reusable test blueprint</p>
-          </div>
-        </div>
-        <div className="max-w-2xl">
-          <DefinitionForm />
-        </div>
-      </main>
+    <div className="container py-6 max-w-2xl mx-auto">
+      <div className="flex items-center gap-2 mb-6">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/definitions">
+            <ArrowLeft className="h-4 w-4" />
+            <span className="sr-only">Back</span>
+          </Link>
+        </Button>
+        <h1 className="text-2xl font-bold">Create Test Definition</h1>
+      </div>
+      <DefinitionForm />
     </div>
   )
 }

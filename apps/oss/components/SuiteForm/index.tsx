@@ -64,15 +64,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       <Card className="shadow-sm">
-        <CardHeader>
-          <CardTitle>{existingSuite ? "Edit" : "Create"} Test Suite</CardTitle>
-          <CardDescription>
-            {existingSuite
-              ? "Update this test suite configuration"
-              : "Create a test suite to group related test definitions together."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-8">
           <div className="space-y-2">
             <Label htmlFor="name">Suite Name</Label>
             <Input
