@@ -141,9 +141,7 @@ export default function ExecutorsPage() {
                     <Cpu className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">
-                      {executor.name}
-                    </h3>
+                    <h3 className="font-semibold text-foreground">{executor.name}</h3>
                     <p className="text-sm text-muted-foreground">{executor.image}</p>
                   </div>
                 </CardTitle>

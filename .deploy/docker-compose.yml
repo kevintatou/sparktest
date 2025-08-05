@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Frontend Next.js application (MVP mode with local storage)
@@ -57,7 +57,6 @@ services:
 networks:
   sparktest:
     driver: bridge
-
 # Uncomment when backend is re-enabled
 # volumes:
 #   backend_data:

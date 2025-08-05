@@ -15,6 +15,7 @@ Your SparkTest MVP is now configured for automated deployment using your self-ho
 ### Manual Deployment:
 
 You can also trigger deployment manually:
+
 1. Go to Actions tab in your GitHub repo
 2. Select "Deploy SparkTest MVP to Droplet" workflow
 3. Click "Run workflow"
@@ -24,7 +25,7 @@ You can also trigger deployment manually:
 - **Frontend**: Next.js app with React UI (Port 80)
   - **MVP Mode**: Uses local storage for data persistence
   - No backend dependency for simplified deployment
-- **Backend**: Rust API with Axum framework (Port 8080) - *Commented out in MVP*
+- **Backend**: Rust API with Axum framework (Port 8080) - _Commented out in MVP_
   - Available when enabled: SQLite database for persistence
   - Can be re-enabled by uncommenting in docker-compose.yml
 
@@ -36,7 +37,7 @@ You can also trigger deployment manually:
 ### Files Created:
 
 - `Dockerfile` - Frontend production build
-- `Dockerfile.backend` - Backend production build  
+- `Dockerfile.backend` - Backend production build
 - `docker-compose.prod.yml` - Production orchestration
 - `.github/workflows/deploy.yml` - Deployment workflow
 
