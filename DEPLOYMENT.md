@@ -7,11 +7,10 @@ Your SparkTest MVP is now configured for automated deployment using your self-ho
 ### How it works:
 
 1. **Trigger**: When you create a new release on GitHub, the deployment workflow automatically starts
-2. **Build**: Both frontend (Next.js) and backend (Rust) are built as Docker containers
-3. **Deploy**: Services are deployed using docker-compose with health checks
+2. **Build**: Frontend (Next.js) is built as Docker container in MVP mode
+3. **Deploy**: Frontend service deployed using docker-compose with health checks
 4. **Access**: Your app will be available at:
-   - Frontend: `http://your-droplet-ip:80`
-   - Backend API: `http://your-droplet-ip:8080`
+   - Frontend: `http://your-droplet-ip` (MVP mode with local storage)
 
 ### Manual Deployment:
 
@@ -23,14 +22,16 @@ You can also trigger deployment manually:
 ### Services:
 
 - **Frontend**: Next.js app with React UI (Port 80)
-- **Backend**: Rust API with Axum framework (Port 8080)
-- **Database**: SQLite for persistence
-- **Networking**: Docker bridge network for service communication
+  - **MVP Mode**: Uses local storage for data persistence
+  - No backend dependency for simplified deployment
+- **Backend**: Rust API with Axum framework (Port 8080) - *Commented out in MVP*
+  - Available when enabled: SQLite database for persistence
+  - Can be re-enabled by uncommenting in docker-compose.yml
 
 ### Health Checks:
 
-- Frontend: `http://your-droplet-ip:80/`
-- Backend: `http://your-droplet-ip:8080/api/health`
+- Frontend: `http://your-droplet-ip/`
+- Backend (when enabled): `http://your-droplet-ip:8080/api/health`
 
 ### Files Created:
 

@@ -39,17 +39,15 @@ cd ~/sparktest/.deploy
 
 ## 📋 Services
 
-The deployment includes:
+The MVP deployment includes:
 
 - **Frontend** (Next.js): Available on port 80
   - Modern React/Next.js application
   - Responsive UI with Tailwind CSS
   - Production-optimized build
+  - **MVP Mode**: Uses local storage (no backend required)
 
-- **Backend** (Rust): Available on port 8080
-  - High-performance Axum web server
-  - SQLite database for persistence
-  - RESTful API endpoints
+*Note: Backend service is commented out for MVP deployment to reduce resource usage and simplify deployment.*
 
 ## 🔧 Management Commands
 
@@ -76,11 +74,25 @@ docker compose -f docker-compose.yml down
 
 After successful deployment:
 
-- **Frontend**: `http://your-droplet-ip:80`
-- **Backend API**: `http://your-droplet-ip:8080`
-- **Health checks**: 
-  - Frontend: `http://your-droplet-ip:80/api/health`
-  - Backend: `http://your-droplet-ip:8080/health`
+- **Frontend**: `http://your-droplet-ip` (MVP mode with local storage)
+
+### To Enable Backend (Exit MVP Mode)
+
+To add backend API support:
+
+1. Edit `docker-compose.yml`:
+   - Uncomment the backend service section
+   - Uncomment the backend_data volume section
+   - Set `NEXT_PUBLIC_USE_RUST_API=true` in frontend environment
+   - Add `depends_on: - backend` to frontend service
+
+2. Redeploy: `./deploy-mvp.sh`
+
+3. Backend will be available at: `http://your-droplet-ip:8080`
+
+### Health Checks (Full Mode)
+- Frontend: `http://your-droplet-ip/api/health`  
+- Backend: `http://your-droplet-ip:8080/health`
 
 ## 🐛 Troubleshooting
 
@@ -106,12 +118,11 @@ docker compose -f docker-compose.yml up --build --force-recreate
 
 ### Port conflicts
 ```bash
-# Check what's using ports 80 and 8080
-sudo netstat -tlnp | grep ':80\|:8080'
+# Check what's using port 80 (backend port 8080 not used in MVP mode)
+sudo netstat -tlnp | grep ':80'
 
 # Kill processes if needed
 sudo fuser -k 80/tcp
-sudo fuser -k 8080/tcp
 ```
 
 ## 📊 Monitoring
@@ -146,14 +157,16 @@ To update your deployment with the latest code:
 ## 🛡️ Security Notes
 
 - Services run as non-root users in containers
-- SQLite database is persisted in a Docker volume
-- Frontend and backend communicate over the internal Docker network
-- Only necessary ports (80, 8080) are exposed
+- **MVP Mode**: Data stored in browser localStorage (no database)
+- Only necessary port (80) is exposed in MVP mode
+- Frontend runs in production mode with optimized build
+
+*Note: When backend is enabled, SQLite database will be persisted in a Docker volume and internal Docker networking will be used for frontend-backend communication.*
 
 ## 📝 Configuration
 
 Key files:
-- `docker-compose.yml`: Service orchestration
-- `Dockerfile.backend`: Rust backend container
+- `docker-compose.yml`: Service orchestration (MVP: frontend only)
+- `Dockerfile.backend`: Rust backend container (commented out for MVP)
 - `../Dockerfile`: Next.js frontend container (in project root)
-- `deploy-mvp.sh`: Manual deployment script
+- `deploy-mvp.sh`: Manual deployment script (shows external IP)
