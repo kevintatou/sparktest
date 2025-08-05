@@ -129,8 +129,21 @@ deploy_application() {
     echo "✅ SparkTest MVP deployed successfully!"
     echo ""
     echo "🌐 Access your application:"
-    echo "   Frontend: http://$(hostname -I | awk '{print $1}'):80"
-    echo "   Backend API: http://$(hostname -I | awk '{print $1}'):8080"
+    # Get external IP (try multiple methods for reliability)
+    EXTERNAL_IP=""
+    if command -v curl &> /dev/null; then
+        EXTERNAL_IP=$(curl -s ifconfig.me 2>/dev/null || curl -s icanhazip.com 2>/dev/null || curl -s ipecho.net/plain 2>/dev/null)
+    fi
+    
+    # Fallback to hostname -I if external IP detection fails
+    if [ -z "$EXTERNAL_IP" ]; then
+        EXTERNAL_IP=$(hostname -I | awk '{print $1}')
+        echo "   Frontend: http://$EXTERNAL_IP (Note: This may be an internal IP)"
+    else
+        echo "   Frontend: http://$EXTERNAL_IP"
+    fi
+    echo ""
+    echo "ℹ️  MVP Mode: Using local storage (no backend required)"
     echo ""
 }
 
@@ -150,6 +163,12 @@ show_management_info() {
     echo "💡 If Docker commands require sudo, add 'sudo' before 'docker':"
     echo "   sudo docker compose -f docker-compose.yml logs -f"
     echo ""
+    echo "🔄 To enable backend API (exit MVP mode):"
+    echo "   1. Edit docker-compose.yml: uncomment backend service and volume"
+    echo "   2. Set NEXT_PUBLIC_USE_RUST_API=true in frontend environment"
+    echo "   3. Add 'depends_on: - backend' to frontend service"
+    echo "   4. Redeploy: ./deploy-mvp.sh"
+    echo ""
 }
 
 # Main execution
@@ -158,7 +177,7 @@ main() {
     deploy_application
     show_management_info
     
-    echo "🎉 Deployment complete! Your SparkTest MVP is now running."
+    echo "🎉 Deployment complete! Your SparkTest MVP is now running in local storage mode."
 }
 
 # Run main function
