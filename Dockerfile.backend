@@ -1,5 +1,5 @@
 # Production Dockerfile for SparkTest Rust Backend
-FROM rust:1.82-slim as builder
+FROM rustlang/rust:nightly-slim AS builder
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -10,14 +10,8 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy the entire workspace - this is simpler and ensures we get everything
-COPY Cargo.toml ./
+COPY Cargo.toml Cargo.lock ./
 COPY backend/ ./backend/
-
-# Check if Cargo.lock exists, if not generate it
-RUN if [ ! -f Cargo.lock ]; then \
-        echo "Cargo.lock not found, generating it..." && \
-        cargo generate-lockfile; \
-    fi
 
 # Build the application
 RUN cargo build --release --bin sparktest-bin
