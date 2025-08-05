@@ -10,8 +10,15 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy the entire workspace - this is simpler and ensures we get everything
-COPY Cargo.toml Cargo.lock ./
+# Copy all Cargo.* files (Cargo.toml and Cargo.lock if it exists)
+COPY Cargo.* ./
 COPY backend/ ./backend/
+
+# Generate Cargo.lock if it doesn't exist
+RUN if [ ! -f Cargo.lock ]; then \
+        echo "Cargo.lock not found, generating it..." && \
+        cargo generate-lockfile; \
+    fi
 
 # Build the application
 RUN cargo build --release --bin sparktest-bin
