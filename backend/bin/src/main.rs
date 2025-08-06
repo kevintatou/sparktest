@@ -1,10 +1,10 @@
 use sparktest_api::create_app;
-use sparktest_core::Database;
-use sqlx::{postgres::PgPoolOptions, sqlite::SqlitePoolOptions, AnyPool, Pool, Postgres, Sqlite};
+use sqlx::{postgres::PgPoolOptions, sqlite::SqlitePoolOptions, Pool, Postgres, Sqlite};
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
+#[allow(dead_code)]
 enum DatabasePool {
     Postgres(Pool<Postgres>),
     Sqlite(Pool<Sqlite>),
@@ -31,7 +31,7 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("Connecting to database: {}", database_url);
 
     // Connect to database based on URL scheme
-    let pool =
+    let _pool =
         if database_url.starts_with("postgresql://") || database_url.starts_with("postgres://") {
             tracing::info!("Using PostgreSQL database");
             let pg_pool = PgPoolOptions::new()
