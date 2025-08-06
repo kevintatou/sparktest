@@ -128,6 +128,31 @@ pnpm lint          # Run ESLint
 pnpm type-check    # TypeScript checks
 ```
 
+#### Coverage Reporting
+
+SparkTest generates comprehensive test coverage reports for both frontend and backend:
+
+**Frontend (TypeScript/React):**
+- Uses Vitest with V8 coverage provider
+- Generates HTML and LCOV reports in `apps/oss/coverage/`
+- Configured to cover components, utilities, API routes, and hooks
+
+**Backend (Rust):**  
+- Uses cargo with LLVM coverage instrumentation
+- Processes with grcov to generate LCOV reports  
+- Covers all workspace crates: sparktest-api, sparktest-core, sparktest-bin
+
+**CI Integration:**
+- Coverage reports are automatically uploaded to Codecov on PRs
+- Both frontend and backend coverage is combined for complete project visibility
+- Self-hosted runner includes all coverage tooling
+
+```bash
+# Generate coverage reports locally
+pnpm test:coverage              # Frontend only
+pnpm cargo-coverage             # Backend only  
+```
+
 ---
 
 ## 🤝 Contributing

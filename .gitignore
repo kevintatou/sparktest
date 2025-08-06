@@ -32,6 +32,7 @@ next-env.d.ts
 # coverage
 coverage/
 .nyc_output/
+*.profraw
 
 # Backend
 target/

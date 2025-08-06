@@ -6,17 +6,19 @@ on:
     paths:
       - "apps/**"
       - "packages/**"
+      - "backend/**"
       - "package.json"
       - "pnpm-lock.yaml"
-      - ".github/workflows/ci.yml"
+      - ".github/workflows/ci-self-hosted.yml"
   pull_request:
     branches: [main]
     paths:
       - "apps/**"
       - "packages/**"
+      - "backend/**"
       - "package.json"
       - "pnpm-lock.yaml"
-      - ".github/workflows/ci.yml"
+      - ".github/workflows/ci-self-hosted.yml"
 
 jobs:
   build:
@@ -46,5 +48,28 @@ jobs:
       - name: Build application
         run: pnpm --filter "@tatou/oss" build
 
-      - name: Run tests
-        run: pnpm test
+      - name: Run frontend tests with coverage
+        run: pnpm --filter "@tatou/oss" test:coverage
+
+      - name: Run Rust clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run Rust tests with coverage
+        run: |
+          rustup component add llvm-tools-preview
+          cargo install grcov || echo "grcov already installed"
+          export CARGO_INCREMENTAL=0
+          export RUSTFLAGS='-Cinstrument-coverage'
+          export LLVM_PROFILE_FILE='cargo-test-%p-%m.profraw'
+          cargo test
+          grcov . --binary-path ./target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/coverage/lcov.info
+          rm -f *.profraw
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./apps/oss/coverage/lcov.info,./target/coverage/lcov.info
+          flags: frontend,backend
+          name: SparkTest Coverage
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
