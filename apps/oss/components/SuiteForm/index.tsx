@@ -3,14 +3,7 @@
 import { useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -64,15 +57,7 @@ export function SuiteForm({ existingSuite }: SuiteFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       <Card className="shadow-sm">
-        <CardHeader>
-          <CardTitle>{existingSuite ? "Edit" : "Create"} Test Suite</CardTitle>
-          <CardDescription>
-            {existingSuite
-              ? "Update this test suite configuration"
-              : "Create a test suite to group related test definitions together."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-8">
           <div className="space-y-2">
             <Label htmlFor="name">Suite Name</Label>
             <Input

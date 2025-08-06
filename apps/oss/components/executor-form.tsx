@@ -42,7 +42,7 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 bg-white p-6 rounded-lg border max-w-2xl mx-auto shadow-sm"
+      className="space-y-6 bg-card p-6 rounded-lg border max-w-2xl mx-auto shadow-sm"
     >
       {isEditMode && (
         <div>

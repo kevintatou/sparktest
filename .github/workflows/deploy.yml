@@ -3,7 +3,7 @@ name: Deploy SparkTest MVP to Droplet
 on:
   release:
     types: [published]
-  workflow_dispatch:  # Allow manual deployment
+  workflow_dispatch: # Allow manual deployment
 
 jobs:
   deploy:
@@ -18,7 +18,7 @@ jobs:
           echo "Current user: $(whoami)"
           echo "User groups: $(groups)"
           echo ""
-          
+
           # Check if docker command exists
           if command -v docker &> /dev/null; then
             echo "✅ Docker command found"
@@ -27,7 +27,7 @@ jobs:
             echo "❌ Docker command not found"
             exit 1
           fi
-          
+
           # Check Docker socket info
           echo "🔍 Docker socket information:"
           if [ -S /var/run/docker.sock ]; then
@@ -38,22 +38,22 @@ jobs:
             echo "❌ Docker socket not found"
             exit 1
           fi
-          
+
           # Fix Docker access permanently
           echo "� Fixing Docker access..."
-          
+
           # Method 1: Add user to existing docker group and create one with correct GID
           sudo groupadd -f -g $DOCKER_GID docker_host || true
           sudo usermod -aG docker $(whoami) || true
           sudo usermod -aG docker_host $(whoami) || true
-          
+
           # Method 2: Fix socket permissions as backup
           sudo chown :docker /var/run/docker.sock || true
           sudo chmod 666 /var/run/docker.sock || true
-          
+
           # Method 3: Use newgrp to apply group membership immediately
           echo "🔌 Testing Docker access..."
-          
+
           # Test Docker access with different methods
           if docker info > /dev/null 2>&1; then
             echo "✅ Docker accessible directly"
@@ -68,14 +68,14 @@ jobs:
             echo "⚠️  Direct Docker access still not working, but container should handle this"
             echo "Continuing with deployment..."
           fi
-          
+
           echo ""
           echo "🔍 Validating deployment environment..."
-          
+
           # Test Docker functionality with fallback methods
           echo "🐳 Testing Docker functionality..."
           DOCKER_CMD="docker info"
-          
+
           if docker info &> /dev/null; then
             echo "✅ Docker is working correctly"
             docker version --format 'Docker version: {{.Server.Version}}'
@@ -92,7 +92,7 @@ jobs:
             echo "Docker socket: $(ls -la /var/run/docker.sock 2>/dev/null || echo 'not found')"
             exit 1
           fi
-          
+
           # Test Docker Compose
           echo "📦 Testing Docker Compose..."
           if docker compose version &> /dev/null; then
@@ -104,7 +104,7 @@ jobs:
             echo "❌ Docker Compose not found or not working"
             exit 1
           fi
-          
+
           echo "📍 Deploying SparkTest MVP from release: ${{ github.event.release.tag_name || 'manual-deploy' }}"
       - name: Deploy SparkTest MVP
         run: |

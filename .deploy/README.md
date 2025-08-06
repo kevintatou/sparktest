@@ -47,7 +47,7 @@ The MVP deployment includes:
   - Production-optimized build
   - **MVP Mode**: Uses local storage (no backend required)
 
-*Note: Backend service is commented out for MVP deployment to reduce resource usage and simplify deployment.*
+_Note: Backend service is commented out for MVP deployment to reduce resource usage and simplify deployment._
 
 ## 🔧 Management Commands
 
@@ -91,12 +91,14 @@ To add backend API support:
 3. Backend will be available at: `http://your-droplet-ip:8080`
 
 ### Health Checks (Full Mode)
-- Frontend: `http://your-droplet-ip/api/health`  
+
+- Frontend: `http://your-droplet-ip/api/health`
 - Backend: `http://your-droplet-ip:8080/health`
 
 ## 🐛 Troubleshooting
 
 ### Deployment fails
+
 ```bash
 # Check Docker status
 docker info
@@ -108,6 +110,7 @@ docker stats # Container resources
 ```
 
 ### Services not starting
+
 ```bash
 # Check detailed logs
 docker compose -f docker-compose.yml logs
@@ -117,6 +120,7 @@ docker compose -f docker-compose.yml up --build --force-recreate
 ```
 
 ### Port conflicts
+
 ```bash
 # Check what's using port 80 (backend port 8080 not used in MVP mode)
 sudo netstat -tlnp | grep ':80'
@@ -161,11 +165,12 @@ To update your deployment with the latest code:
 - Only necessary port (80) is exposed in MVP mode
 - Frontend runs in production mode with optimized build
 
-*Note: When backend is enabled, SQLite database will be persisted in a Docker volume and internal Docker networking will be used for frontend-backend communication.*
+_Note: When backend is enabled, SQLite database will be persisted in a Docker volume and internal Docker networking will be used for frontend-backend communication._
 
 ## 📝 Configuration
 
 Key files:
+
 - `docker-compose.yml`: Service orchestration (MVP: frontend only)
 - `Dockerfile.backend`: Rust backend container (commented out for MVP)
 - `../Dockerfile`: Next.js frontend container (in project root)

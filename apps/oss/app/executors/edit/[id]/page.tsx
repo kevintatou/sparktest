@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { ExecutorForm } from "@/components/executor-form"
 import { storage } from "@tatou/storage-service"
 import type { Executor } from "@tatou/core/types"
-import ClientLayout from "@/app/client-layout"
 
 export default function EditExecutorPage({ params }: { params: { id: string } }) {
   const { id } = params
@@ -31,21 +30,17 @@ export default function EditExecutorPage({ params }: { params: { id: string } })
   }
 
   return (
-    <ClientLayout>
-      <div className="flex min-h-screen flex-col">
-        <main className="container py-6 max-w-2xl mx-auto">
-          <div className="flex items-center gap-2 mb-6">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/executors">
-                <ArrowLeft className="h-4 w-4" />
-                <span className="sr-only">Back</span>
-              </Link>
-            </Button>
-            <h1 className="text-2xl font-bold">Edit Executor</h1>
-          </div>
-          <ExecutorForm existingExecutor={executor} />
-        </main>
+    <div className="container py-6 max-w-2xl mx-auto">
+      <div className="flex items-center gap-2 mb-6">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/executors">
+            <ArrowLeft className="h-4 w-4" />
+            <span className="sr-only">Back</span>
+          </Link>
+        </Button>
+        <h1 className="text-2xl font-bold">Edit Executor</h1>
       </div>
-    </ClientLayout>
+      <ExecutorForm existingExecutor={executor} />
+    </div>
   )
 }

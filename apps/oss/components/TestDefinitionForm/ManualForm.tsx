@@ -2,14 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -61,15 +54,7 @@ export function ManualForm({
   return (
     <form onSubmit={handleSubmit}>
       <Card className="shadow-sm">
-        <CardHeader>
-          <CardTitle>{existingTest ? "Edit" : "Create"} Test Definition</CardTitle>
-          <CardDescription>
-            {existingTest
-              ? "Update this test definition"
-              : "Create a reusable test definition that can be executed on demand or scheduled."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-8">
           <div className="space-y-2">
             <Label htmlFor="name">Test Name</Label>
             <Input
