@@ -381,7 +381,8 @@ impl KubernetesClient {
         let status = pod
             .status
             .as_ref()
-            .and_then(|s| s.phase.as_ref()).cloned()
+            .and_then(|s| s.phase.as_ref())
+            .cloned()
             .unwrap_or_else(|| "Unknown".to_string());
 
         Ok(status)
