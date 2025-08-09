@@ -48,3 +48,6 @@ jobs:
 
       - name: Run tests
         run: pnpm test
+
+      - name: Create coverage directory
+        run: mkdir -p target/coverage
