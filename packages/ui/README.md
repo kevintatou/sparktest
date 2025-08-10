@@ -21,9 +21,53 @@ pnpm install
 
 ## Quick Start
 
-### Minimal Setup
+### 🎯 Complete Application (Zero Configuration)
 
-For the easiest setup, use the default `AppSidebar`:
+For the easiest setup, use the complete `AppLayout`:
+
+```tsx
+import { AppLayout } from '@tatou/ui'
+
+function App({ children }) {
+  return (
+    <AppLayout>
+      {children}
+    </AppLayout>
+  )
+}
+```
+
+This gives you a complete application with sidebar, header, search, theme toggle, and notifications.
+
+### 🎨 Header with Search and Actions
+
+```tsx
+import { AppHeader, defaultHeaderActions } from '@tatou/ui'
+
+<AppHeader
+  onSearch={async (query) => await searchEntities(query)}
+  onThemeToggle={() => toggleTheme()}
+  actions={defaultHeaderActions}
+/>
+```
+
+### 📊 Status System
+
+```tsx
+import { defaultStatusConfig, getStatusConfig } from '@tatou/ui'
+
+const config = getStatusConfig(status)
+const StatusIcon = config.icon
+
+<Badge className={config.badge}>
+  <StatusIcon className="h-3 w-3 mr-1" />
+  {config.label}
+</Badge>
+```
+
+### 🛠️ Sidebar Configuration
+
+For sidebar-only setup or customization:
 
 ```tsx
 import { AppSidebar, SidebarProvider, SidebarInset } from '@tatou/ui'
@@ -78,16 +122,26 @@ function SaasSidebar({ pathname }) {
 }
 ```
 
-See [SIDEBAR_USAGE.md](./SIDEBAR_USAGE.md) for comprehensive examples and [EXAMPLES.tsx](./EXAMPLES.tsx) for live code samples.
+See [REUSABLE_PATTERNS.md](./REUSABLE_PATTERNS.md) for comprehensive examples of all reusable patterns, [SIDEBAR_USAGE.md](./SIDEBAR_USAGE.md) for sidebar-specific examples, and [EXAMPLES.tsx](./EXAMPLES.tsx) for live code samples.
 
 ## Components
 
 The package exports a wide range of components including:
 
-### Application Components
+### 🚀 Application Framework Components
+- `AppLayout` - **NEW!** Complete application layout with sidebar + header  
 - `AppSidebar` - **NEW!** Configurable application sidebar with navigation
-- `defaultNavigationItems` - Default OSS navigation items (extendable)
-- `defaultCreateItems` - Default create menu items (extendable)
+- `AppHeader` - **NEW!** Configurable header with search and actions
+- `DashboardLayout` - **NEW!** Dashboard-specific layout with padding
+- `MinimalLayout` - **NEW!** Simple layout without sidebar
+
+### 📋 Default Configurations (Extendable)
+- `defaultNavigationItems` - OSS navigation (Dashboard, Runs, Definitions, Suites, Executors)
+- `defaultCreateItems` - Create menu items (New Run, New Definition, New Executor)
+- `defaultHeaderActions` - Header actions (GitHub link, theme toggle)
+- `defaultStatusConfig` - Status styling (passed, failed, running, pending, etc.)
+- `defaultCrudActions` - CRUD operations (edit, copy, delete)
+- `defaultQueryClient` - React Query configuration
 
 ### Basic Components
 - `Button` - Customizable button component
