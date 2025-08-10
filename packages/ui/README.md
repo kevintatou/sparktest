@@ -19,9 +19,75 @@ This package is part of the SparkTest monorepo. Install dependencies:
 pnpm install
 ```
 
+## Quick Start
+
+### Minimal Setup
+
+For the easiest setup, use the default `AppSidebar`:
+
+```tsx
+import { AppSidebar, SidebarProvider, SidebarInset } from '@tatou/ui'
+
+function Layout({ children }) {
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        {children}
+      </SidebarInset>
+    </SidebarProvider>
+  )
+}
+```
+
+This gives you the complete OSS sidebar with Dashboard, Runs, Definitions, Suites, Executors navigation, create menu, and settings.
+
+### Extending for SAAS
+
+Easily extend the default navigation for SAAS applications:
+
+```tsx
+import { 
+  AppSidebar, 
+  defaultNavigationItems, 
+  type NavigationItem 
+} from '@tatou/ui'
+import { CreditCard, Users } from 'lucide-react'
+
+const saasNavigation: NavigationItem[] = [
+  ...defaultNavigationItems, // Keep OSS defaults
+  {
+    title: "Billing",
+    url: "/billing",
+    icon: CreditCard,
+  },
+  {
+    title: "Team", 
+    url: "/team",
+    icon: Users,
+  },
+]
+
+function SaasSidebar({ pathname }) {
+  return (
+    <AppSidebar 
+      navigationItems={saasNavigation}
+      pathname={pathname}
+    />
+  )
+}
+```
+
+See [SIDEBAR_USAGE.md](./SIDEBAR_USAGE.md) for comprehensive examples and [EXAMPLES.tsx](./EXAMPLES.tsx) for live code samples.
+
 ## Components
 
 The package exports a wide range of components including:
+
+### Application Components
+- `AppSidebar` - **NEW!** Configurable application sidebar with navigation
+- `defaultNavigationItems` - Default OSS navigation items (extendable)
+- `defaultCreateItems` - Default create menu items (extendable)
 
 ### Basic Components
 - `Button` - Customizable button component
@@ -31,7 +97,7 @@ The package exports a wide range of components including:
 - `Badge` - Status and category labels
 
 ### Layout Components
-- `Sidebar` - Collapsible sidebar navigation
+- `Sidebar` - Low-level collapsible sidebar primitives
 - `Sheet` - Slide-out panel
 - `Separator` - Visual divider
 - `Aspect Ratio` - Maintain aspect ratios
@@ -74,7 +140,7 @@ The package exports a wide range of components including:
 - `useToast` - Toast notification hook
 - `useIsMobile` - Mobile detection hook
 
-## Usage
+## Basic Component Usage
 
 ```tsx
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@tatou/ui'

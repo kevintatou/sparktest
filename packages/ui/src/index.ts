@@ -37,6 +37,7 @@ export { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectScro
 export { Separator } from "./components/separator"
 export { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "./components/sheet"
 export { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuAction, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarMenuSkeleton, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarProvider, SidebarRail, SidebarSeparator, SidebarTrigger, useSidebar } from "./components/sidebar"
+export { AppSidebar, defaultNavigationItems, defaultCreateItems, defaultAppConfig, type NavigationItem, type CreateItem, type AppConfig, type AppSidebarProps } from "./components/app-sidebar"
 export { Skeleton } from "./components/skeleton"
 export { Slider } from "./components/slider"
 export { Toaster } from "./components/sonner"
