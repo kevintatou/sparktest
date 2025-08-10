@@ -28,6 +28,11 @@ import {
   type HeaderAction,
   type SearchEntity,
   
+  // Theme Components
+  themePresets,
+  createBrandTheme,
+  type ThemePresetName,
+  
   // Status System
   defaultStatusConfig,
   getStatusConfig,
@@ -349,6 +354,146 @@ export function NextJsExample() {
   )
 }
 
+// ===== THEMING EXAMPLES =====
+
+// Example 11: Custom Themed SAAS Application
+export function CustomThemeSaaSExample() {
+  return (
+    <AppLayout
+      themeConfig={createBrandTheme(280, 85, {
+        borderRadius: { radius: "1rem" }
+      })}
+      sidebarProps={{
+        navigationItems: [
+          ...defaultNavigationItems,
+          { title: "Billing", url: "/billing", icon: CreditCard },
+          { title: "Team", url: "/team", icon: Users },
+          { title: "Analytics", url: "/analytics", icon: BarChart },
+        ],
+        createItems: [
+          ...defaultCreateItems,
+          {
+            title: "Invite User",
+            url: "/team/invite", 
+            description: "Add a team member"
+          },
+        ],
+        config: {
+          name: "BrandApp",
+          version: "Pro",
+        },
+      }}
+      headerProps={{
+        actions: [
+          ...defaultHeaderActions,
+          {
+            label: "Upgrade",
+            href: "/billing/upgrade",
+            variant: "default",
+            size: "sm",
+          },
+        ],
+      }}
+    >
+      <div className="p-6">
+        <h1 className="text-2xl font-bold text-foreground mb-4">
+          Custom Themed Dashboard
+        </h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-primary">Brand Colors</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Complete color customization with brand consistency
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-primary">Custom Styling</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Rounded corners and custom spacing
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-primary">Theme Presets</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Professional theme presets for quick setup
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </AppLayout>
+  )
+}
+
+// Example 12: Theme Preset Showcase
+export function ThemePresetExample() {
+  const [currentTheme, setCurrentTheme] = React.useState<keyof typeof themePresets>('default')
+  
+  const switchTheme = () => {
+    const themeNames = Object.keys(themePresets) as Array<keyof typeof themePresets>
+    const currentIndex = themeNames.indexOf(currentTheme)
+    const nextIndex = (currentIndex + 1) % themeNames.length
+    setCurrentTheme(themeNames[nextIndex])
+  }
+  
+  return (
+    <AppLayout
+      themeConfig={themePresets[currentTheme]}
+      headerProps={{
+        actions: [
+          ...defaultHeaderActions,
+          {
+            label: `Theme: ${currentTheme}`,
+            onClick: switchTheme,
+            variant: "outline",
+            size: "sm",
+          },
+        ],
+      }}
+    >
+      <div className="p-6">
+        <h1 className="text-2xl font-bold text-foreground mb-4">
+          Theme Preset: {currentTheme}
+        </h1>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-primary">Color Showcase</CardTitle>
+            <CardDescription>Click the theme button in header to cycle through presets</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="default" className="bg-primary text-primary-foreground">Primary</Badge>
+              <Badge variant="secondary" className="bg-secondary text-secondary-foreground">Secondary</Badge>
+              <Badge variant="outline" className="border-border">Outline</Badge>
+              <Badge variant="destructive" className="bg-destructive text-destructive-foreground">Destructive</Badge>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="default">Primary Button</Button>
+              <Button variant="secondary">Secondary Button</Button>
+              <Button variant="outline">Outline Button</Button>
+              <Button variant="destructive">Destructive Button</Button>
+            </div>
+            <p className="text-muted-foreground">
+              Available presets: default, modern, corporate, minimal
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </AppLayout>
+  )
+}
+
 // Export all examples
 export const examples = {
   MinimalSetupExample,
@@ -361,4 +506,6 @@ export const examples = {
   MinimalSidebar,
   CherryPickExample,
   NextJsExample,
+  CustomThemeSaaSExample,
+  ThemePresetExample,
 }

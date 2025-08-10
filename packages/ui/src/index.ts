@@ -42,6 +42,8 @@ export { AppHeader, defaultSearchConfig, defaultHeaderActions, type SearchEntity
 export { AppLayout, MinimalLayout, DashboardLayout, defaultQueryClient, type LayoutConfig, type AppLayoutProps } from "./components/app-layout"
 export { defaultStatusConfig, minimalStatusConfig, compactStatusConfig, getStatusConfig, type StatusConfig, type StatusType } from "./components/status-config"
 export { defaultCrudActions, defaultCreateActions, defaultBulkActions, defaultImportExportActions, defaultToolbarActions, getActionsByCategory, getCreateAction, mergeActions, type ActionConfig, type EntityAction } from "./components/action-config"
+export { ThemeProvider, useTheme, useThemeToggle, type ThemeProviderProps } from "./components/theme-provider"
+export { defaultThemeConfig, modernThemeConfig, corporateThemeConfig, minimalThemeConfig, themePresets, createCustomTheme, createBrandTheme, generateThemeCSS, generateColorScale, type ThemeConfig, type ThemeColors, type ColorScale, type ThemePresetName } from "./components/theme-config"
 export { Skeleton } from "./components/skeleton"
 export { Slider } from "./components/slider"
 export { Toaster } from "./components/sonner"

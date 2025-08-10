@@ -6,6 +6,8 @@ import { SidebarProvider, SidebarInset } from "./sidebar"
 import { AppSidebar, type AppSidebarProps } from "./app-sidebar"
 import { AppHeader, type AppHeaderProps } from "./app-header"
 import { Toaster } from "./toaster"
+import { ThemeProvider, type ThemeProviderProps } from "./theme-provider"
+import { type ThemeConfig } from "./theme-config"
 
 // Types for layout configuration
 export interface LayoutConfig {
@@ -14,6 +16,8 @@ export interface LayoutConfig {
   sidebarProps?: Partial<AppSidebarProps>
   headerProps?: Partial<AppHeaderProps>
   themeProvider?: React.ComponentType<{ children: React.ReactNode }>
+  themeConfig?: ThemeConfig
+  themeProviderProps?: Partial<ThemeProviderProps>
 }
 
 export interface AppLayoutProps extends LayoutConfig {
@@ -33,7 +37,7 @@ export const defaultQueryClient = new QueryClient({
 
 // Simple theme provider fallback
 const DefaultThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="min-h-screen bg-background text-foreground">{children}</div>
+  <ThemeProvider>{children}</ThemeProvider>
 )
 
 export function AppLayout({
@@ -43,11 +47,15 @@ export function AppLayout({
   showToaster = true,
   sidebarProps = {},
   headerProps = {},
-  themeProvider: ThemeProvider = DefaultThemeProvider,
+  themeProvider: ThemeProviderComponent = DefaultThemeProvider,
+  themeConfig,
+  themeProviderProps = {},
 }: AppLayoutProps) {
+  const themeProps = themeConfig ? { ...themeProviderProps, themeConfig } : themeProviderProps
+  
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <ThemeProviderComponent {...themeProps}>
         <SidebarProvider>
           <div className={`flex h-screen bg-background ${className || ""}`}>
             <AppSidebar {...sidebarProps} />
@@ -58,7 +66,7 @@ export function AppLayout({
           </div>
           {showToaster && <Toaster />}
         </SidebarProvider>
-      </ThemeProvider>
+      </ThemeProviderComponent>
     </QueryClientProvider>
   )
 }
@@ -70,17 +78,21 @@ export function MinimalLayout({
   queryClient = defaultQueryClient,
   showToaster = true,
   headerProps = {},
-  themeProvider: ThemeProvider = DefaultThemeProvider,
+  themeProvider: ThemeProviderComponent = DefaultThemeProvider,
+  themeConfig,
+  themeProviderProps = {},
 }: Omit<AppLayoutProps, "sidebarProps">) {
+  const themeProps = themeConfig ? { ...themeProviderProps, themeConfig } : themeProviderProps
+  
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <ThemeProviderComponent {...themeProps}>
         <div className={`min-h-screen bg-background ${className || ""}`}>
           <AppHeader {...headerProps} />
           <main className="flex-1">{children}</main>
           {showToaster && <Toaster />}
         </div>
-      </ThemeProvider>
+      </ThemeProviderComponent>
     </QueryClientProvider>
   )
 }
@@ -93,11 +105,15 @@ export function DashboardLayout({
   showToaster = true,
   sidebarProps = {},
   headerProps = {},
-  themeProvider: ThemeProvider = DefaultThemeProvider,
+  themeProvider: ThemeProviderComponent = DefaultThemeProvider,
+  themeConfig,
+  themeProviderProps = {},
 }: AppLayoutProps) {
+  const themeProps = themeConfig ? { ...themeProviderProps, themeConfig } : themeProviderProps
+  
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <ThemeProviderComponent {...themeProps}>
         <SidebarProvider>
           <div className={`flex h-screen bg-background ${className || ""}`}>
             <AppSidebar {...sidebarProps} />
@@ -108,7 +124,7 @@ export function DashboardLayout({
           </div>
           {showToaster && <Toaster />}
         </SidebarProvider>
-      </ThemeProvider>
+      </ThemeProviderComponent>
     </QueryClientProvider>
   )
 }

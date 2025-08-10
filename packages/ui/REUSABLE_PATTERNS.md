@@ -286,5 +286,59 @@ function SaaSApp({ children }) {
 - **Consistent Design**: Maintain design system across applications
 - **Type Safety**: Full TypeScript support
 - **Framework Agnostic**: Works with Next.js, React Router, etc.
+- **Complete Theming**: Full color and visual customization capabilities
+
+## 🎨 Complete Visual Customization
+
+Beyond functional patterns, you can completely redesign the visual appearance:
+
+### Theme Presets
+```tsx
+import { AppLayout, modernThemeConfig, corporateThemeConfig } from '@tatou/ui'
+
+// Modern purple theme
+<AppLayout themeConfig={modernThemeConfig}>
+  {children}
+</AppLayout>
+
+// Professional corporate theme
+<AppLayout themeConfig={corporateThemeConfig}>
+  {children}
+</AppLayout>
+```
+
+### Custom Brand Colors
+```tsx
+import { createBrandTheme } from '@tatou/ui'
+
+// Create theme from your brand color
+const brandTheme = createBrandTheme(280, 85) // Purple brand
+
+<AppLayout themeConfig={brandTheme}>
+  {children}
+</AppLayout>
+```
+
+### Full Color Customization
+```tsx
+import { createCustomTheme } from '@tatou/ui'
+
+const customTheme = createCustomTheme({
+  colors: {
+    light: {
+      primary: "142.1 76.2% 36.3%", // Green
+      accent: "24.6 95% 53.1%",     // Orange
+      // Customize any color...
+    },
+    dark: {
+      primary: "142.1 70.6% 45.3%", // Lighter green for dark mode
+      // Dark mode colors...
+    },
+  },
+  borderRadius: { radius: "1rem" }, // Extra rounded
+})
+```
+
+**See [THEME_CUSTOMIZATION.md](./THEME_CUSTOMIZATION.md) for complete theming documentation.**
 
 Each pattern can be used independently or combined for comprehensive application frameworks.
