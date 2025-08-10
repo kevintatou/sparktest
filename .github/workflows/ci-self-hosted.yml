@@ -6,17 +6,19 @@ on:
     paths:
       - "apps/**"
       - "packages/**"
+      - "backend/**"
       - "package.json"
       - "pnpm-lock.yaml"
-      - ".github/workflows/ci.yml"
+      - ".github/workflows/ci-self-hosted.yml"
   pull_request:
     branches: [main]
     paths:
       - "apps/**"
       - "packages/**"
+      - "backend/**"
       - "package.json"
       - "pnpm-lock.yaml"
-      - ".github/workflows/ci.yml"
+      - ".github/workflows/ci-self-hosted.yml"
 
 jobs:
   build:
@@ -31,6 +33,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build workspace packages
+        run: |
+          echo "Building core package..."
+          pnpm --filter '@tatou/core' build
+          echo "Building UI package..."  
+          pnpm --filter '@tatou/ui' build
+          echo "Building storage-service package..."
+          pnpm --filter '@tatou/storage-service' build
+          echo "Checking if core dist files exist..."
+          ls -la packages/core/dist/ || echo "Core dist directory not found"
+
       - name: Check code formatting
         run: pnpm format:check
 
@@ -38,13 +51,37 @@ jobs:
         run: pnpm lint
 
       - name: Type check
-        run: pnpm type-check
-
-      - name: Build workspace packages
-        run: pnpm build:packages
+        run: |
+          echo "Running type check..."
+          echo "Core package structure:"
+          find packages/core -name "*.d.ts" || echo "No .d.ts files found"
+          pnpm type-check
 
       - name: Build application
         run: pnpm --filter "@tatou/oss" build
 
-      - name: Run tests
-        run: pnpm test
+      - name: Run frontend tests with coverage
+        run: pnpm --filter "@tatou/oss" test:coverage
+
+      - name: Run Rust clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run Rust tests with coverage
+        run: |
+          rustup component add llvm-tools-preview
+          cargo install grcov || echo "grcov already installed"
+          export CARGO_INCREMENTAL=0
+          export RUSTFLAGS='-Cinstrument-coverage'
+          export LLVM_PROFILE_FILE='cargo-test-%p-%m.profraw'
+          cargo test
+          grcov . --binary-path ./target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore '../*' --ignore "/*" -o target/coverage/lcov.info
+          rm -f *.profraw
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./apps/oss/coverage/lcov.info,./target/coverage/lcov.info
+          flags: frontend,backend
+          name: SparkTest Coverage
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}

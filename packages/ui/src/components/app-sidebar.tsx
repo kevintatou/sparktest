@@ -47,7 +47,11 @@ export interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   showCreateMenu?: boolean
   showSettings?: boolean
   settingsUrl?: string
-  LinkComponent?: React.ComponentType<{ href: string; children: React.ReactNode; className?: string }>
+  LinkComponent?: React.ComponentType<{
+    href: string
+    children: React.ReactNode
+    className?: string
+  }>
 }
 
 // Default navigation items (can be imported and extended)
@@ -142,9 +146,7 @@ export function AppSidebar({
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{config.name}</span>
-                  {config.version && (
-                    <span className="truncate text-xs">{config.version}</span>
-                  )}
+                  {config.version && <span className="truncate text-xs">{config.version}</span>}
                 </div>
               </LinkComponent>
             </SidebarMenuButton>

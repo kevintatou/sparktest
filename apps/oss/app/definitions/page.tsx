@@ -4,7 +4,16 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Plus, Play, Edit, Trash2, FileText, Github, ExternalLink } from "lucide-react"
 
-import { Button, Card, CardContent, CardFooter, CardHeader, CardTitle, Input, Badge } from "@tatou/ui"
+import {
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Input,
+  Badge,
+} from "@tatou/ui"
 import { storage } from "@tatou/storage-service"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"

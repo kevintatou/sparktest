@@ -7,21 +7,20 @@ The `@tatou/ui` package provides a configurable `AppSidebar` component that can 
 For the simplest setup, just import and use the AppSidebar with default configuration:
 
 ```tsx
-import { AppSidebar, SidebarProvider, SidebarInset } from '@tatou/ui'
+import { AppSidebar, SidebarProvider, SidebarInset } from "@tatou/ui"
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        {children}
-      </SidebarInset>
+      <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
   )
 }
 ```
 
 This gives you the complete OSS sidebar with:
+
 - Dashboard, Runs, Definitions, Suites, Executors navigation
 - Create menu with New Run, New Definition, New Executor
 - Settings link
@@ -32,21 +31,21 @@ This gives you the complete OSS sidebar with:
 To customize navigation for a SAAS app, extend the default items:
 
 ```tsx
-import { 
-  AppSidebar, 
-  defaultNavigationItems, 
+import {
+  AppSidebar,
+  defaultNavigationItems,
   defaultCreateItems,
   type NavigationItem,
-  type CreateItem 
-} from '@tatou/ui'
-import { CreditCard, Users, Building } from 'lucide-react'
+  type CreateItem,
+} from "@tatou/ui"
+import { CreditCard, Users, Building } from "lucide-react"
 
 // Extend default navigation with SAAS-specific items
 const saasNavigationItems: NavigationItem[] = [
   ...defaultNavigationItems,
   {
     title: "Billing",
-    url: "/billing", 
+    url: "/billing",
     icon: CreditCard,
   },
   {
@@ -73,7 +72,7 @@ const saasCreateItems: CreateItem[] = [
 
 function SaasSidebar({ pathname }: { pathname: string }) {
   return (
-    <AppSidebar 
+    <AppSidebar
       navigationItems={saasNavigationItems}
       createItems={saasCreateItems}
       pathname={pathname}
@@ -87,8 +86,8 @@ function SaasSidebar({ pathname }: { pathname: string }) {
 Customize the app branding and configuration:
 
 ```tsx
-import { AppSidebar, type AppConfig } from '@tatou/ui'
-import { Zap } from 'lucide-react'
+import { AppSidebar, type AppConfig } from "@tatou/ui"
+import { Zap } from "lucide-react"
 
 const saasConfig: AppConfig = {
   name: "SparkTest Pro",
@@ -98,12 +97,7 @@ const saasConfig: AppConfig = {
 }
 
 function BrandedSidebar() {
-  return (
-    <AppSidebar 
-      config={saasConfig}
-      navigationItems={customNavItems}
-    />
-  )
+  return <AppSidebar config={saasConfig} navigationItems={customNavItems} />
 }
 ```
 
@@ -112,34 +106,28 @@ function BrandedSidebar() {
 ### Next.js Integration
 
 ```tsx
-import { AppSidebar } from '@tatou/ui'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { AppSidebar } from "@tatou/ui"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 function NextJsSidebar() {
   const pathname = usePathname()
-  
-  return (
-    <AppSidebar 
-      pathname={pathname}
-      LinkComponent={Link}
-      navigationItems={customNavItems}
-    />
-  )
+
+  return <AppSidebar pathname={pathname} LinkComponent={Link} navigationItems={customNavItems} />
 }
 ```
 
 ### React Router Integration
 
 ```tsx
-import { AppSidebar } from '@tatou/ui'
-import { Link, useLocation } from 'react-router-dom'
+import { AppSidebar } from "@tatou/ui"
+import { Link, useLocation } from "react-router-dom"
 
 function RouterSidebar() {
   const location = useLocation()
-  
+
   return (
-    <AppSidebar 
+    <AppSidebar
       pathname={location.pathname}
       LinkComponent={Link}
       navigationItems={customNavItems}
@@ -154,14 +142,14 @@ Disable features you don't need:
 
 ```tsx
 // Minimal sidebar without create menu or settings
-<AppSidebar 
+<AppSidebar
   navigationItems={basicNavItems}
   showCreateMenu={false}
   showSettings={false}
 />
 
 // Custom settings URL
-<AppSidebar 
+<AppSidebar
   settingsUrl="/admin/settings"
 />
 ```
@@ -169,21 +157,21 @@ Disable features you don't need:
 ## Complete SAAS Example
 
 ```tsx
-import { 
-  AppSidebar, 
-  SidebarProvider, 
+import {
+  AppSidebar,
+  SidebarProvider,
   SidebarInset,
   defaultNavigationItems,
-  type NavigationItem 
-} from '@tatou/ui'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { CreditCard, Users, Building, BarChart } from 'lucide-react'
+  type NavigationItem,
+} from "@tatou/ui"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { CreditCard, Users, Building, BarChart } from "lucide-react"
 
 const saasNavigation: NavigationItem[] = [
   ...defaultNavigationItems,
   {
-    title: "Analytics", 
+    title: "Analytics",
     url: "/analytics",
     icon: BarChart,
   },
@@ -194,7 +182,7 @@ const saasNavigation: NavigationItem[] = [
   },
   {
     title: "Team",
-    url: "/team", 
+    url: "/team",
     icon: Users,
   },
   {
@@ -211,7 +199,7 @@ const saasConfig = {
 
 export function SaasLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  
+
   return (
     <SidebarProvider>
       <AppSidebar
@@ -221,9 +209,7 @@ export function SaasLayout({ children }: { children: React.ReactNode }) {
         LinkComponent={Link}
         showSettings={false} // Using custom settings in nav
       />
-      <SidebarInset>
-        {children}
-      </SidebarInset>
+      <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
   )
 }

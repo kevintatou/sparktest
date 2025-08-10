@@ -10,7 +10,15 @@ export interface StatusConfig {
   label: string
 }
 
-export type StatusType = "passed" | "failed" | "running" | "completed" | "pending" | "error" | "cancelled" | "unknown"
+export type StatusType =
+  | "passed"
+  | "failed"
+  | "running"
+  | "completed"
+  | "pending"
+  | "error"
+  | "cancelled"
+  | "unknown"
 
 // Default status configurations that can be imported and extended
 export const defaultStatusConfig: Record<StatusType, StatusConfig> = {
@@ -73,7 +81,10 @@ export const defaultStatusConfig: Record<StatusType, StatusConfig> = {
 }
 
 // Helper function to get status configuration
-export function getStatusConfig(status: string, customConfig?: Partial<Record<StatusType, StatusConfig>>): StatusConfig {
+export function getStatusConfig(
+  status: string,
+  customConfig?: Partial<Record<StatusType, StatusConfig>>
+): StatusConfig {
   const config = { ...defaultStatusConfig, ...customConfig }
   const statusKey = status.toLowerCase() as StatusType
   return config[statusKey] || config.unknown

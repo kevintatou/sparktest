@@ -52,7 +52,7 @@ export function AppLayout({
   themeProviderProps = {},
 }: AppLayoutProps) {
   const themeProps = themeConfig ? { ...themeProviderProps, themeConfig } : themeProviderProps
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProviderComponent {...themeProps}>
@@ -83,7 +83,7 @@ export function MinimalLayout({
   themeProviderProps = {},
 }: Omit<AppLayoutProps, "sidebarProps">) {
   const themeProps = themeConfig ? { ...themeProviderProps, themeConfig } : themeProviderProps
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProviderComponent {...themeProps}>
@@ -110,7 +110,7 @@ export function DashboardLayout({
   themeProviderProps = {},
 }: AppLayoutProps) {
   const themeProps = themeConfig ? { ...themeProviderProps, themeConfig } : themeProviderProps
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProviderComponent {...themeProps}>

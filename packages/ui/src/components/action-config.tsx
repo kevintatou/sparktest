@@ -136,7 +136,9 @@ export const defaultToolbarActions: EntityAction[] = [
 ]
 
 // Helper function to get actions by category
-export function getActionsByCategory(category: "crud" | "create" | "bulk" | "toolbar" | "import-export"): EntityAction[] {
+export function getActionsByCategory(
+  category: "crud" | "create" | "bulk" | "toolbar" | "import-export"
+): EntityAction[] {
   switch (category) {
     case "crud":
       return defaultCrudActions
@@ -159,9 +161,12 @@ export function getCreateAction(entityType: string): EntityAction | undefined {
 }
 
 // Helper to merge custom actions with defaults
-export function mergeActions(defaults: EntityAction[], custom: Partial<EntityAction>[]): EntityAction[] {
+export function mergeActions(
+  defaults: EntityAction[],
+  custom: Partial<EntityAction>[]
+): EntityAction[] {
   const merged = [...defaults]
-  
+
   custom.forEach((customAction) => {
     const existingIndex = merged.findIndex((action) => action.key === customAction.key)
     if (existingIndex >= 0) {
@@ -170,6 +175,6 @@ export function mergeActions(defaults: EntityAction[], custom: Partial<EntityAct
       merged.push(customAction as EntityAction)
     }
   })
-  
+
   return merged
 }

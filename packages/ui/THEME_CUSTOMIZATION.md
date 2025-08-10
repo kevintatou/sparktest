@@ -5,44 +5,48 @@ The `@tatou/ui` package provides comprehensive theming capabilities that allow y
 ## 🎨 Complete Color Customization
 
 ### Basic Theme Usage
+
 ```tsx
-import { AppLayout, modernThemeConfig } from '@tatou/ui'
+import { AppLayout, modernThemeConfig } from "@tatou/ui"
 
 // Use a pre-built theme
-<AppLayout themeConfig={modernThemeConfig}>
-  {children}
-</AppLayout>
+;<AppLayout themeConfig={modernThemeConfig}>{children}</AppLayout>
 ```
 
 ### Available Theme Presets
 
 #### Default Theme (OSS Style)
+
 ```tsx
-import { defaultThemeConfig } from '@tatou/ui'
+import { defaultThemeConfig } from "@tatou/ui"
 // Clean blue theme matching the OSS application
 ```
 
 #### Modern Theme (Purple Accent)
+
 ```tsx
-import { modernThemeConfig } from '@tatou/ui'
+import { modernThemeConfig } from "@tatou/ui"
 // Contemporary purple theme with rounded corners
 ```
 
 #### Corporate Theme (Professional Blue)
+
 ```tsx
-import { corporateThemeConfig } from '@tatou/ui'
+import { corporateThemeConfig } from "@tatou/ui"
 // Professional dark blue theme with sharp corners
 ```
 
 #### Minimal Theme (Black & White)
+
 ```tsx
-import { minimalThemeConfig } from '@tatou/ui'
+import { minimalThemeConfig } from "@tatou/ui"
 // Clean monochromatic theme with minimal styling
 ```
 
 ## 🛠️ Custom Theme Creation
 
 ### Create Brand-Specific Themes
+
 ```tsx
 import { createBrandTheme } from '@tatou/ui'
 
@@ -61,6 +65,7 @@ const brandTheme = createBrandTheme(
 ```
 
 ### Full Custom Theme Configuration
+
 ```tsx
 import { createCustomTheme, type ThemeConfig } from '@tatou/ui'
 
@@ -96,12 +101,14 @@ const customTheme: ThemeConfig = createCustomTheme({
 ### All Customizable Colors
 
 #### Base Colors
+
 - `background` - Main background color
 - `foreground` - Primary text color
 - `card` - Card background
 - `cardForeground` - Card text color
 
 #### Brand Colors
+
 - `primary` - Primary brand color (buttons, links)
 - `primaryForeground` - Text on primary color
 - `secondary` - Secondary brand color
@@ -110,6 +117,7 @@ const customTheme: ThemeConfig = createCustomTheme({
 - `accentForeground` - Text on accent color
 
 #### Semantic Colors
+
 - `destructive` - Error/danger color
 - `destructiveForeground` - Text on error color
 - `success` - Success color
@@ -118,6 +126,7 @@ const customTheme: ThemeConfig = createCustomTheme({
 - `warningForeground` - Text on warning color
 
 #### Interactive Colors
+
 - `muted` - Muted background for subtle elements
 - `mutedForeground` - Muted text
 - `border` - Border color
@@ -125,6 +134,7 @@ const customTheme: ThemeConfig = createCustomTheme({
 - `ring` - Focus ring color
 
 #### Sidebar Colors
+
 - `sidebarBackground` - Sidebar background
 - `sidebarForeground` - Sidebar text
 - `sidebarPrimary` - Sidebar primary color
@@ -135,7 +145,9 @@ const customTheme: ThemeConfig = createCustomTheme({
 - `sidebarRing` - Sidebar focus rings
 
 ### HSL Color Format
+
 All colors use HSL (Hue, Saturation, Lightness) format for better manipulation:
+
 ```tsx
 "220.9 39.3% 11%" // hue saturation% lightness%
 ```
@@ -143,8 +155,9 @@ All colors use HSL (Hue, Saturation, Lightness) format for better manipulation:
 ## ⚙️ Advanced Theming
 
 ### Generate Color Scales
+
 ```tsx
-import { generateColorScale } from '@tatou/ui'
+import { generateColorScale } from "@tatou/ui"
 
 // Create a full color scale from your brand color
 const brandScale = generateColorScale(280, 85) // Purple with 85% saturation
@@ -166,28 +179,26 @@ const theme = createCustomTheme({
 ```
 
 ### Runtime Theme Switching
+
 ```tsx
-import { useTheme } from '@tatou/ui'
+import { useTheme } from "@tatou/ui"
 
 function ThemeCustomizer() {
   const { config, setConfig } = useTheme()
-  
+
   const switchToPurple = () => {
     const purpleTheme = createBrandTheme(280, 85)
     setConfig(purpleTheme)
   }
-  
-  return (
-    <Button onClick={switchToPurple}>
-      Switch to Purple Theme
-    </Button>
-  )
+
+  return <Button onClick={switchToPurple}>Switch to Purple Theme</Button>
 }
 ```
 
 ### Export CSS for External Use
+
 ```tsx
-import { generateThemeCSS, modernThemeConfig } from '@tatou/ui'
+import { generateThemeCSS, modernThemeConfig } from "@tatou/ui"
 
 // Generate CSS string for use in other applications
 const cssString = generateThemeCSS(modernThemeConfig)
@@ -197,13 +208,14 @@ console.log(cssString) // CSS variables ready for any application
 ## 🎨 SAAS Theming Examples
 
 ### Corporate Brand Integration
+
 ```tsx
-import { createBrandTheme, AppLayout } from '@tatou/ui'
+import { createBrandTheme, AppLayout } from "@tatou/ui"
 
 // Match your company's brand colors
 const corporateBrand = createBrandTheme(
   210, // Corporate blue hue
-  95,  // High saturation
+  95, // High saturation
   {
     borderRadius: { radius: "0.25rem" }, // Sharp, professional look
   }
@@ -211,7 +223,7 @@ const corporateBrand = createBrandTheme(
 
 function CorporateApp({ children }) {
   return (
-    <AppLayout 
+    <AppLayout
       themeConfig={corporateBrand}
       sidebarProps={{
         config: {
@@ -227,8 +239,9 @@ function CorporateApp({ children }) {
 ```
 
 ### Multi-Brand Application
+
 ```tsx
-import { useTheme, themePresets } from '@tatou/ui'
+import { useTheme, themePresets } from "@tatou/ui"
 
 function MultiBrandApp({ brandType, children }) {
   const themes = {
@@ -236,18 +249,15 @@ function MultiBrandApp({ brandType, children }) {
     enterprise: createBrandTheme(210, 85), // Blue
     creative: createBrandTheme(340, 75), // Pink
   }
-  
-  return (
-    <AppLayout themeConfig={themes[brandType]}>
-      {children}
-    </AppLayout>
-  )
+
+  return <AppLayout themeConfig={themes[brandType]}>{children}</AppLayout>
 }
 ```
 
 ### Dark Mode Customization
+
 ```tsx
-import { createCustomTheme } from '@tatou/ui'
+import { createCustomTheme } from "@tatou/ui"
 
 // Custom dark theme with specific colors
 const customDarkTheme = createCustomTheme({
@@ -256,10 +266,10 @@ const customDarkTheme = createCustomTheme({
       // Light mode colors...
     },
     dark: {
-      background: "240 10% 3.9%",      // Nearly black
-      foreground: "0 0% 98%",          // Nearly white
-      primary: "142.1 76.2% 36.3%",   // Green accent
-      card: "240 10% 5.9%",           // Dark cards
+      background: "240 10% 3.9%", // Nearly black
+      foreground: "0 0% 98%", // Nearly white
+      primary: "142.1 76.2% 36.3%", // Green accent
+      card: "240 10% 5.9%", // Dark cards
       // Customize any other dark mode colors...
     },
   },

@@ -37,13 +37,13 @@ export function ThemeProvider({
   const applyTheme = React.useCallback((newConfig: ThemeConfig) => {
     if (typeof document !== "undefined") {
       const css = generateThemeCSS(newConfig)
-      
+
       // Remove existing theme style if it exists
       const existingStyle = document.getElementById("tatou-theme-css")
       if (existingStyle) {
         existingStyle.remove()
       }
-      
+
       // Add new theme style
       const style = document.createElement("style")
       style.id = "tatou-theme-css"
@@ -55,11 +55,13 @@ export function ThemeProvider({
   // Update theme class on document
   useEffect(() => {
     const root = window.document.documentElement
-    
+
     root.classList.remove("light", "dark")
-    
+
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
       root.classList.add(systemTheme)
     } else {
       root.classList.add(theme)
@@ -82,18 +84,24 @@ export function ThemeProvider({
   }, [storageKey])
 
   // Save theme to storage
-  const setTheme = React.useCallback((newTheme: string) => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(storageKey, newTheme)
-    }
-    setThemeState(newTheme)
-  }, [storageKey])
+  const setTheme = React.useCallback(
+    (newTheme: string) => {
+      if (typeof window !== "undefined") {
+        localStorage.setItem(storageKey, newTheme)
+      }
+      setThemeState(newTheme)
+    },
+    [storageKey]
+  )
 
   // Update config and apply immediately
-  const setConfig = React.useCallback((newConfig: ThemeConfig) => {
-    setConfigState(newConfig)
-    applyTheme(newConfig)
-  }, [applyTheme])
+  const setConfig = React.useCallback(
+    (newConfig: ThemeConfig) => {
+      setConfigState(newConfig)
+      applyTheme(newConfig)
+    },
+    [applyTheme]
+  )
 
   const value = {
     theme,
@@ -106,9 +114,7 @@ export function ThemeProvider({
   return (
     <ThemeContext.Provider {...props} value={value}>
       {enableColorSchemeScript && <ColorSchemeScript />}
-      <div className="min-h-screen bg-background text-foreground">
-        {children}
-      </div>
+      <div className="min-h-screen bg-background text-foreground">{children}</div>
     </ThemeContext.Provider>
   )
 }

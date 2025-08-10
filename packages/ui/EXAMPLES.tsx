@@ -3,13 +3,13 @@
  * This demonstrates layouts, headers, status systems, actions, and sidebar configurations
  */
 
-import React from 'react'
+import React from "react"
 import {
   // Layout Components
   AppLayout,
   DashboardLayout,
   MinimalLayout,
-  
+
   // Sidebar Components
   AppSidebar,
   SidebarProvider,
@@ -20,29 +20,29 @@ import {
   type NavigationItem,
   type CreateItem,
   type AppConfig,
-  
+
   // Header Components
   AppHeader,
   defaultHeaderActions,
   defaultSearchConfig,
   type HeaderAction,
   type SearchEntity,
-  
+
   // Theme Components
   themePresets,
   createBrandTheme,
   type ThemePresetName,
-  
+
   // Status System
   defaultStatusConfig,
   getStatusConfig,
   type StatusType,
-  
+
   // Action System
   defaultCrudActions,
   getCreateAction,
   mergeActions,
-  
+
   // UI Components
   Button,
   Badge,
@@ -50,8 +50,17 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@tatou/ui'
-import { CreditCard, Users, BarChart, Receipt, Archive, CheckCircle, Building, Mail } from 'lucide-react'
+} from "@tatou/ui"
+import {
+  CreditCard,
+  Users,
+  BarChart,
+  Receipt,
+  Archive,
+  CheckCircle,
+  Building,
+  Mail,
+} from "lucide-react"
 
 // ===== COMPLETE APPLICATION LAYOUTS =====
 
@@ -111,9 +120,7 @@ export function SaaSExtensionExample() {
 
   const handleSearch = async (query: string): Promise<SearchEntity[]> => {
     // Your SAAS search implementation
-    return [
-      { id: "1", name: "Sample Result", type: "billing", href: "/billing/1" },
-    ]
+    return [{ id: "1", name: "Sample Result", type: "billing", href: "/billing/1" }]
   }
 
   return (
@@ -229,7 +236,7 @@ export function CrudActionsExample() {
     },
     {
       key: "archive",
-      label: "Archive", 
+      label: "Archive",
       icon: Archive,
       variant: "ghost",
     },
@@ -326,7 +333,7 @@ export function CherryPickExample() {
 // Example 10: Next.js Integration Example
 export function NextJsExample() {
   // Simulated Next.js Link component
-  const NextLink: React.FC<{ 
+  const NextLink: React.FC<{
     href: string
     children: React.ReactNode
     className?: string
@@ -361,7 +368,7 @@ export function CustomThemeSaaSExample() {
   return (
     <AppLayout
       themeConfig={createBrandTheme(280, 85, {
-        borderRadius: { radius: "1rem" }
+        borderRadius: { radius: "1rem" },
       })}
       sidebarProps={{
         navigationItems: [
@@ -374,8 +381,8 @@ export function CustomThemeSaaSExample() {
           ...defaultCreateItems,
           {
             title: "Invite User",
-            url: "/team/invite", 
-            description: "Add a team member"
+            url: "/team/invite",
+            description: "Add a team member",
           },
         ],
         config: {
@@ -396,9 +403,7 @@ export function CustomThemeSaaSExample() {
       }}
     >
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-foreground mb-4">
-          Custom Themed Dashboard
-        </h1>
+        <h1 className="text-2xl font-bold text-foreground mb-4">Custom Themed Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardHeader>
@@ -415,9 +420,7 @@ export function CustomThemeSaaSExample() {
               <CardTitle className="text-primary">Custom Styling</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                Rounded corners and custom spacing
-              </p>
+              <p className="text-muted-foreground">Rounded corners and custom spacing</p>
             </CardContent>
           </Card>
           <Card>
@@ -425,9 +428,7 @@ export function CustomThemeSaaSExample() {
               <CardTitle className="text-primary">Theme Presets</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                Professional theme presets for quick setup
-              </p>
+              <p className="text-muted-foreground">Professional theme presets for quick setup</p>
             </CardContent>
           </Card>
         </div>
@@ -438,15 +439,15 @@ export function CustomThemeSaaSExample() {
 
 // Example 12: Theme Preset Showcase
 export function ThemePresetExample() {
-  const [currentTheme, setCurrentTheme] = React.useState<keyof typeof themePresets>('default')
-  
+  const [currentTheme, setCurrentTheme] = React.useState<keyof typeof themePresets>("default")
+
   const switchTheme = () => {
     const themeNames = Object.keys(themePresets) as Array<keyof typeof themePresets>
     const currentIndex = themeNames.indexOf(currentTheme)
     const nextIndex = (currentIndex + 1) % themeNames.length
     setCurrentTheme(themeNames[nextIndex])
   }
-  
+
   return (
     <AppLayout
       themeConfig={themePresets[currentTheme]}
@@ -463,20 +464,28 @@ export function ThemePresetExample() {
       }}
     >
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-foreground mb-4">
-          Theme Preset: {currentTheme}
-        </h1>
+        <h1 className="text-2xl font-bold text-foreground mb-4">Theme Preset: {currentTheme}</h1>
         <Card>
           <CardHeader>
             <CardTitle className="text-primary">Color Showcase</CardTitle>
-            <CardDescription>Click the theme button in header to cycle through presets</CardDescription>
+            <CardDescription>
+              Click the theme button in header to cycle through presets
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-wrap gap-2">
-              <Badge variant="default" className="bg-primary text-primary-foreground">Primary</Badge>
-              <Badge variant="secondary" className="bg-secondary text-secondary-foreground">Secondary</Badge>
-              <Badge variant="outline" className="border-border">Outline</Badge>
-              <Badge variant="destructive" className="bg-destructive text-destructive-foreground">Destructive</Badge>
+              <Badge variant="default" className="bg-primary text-primary-foreground">
+                Primary
+              </Badge>
+              <Badge variant="secondary" className="bg-secondary text-secondary-foreground">
+                Secondary
+              </Badge>
+              <Badge variant="outline" className="border-border">
+                Outline
+              </Badge>
+              <Badge variant="destructive" className="bg-destructive text-destructive-foreground">
+                Destructive
+              </Badge>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <Button variant="default">Primary Button</Button>

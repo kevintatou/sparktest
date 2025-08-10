@@ -23,19 +23,19 @@ export interface ThemeColors {
   cardForeground: string
   popover: string
   popoverForeground: string
-  
+
   // Primary brand colors
   primary: string
   primaryForeground: string
-  
+
   // Secondary colors
   secondary: string
   secondaryForeground: string
-  
+
   // Accent colors
   accent: string
   accentForeground: string
-  
+
   // Semantic colors
   destructive: string
   destructiveForeground: string
@@ -43,14 +43,14 @@ export interface ThemeColors {
   successForeground: string
   warning: string
   warningForeground: string
-  
+
   // Interactive colors
   muted: string
   mutedForeground: string
   border: string
   input: string
   ring: string
-  
+
   // Sidebar specific colors
   sidebarBackground: string
   sidebarForeground: string
@@ -248,12 +248,12 @@ export function createCustomTheme(overrides: PartialThemeConfig): ThemeConfig {
 
 export function generateThemeCSS(theme: ThemeConfig): string {
   const lightVars = Object.entries(theme.colors.light)
-    .map(([key, value]) => `    --${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
-    .join('\n')
-  
+    .map(([key, value]) => `    --${key.replace(/([A-Z])/g, "-$1").toLowerCase()}: ${value};`)
+    .join("\n")
+
   const darkVars = Object.entries(theme.colors.dark)
-    .map(([key, value]) => `    --${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
-    .join('\n')
+    .map(([key, value]) => `    --${key.replace(/([A-Z])/g, "-$1").toLowerCase()}: ${value};`)
+    .join("\n")
 
   const radiusVar = `    --radius: ${theme.borderRadius.radius};`
 
@@ -295,7 +295,7 @@ export function createBrandTheme(
   options: PartialThemeConfig = {}
 ): ThemeConfig {
   const primaryScale = generateColorScale(primaryHue, primarySaturation)
-  
+
   return createCustomTheme({
     colors: {
       light: {

@@ -5,19 +5,17 @@ This document showcases the comprehensive reusable patterns available in the `@t
 ## 🎯 Complete Application Layout
 
 ### Minimal Setup (Zero Configuration)
+
 ```tsx
-import { AppLayout } from '@tatou/ui'
+import { AppLayout } from "@tatou/ui"
 
 function App({ children }) {
-  return (
-    <AppLayout>
-      {children}
-    </AppLayout>
-  )
+  return <AppLayout>{children}</AppLayout>
 }
 ```
 
 This gives you:
+
 - **Complete sidebar** with OSS navigation (Dashboard, Runs, Definitions, Suites, Executors)
 - **Header** with search, theme toggle, and GitHub link
 - **Query client** for data fetching
@@ -27,19 +25,21 @@ This gives you:
 ## 🎨 Reusable Header with Search
 
 ### Default Header
-```tsx
-import { AppHeader, defaultHeaderActions } from '@tatou/ui'
 
-<AppHeader
+```tsx
+import { AppHeader, defaultHeaderActions } from "@tatou/ui"
+
+;<AppHeader
   onSearch={async (query) => {
     // Your search implementation
     return searchResults
   }}
-  onThemeToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+  onThemeToggle={() => setTheme(theme === "dark" ? "light" : "dark")}
 />
 ```
 
 ### Extended for SAAS
+
 ```tsx
 import { AppHeader, defaultHeaderActions, type HeaderAction } from '@tatou/ui'
 import { CreditCard, Users } from 'lucide-react'
@@ -56,7 +56,7 @@ const saasActions: HeaderAction[] = [
   {
     label: "Team",
     icon: Users,
-    href: "/team", 
+    href: "/team",
     variant: "outline",
     size: "sm",
   },
@@ -68,14 +68,15 @@ const saasActions: HeaderAction[] = [
 ## 📊 Status Configuration System
 
 ### Default Status Usage
+
 ```tsx
-import { defaultStatusConfig, getStatusConfig } from '@tatou/ui'
-import { Badge } from '@tatou/ui'
+import { defaultStatusConfig, getStatusConfig } from "@tatou/ui"
+import { Badge } from "@tatou/ui"
 
 function StatusBadge({ status }: { status: string }) {
   const config = getStatusConfig(status)
   const StatusIcon = config.icon
-  
+
   return (
     <Badge className={config.badge}>
       <StatusIcon className="h-3 w-3 mr-1" />
@@ -86,8 +87,9 @@ function StatusBadge({ status }: { status: string }) {
 ```
 
 ### Custom Status Configuration
+
 ```tsx
-import { defaultStatusConfig, type StatusConfig } from '@tatou/ui'
+import { defaultStatusConfig, type StatusConfig } from "@tatou/ui"
 
 const saasStatusConfig = {
   ...defaultStatusConfig,
@@ -101,7 +103,7 @@ const saasStatusConfig = {
   archived: {
     icon: Archive,
     color: "text-gray-400",
-    bg: "bg-gray-50 dark:bg-gray-950/20", 
+    bg: "bg-gray-50 dark:bg-gray-950/20",
     badge: "bg-gray-100 text-gray-600",
     label: "Archived",
   },
@@ -111,8 +113,9 @@ const saasStatusConfig = {
 ## ⚡ Action Configuration System
 
 ### CRUD Actions
+
 ```tsx
-import { defaultCrudActions, mergeActions } from '@tatou/ui'
+import { defaultCrudActions, mergeActions } from "@tatou/ui"
 
 const customActions = mergeActions(defaultCrudActions, [
   {
@@ -122,7 +125,7 @@ const customActions = mergeActions(defaultCrudActions, [
     variant: "outline",
   },
   {
-    key: "archive", 
+    key: "archive",
     label: "Archive",
     icon: Archive,
     variant: "ghost",
@@ -131,8 +134,9 @@ const customActions = mergeActions(defaultCrudActions, [
 ```
 
 ### Entity-Specific Create Actions
+
 ```tsx
-import { getCreateAction, defaultCreateActions } from '@tatou/ui'
+import { getCreateAction, defaultCreateActions } from "@tatou/ui"
 
 // Get specific create action
 const runAction = getCreateAction("run")
@@ -142,7 +146,7 @@ const saasCreateActions = {
   ...defaultCreateActions,
   billing: {
     key: "create-invoice",
-    label: "New Invoice", 
+    label: "New Invoice",
     icon: Receipt,
     variant: "default",
     tooltip: "Create a new invoice",
@@ -153,24 +157,25 @@ const saasCreateActions = {
 ## 🎛️ Layout Templates
 
 ### Dashboard Layout (with padding)
-```tsx
-import { DashboardLayout } from '@tatou/ui'
 
-<DashboardLayout>
-  {/* Your dashboard content with built-in padding */}
-</DashboardLayout>
+```tsx
+import { DashboardLayout } from "@tatou/ui"
+
+;<DashboardLayout>{/* Your dashboard content with built-in padding */}</DashboardLayout>
 ```
 
 ### Minimal Layout (no sidebar)
-```tsx
-import { MinimalLayout } from '@tatou/ui'
 
-<MinimalLayout headerProps={{ showSearch: false }}>
+```tsx
+import { MinimalLayout } from "@tatou/ui"
+
+;<MinimalLayout headerProps={{ showSearch: false }}>
   {/* Landing page or simple content */}
 </MinimalLayout>
 ```
 
 ### Full Customization
+
 ```tsx
 import { AppLayout, defaultNavigationItems, defaultHeaderActions } from '@tatou/ui'
 
@@ -190,7 +195,7 @@ const saasConfig = {
   headerProps: {
     actions: [
       ...defaultHeaderActions,
-      { 
+      {
         label: "Support",
         href: "/support",
         variant: "outline" as const,
@@ -208,8 +213,9 @@ const saasConfig = {
 ## 🔧 Advanced Patterns
 
 ### Complete SAAS Application Setup
+
 ```tsx
-import { 
+import {
   AppLayout,
   defaultNavigationItems,
   defaultCreateItems,
@@ -219,7 +225,7 @@ import {
   type NavigationItem,
   type CreateItem,
   type HeaderAction,
-} from '@tatou/ui'
+} from "@tatou/ui"
 
 // Extend navigation for SAAS
 const saasNavigation: NavigationItem[] = [
@@ -229,7 +235,7 @@ const saasNavigation: NavigationItem[] = [
   { title: "Analytics", url: "/analytics", icon: BarChart },
 ]
 
-// Extend create menu for SAAS  
+// Extend create menu for SAAS
 const saasCreateItems: CreateItem[] = [
   ...defaultCreateItems,
   {
@@ -238,7 +244,7 @@ const saasCreateItems: CreateItem[] = [
     description: "Add a team member",
   },
   {
-    title: "New Project", 
+    title: "New Project",
     url: "/projects/new",
     description: "Create a new project",
   },
@@ -293,6 +299,7 @@ function SaaSApp({ children }) {
 Beyond functional patterns, you can completely redesign the visual appearance:
 
 ### Theme Presets
+
 ```tsx
 import { AppLayout, modernThemeConfig, corporateThemeConfig } from '@tatou/ui'
 
@@ -308,6 +315,7 @@ import { AppLayout, modernThemeConfig, corporateThemeConfig } from '@tatou/ui'
 ```
 
 ### Custom Brand Colors
+
 ```tsx
 import { createBrandTheme } from '@tatou/ui'
 
@@ -320,14 +328,15 @@ const brandTheme = createBrandTheme(280, 85) // Purple brand
 ```
 
 ### Full Color Customization
+
 ```tsx
-import { createCustomTheme } from '@tatou/ui'
+import { createCustomTheme } from "@tatou/ui"
 
 const customTheme = createCustomTheme({
   colors: {
     light: {
       primary: "142.1 76.2% 36.3%", // Green
-      accent: "24.6 95% 53.1%",     // Orange
+      accent: "24.6 95% 53.1%", // Orange
       // Customize any color...
     },
     dark: {

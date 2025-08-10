@@ -45,7 +45,13 @@ export interface AppHeaderProps extends React.HTMLAttributes<HTMLElement> {
   showMobileMenu?: boolean
   isMobile?: boolean
   isMobileMenuOpen?: boolean
-  LinkComponent?: React.ComponentType<{ href: string; children: React.ReactNode; className?: string; target?: string; rel?: string }>
+  LinkComponent?: React.ComponentType<{
+    href: string
+    children: React.ReactNode
+    className?: string
+    target?: string
+    rel?: string
+  }>
 }
 
 // Default search configuration
@@ -70,7 +76,7 @@ export const defaultHeaderActions: HeaderAction[] = [
 ]
 
 // Default Link component
-const DefaultLink: React.FC<{ 
+const DefaultLink: React.FC<{
   href: string
   children: React.ReactNode
   className?: string
@@ -134,7 +140,7 @@ export function AppHeader({
   }
 
   return (
-    <header 
+    <header
       className={cn(
         "flex h-16 items-center justify-between border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-4 sm:px-6",
         className
@@ -144,12 +150,7 @@ export function AppHeader({
       <div className="flex items-center gap-4 sm:gap-6 flex-1">
         {/* Mobile Menu Button */}
         {showMobileMenu && isMobile && onMobileMenuToggle && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onMobileMenuToggle}
-            className="lg:hidden"
-          >
+          <Button variant="ghost" size="icon" onClick={onMobileMenuToggle} className="lg:hidden">
             <Menu className="h-5 w-5" />
           </Button>
         )}
@@ -203,7 +204,7 @@ export function AppHeader({
         {/* Custom Actions */}
         {actions.map((action, index) => {
           const ActionIcon = action.icon
-          
+
           if (action.mobileHidden && isMobile) {
             return null
           }

@@ -26,14 +26,10 @@ pnpm install
 For the easiest setup, use the complete `AppLayout`:
 
 ```tsx
-import { AppLayout } from '@tatou/ui'
+import { AppLayout } from "@tatou/ui"
 
 function App({ children }) {
-  return (
-    <AppLayout>
-      {children}
-    </AppLayout>
-  )
+  return <AppLayout>{children}</AppLayout>
 }
 ```
 
@@ -42,9 +38,9 @@ This gives you a complete application with sidebar, header, search, theme toggle
 ### 🎨 Header with Search and Actions
 
 ```tsx
-import { AppHeader, defaultHeaderActions } from '@tatou/ui'
+import { AppHeader, defaultHeaderActions } from "@tatou/ui"
 
-<AppHeader
+;<AppHeader
   onSearch={async (query) => await searchEntities(query)}
   onThemeToggle={() => toggleTheme()}
   actions={defaultHeaderActions}
@@ -70,15 +66,13 @@ const StatusIcon = config.icon
 For sidebar-only setup or customization:
 
 ```tsx
-import { AppSidebar, SidebarProvider, SidebarInset } from '@tatou/ui'
+import { AppSidebar, SidebarProvider, SidebarInset } from "@tatou/ui"
 
 function Layout({ children }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        {children}
-      </SidebarInset>
+      <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
   )
 }
@@ -91,12 +85,8 @@ This gives you the complete OSS sidebar with Dashboard, Runs, Definitions, Suite
 Easily extend the default navigation for SAAS applications:
 
 ```tsx
-import { 
-  AppSidebar, 
-  defaultNavigationItems, 
-  type NavigationItem 
-} from '@tatou/ui'
-import { CreditCard, Users } from 'lucide-react'
+import { AppSidebar, defaultNavigationItems, type NavigationItem } from "@tatou/ui"
+import { CreditCard, Users } from "lucide-react"
 
 const saasNavigation: NavigationItem[] = [
   ...defaultNavigationItems, // Keep OSS defaults
@@ -106,19 +96,14 @@ const saasNavigation: NavigationItem[] = [
     icon: CreditCard,
   },
   {
-    title: "Team", 
+    title: "Team",
     url: "/team",
     icon: Users,
   },
 ]
 
 function SaasSidebar({ pathname }) {
-  return (
-    <AppSidebar 
-      navigationItems={saasNavigation}
-      pathname={pathname}
-    />
-  )
+  return <AppSidebar navigationItems={saasNavigation} pathname={pathname} />
 }
 ```
 
@@ -129,13 +114,15 @@ See [REUSABLE_PATTERNS.md](./REUSABLE_PATTERNS.md) for comprehensive examples of
 The package exports a wide range of components including:
 
 ### 🚀 Application Framework Components
-- `AppLayout` - **NEW!** Complete application layout with sidebar + header  
+
+- `AppLayout` - **NEW!** Complete application layout with sidebar + header
 - `AppSidebar` - **NEW!** Configurable application sidebar with navigation
 - `AppHeader` - **NEW!** Configurable header with search and actions
 - `DashboardLayout` - **NEW!** Dashboard-specific layout with padding
 - `MinimalLayout` - **NEW!** Simple layout without sidebar
 
 ### 📋 Default Configurations (Extendable)
+
 - `defaultNavigationItems` - OSS navigation (Dashboard, Runs, Definitions, Suites, Executors)
 - `defaultCreateItems` - Create menu items (New Run, New Definition, New Executor)
 - `defaultHeaderActions` - Header actions (GitHub link, theme toggle)
@@ -144,6 +131,7 @@ The package exports a wide range of components including:
 - `defaultQueryClient` - React Query configuration
 
 ### Basic Components
+
 - `Button` - Customizable button component
 - `Input` - Form input component
 - `Label` - Form label component
@@ -151,12 +139,14 @@ The package exports a wide range of components including:
 - `Badge` - Status and category labels
 
 ### Layout Components
+
 - `Sidebar` - Low-level collapsible sidebar primitives
 - `Sheet` - Slide-out panel
 - `Separator` - Visual divider
 - `Aspect Ratio` - Maintain aspect ratios
 
 ### Form Components
+
 - `Form` - Form wrapper with validation
 - `Checkbox` - Checkbox input
 - `Radio Group` - Radio button group
@@ -165,18 +155,21 @@ The package exports a wide range of components including:
 - `Textarea` - Multi-line text input
 
 ### Navigation Components
+
 - `Breadcrumb` - Navigation breadcrumbs
 - `Navigation Menu` - Main navigation
 - `Pagination` - Page navigation
 - `Tabs` - Tab navigation
 
 ### Feedback Components
+
 - `Alert` - Status messages
 - `Toast` - Notification messages
 - `Progress` - Progress indicators
 - `Skeleton` - Loading placeholders
 
 ### Overlay Components
+
 - `Dialog` - Modal dialogs
 - `Alert Dialog` - Confirmation dialogs
 - `Popover` - Floating content
@@ -184,12 +177,14 @@ The package exports a wide range of components including:
 - `Hover Card` - Rich hover content
 
 ### Data Display
+
 - `Table` - Data tables
 - `Chart` - Data visualization
 - `Calendar` - Date selection
 - `Avatar` - User avatars
 
 ### Utilities
+
 - `cn` - Utility for merging CSS classes
 - `useToast` - Toast notification hook
 - `useIsMobile` - Mobile detection hook
@@ -197,7 +192,7 @@ The package exports a wide range of components including:
 ## Basic Component Usage
 
 ```tsx
-import { Button, Card, CardContent, CardHeader, CardTitle } from '@tatou/ui'
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@tatou/ui"
 
 function MyComponent() {
   return (
