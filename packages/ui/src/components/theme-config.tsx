@@ -74,6 +74,18 @@ export interface ThemeConfig {
   typography?: Record<string, any>
 }
 
+export interface PartialThemeConfig {
+  colors?: {
+    light?: Partial<ThemeColors>
+    dark?: Partial<ThemeColors>
+  }
+  borderRadius?: {
+    radius?: string
+  }
+  spacing?: Record<string, string>
+  typography?: Record<string, any>
+}
+
 // Default OSS theme (matches current implementation)
 export const defaultThemeConfig: ThemeConfig = {
   colors: {
@@ -222,7 +234,7 @@ export const minimalThemeConfig: ThemeConfig = {
 }
 
 // Utility functions for theme customization
-export function createCustomTheme(overrides: Partial<ThemeConfig>): ThemeConfig {
+export function createCustomTheme(overrides: PartialThemeConfig): ThemeConfig {
   return {
     colors: {
       light: { ...defaultThemeConfig.colors.light, ...overrides.colors?.light },
@@ -280,7 +292,7 @@ export function generateColorScale(baseHue: number, saturation: number): ColorSc
 export function createBrandTheme(
   primaryHue: number,
   primarySaturation: number = 83,
-  options: Partial<ThemeConfig> = {}
+  options: PartialThemeConfig = {}
 ): ThemeConfig {
   const primaryScale = generateColorScale(primaryHue, primarySaturation)
   
