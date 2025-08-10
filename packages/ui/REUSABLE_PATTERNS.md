@@ -28,7 +28,6 @@ This gives you:
 
 ```tsx
 import { AppHeader, defaultHeaderActions } from "@tatou/ui"
-
 ;<AppHeader
   onSearch={async (query) => {
     // Your search implementation
@@ -160,7 +159,6 @@ const saasCreateActions = {
 
 ```tsx
 import { DashboardLayout } from "@tatou/ui"
-
 ;<DashboardLayout>{/* Your dashboard content with built-in padding */}</DashboardLayout>
 ```
 
@@ -168,7 +166,6 @@ import { DashboardLayout } from "@tatou/ui"
 
 ```tsx
 import { MinimalLayout } from "@tatou/ui"
-
 ;<MinimalLayout headerProps={{ showSearch: false }}>
   {/* Landing page or simple content */}
 </MinimalLayout>

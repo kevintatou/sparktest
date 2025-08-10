@@ -39,7 +39,6 @@ This gives you a complete application with sidebar, header, search, theme toggle
 
 ```tsx
 import { AppHeader, defaultHeaderActions } from "@tatou/ui"
-
 ;<AppHeader
   onSearch={async (query) => await searchEntities(query)}
   onThemeToggle={() => toggleTheme()}
