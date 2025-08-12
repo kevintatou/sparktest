@@ -381,7 +381,8 @@ impl KubernetesClient {
         let status = pod
             .status
             .as_ref()
-            .and_then(|s| s.phase.as_ref()).cloned()
+            .and_then(|s| s.phase.as_ref())
+            .cloned()
             .unwrap_or_else(|| "Unknown".to_string());
 
         Ok(status)
@@ -438,8 +439,7 @@ mod tests {
             }
             Err(e) => {
                 println!(
-                    "⚠️ Kubernetes client creation failed (expected in test environment): {}",
-                    e
+                    "⚠️ Kubernetes client creation failed (expected in test environment): {e}"
                 );
                 // This is expected when not running in a Kubernetes cluster
             }
@@ -450,7 +450,7 @@ mod tests {
     async fn test_job_name_generation() {
         // Test that job names are generated correctly for test runs
         let run_id = uuid::Uuid::new_v4();
-        let job_name = format!("test-run-{}", run_id);
+        let job_name = format!("test-run-{run_id}");
 
         assert!(job_name.starts_with("test-run-"));
         assert_eq!(job_name.len(), 45); // "test-run-" (9) + UUID (36)

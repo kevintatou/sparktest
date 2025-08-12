@@ -217,6 +217,7 @@ SparkTest is configured to **only deploy on releases** via Vercel. Automatic dep
 - **Backend**: Deployed separately using self-hosted runners (see `.github/workflows/deploy.yml`)
 
 To enable Vercel deployment for a release:
+
 1. Create a release tag in GitHub: `git tag v1.0.0 && git push origin v1.0.0`
 2. Create a release from the tag in GitHub UI
 3. Vercel will automatically deploy the frontend
