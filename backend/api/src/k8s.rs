@@ -215,7 +215,7 @@ impl KubernetesClient {
         let job = jobs
             .get(job_name)
             .await
-            .with_context(|| format!("Failed to get job '{}'", job_name))?;
+            .with_context(|| format!("Failed to get job '{job_name}'"))?;
 
         let job_status = job
             .status
@@ -251,7 +251,7 @@ impl KubernetesClient {
                     .get_pod_pending_reason(&pod_name)
                     .await
                     .unwrap_or_else(|_| "Unknown reason".to_string());
-                format!("Pod is pending: {}", reason)
+                format!("Pod is pending: {reason}")
             }
             _ => self
                 .get_pod_logs(&pod_name)
@@ -272,23 +272,23 @@ impl KubernetesClient {
     async fn get_job_pod_name(&self, job_name: &str) -> Result<String> {
         let pods: Api<Pod> = Api::namespaced(self.client.clone(), &self.config.namespace);
 
-        let label_selector = format!("job-name={}", job_name);
+        let label_selector = format!("job-name={job_name}");
         let list_params = ListParams::default().labels(&label_selector);
 
         let pod_list = pods
             .list(&list_params)
             .await
-            .with_context(|| format!("Failed to list pods for job '{}'", job_name))?;
+            .with_context(|| format!("Failed to list pods for job '{job_name}'"))?;
 
         let pod = pod_list
             .items
             .into_iter()
             .next()
-            .with_context(|| format!("No pods found for job '{}'", job_name))?;
+            .with_context(|| format!("No pods found for job '{job_name}'"))?;
 
         pod.metadata
             .name
-            .with_context(|| format!("Pod for job '{}' has no name", job_name))
+            .with_context(|| format!("Pod for job '{job_name}' has no name"))
     }
 
     /// Get logs from a specific pod
@@ -304,7 +304,7 @@ impl KubernetesClient {
         let logs = pods
             .logs(pod_name, &log_params)
             .await
-            .with_context(|| format!("Failed to get logs for pod '{}'", pod_name))?;
+            .with_context(|| format!("Failed to get logs for pod '{pod_name}'"))?;
 
         Ok(logs)
     }
@@ -329,7 +329,7 @@ impl KubernetesClient {
         let job = jobs
             .get(job_name)
             .await
-            .with_context(|| format!("Failed to get job '{}'", job_name))?;
+            .with_context(|| format!("Failed to get job '{job_name}'"))?;
 
         let status = job
             .status
@@ -363,7 +363,7 @@ impl KubernetesClient {
         let delete_params = kube::api::DeleteParams::default();
         jobs.delete(job_name, &delete_params)
             .await
-            .with_context(|| format!("Failed to delete job '{}'", job_name))?;
+            .with_context(|| format!("Failed to delete job '{job_name}'"))?;
 
         info!("Successfully deleted job '{}'", job_name);
         Ok(())
@@ -376,13 +376,12 @@ impl KubernetesClient {
         let pod = pods
             .get(pod_name)
             .await
-            .with_context(|| format!("Failed to get pod '{}'", pod_name))?;
+            .with_context(|| format!("Failed to get pod '{pod_name}'"))?;
 
         let status = pod
             .status
             .as_ref()
-            .and_then(|s| s.phase.as_ref())
-            .map(|phase| phase.clone())
+            .and_then(|s| s.phase.as_ref()).cloned()
             .unwrap_or_else(|| "Unknown".to_string());
 
         Ok(status)
@@ -395,7 +394,7 @@ impl KubernetesClient {
         let pod = pods
             .get(pod_name)
             .await
-            .with_context(|| format!("Failed to get pod '{}'", pod_name))?;
+            .with_context(|| format!("Failed to get pod '{pod_name}'"))?;
 
         let reason = pod
             .status
@@ -420,7 +419,7 @@ impl From<KubeError> for KubernetesError {
         KubernetesError {
             error_type: "KubernetesError".to_string(),
             message: error.to_string(),
-            details: Some(format!("{:?}", error)),
+            details: Some(format!("{error:?}")),
         }
     }
 }
