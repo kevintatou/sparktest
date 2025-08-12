@@ -205,6 +205,26 @@ For more help: [Issues](https://github.com/kevintatou/sparktest/issues) | [Discu
 
 ---
 
+## 🚀 Deployment
+
+### Vercel (Frontend Only)
+
+SparkTest is configured to **only deploy on releases** via Vercel. Automatic deployments on commits/PRs are disabled.
+
+- **Manual deployments**: Disabled on all branches
+- **Release deployments**: Enable by creating a GitHub release tag
+- **Frontend app**: Only the Next.js app (`apps/oss`) is deployed to Vercel
+- **Backend**: Deployed separately using self-hosted runners (see `.github/workflows/deploy.yml`)
+
+To enable Vercel deployment for a release:
+1. Create a release tag in GitHub: `git tag v1.0.0 && git push origin v1.0.0`
+2. Create a release from the tag in GitHub UI
+3. Vercel will automatically deploy the frontend
+
+**Note**: The backend (Rust API) is not deployed to Vercel and requires separate hosting.
+
+---
+
 ## 📄 License
 
 MIT — see `LICENSE`
