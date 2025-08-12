@@ -1,6 +1,31 @@
 /**
  * Comprehensive examples of all reusable patterns in the @tatou/ui package
  * This demonstrates layouts, headers, status systems, actions, and sidebar configurations
+ *
+ * ## Visual Examples Overview:
+ *
+ * 1. **MinimalSetupExample** - Complete OSS app with zero configuration (sidebar + header + search)
+ * 2. **SaaSExtensionExample** - Extended navigation and features for SAAS applications
+ * 3. **DashboardLayoutExample** - Dashboard layout with metrics cards and built-in padding
+ * 4. **MinimalLayoutExample** - Simple landing page layout without sidebar
+ * 5. **StatusExamples** - Status badge system with different states (passed, failed, running, etc.)
+ * 6. **CrudActionsExample** - Action buttons for edit, copy, delete, approve, archive
+ * 7. **CreateActionsExample** - Entity creation buttons for runs and definitions
+ * 8. **MinimalSidebar** - Sidebar-only setup for backwards compatibility
+ * 9. **CherryPickExample** - Custom navigation with selected OSS items + new features
+ * 10. **NextJsExample** - Integration example with Next.js Link components
+ * 11. **CustomThemeSaaSExample** - Purple-themed SAAS app with custom branding
+ * 12. **ThemePresetExample** - Interactive theme switcher showing all preset themes
+ *
+ * Each example demonstrates different aspects of the UI package's flexibility and reusability.
+ *
+ * ## Screenshots
+ *
+ * Visual screenshots for each example are documented in:
+ * - [SCREENSHOTS.md](./SCREENSHOTS.md) - Screenshot documentation and guidelines
+ * - [screenshots/](./screenshots/) - Directory containing actual screenshot files
+ *
+ * Each example below includes a 📸 comment describing what the screenshot shows.
  */
 
 import React from "react"
@@ -50,6 +75,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@tatou/ui"
 import {
   CreditCard,
@@ -65,6 +91,8 @@ import {
 // ===== COMPLETE APPLICATION LAYOUTS =====
 
 // Example 1: Minimal Setup - Complete App with Zero Configuration
+// 📸 SCREENSHOT: Shows full application with sidebar (Dashboard, Runs, Definitions, Executors),
+//    header with search bar and GitHub link, theme toggle, and main content area
 export function MinimalSetupExample() {
   return (
     <AppLayout>
@@ -77,6 +105,8 @@ export function MinimalSetupExample() {
 }
 
 // Example 2: SAAS Extension - Easy Extension of OSS Components
+// 📸 SCREENSHOT: Similar to Example 1 but with additional "Billing", "Team", "Analytics"
+//    in sidebar, "Upgrade" and "Support" buttons in header, and "SAAS Application" content
 export function SaaSExtensionExample() {
   // Extend navigation with SAAS features
   const saasNavigation: NavigationItem[] = [
@@ -150,6 +180,8 @@ export function SaaSExtensionExample() {
 // ===== LAYOUT VARIATIONS =====
 
 // Example 3: Dashboard Layout - Built-in padding for dashboards
+// 📸 SCREENSHOT: Dashboard with sidebar, header, and 3 metric cards in a grid layout
+//    showing "Metric 1: 1,234", "Metric 2: 567", "Metric 3: 89" with proper spacing
 export function DashboardLayoutExample() {
   return (
     <DashboardLayout>
@@ -185,6 +217,8 @@ export function DashboardLayoutExample() {
 }
 
 // Example 4: Minimal Layout - No sidebar for simple pages
+// 📸 SCREENSHOT: Clean layout with only header (no search), centered "Welcome" title
+//    and subtitle text, suitable for landing pages or marketing sites
 export function MinimalLayoutExample() {
   return (
     <MinimalLayout headerProps={{ showSearch: false }}>
@@ -201,6 +235,8 @@ export function MinimalLayoutExample() {
 // ===== STATUS SYSTEM EXAMPLES =====
 
 // Example 5: Status Badge Usage
+// 📸 SCREENSHOT: Row of status badges showing "✓ Passed" (green), "✗ Failed" (red),
+//    "⟳ Running" (blue), "⏸ Pending" (yellow), "⚠ Error" (red) with icons and colors
 export function StatusExamples() {
   const statuses: StatusType[] = ["passed", "failed", "running", "pending", "error"]
 
@@ -226,6 +262,8 @@ export function StatusExamples() {
 // ===== ACTION SYSTEM EXAMPLES =====
 
 // Example 6: CRUD Actions
+// 📸 SCREENSHOT: Row of action buttons - "Edit", "Copy", "Delete", "Approve", "Archive"
+//    with appropriate icons and different button styles (outline, ghost, etc.)
 export function CrudActionsExample() {
   const customActions = mergeActions(defaultCrudActions, [
     {
@@ -261,6 +299,8 @@ export function CrudActionsExample() {
 }
 
 // Example 7: Create Actions
+// 📸 SCREENSHOT: Two create action buttons - "New Run" and "New Definition"
+//    with play and document icons, showing entity creation patterns
 export function CreateActionsExample() {
   const runAction = getCreateAction("run")
   const definitionAction = getCreateAction("definition")
@@ -289,6 +329,8 @@ export function CreateActionsExample() {
 // ===== SIDEBAR-ONLY EXAMPLES =====
 
 // Example 8: Minimal Sidebar (for backwards compatibility)
+// 📸 SCREENSHOT: Simple layout with only sidebar and basic content, showing
+//    the sidebar component in isolation for existing applications
 export function MinimalSidebar() {
   return (
     <SidebarProvider>
@@ -304,6 +346,8 @@ export function MinimalSidebar() {
 }
 
 // Example 9: Cherry-Pick Navigation Items
+// 📸 SCREENSHOT: Sidebar with only "Dashboard", "Runs", and "Custom Feature" items,
+//    demonstrating selective use of OSS navigation plus custom additions
 export function CherryPickExample() {
   // Use only specific OSS navigation items + custom ones
   const customNav: NavigationItem[] = [
@@ -331,6 +375,8 @@ export function CherryPickExample() {
 // ===== FRAMEWORK INTEGRATION =====
 
 // Example 10: Next.js Integration Example
+// 📸 SCREENSHOT: Full application showing Next.js integration with custom Link component,
+//    active navigation state, and "Next.js Integration" content demonstrating framework compatibility
 export function NextJsExample() {
   // Simulated Next.js Link component
   const NextLink: React.FC<{
@@ -364,6 +410,8 @@ export function NextJsExample() {
 // ===== THEMING EXAMPLES =====
 
 // Example 11: Custom Themed SAAS Application
+// 📸 SCREENSHOT: Full SAAS app with purple theme colors, rounded corners, extended
+//    navigation (Billing, Team, Analytics), Upgrade button, and 3 feature cards showing custom branding
 export function CustomThemeSaaSExample() {
   return (
     <AppLayout
@@ -438,6 +486,9 @@ export function CustomThemeSaaSExample() {
 }
 
 // Example 12: Theme Preset Showcase
+// 📸 SCREENSHOT: Interactive example with theme switching button in header,
+//    showing color showcase card with Primary/Secondary/Outline/Destructive badges and buttons.
+//    Theme cycles through: default, modern, corporate, minimal
 export function ThemePresetExample() {
   const [currentTheme, setCurrentTheme] = React.useState<keyof typeof themePresets>("default")
 
