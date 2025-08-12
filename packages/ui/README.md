@@ -1,29 +1,38 @@
 # @tatou/ui
 
-Reusable UI components for SparkTest applications.
+Comprehensive UI package for building SparkTest applications with minimal setup. Transform basic components into complete applications with full theming, navigation, and reusable patterns.
 
 ## Overview
 
-This package contains a comprehensive set of UI components built with:
+This package provides **multiple levels of reusability** - from individual components to complete application frameworks:
+
+- **Complete Applications** - Zero-config layouts with sidebar, header, search, theming
+- **Configurable Components** - AppSidebar, AppHeader, Status systems, Action patterns
+- **Full Theming System** - Brand colors, theme presets, runtime theme switching
+- **SAAS Extension** - Easy extension of OSS defaults for commercial applications
+
+Built with:
 
 - **React** - UI framework
 - **Radix UI** - Accessible component primitives
 - **Tailwind CSS** - Utility-first CSS framework
-- **TypeScript** - Type safety
+- **TypeScript** - Complete type safety
 
 ## Installation
 
-This package is part of the SparkTest monorepo. Install dependencies:
-
 ```bash
-pnpm install
+# In your project
+npm install @tatou/ui
+
+# Peer dependencies (likely already installed)
+npm install react react-dom typescript
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
-### 🎯 Complete Application (Zero Configuration)
+### Complete Application (Zero Configuration)
 
-For the easiest setup, use the complete `AppLayout`:
+The easiest way to get started - full application with sidebar, header, search, and theming:
 
 ```tsx
 import { AppLayout } from "@tatou/ui"
@@ -33,36 +42,128 @@ function App({ children }) {
 }
 ```
 
-This gives you a complete application with sidebar, header, search, theme toggle, and notifications.
+### SAAS Extension (Minimal Setup)
 
-### 🎨 Header with Search and Actions
+Extend OSS defaults with your own features and branding:
 
 ```tsx
-import { AppHeader, defaultHeaderActions } from "@tatou/ui"
-;<AppHeader
-  onSearch={async (query) => await searchEntities(query)}
-  onThemeToggle={() => toggleTheme()}
+import { AppLayout, defaultNavigationItems, createBrandTheme } from "@tatou/ui"
+
+const saasConfig = {
+  themeConfig: createBrandTheme(280, 85), // Purple brand
+  sidebarProps: {
+    navigationItems: [...defaultNavigationItems, billingNav, teamNav],
+    createItems: [...defaultCreateItems, inviteUser, newInvoice],
+  },
+  headerProps: {
+    actions: [...defaultHeaderActions, upgradeAction, supportAction],
+  },
+}
+
+function SaasApp({ children }) {
+  return <AppLayout {...saasConfig}>{children}</AppLayout>
+}
+```
+
+## 🎯 Reusable Application Patterns
+
+### Complete Layouts
+
+#### AppLayout - Full Application Framework
+
+```tsx
+import { AppLayout } from "@tatou/ui"
+
+// Zero configuration - includes sidebar, header, search, themes
+<AppLayout>{children}</AppLayout>
+
+// With customization
+<AppLayout
+  themeConfig={yourBrandTheme}
+  sidebarProps={{ navigationItems: customNav }}
+  headerProps={{ actions: customActions }}
+>
+  {children}
+</AppLayout>
+```
+
+#### DashboardLayout - Dashboard-Specific Layout
+
+```tsx
+import { DashboardLayout } from "@tatou/ui"
+
+;<DashboardLayout>{dashboardContent}</DashboardLayout>
+```
+
+#### MinimalLayout - Landing Pages & Marketing
+
+```tsx
+import { MinimalLayout } from "@tatou/ui"
+
+;<MinimalLayout>{landingPageContent}</MinimalLayout>
+```
+
+### Configurable Header System
+
+```tsx
+import { AppHeader, defaultHeaderActions, defaultSearchConfig } from "@tatou/ui"
+
+// Default setup
+<AppHeader
+  searchConfig={defaultSearchConfig}
   actions={defaultHeaderActions}
+/>
+
+// Custom search and actions
+<AppHeader
+  onSearch={async (query) => await searchEntities(query)}
+  actions={[...defaultHeaderActions, customAction]}
+  showThemeToggle={true}
 />
 ```
 
-### 📊 Status System
+### Status Configuration System
 
 ```tsx
-import { defaultStatusConfig, getStatusConfig } from '@tatou/ui'
+import { StatusBadge, getStatusConfig, defaultStatusConfig } from "@tatou/ui"
 
-const config = getStatusConfig(status)
-const StatusIcon = config.icon
+// Use default status styling
+<StatusBadge status="passed" config={defaultStatusConfig} />
 
-<Badge className={config.badge}>
-  <StatusIcon className="h-3 w-3 mr-1" />
-  {config.label}
-</Badge>
+// Get specific status configuration
+const statusConfig = getStatusConfig("failed")
+<div className={statusConfig.className}>{statusConfig.label}</div>
+
+// Alternative configurations
+import { minimalStatusConfig, compactStatusConfig } from "@tatou/ui"
 ```
 
-### 🛠️ Sidebar Configuration
+### Action Configuration System
 
-For sidebar-only setup or customization:
+```tsx
+import {
+  defaultCrudActions,
+  defaultCreateActions,
+  defaultBulkActions,
+  getCreateAction,
+} from "@tatou/ui"
+
+// Standard CRUD operations
+const actions = defaultCrudActions // edit, copy, delete
+
+// Entity creation
+const createActions = defaultCreateActions // runs, definitions, executors
+
+// Bulk operations
+const bulkActions = defaultBulkActions // delete selected, export
+
+// Get specific action
+const newRunAction = getCreateAction("run")
+```
+
+## 📊 AppSidebar Usage
+
+### Basic Usage (Zero Config)
 
 ```tsx
 import { AppSidebar, SidebarProvider, SidebarInset } from "@tatou/ui"
@@ -77,59 +178,154 @@ function Layout({ children }) {
 }
 ```
 
-This gives you the complete OSS sidebar with Dashboard, Runs, Definitions, Suites, Executors navigation, create menu, and settings.
-
-### Extending for SAAS
-
-Easily extend the default navigation for SAAS applications:
+### Extending OSS Navigation
 
 ```tsx
-import { AppSidebar, defaultNavigationItems, type NavigationItem } from "@tatou/ui"
+import { AppSidebar, defaultNavigationItems } from "@tatou/ui"
 import { CreditCard, Users } from "lucide-react"
 
-const saasNavigation: NavigationItem[] = [
-  ...defaultNavigationItems, // Keep OSS defaults
-  {
-    title: "Billing",
-    url: "/billing",
-    icon: CreditCard,
-  },
-  {
-    title: "Team",
-    url: "/team",
-    icon: Users,
-  },
+const saasNavigation = [
+  ...defaultNavigationItems, // Keep all OSS links
+  { title: "Billing", url: "/billing", icon: CreditCard },
+  { title: "Team", url: "/team", icon: Users },
 ]
 
-function SaasSidebar({ pathname }) {
-  return <AppSidebar navigationItems={saasNavigation} pathname={pathname} />
+<AppSidebar navigationItems={saasNavigation} />
+```
+
+### Cherry-Pick Navigation Items
+
+```tsx
+const customNav = [
+  defaultNavigationItems[0], // Keep Dashboard
+  defaultNavigationItems[1], // Keep Runs
+  { title: "Custom Feature", url: "/custom", icon: MyIcon },
+]
+
+<AppSidebar navigationItems={customNav} />
+```
+
+### Custom Create Menu
+
+```tsx
+import { defaultCreateItems } from "@tatou/ui"
+
+const saasCreateItems = [
+  ...defaultCreateItems,
+  { title: "New Invoice", icon: Receipt, action: () => createInvoice() },
+  { title: "Invite User", icon: UserPlus, action: () => openInviteModal() },
+]
+
+<AppSidebar createItems={saasCreateItems} />
+```
+
+## 🎨 Complete Theme Customization
+
+### Theme Presets
+
+```tsx
+import { AppLayout, modernThemeConfig, corporateThemeConfig } from "@tatou/ui"
+
+// Modern purple theme
+<AppLayout themeConfig={modernThemeConfig}>{children}</AppLayout>
+
+// Corporate blue theme
+<AppLayout themeConfig={corporateThemeConfig}>{children}</AppLayout>
+```
+
+### Brand Colors from Palette
+
+```tsx
+import { createBrandTheme } from "@tatou/ui"
+
+// Create theme from HSL hue (0-360) and saturation (0-100)
+const purpleBrand = createBrandTheme(280, 85)  // Purple
+const greenBrand = createBrandTheme(142, 76)   // Green
+const blueBrand = createBrandTheme(200, 80)    // Blue
+
+<AppLayout themeConfig={purpleBrand}>{children}</AppLayout>
+```
+
+### Complete Custom Colors
+
+```tsx
+import { createCustomTheme } from "@tatou/ui"
+
+const customTheme = createCustomTheme({
+  colors: {
+    light: {
+      primary: "142.1 76.2% 36.3%",     // Your green
+      accent: "24.6 95% 53.1%",         // Your orange
+      background: "0 0% 100%",          // Pure white
+      foreground: "222.2 84% 4.9%",     // Dark text
+      secondary: "210 40% 98%",         // Light gray
+      muted: "210 40% 96%",             // Muted background
+      // ... customize any of 24+ color properties
+    },
+    dark: {
+      primary: "142.1 70.6% 45.3%",     // Lighter green for dark mode
+      accent: "24.6 95% 63.1%",         // Lighter orange
+      background: "222.2 84% 4.9%",     // Dark background
+      foreground: "210 40% 98%",        // Light text
+      // ... dark mode variations
+    },
+  },
+  borderRadius: {
+    radius: "1rem" // Custom corner rounding
+  },
+})
+
+<AppLayout themeConfig={customTheme}>{children}</AppLayout>
+```
+
+### Runtime Theme Switching
+
+```tsx
+import { useTheme } from "@tatou/ui"
+
+function ThemeSelector() {
+  const { setConfig } = useTheme()
+
+  return (
+    <select onChange={(e) => setConfig(themes[e.target.value])}>
+      <option value="default">Default</option>
+      <option value="modern">Modern</option>
+      <option value="corporate">Corporate</option>
+    </select>
+  )
 }
 ```
 
-See [REUSABLE_PATTERNS.md](./REUSABLE_PATTERNS.md) for comprehensive examples of all reusable patterns, [SIDEBAR_USAGE.md](./SIDEBAR_USAGE.md) for sidebar-specific examples, and [EXAMPLES.tsx](./EXAMPLES.tsx) for live code samples.
+### Available Theme Properties
 
-## Components
+You can customize these color properties in light and dark modes:
 
-The package exports a wide range of components including:
+**Core Colors:**
 
-### 🚀 Application Framework Components
+- `primary`, `secondary`, `accent` - Main brand colors
+- `background`, `foreground` - Base background and text
+- `muted`, `mutedForeground` - Subtle backgrounds and text
 
-- `AppLayout` - **NEW!** Complete application layout with sidebar + header
-- `AppSidebar` - **NEW!** Configurable application sidebar with navigation
-- `AppHeader` - **NEW!** Configurable header with search and actions
-- `DashboardLayout` - **NEW!** Dashboard-specific layout with padding
-- `MinimalLayout` - **NEW!** Simple layout without sidebar
+**Semantic Colors:**
 
-### 📋 Default Configurations (Extendable)
+- `destructive`, `destructiveForeground` - Error states
+- `success`, `successForeground` - Success states
+- `warning`, `warningForeground` - Warning states
 
-- `defaultNavigationItems` - OSS navigation (Dashboard, Runs, Definitions, Suites, Executors)
-- `defaultCreateItems` - Create menu items (New Run, New Definition, New Executor)
-- `defaultHeaderActions` - Header actions (GitHub link, theme toggle)
-- `defaultStatusConfig` - Status styling (passed, failed, running, pending, etc.)
-- `defaultCrudActions` - CRUD operations (edit, copy, delete)
-- `defaultQueryClient` - React Query configuration
+**Component Colors:**
 
-### Basic Components
+- `card`, `cardForeground` - Card backgrounds
+- `popover`, `popoverForeground` - Popover backgrounds
+- `border`, `input`, `ring` - Border and focus colors
+- `sidebar*` - Sidebar-specific color system
+
+**Spacing & Layout:**
+
+- `borderRadius.radius` - Global border radius
+
+## 🎯 Basic Components
+
+All the standard UI primitives you need:
 
 - `Button` - Customizable button component
 - `Input` - Form input component
@@ -207,10 +403,37 @@ function MyComponent() {
 }
 ```
 
-## Styling
+## Development
 
-Components use Tailwind CSS classes and CSS variables for theming. Make sure your application has Tailwind CSS configured and includes the necessary CSS variables for theming.
+This package is part of the SparkTest monorepo. To develop:
 
-## TypeScript
+```bash
+# Install dependencies
+pnpm install
 
-All components are fully typed with TypeScript for better development experience and type safety.
+# Build the package
+pnpm --filter "@tatou/ui" build
+
+# Start development
+pnpm --filter "@tatou/ui" dev
+```
+
+## Styling Requirements
+
+Components use Tailwind CSS classes and CSS variables for theming. Ensure your application includes:
+
+1. **Tailwind CSS** configured with the UI package's color scheme
+2. **CSS Variables** for theming (automatically included with AppLayout)
+3. **Border radius variables** for consistent corner rounding
+
+## TypeScript Support
+
+All components are fully typed with TypeScript for excellent developer experience and complete type safety.
+
+## Examples
+
+See [EXAMPLES.tsx](./EXAMPLES.tsx) for comprehensive usage examples of all components and patterns.
+
+## License
+
+MIT License - see the LICENSE file for details.
