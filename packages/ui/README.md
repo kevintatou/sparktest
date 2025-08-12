@@ -91,7 +91,6 @@ import { AppLayout } from "@tatou/ui"
 
 ```tsx
 import { DashboardLayout } from "@tatou/ui"
-
 ;<DashboardLayout>{dashboardContent}</DashboardLayout>
 ```
 
@@ -99,7 +98,6 @@ import { DashboardLayout } from "@tatou/ui"
 
 ```tsx
 import { MinimalLayout } from "@tatou/ui"
-
 ;<MinimalLayout>{landingPageContent}</MinimalLayout>
 ```
 
