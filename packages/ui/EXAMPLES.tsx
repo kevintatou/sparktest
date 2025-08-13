@@ -1,31 +1,217 @@
 /**
- * Comprehensive examples of all reusable patterns in the @tatou/ui package
- * This demonstrates layouts, headers, status systems, actions, and sidebar configurations
+ * @tatou/ui - Comprehensive Usage Examples & Documentation
  *
- * ## Visual Examples Overview:
+ * This file contains both live React examples and complete documentation for all components
+ * and patterns in the @tatou/ui package. It serves as the single source of truth for
+ * usage examples, patterns, and visual demonstrations.
  *
- * 1. **MinimalSetupExample** - Complete OSS app with zero configuration (sidebar + header + search)
+ * ## 🚀 Complete Application Layouts
+ *
+ * ### AppLayout - Full Application Framework
+ * Zero configuration - includes sidebar, header, search, themes:
+ * ```tsx
+ * import { AppLayout } from "@tatou/ui"
+ * function App({ children }) {
+ *   return <AppLayout>{children}</AppLayout>
+ * }
+ * ```
+ *
+ * With customization:
+ * ```tsx
+ * <AppLayout
+ *   themeConfig={yourBrandTheme}
+ *   sidebarProps={{ navigationItems: customNav }}
+ *   headerProps={{ actions: customActions }}
+ * >
+ *   {children}
+ * </AppLayout>
+ * ```
+ *
+ * ### DashboardLayout - Dashboard-Specific Layout
+ * ```tsx
+ * import { DashboardLayout } from "@tatou/ui"
+ * function Dashboard() {
+ *   return <DashboardLayout>{dashboardContent}</DashboardLayout>
+ * }
+ * ```
+ *
+ * ### MinimalLayout - Landing Pages & Marketing
+ * ```tsx
+ * import { MinimalLayout } from "@tatou/ui"
+ * function LandingPage() {
+ *   return <MinimalLayout>{landingPageContent}</MinimalLayout>
+ * }
+ * ```
+ *
+ * ## 📊 AppSidebar Usage
+ *
+ * ### Basic Usage (Zero Config)
+ * ```tsx
+ * import { AppSidebar, SidebarProvider, SidebarInset } from "@tatou/ui"
+ * function Layout({ children }) {
+ *   return (
+ *     <SidebarProvider>
+ *       <AppSidebar />
+ *       <SidebarInset>{children}</SidebarInset>
+ *     </SidebarProvider>
+ *   )
+ * }
+ * ```
+ *
+ * ### Extending OSS Navigation
+ * ```tsx
+ * import { AppSidebar, defaultNavigationItems } from "@tatou/ui"
+ * import { CreditCard, Users } from "lucide-react"
+ *
+ * const saasNavigation = [
+ *   ...defaultNavigationItems, // Keep all OSS links
+ *   { title: "Billing", url: "/billing", icon: CreditCard },
+ *   { title: "Team", url: "/team", icon: Users },
+ * ]
+ * <AppSidebar navigationItems={saasNavigation} />
+ * ```
+ *
+ * ### Cherry-Pick Navigation Items
+ * ```tsx
+ * const customNav = [
+ *   defaultNavigationItems[0], // Keep Dashboard
+ *   defaultNavigationItems[1], // Keep Runs
+ *   { title: "Custom Feature", url: "/custom", icon: MyIcon },
+ * ]
+ * <AppSidebar navigationItems={customNav} />
+ * ```
+ *
+ * ## 🎨 Configurable Header System
+ * ```tsx
+ * import { AppHeader, defaultHeaderActions, defaultSearchConfig } from "@tatou/ui"
+ *
+ * // Default setup
+ * <AppHeader
+ *   searchConfig={defaultSearchConfig}
+ *   actions={defaultHeaderActions}
+ * />
+ *
+ * // Custom search and actions
+ * <AppHeader
+ *   onSearch={async (query) => await searchEntities(query)}
+ *   actions={[...defaultHeaderActions, customAction]}
+ *   showThemeToggle={true}
+ * />
+ * ```
+ *
+ * ## 📊 Status Configuration System
+ * ```tsx
+ * import { StatusBadge, getStatusConfig, defaultStatusConfig } from "@tatou/ui"
+ *
+ * // Use default status styling
+ * <StatusBadge status="passed" config={defaultStatusConfig} />
+ *
+ * // Get specific status configuration
+ * const statusConfig = getStatusConfig("failed")
+ * <div className={statusConfig.className}>{statusConfig.label}</div>
+ * ```
+ *
+ * ## ⚡ Action Configuration System
+ * ```tsx
+ * import {
+ *   defaultCrudActions,
+ *   defaultCreateActions,
+ *   defaultBulkActions,
+ *   getCreateAction,
+ * } from "@tatou/ui"
+ *
+ * // Standard CRUD operations
+ * const actions = defaultCrudActions // edit, copy, delete
+ *
+ * // Entity creation
+ * const createActions = defaultCreateActions // runs, definitions, executors
+ *
+ * // Get specific action
+ * const newRunAction = getCreateAction("run")
+ * ```
+ *
+ * ## 🎨 Complete Theme Customization
+ *
+ * ### Theme Presets
+ * ```tsx
+ * import { AppLayout, modernThemeConfig, corporateThemeConfig } from "@tatou/ui"
+ *
+ * // Modern purple theme
+ * <AppLayout themeConfig={modernThemeConfig}>{children}</AppLayout>
+ *
+ * // Corporate blue theme
+ * <AppLayout themeConfig={corporateThemeConfig}>{children}</AppLayout>
+ * ```
+ *
+ * ### Brand Colors from Palette
+ * ```tsx
+ * import { createBrandTheme } from "@tatou/ui"
+ *
+ * // Create theme from HSL hue (0-360) and saturation (0-100)
+ * const purpleBrand = createBrandTheme(280, 85)  // Purple
+ * const greenBrand = createBrandTheme(142, 76)   // Green
+ * const blueBrand = createBrandTheme(200, 80)    // Blue
+ *
+ * <AppLayout themeConfig={purpleBrand}>{children}</AppLayout>
+ * ```
+ *
+ * ### Complete Custom Colors
+ * ```tsx
+ * import { createCustomTheme } from "@tatou/ui"
+ *
+ * const customTheme = createCustomTheme({
+ *   colors: {
+ *     light: {
+ *       primary: "142.1 76.2% 36.3%",     // Your green
+ *       accent: "24.6 95% 53.1%",         // Your orange
+ *       background: "0 0% 100%",          // Pure white
+ *       foreground: "222.2 84% 4.9%",     // Dark text
+ *       // ... customize any of 24+ color properties
+ *     },
+ *     dark: {
+ *       primary: "142.1 70.6% 45.3%",     // Lighter green for dark mode
+ *       // ... dark mode variations
+ *     },
+ *   },
+ *   borderRadius: { radius: "1rem" }       // Custom corner rounding
+ * })
+ * <AppLayout themeConfig={customTheme}>{children}</AppLayout>
+ * ```
+ *
+ * ### Runtime Theme Switching
+ * ```tsx
+ * import { useTheme } from "@tatou/ui"
+ *
+ * function ThemeSelector() {
+ *   const { setConfig } = useTheme()
+ *   return (
+ *     <select onChange={(e) => setConfig(themes[e.target.value])}>
+ *       <option value="default">Default</option>
+ *       <option value="modern">Modern</option>
+ *       <option value="corporate">Corporate</option>
+ *     </select>
+ *   )
+ * }
+ * ```
+ *
+ * ## Live Visual Examples
+ *
+ * The examples below demonstrate all patterns with live React components:
+ *
+ * 1. **MinimalSetupExample** - Complete OSS app with zero configuration
  * 2. **SaaSExtensionExample** - Extended navigation and features for SAAS applications
- * 3. **DashboardLayoutExample** - Dashboard layout with metrics cards and built-in padding
+ * 3. **DashboardLayoutExample** - Dashboard layout with metrics cards
  * 4. **MinimalLayoutExample** - Simple landing page layout without sidebar
- * 5. **StatusExamples** - Status badge system with different states (passed, failed, running, etc.)
- * 6. **CrudActionsExample** - Action buttons for edit, copy, delete, approve, archive
- * 7. **CreateActionsExample** - Entity creation buttons for runs and definitions
+ * 5. **StatusExamples** - Status badge system with different states
+ * 6. **CrudActionsExample** - Action buttons for edit, copy, delete
+ * 7. **CreateActionsExample** - Entity creation buttons
  * 8. **MinimalSidebar** - Sidebar-only setup for backwards compatibility
- * 9. **CherryPickExample** - Custom navigation with selected OSS items + new features
+ * 9. **CherryPickExample** - Custom navigation with selected items
  * 10. **NextJsExample** - Integration example with Next.js Link components
  * 11. **CustomThemeSaaSExample** - Purple-themed SAAS app with custom branding
- * 12. **ThemePresetExample** - Interactive theme switcher showing all preset themes
+ * 12. **ThemePresetExample** - Interactive theme switcher
  *
- * Each example demonstrates different aspects of the UI package's flexibility and reusability.
- *
- * ## Screenshots
- *
- * Visual screenshots for each example are documented in:
- * - [SCREENSHOTS.md](./SCREENSHOTS.md) - Screenshot documentation and guidelines
- * - [screenshots/](./screenshots/) - Directory containing actual screenshot files
- *
- * Each example below includes a 📸 comment describing what the screenshot shows.
+ * Each example includes a 📸 comment describing the visual appearance.
  */
 
 import React from "react"
