@@ -1,0 +1,55 @@
+name: Deploy to Vercel on Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: # Allow manual deployment
+
+jobs:
+  deploy-vercel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build workspace packages
+        run: |
+          echo "Building core package..."
+          pnpm --filter '@tatou/core' build
+          echo "Building UI package..."  
+          pnpm --filter '@tatou/ui' build
+          echo "Building storage-service package..."
+          pnpm --filter '@tatou/storage-service' build
+
+      - name: Build application for Vercel
+        run: pnpm --filter "@tatou/oss" build
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: apps/oss
+          vercel-args: "--prod"
+
+      - name: Deployment summary
+        run: |
+          echo "✅ SparkTest deployed to Vercel successfully!"
+          echo "🌐 Production URL: https://sparktest.vercel.app"
+          echo "🏷️  Release version: ${{ github.event.release.tag_name }}"

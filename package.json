@@ -5,10 +5,11 @@
   "description": "SparkTest monorepo for OSS packages and application",
   "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
   "scripts": {
-    "build": "pnpm build:core && pnpm build:storage-service",
+    "build": "pnpm build:core && pnpm build:ui && pnpm build:storage-service",
     "build:core": "pnpm --filter '@tatou/core' build",
+    "build:ui": "pnpm --filter '@tatou/ui' build",
     "build:storage-service": "pnpm --filter '@tatou/storage-service' build",
-    "build:packages": "pnpm build:core && pnpm build:storage-service",
+    "build:packages": "pnpm build:core && pnpm build:ui && pnpm build:storage-service",
     "build:app": "pnpm --filter '@tatou/oss' build",
     "dev": "pnpm --filter '@tatou/oss' dev",
     "dev:backend": "cargo run -p sparktest-bin --manifest-path backend/bin/Cargo.toml",

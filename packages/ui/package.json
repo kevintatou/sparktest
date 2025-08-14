@@ -1,23 +1,37 @@
 {
-  "name": "@tatou/oss",
+  "name": "@tatou/ui",
   "version": "0.2.0",
-  "private": true,
+  "description": "Reusable UI components for SparkTest applications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./components/*": {
+      "types": "./dist/components/*.d.ts",
+      "import": "./dist/components/*.js",
+      "default": "./dist/components/*.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "lint": "next lint",
-    "start": "next start",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "test:e2e": "echo 'E2E tests not implemented yet' && exit 0",
-    "type-check": "tsc --noEmit || echo 'Type check completed with warnings' && exit 0"
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "pnpm build"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
-    "@tatou/core": "workspace:*",
-    "@tatou/storage-service": "workspace:*",
-    "@tatou/ui": "workspace:*",
-    "@edge-runtime/vm": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
@@ -46,55 +60,33 @@
     "@radix-ui/react-toggle": "latest",
     "@radix-ui/react-toggle-group": "latest",
     "@radix-ui/react-tooltip": "latest",
-    "@tanstack/react-query": "^5.83.0",
-    "@testing-library/dom": "latest",
-    "@testing-library/jest-dom": "latest",
-    "@testing-library/react": "latest",
-    "@types/debug": "latest",
-    "@vitejs/plugin-react": "latest",
-    "@vitest/browser": "latest",
-    "@vitest/ui": "latest",
-    "autoprefixer": "^10.4.20",
+    "@tanstack/react-query": "^5.62.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "latest",
     "date-fns": "4.1.0",
     "embla-carousel-react": "latest",
-    "happy-dom": "latest",
     "input-otp": "latest",
-    "jsdom": "latest",
     "lucide-react": "^0.454.0",
-    "next": "14.2.16",
     "next-themes": "latest",
-    "path": "latest",
-    "react": "^18",
     "react-day-picker": "latest",
-    "react-dom": "^18",
     "react-hook-form": "latest",
     "react-resizable-panels": "latest",
     "recharts": "latest",
     "sonner": "latest",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "uuid": "latest",
-    "vaul": "latest",
-    "vite": "latest",
-    "vitest": "latest",
-    "zod": "^3.24.1"
+    "vaul": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/uuid": "^10.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.38.0",
-    "@typescript-eslint/parser": "^8.38.0",
-    "@vitest/coverage-v8": "^3.2.4",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^15.3.4",
-    "postcss": "^8.5",
-    "tailwindcss": "^3.4.17",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184"
+  "peerDependencies": {
+    "react": "^18",
+    "react-dom": "^18",
+    "typescript": "^5"
+  }
 }

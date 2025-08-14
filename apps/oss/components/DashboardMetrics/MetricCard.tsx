@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@tatou/ui"
 import { TrendChart } from "@/components/trend-chart"
 import { COLOR_SCHEMES, type MetricCardProps } from "./metricsUtils"
 

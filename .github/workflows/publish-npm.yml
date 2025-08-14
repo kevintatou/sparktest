@@ -64,3 +64,8 @@ jobs:
         run: cd packages/storage-service && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @tatou/ui
+        run: cd packages/ui && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
