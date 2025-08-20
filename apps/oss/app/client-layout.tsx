@@ -1,39 +1,57 @@
 "use client"
 
 import type React from "react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-
-import { SimpleSidebar } from "@/components/simple-sidebar"
-import { TopHeader } from "@/components/top-header"
+import { usePathname } from "next/navigation"
+import Link from "next/link"
+import { useTheme } from "next-themes"
+import { AppLayout } from "@tatou/ui"
 import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
-import { SidebarProvider } from "@/contexts/sidebar-context"
-
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
-    },
-  },
-})
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const { setTheme, theme } = useTheme()
+
+  // Custom Link component for Next.js
+  const NextLink = ({ href, children, className }: {
+    href: string
+    children: React.ReactNode
+    className?: string
+  }) => (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
+  )
+
+  // Handle theme toggle
+  const handleThemeToggle = () => {
+    setTheme(theme === "dark" ? "light" : "dark")
+  }
+
+  // Handle search (placeholder implementation)
+  const handleSearch = async (query: string) => {
+    // This would typically search across runs, definitions, etc.
+    // For now, return empty results
+    return []
+  }
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <SidebarProvider>
-          <div className="flex h-screen bg-background">
-            <SimpleSidebar />
-            <div className="flex flex-1 flex-col overflow-hidden lg:ml-0">
-              <TopHeader />
-              <main className="flex-1 overflow-auto">{children}</main>
-            </div>
-          </div>
-          <Toaster />
-        </SidebarProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <AppLayout 
+      sidebarProps={{ 
+        pathname,
+        LinkComponent: NextLink
+      }}
+      headerProps={{
+        LinkComponent: NextLink,
+        onThemeToggle: handleThemeToggle,
+        onSearch: handleSearch
+      }}
+      themeProvider={({ children }) => (
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
+      )}
+    >
+      {children}
+    </AppLayout>
   )
 }
