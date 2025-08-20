@@ -25,13 +25,24 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint:all": "pnpm lint && pnpm format:check",
-    "fix": "pnpm format && pnpm lint"
+    "fix": "pnpm format && pnpm lint",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "changeset publish",
+    "changeset:status": "changeset status",
+    "cargo-changeset": "./scripts/cargo-changeset.sh",
+    "cargo-changeset:add": "./scripts/cargo-changeset.sh add",
+    "cargo-changeset:status": "./scripts/cargo-changeset.sh status",
+    "cargo-changeset:version": "./scripts/cargo-changeset.sh version",
+    "cargo-changeset:publish": "./scripts/cargo-changeset.sh publish"
   },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.1",
+    "@changesets/cli": "^2.29.6",
     "concurrently": "^7.6.0",
     "prettier": "^3.6.2",
     "tsup": "^8.5.0",
