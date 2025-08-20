@@ -5,6 +5,7 @@ This document describes how to use changesets for managing independent versionin
 ## Overview
 
 The SparkTest monorepo contains:
+
 - **NPM packages**: `@tatou/core`, `@tatou/storage-service`, `@tatou/ui`
 - **Cargo crates**: `sparktest-core`, `sparktest-api`, `sparktest-bin`
 
@@ -30,6 +31,7 @@ pnpm run changeset
 ```
 
 This will:
+
 1. Ask which packages have changes
 2. Ask what type of change (patch/minor/major)
 3. Ask for a description of changes
@@ -79,6 +81,7 @@ pnpm run cargo-changeset:add
 ```
 
 This will:
+
 1. Show available crates (sparktest-core, sparktest-api, sparktest-bin)
 2. Ask which crates have changes
 3. Ask what type of change (patch/minor/major)
@@ -152,6 +155,7 @@ When a tag is pushed:
 1. **Make changes** to `packages/core/src/index.ts`
 
 2. **Create NPM changeset**:
+
    ```bash
    pnpm changeset
    # Select: @tatou/core
@@ -160,6 +164,7 @@ When a tag is pushed:
    ```
 
 3. **Apply changeset**:
+
    ```bash
    pnpm changeset:version
    # This bumps @tatou/core from 0.2.0 to 0.3.0
@@ -167,6 +172,7 @@ When a tag is pushed:
    ```
 
 4. **Commit and tag**:
+
    ```bash
    git add .
    git commit -m "Release @tatou/core v0.3.0"
@@ -183,12 +189,13 @@ When a tag is pushed:
 1. **Make changes** to both `packages/core` and `backend/api`
 
 2. **Create changesets**:
+
    ```bash
    # NPM changeset
    pnpm changeset
    # Select: @tatou/core
    # Type: patch
-   
+
    # Cargo changeset
    pnpm run cargo-changeset:add
    # Select: sparktest-api
@@ -196,12 +203,14 @@ When a tag is pushed:
    ```
 
 3. **Apply changesets**:
+
    ```bash
    pnpm changeset:version
    pnpm run cargo-changeset:version
    ```
 
 4. **Commit and tag**:
+
    ```bash
    git add .
    git commit -m "Release multiple packages"
@@ -217,17 +226,20 @@ When a tag is pushed:
 ## Best Practices
 
 ### 1. Create changesets for every change
+
 - Always create a changeset when modifying packages
 - Be descriptive in changeset descriptions
 - Choose appropriate semver levels (patch/minor/major)
 
 ### 2. Review changeset status before releasing
+
 ```bash
 pnpm changeset:status
 pnpm run cargo-changeset:status
 ```
 
 ### 3. Test locally before publishing
+
 ```bash
 # Build all packages
 pnpm build:packages
@@ -237,11 +249,13 @@ cd backend && cargo test
 ```
 
 ### 4. Use consistent commit messages
+
 ```bash
 git commit -m "Release packages [changeset]"
 ```
 
 ### 5. Tag releases meaningfully
+
 ```bash
 # Use semantic versioning for tags
 git tag v0.3.0  # Major release
@@ -281,6 +295,7 @@ cargo search sparktest-core
 If you get version conflicts:
 
 1. **Check if version already exists**:
+
    ```bash
    npm view @tatou/core versions --json
    cargo search sparktest-core

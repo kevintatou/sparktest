@@ -59,7 +59,7 @@ jobs:
         run: |
           echo "Checking changeset status..."
           npx changeset status
-          
+
           # Check if there are any changesets to publish
           if npx changeset status --output=json | jq -e '.releases | length > 0' > /dev/null; then
             echo "HAS_CHANGESETS=true" >> $GITHUB_ENV

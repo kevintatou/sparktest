@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "Checking cargo changeset status..."
           ./scripts/cargo-changeset.sh status
-          
+
           # Check if any crates need to be published
           if [[ -d .cargo-changesets ]] && [[ $(find .cargo-changesets -name "*.md" 2>/dev/null | wc -l) -gt 0 ]]; then
             echo "HAS_CARGO_CHANGESETS=true" >> $GITHUB_ENV
@@ -63,10 +63,10 @@ jobs:
         if: env.HAS_CARGO_CHANGESETS == 'false'
         run: |
           echo "No changesets found, checking if crates need individual publishing..."
-          
+
           # Check each crate individually to see if it needs publishing
           cd backend
-          
+
           # Function to check if a version is already published
           check_and_publish() {
             local crate_name="$1"
@@ -105,7 +105,7 @@ jobs:
               fi
             fi
           }
-          
+
           # Publish in dependency order
           check_and_publish "sparktest-core" "core"
           check_and_publish "sparktest-api" "api"
