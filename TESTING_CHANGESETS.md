@@ -5,6 +5,7 @@ This guide explains how to test the changeset-based deployment system without ac
 ## Quick Test Commands
 
 ### Test Everything
+
 Run a comprehensive test of the entire changeset system:
 
 ```bash
@@ -13,6 +14,7 @@ pnpm run changeset:test
 ```
 
 ### Test NPM Changesets
+
 ```bash
 # Check changeset status (safe - no changes)
 pnpm changeset:status
@@ -22,6 +24,7 @@ pnpm changeset:publish --dry-run
 ```
 
 ### Test Cargo Changesets
+
 ```bash
 # Test the cargo changeset system
 pnpm run cargo-changeset:test
@@ -48,6 +51,7 @@ pnpm run changeset:test
 ```
 
 This will check:
+
 - ✅ Package.json scripts are properly configured
 - ✅ NPM changeset configuration is valid
 - ✅ Cargo changeset script works correctly
@@ -59,6 +63,7 @@ This will check:
 ### 2. Test Changeset Creation
 
 #### NPM Packages
+
 ```bash
 # Interactive changeset creation (you can cancel without saving)
 pnpm changeset
@@ -69,6 +74,7 @@ pnpm changeset:status
 ```
 
 #### Cargo Crates
+
 ```bash
 # Test the cargo changeset system first
 pnpm run cargo-changeset:test
@@ -89,7 +95,7 @@ Test what version changes would be applied:
 # NPM packages - preview version changes
 pnpm changeset version --dry-run
 
-# Cargo crates - preview version changes  
+# Cargo crates - preview version changes
 pnpm run cargo-changeset version --dry-run --verbose
 ```
 
@@ -123,19 +129,25 @@ pnpm build && pnpm cargo-build
 ## Test Scenarios
 
 ### Scenario 1: No Changes
+
 When no changesets exist, test that:
+
 - Status commands show "no changes"
 - Publish commands skip publishing
 - Version commands don't modify anything
 
 ### Scenario 2: Single Package Change
+
 Create a test changeset for one package and verify:
+
 - Only that package gets version bumped
 - Dependencies are handled correctly
 - Publishing would only affect changed packages
 
 ### Scenario 3: Multiple Package Changes
+
 Test with multiple packages to ensure:
+
 - Version bumping respects dependency order
 - Related packages are updated appropriately
 - Publishing follows correct order
@@ -186,8 +198,9 @@ The GitHub workflows will also test changesets:
 ### Getting Help
 
 If tests fail, the output will show:
+
 - ✅ **Green checkmarks** for passing tests
-- ❌ **Red X marks** for failing tests  
+- ❌ **Red X marks** for failing tests
 - ⚠️ **Yellow warnings** for issues that may need attention
 
 The test scripts provide detailed information about what's working and what needs to be fixed.
