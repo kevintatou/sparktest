@@ -18,6 +18,24 @@ Previously, all packages shared the same version and were published together, ca
 
 ## NPM Packages (using @changesets/cli)
 
+### Testing the Changeset System
+
+Before creating actual changesets, you can test the system:
+
+```bash
+# Test the entire changeset system
+pnpm run changeset:test
+
+# Test just the cargo changeset system
+pnpm run cargo-changeset:test
+
+# Test dry-run operations
+pnpm run cargo-changeset version --dry-run
+pnpm run cargo-changeset publish --dry-run
+```
+
+See `TESTING_CHANGESETS.md` for detailed testing instructions.
+
 ### Creating a Changeset
 
 When you make changes to NPM packages, create a changeset:

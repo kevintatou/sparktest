@@ -30,11 +30,13 @@
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "changeset:status": "changeset status",
+    "changeset:test": "./scripts/test-changesets.sh",
     "cargo-changeset": "./scripts/cargo-changeset.sh",
     "cargo-changeset:add": "./scripts/cargo-changeset.sh add",
     "cargo-changeset:status": "./scripts/cargo-changeset.sh status",
     "cargo-changeset:version": "./scripts/cargo-changeset.sh version",
-    "cargo-changeset:publish": "./scripts/cargo-changeset.sh publish"
+    "cargo-changeset:publish": "./scripts/cargo-changeset.sh publish",
+    "cargo-changeset:test": "./scripts/cargo-changeset.sh test"
   },
   "workspaces": [
     "apps/*",
