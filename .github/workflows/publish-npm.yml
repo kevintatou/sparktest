@@ -55,17 +55,29 @@ jobs:
       - name: Build packages
         run: pnpm build:packages
 
-      - name: Publish @tatou/core
-        run: cd packages/core && npm publish --access public
+      - name: Check for changeset updates
+        run: |
+          echo "Checking changeset status..."
+          npx changeset status
+
+          # Check if there are any changesets to publish
+          if npx changeset status --output=json | jq -e '.releases | length > 0' > /dev/null; then
+            echo "HAS_CHANGESETS=true" >> $GITHUB_ENV
+          else
+            echo "HAS_CHANGESETS=false" >> $GITHUB_ENV
+            echo "No packages need to be published"
+          fi
+
+      - name: Publish packages with changesets
+        if: env.HAS_CHANGESETS == 'true'
+        run: |
+          echo "Publishing packages using changesets..."
+          npx changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish @tatou/storage-service
-        run: cd packages/storage-service && npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish @tatou/ui
-        run: cd packages/ui && npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: No packages to publish
+        if: env.HAS_CHANGESETS == 'false'
+        run: |
+          echo "🎉 No packages have changes to publish"
+          echo "All packages are up to date!"
