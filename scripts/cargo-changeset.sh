@@ -186,6 +186,15 @@ show_status() {
     
     if [[ ${#changesets[@]} -eq 0 ]]; then
         echo -e "${YELLOW}No pending changesets${NC}"
+        echo ""
+        echo "This means you haven't created any changesets yet."
+        echo ""
+        echo "To get started:"
+        echo -e "  • Create a changeset: ${BLUE}pnpm run cargo-changeset:add${NC}"
+        echo -e "  • Or use the script directly: ${BLUE}./scripts/cargo-changeset.sh add${NC}"
+        echo ""
+        echo "After making changes to your code, create a changeset to track"
+        echo "what changed and how the version should be updated."
         return
     fi
     

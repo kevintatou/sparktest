@@ -175,13 +175,34 @@ The GitHub workflows will also test changesets:
 2. **Create PR** - workflows validate changeset format
 3. **Merge to main** - workflows would publish (but can be disabled for testing)
 
+## Understanding Changeset Status Messages
+
+The changeset status commands will show different messages depending on the current state:
+
+### "No changesets found" / "No pending changesets"
+- **Meaning**: You haven't created any changesets yet
+- **What to do**: This is normal for a fresh repository or when no changes have been tracked yet
+- **Next steps**: Create a changeset using `pnpm changeset` or `pnpm run cargo-changeset:add`
+
+### "NO packages to be bumped" (NPM changesets)
+- **Meaning**: No packages need version updates
+- **What to do**: Create changesets to track your changes
+- **Next steps**: Run `pnpm changeset` to create a new changeset
+
+### Changeset status commands now provide helpful guidance
+- Run `pnpm changeset:status` for NPM packages
+- Run `pnpm run cargo-changeset:status` for Cargo crates  
+- Both commands will guide you on what to do next when no changesets exist
+
 ## Troubleshooting Tests
 
 ### Common Issues
 
-1. **"No changesets found"**
-   - Expected when no changes have been made
-   - Run `pnpm changeset:status` to confirm
+1. **"No changesets found" or "No pending changesets"**
+   - This is **expected** when you haven't created any changesets yet
+   - It means the changeset system is working correctly, but you need to create changesets first
+   - To create changesets: Run `pnpm changeset` (NPM) or `pnpm run cargo-changeset:add` (Cargo)
+   - Run `pnpm changeset:status` or `pnpm run cargo-changeset:status` for helpful guidance
 
 2. **"Build failures"**
    - Run `pnpm build:packages` to check NPM builds

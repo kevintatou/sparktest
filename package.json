@@ -29,7 +29,7 @@
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "changeset:status": "changeset status",
+    "changeset:status": "./scripts/changeset-status.sh",
     "changeset:test": "./scripts/test-changesets.sh",
     "cargo-changeset": "./scripts/cargo-changeset.sh",
     "cargo-changeset:add": "./scripts/cargo-changeset.sh add",
