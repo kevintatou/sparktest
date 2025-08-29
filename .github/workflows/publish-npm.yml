@@ -14,9 +14,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch all branches and tags
-        run: git fetch --prune --tags
-
       - name: Enable Corepack and install pnpm
         run: |
           corepack enable
