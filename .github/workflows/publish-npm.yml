@@ -57,14 +57,29 @@ jobs:
       - name: Build packages
         run: pnpm build:packages
 
+      - name: Setup git for changeset comparison
+        run: |
+          echo "Setting up git references for changeset..."
+          # Ensure we have the main branch reference for changeset comparison
+          git fetch origin main:main || echo "Main branch already available"
+          git branch -a
+          echo "Current git status:"
+          git status
+
       - name: Check for changeset updates
         run: |
           echo "Checking changeset status..."
           npx changeset status
 
           # Check if there are any changesets to publish
-          if npx changeset status --output=json | jq -e '.releases | length > 0' > /dev/null; then
+          # Handle both cases: empty output and proper JSON with empty releases array
+          CHANGESET_JSON=$(npx changeset status --output=json)
+          if [ -z "$CHANGESET_JSON" ]; then
+            echo "No changeset output, no packages to publish"
+            echo "HAS_CHANGESETS=false" >> $GITHUB_ENV
+          elif echo "$CHANGESET_JSON" | jq -e '.releases | length > 0' > /dev/null 2>&1; then
             echo "HAS_CHANGESETS=true" >> $GITHUB_ENV
+            echo "Found packages to publish"
           else
             echo "HAS_CHANGESETS=false" >> $GITHUB_ENV
             echo "No packages need to be published"
