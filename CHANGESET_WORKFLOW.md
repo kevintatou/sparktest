@@ -2,6 +2,18 @@
 
 This document describes how to use changesets for managing independent versioning and publishing of NPM packages and Cargo crates in the SparkTest monorepo.
 
+## ⚠️ **Important: When to Create Changesets**
+
+**Create changesets BEFORE pushing your changes, not after!**
+
+**Correct workflow:**
+1. 📝 Make code changes locally
+2. 📋 Create changesets: `pnpm changeset` or `pnpm run cargo-changeset:add`  
+3. 💾 Commit both code changes AND changeset files together
+4. 🚀 Push to your branch/main
+
+**Why this order matters:** Changeset files tell the CI system how to version and publish your packages. They need to be committed alongside your code changes so the system knows what changed and how to handle versioning.
+
 ## Overview
 
 The SparkTest monorepo contains:
@@ -37,6 +49,14 @@ pnpm run cargo-changeset publish --dry-run
 See `TESTING_CHANGESETS.md` for detailed testing instructions.
 
 ### Creating a Changeset
+
+**IMPORTANT:** Create changesets BEFORE committing/pushing your changes, not after!
+
+The workflow is:
+1. Make your code changes locally
+2. Create a changeset for those changes (see commands below)
+3. Commit both your code changes AND the changeset files together
+4. Push to your branch
 
 When you make changes to NPM packages, create a changeset:
 
@@ -89,6 +109,14 @@ pnpm changeset:publish
 ## Cargo Crates (using custom script)
 
 ### Creating a Changeset
+
+**IMPORTANT:** Create changesets BEFORE committing/pushing your changes, not after!
+
+The workflow is:
+1. Make your code changes locally  
+2. Create a changeset for those changes (see commands below)
+3. Commit both your code changes AND the changeset files together
+4. Push to your branch
 
 ```bash
 # Interactive changeset creation for cargo crates
@@ -172,7 +200,7 @@ When a tag is pushed:
 
 1. **Make changes** to `packages/core/src/index.ts`
 
-2. **Create NPM changeset**:
+2. **Create NPM changeset** (BEFORE committing):
 
    ```bash
    pnpm changeset
@@ -181,7 +209,7 @@ When a tag is pushed:
    # Description: "Add new utility function"
    ```
 
-3. **Apply changeset**:
+3. **Apply changeset** (to update versions):
 
    ```bash
    pnpm changeset:version
@@ -189,7 +217,7 @@ When a tag is pushed:
    # Other packages stay at 0.2.0
    ```
 
-4. **Commit and tag**:
+4. **Commit and tag** (code changes + changeset files together):
 
    ```bash
    git add .
@@ -206,7 +234,7 @@ When a tag is pushed:
 
 1. **Make changes** to both `packages/core` and `backend/api`
 
-2. **Create changesets**:
+2. **Create changesets** (BEFORE committing):
 
    ```bash
    # NPM changeset
@@ -220,14 +248,14 @@ When a tag is pushed:
    # Type: minor
    ```
 
-3. **Apply changesets**:
+3. **Apply changesets** (to update versions):
 
    ```bash
    pnpm changeset:version
    pnpm run cargo-changeset:version
    ```
 
-4. **Commit and tag**:
+4. **Commit and tag** (code changes + changeset files together):
 
    ```bash
    git add .
