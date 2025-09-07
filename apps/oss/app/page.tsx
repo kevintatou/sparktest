@@ -1,15 +1,9 @@
 "use client"
 
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
-  Search,
-  Play,
   CheckCircle2,
   XCircle,
   Clock,
@@ -138,151 +132,122 @@ function formatDuration(duration: string | null) {
 
 export default function Dashboard() {
   return (
-    <SidebarProvider defaultOpen={false}>
-      <AppSidebar />
-      <SidebarInset>
-        {/* Clean header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-16 items-center justify-between px-6">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger />
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input placeholder="Search..." className="pl-9 bg-muted/50 border-0 focus-visible:ring-1" />
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button size="sm" className="gap-2">
-                <Play className="h-4 w-4" />
-                Run Test
-              </Button>
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-            </div>
-          </div>
-        </header>
+    <div className="space-y-8 p-6">
+      {/* Simple header */}
+      <div>
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+      </div>
 
-        {/* Main Content */}
-        <main className="flex-1 space-y-8 p-6">
-          {/* Simple header */}
-          <div>
-            <h1 className="text-2xl font-semibold">Dashboard</h1>
-          </div>
-
-          {/* Clean metrics */}
-          <section className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-3">
-              {metrics.map((metric) => {
-                const Icon = metric.icon
-                return (
-                  <Card key={metric.title} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-2">
-                          <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
-                          <div className="flex items-baseline gap-2">
-                            <p className="text-3xl font-bold">{metric.value}</p>
-                            <span
-                              className={`text-sm font-medium ${
-                                metric.color === "emerald"
-                                  ? "text-emerald-600"
-                                  : metric.color === "red"
-                                    ? "text-red-600"
-                                    : "text-blue-600"
-                              }`}
-                            >
-                              {metric.trend}
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground">{metric.subtitle}</p>
-                        </div>
-                        <div
-                          className={`p-3 rounded-full ${
+      {/* Clean metrics */}
+      <section className="space-y-6">
+        <div className="grid gap-6 md:grid-cols-3">
+          {metrics.map((metric) => {
+            const Icon = metric.icon
+            return (
+              <Card key={metric.title} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-3xl font-bold">{metric.value}</p>
+                        <span
+                          className={`text-sm font-medium ${
                             metric.color === "emerald"
-                              ? "bg-emerald-100 dark:bg-emerald-950/50"
+                              ? "text-emerald-600"
                               : metric.color === "red"
-                                ? "bg-red-100 dark:bg-red-950/50"
-                                : "bg-blue-100 dark:bg-blue-950/50"
+                                ? "text-red-600"
+                                : "text-blue-600"
                           }`}
                         >
-                          <Icon
-                            className={`h-6 w-6 ${
-                              metric.color === "emerald"
-                                ? "text-emerald-600"
-                                : metric.color === "red"
-                                  ? "text-red-600"
-                                  : "text-blue-600"
-                            }`}
-                          />
-                        </div>
+                          {metric.trend}
+                        </span>
                       </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
-
-            {/* Status dots */}
-            <div className="flex items-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
-                <span className="text-muted-foreground">9 Completed</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-red-500"></div>
-                <span className="text-muted-foreground">2 Failed</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                <span className="text-muted-foreground">2 Running</span>
-              </div>
-            </div>
-          </section>
-
-          {/* Test runs */}
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium">Recent Runs</h2>
-              <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                <Filter className="h-4 w-4" />
-                Filter
-              </Button>
-            </div>
-
-            <div className="space-y-3">
-              {testRuns.map((test) => (
-                <Card key={test.id} className="hover:shadow-sm transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 flex-1">
-                        {getStatusIcon(test.status)}
-                        <div className="space-y-1 flex-1">
-                          <div className="flex items-center gap-3">
-                            <h3 className="font-medium">{test.name}</h3>
-                            <Badge variant="outline" className="text-xs font-mono">
-                              {test.tag}
-                            </Badge>
-                            {getStatusBadge(test.status)}
-                          </div>
-                          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                            <span>Duration: {formatDuration(test.duration)}</span>
-                            <span>Executed: {test.executed}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
+                      <p className="text-sm text-muted-foreground">{metric.subtitle}</p>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+                    <div
+                      className={`p-3 rounded-full ${
+                        metric.color === "emerald"
+                          ? "bg-emerald-100 dark:bg-emerald-950/50"
+                          : metric.color === "red"
+                            ? "bg-red-100 dark:bg-red-950/50"
+                            : "bg-blue-100 dark:bg-blue-950/50"
+                      }`}
+                    >
+                      <Icon
+                        className={`h-6 w-6 ${
+                          metric.color === "emerald"
+                            ? "text-emerald-600"
+                            : metric.color === "red"
+                              ? "text-red-600"
+                              : "text-blue-600"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+
+        {/* Status dots */}
+        <div className="flex items-center gap-6 text-sm">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
+            <span className="text-muted-foreground">9 Completed</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-red-500"></div>
+            <span className="text-muted-foreground">2 Failed</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+            <span className="text-muted-foreground">2 Running</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Test runs */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-medium">Recent Runs</h2>
+          <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+        </div>
+
+        <div className="space-y-3">
+          {testRuns.map((test) => (
+            <Card key={test.id} className="hover:shadow-sm transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 flex-1">
+                    {getStatusIcon(test.status)}
+                    <div className="space-y-1 flex-1">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-medium">{test.name}</h3>
+                        <Badge variant="outline" className="text-xs font-mono">
+                          {test.tag}
+                        </Badge>
+                        {getStatusBadge(test.status)}
+                      </div>
+                      <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                        <span>Duration: {formatDuration(test.duration)}</span>
+                        <span>Executed: {test.executed}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+    </div>
   )
 }

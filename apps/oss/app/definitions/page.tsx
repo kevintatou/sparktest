@@ -2,14 +2,10 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Plus, Play, Edit, Trash2, FileText, Github, ExternalLink, Search } from "lucide-react"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { Plus, Play, Edit, Trash2, FileText, Github, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { storage } from "@tatou/storage-service"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
@@ -95,36 +91,7 @@ export default function DefinitionsPage() {
   )
 
   return (
-    <SidebarProvider defaultOpen={false}>
-      <AppSidebar />
-      <SidebarInset>
-        {/* Clean header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-16 items-center justify-between px-6">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger />
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input placeholder="Search..." className="pl-9 bg-muted/50 border-0 focus-visible:ring-1" />
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button size="sm" className="gap-2" asChild>
-                <Link href="/definitions/new">
-                  <Plus className="h-4 w-4" />
-                  New Definition
-                </Link>
-              </Button>
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="flex-1 space-y-8 p-6">
+    <div className="space-y-8 p-6">
           {/* Simple header */}
           <div>
             <h1 className="text-2xl font-semibold">Definitions</h1>
@@ -292,8 +259,6 @@ export default function DefinitionsPage() {
             itemName={definitionToDelete?.name}
             itemType="Definition"
           />
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
-  )
-}
+        </div>
+      )
+    }

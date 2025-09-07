@@ -1,15 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
-import { Plus, Play, CheckCircle2, XCircle, Clock, MoreHorizontal, Filter, Search, AlertTriangle } from "lucide-react"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { Plus, Play, CheckCircle2, XCircle, Clock, MoreHorizontal, Filter, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { formatDistanceToNow } from "@tatou/core"
 import type { Run } from "@tatou/core/types"
 import { useRuns, useDefinitions, useExecutors, useDeleteRun } from "@/hooks/use-queries"
@@ -130,150 +126,122 @@ export default function RunsPage() {
   )
 
   return (
-    <SidebarProvider defaultOpen={false}>
-      <AppSidebar />
-      <SidebarInset>
-        {/* Clean header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-16 items-center justify-between px-6">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger />
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input 
-                  placeholder="Search..." 
-                  className="pl-9 bg-muted/50 border-0 focus-visible:ring-1"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button size="sm" className="gap-2" asChild>
-                <Link href="/runs/new">
-                  <Plus className="h-4 w-4" />
-                  New Run
-                </Link>
-              </Button>
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-            </div>
+    <div className="space-y-8 p-6">
+      {/* Simple header */}
+      <div>
+        <h1 className="text-2xl font-semibold">Runs</h1>
+      </div>
+
+      {/* Test runs */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-medium">Test Runs</h2>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+              <Filter className="h-4 w-4" />
+              Filter
+            </Button>
+            <Button size="sm" className="gap-2" asChild>
+              <Link href="/runs/new">
+                <Plus className="h-4 w-4" />
+                New Run
+              </Link>
+            </Button>
           </div>
-        </header>
+        </div>
 
-        {/* Main Content */}
-        <main className="flex-1 space-y-8 p-6">
-          {/* Simple header */}
-          <div>
-            <h1 className="text-2xl font-semibold">Runs</h1>
-          </div>
-
-          {/* Test runs */}
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium">Test Runs</h2>
-              <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                <Filter className="h-4 w-4" />
-                Filter
-              </Button>
-            </div>
-
-            {runsLoading ? (
-              <div className="space-y-3">
-                {Array(6)
-                  .fill(null)
-                  .map((_, i) => (
-                    <Card key={i} className="animate-pulse">
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4 flex-1">
-                            <div className="h-6 w-6 bg-muted rounded-full" />
-                            <div className="space-y-1 flex-1">
-                              <div className="h-4 w-48 bg-muted rounded" />
-                              <div className="h-3 w-64 bg-muted rounded" />
-                            </div>
-                          </div>
-                          <div className="h-8 w-8 bg-muted rounded" />
+        {runsLoading ? (
+          <div className="space-y-3">
+            {Array(6)
+              .fill(null)
+              .map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="h-6 w-6 bg-muted rounded-full" />
+                        <div className="space-y-1 flex-1">
+                          <div className="h-4 w-48 bg-muted rounded" />
+                          <div className="h-3 w-64 bg-muted rounded" />
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-              </div>
-            ) : filteredRuns.length === 0 ? (
-              <Card className="p-12 text-center">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                    <Play className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">
-                      {searchQuery ? "No runs match your search" : "No runs yet"}
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      {searchQuery
-                        ? "Try adjusting your search terms."
-                        : "Create your first run to get started."}
-                    </p>
-                    {!searchQuery && (
-                      <Button asChild>
-                        <Link href="/runs/new">
-                          <Plus className="mr-2 h-4 w-4" />
-                          Create Run
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ) : (
-              <div className="space-y-3">
-                {filteredRuns.map((run) => (
-                  <Card key={run.id} className="hover:shadow-sm transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 flex-1">
-                          {getStatusIcon(run.status)}
-                          <div className="space-y-1 flex-1">
-                            <div className="flex items-center gap-3">
-                              <h3 className="font-medium">{run.name}</h3>
-                              <Badge variant="outline" className="text-xs font-mono">
-                                {run.id}
-                              </Badge>
-                              {getStatusBadge(run.status)}
-                            </div>
-                            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                              <span>Duration: {formatDuration(run.duration)}</span>
-                              <span>Definition: {getDefinitionName(run.definitionId)}</span>
-                              <span>Executor: {getExecutorName(run.executorId)}</span>
-                              <span>Created: {formatDistanceToNow(run.createdAt)}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <Button variant="ghost" size="sm" onClick={() => handleDeleteClick(run)}>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      <div className="h-8 w-8 bg-muted rounded" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+          </div>
+        ) : filteredRuns.length === 0 ? (
+          <Card className="p-12 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
+                <Play className="h-8 w-8 text-muted-foreground" />
               </div>
-            )}
-          </section>
+              <div>
+                <h3 className="text-lg font-semibold mb-2">
+                  {searchQuery ? "No runs match your search" : "No runs yet"}
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  {searchQuery
+                    ? "Try adjusting your search terms."
+                    : "Create your first run to get started."}
+                </p>
+                {!searchQuery && (
+                  <Button asChild>
+                    <Link href="/runs/new">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Run
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {filteredRuns.map((run) => (
+              <Card key={run.id} className="hover:shadow-sm transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 flex-1">
+                      {getStatusIcon(run.status)}
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center gap-3">
+                          <h3 className="font-medium">{run.name}</h3>
+                          <Badge variant="outline" className="text-xs font-mono">
+                            {run.id}
+                          </Badge>
+                          {getStatusBadge(run.status)}
+                        </div>
+                        <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                          <span>Duration: {formatDuration(run.duration)}</span>
+                          <span>Definition: {getDefinitionName(run.definitionId)}</span>
+                          <span>Executor: {getExecutorName(run.executorId)}</span>
+                          <span>Created: {formatDistanceToNow(run.createdAt)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => handleDeleteClick(run)}>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </section>
 
-          <DeleteConfirmationModal
-            isOpen={deleteModalOpen}
-            onClose={handleDeleteCancel}
-            onConfirm={handleDeleteConfirm}
-            isDeleting={deleteRunMutation.isPending}
-            title="Delete Run"
-            description="Are you sure you want to delete this run? This will permanently remove the run data and cannot be undone."
-            itemName={runToDelete?.name}
-            itemType="Run"
-          />
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={deleteRunMutation.isPending}
+        title="Delete Run"
+        description="Are you sure you want to delete this run? This will permanently remove the run data and cannot be undone."
+        itemName={runToDelete?.name}
+        itemType="Run"
+      />
+    </div>
   )
 }
