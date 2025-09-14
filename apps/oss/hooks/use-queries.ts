@@ -69,14 +69,14 @@ export function useExecutor(id: string) {
 export function useSuites() {
   return useQuery({
     queryKey: queryKeys.suites,
-    queryFn: () => storage.getSuites(),
+    queryFn: () => storage.getTestSuites(),
   })
 }
 
 export function useSuite(id: string) {
   return useQuery({
     queryKey: queryKeys.suite(id),
-    queryFn: () => storage.getSuiteById(id),
+    queryFn: () => storage.getTestSuiteById(id),
     enabled: !!id,
   })
 }
@@ -133,7 +133,7 @@ export function useDeleteSuite() {
   const { toast } = useToast()
 
   return useMutation({
-    mutationFn: (id: string) => storage.deleteSuite(id),
+    mutationFn: (id: string) => storage.deleteTestSuite(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.suites })
       toast({

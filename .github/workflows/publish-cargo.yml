@@ -39,52 +39,79 @@ jobs:
       - name: Login to crates.io
         run: cargo login ${{ secrets.CRATES_IO_TOKEN }}
 
-      - name: Publish sparktest-core
-        run: cargo publish -p sparktest-core --allow-dirty
-        working-directory: backend
-
-      - name: Wait for crates.io to update
-        run: sleep 30
-
-      - name: Update sparktest-api dependencies for publishing
+      - name: Check cargo changeset status
         run: |
-          # Extract version from core crate
-          CORE_VERSION=$(grep '^version = ' core/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
-          echo "Using sparktest-core version: $CORE_VERSION"
-          # Replace path dependency with version dependency for sparktest-core
-          sed -i "s/sparktest-core = { path = \"..\/core\" }/sparktest-core = \"$CORE_VERSION\"/" api/Cargo.toml
-          # Verify the change
-          echo "Updated api/Cargo.toml sparktest-core dependency:"
-          grep 'sparktest-core = ' api/Cargo.toml
-        working-directory: backend
+          echo "Checking cargo changeset status..."
+          ./scripts/cargo-changeset.sh status
 
-      - name: Publish sparktest-api
-        run: cargo publish -p sparktest-api --allow-dirty
-        working-directory: backend
+          # Check if any crates need to be published
+          if [[ -d .cargo-changesets ]] && [[ $(find .cargo-changesets -name "*.md" 2>/dev/null | wc -l) -gt 0 ]]; then
+            echo "HAS_CARGO_CHANGESETS=true" >> $GITHUB_ENV
+          else
+            echo "HAS_CARGO_CHANGESETS=false" >> $GITHUB_ENV
+            echo "No cargo crates need to be published"
+          fi
 
-      - name: Wait for crates.io to update
-        run: sleep 30
-
-      - name: Update sparktest-bin dependencies for publishing
+      - name: Apply changeset versions and publish crates
+        if: env.HAS_CARGO_CHANGESETS == 'true'
         run: |
-          # Extract versions from core and api crates
-          CORE_VERSION=$(grep '^version = ' core/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
-          API_VERSION=$(grep '^version = ' api/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
-          echo "Using sparktest-core version: $CORE_VERSION"
-          echo "Using sparktest-api version: $API_VERSION"
-          # Replace path dependencies with version dependencies
-          sed -i "s/sparktest-core = { path = \"..\/core\" }/sparktest-core = \"$CORE_VERSION\"/" bin/Cargo.toml
-          sed -i "s/sparktest-api = { path = \"..\/api\" }/sparktest-api = \"$API_VERSION\"/" bin/Cargo.toml
-          # Copy migrations directory to bin directory to ensure it's available during compilation
-          cp -r migrations bin/
-          echo "Copied migrations directory to bin/"
-          # Verify the changes
-          echo "Updated bin/Cargo.toml dependencies:"
-          grep -E 'sparktest-(core|api) = ' bin/Cargo.toml
-          echo "Migrations directory in bin:"
-          ls -la bin/migrations/
-        working-directory: backend
+          echo "Applying cargo changesets and publishing..."
+          ./scripts/cargo-changeset.sh version
+          ./scripts/cargo-changeset.sh publish
 
-      - name: Publish sparktest-bin
-        run: cargo publish -p sparktest-bin --allow-dirty
-        working-directory: backend
+      - name: Publish individual crates (fallback for manual tags)
+        if: env.HAS_CARGO_CHANGESETS == 'false'
+        run: |
+          echo "No changesets found, checking if crates need individual publishing..."
+
+          # Check each crate individually to see if it needs publishing
+          cd backend
+
+          # Function to check if a version is already published
+          check_and_publish() {
+            local crate_name="$1"
+            local crate_path="$2"
+            
+            local version=$(grep '^version = ' "$crate_path/Cargo.toml" | head -1 | sed 's/version = "\(.*\)"/\1/')
+            echo "Checking $crate_name v$version..."
+            
+            # Check if this version is already published
+            if cargo search "$crate_name" --limit 1 | grep -q "$crate_name = \"$version\""; then
+              echo "✅ $crate_name v$version already published, skipping"
+              return 0
+            else
+              echo "📦 Publishing $crate_name v$version..."
+              cd "$crate_path"
+              
+              # For api and bin crates, update dependencies to use published versions
+              if [[ "$crate_name" == "sparktest-api" ]]; then
+                CORE_VERSION=$(grep '^version = ' ../core/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+                sed -i "s/sparktest-core = { path = \"..\/core\" }/sparktest-core = \"$CORE_VERSION\"/" Cargo.toml
+              elif [[ "$crate_name" == "sparktest-bin" ]]; then
+                CORE_VERSION=$(grep '^version = ' ../core/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+                API_VERSION=$(grep '^version = ' ../api/Cargo.toml | head -1 | sed 's/version = "\(.*\)"/\1/')
+                sed -i "s/sparktest-core = { path = \"..\/core\" }/sparktest-core = \"$CORE_VERSION\"/" Cargo.toml
+                sed -i "s/sparktest-api = { path = \"..\/api\" }/sparktest-api = \"$API_VERSION\"/" Cargo.toml
+                cp -r ../migrations . 2>/dev/null || true
+              fi
+              
+              cargo publish --allow-dirty
+              cd ..
+              
+              # Wait between publishes for crates.io to update
+              if [[ "$crate_name" != "sparktest-bin" ]]; then
+                echo "Waiting 30 seconds for crates.io to update..."
+                sleep 30
+              fi
+            fi
+          }
+
+          # Publish in dependency order
+          check_and_publish "sparktest-core" "core"
+          check_and_publish "sparktest-api" "api"
+          check_and_publish "sparktest-bin" "bin"
+
+      - name: No crates to publish
+        if: env.HAS_CARGO_CHANGESETS == 'false'
+        run: |
+          echo "🎉 All crates are up to date!"

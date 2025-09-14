@@ -187,7 +187,7 @@ describe("SparkTestStorageService", () => {
     it("should save suite", async () => {
       localStorageMock.getItem.mockReturnValue("[]")
 
-      const result = await service.saveSuite(mockSuite)
+      const result = await service.saveTestSuite(mockSuite)
       expect(result).toEqual(mockSuite)
     })
 
@@ -201,7 +201,7 @@ describe("SparkTestStorageService", () => {
     it("should get suite by id", async () => {
       localStorageMock.getItem.mockReturnValue(JSON.stringify([mockSuite]))
 
-      const result = await service.getSuiteById("1")
+      const result = await service.getTestSuiteById("1")
       expect(result).toEqual(mockSuite)
     })
   })

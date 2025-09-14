@@ -234,8 +234,8 @@ describe("HybridStorageService", () => {
           labels: [],
         },
       ]
-      apiInstance.getSuites.mockRejectedValue(new Error("Network Error"))
-      localInstance.getSuites.mockResolvedValue(mockSuites)
+      apiInstance.getTestSuites.mockRejectedValue(new Error("Network Error"))
+      localInstance.getTestSuites.mockResolvedValue(mockSuites)
 
       const result = await service.getSuites()
 
@@ -374,8 +374,8 @@ describe("HybridStorageService", () => {
     })
 
     it("should handle deleteSuite with fallback", async () => {
-      apiInstance.deleteSuite.mockRejectedValue(new Error("Network Error"))
-      localInstance.deleteSuite.mockResolvedValue(true)
+      apiInstance.deleteTestSuite.mockRejectedValue(new Error("Network Error"))
+      localInstance.deleteTestSuite.mockResolvedValue(true)
 
       const result = await service.deleteSuite("1")
 

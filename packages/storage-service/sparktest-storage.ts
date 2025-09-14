@@ -19,16 +19,37 @@ import type {
   JobLogs,
   JobStatus,
   JobDeleteResponse,
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
+=======
+>>>>>>> main
 } from "@tatou/core"
 import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "@tatou/core"
 
 const API_BASE = "http://localhost:8080/api"
+<<<<<<< HEAD
+========
+} from "../types"
+import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "../samples"
+
+const API_BASE = "http://localhost:3001/api"
+>>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
+=======
+>>>>>>> main
 
 export class SparkTestStorageService implements StorageService {
   private executorStorage: GenericHybridStorageService<Executor>
   private definitionStorage: GenericHybridStorageService<Definition>
   private runStorage: GenericHybridStorageService<Run>
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
   private suiteStorage: GenericHybridStorageService<Suite>
+========
+  private testSuiteStorage: GenericHybridStorageService<Suite>
+>>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
+=======
+  private suiteStorage: GenericHybridStorageService<Suite>
+>>>>>>> main
 
   constructor() {
     // Initialize executor storage
@@ -114,14 +135,32 @@ export class SparkTestStorageService implements StorageService {
     )
     this.runStorage = new GenericHybridStorageService<Run>(runApiStorage, runLocalStorage)
 
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
     // Initialize suite storage with transformations
     const suiteLocalStorage = new GenericLocalStorageService<Suite>(
+========
+    // Initialize test suite storage with transformations
+    const testSuiteLocalStorage = new GenericLocalStorageService<Suite>(
+>>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
+=======
+    // Initialize suite storage with transformations
+    const suiteLocalStorage = new GenericLocalStorageService<Suite>(
+>>>>>>> main
       "sparktest_test_suites",
       sampleSuites,
       (suite) => suite.id,
       storageUtils
     )
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
     const suiteApiStorage = new GenericApiStorageService<Suite>(
+========
+    const testSuiteApiStorage = new GenericApiStorageService<Suite>(
+>>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
+=======
+    const suiteApiStorage = new GenericApiStorageService<Suite>(
+>>>>>>> main
       "test-suites",
       API_BASE,
       (suite) => suite.id,
@@ -156,7 +195,18 @@ export class SparkTestStorageService implements StorageService {
         },
       }
     )
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
     this.suiteStorage = new GenericHybridStorageService<Suite>(suiteApiStorage, suiteLocalStorage)
+========
+    this.testSuiteStorage = new GenericHybridStorageService<Suite>(
+      testSuiteApiStorage,
+      testSuiteLocalStorage
+    )
+>>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
+=======
+    this.suiteStorage = new GenericHybridStorageService<Suite>(suiteApiStorage, suiteLocalStorage)
+>>>>>>> main
   }
 
   // Executor methods
@@ -246,6 +296,8 @@ export class SparkTestStorageService implements StorageService {
     })
   }
 
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
   // Suite methods
   async getSuites(): Promise<Suite[]> {
     return this.suiteStorage.getItems()
@@ -253,14 +305,45 @@ export class SparkTestStorageService implements StorageService {
 
   async saveSuite(suite: Suite): Promise<Suite> {
     return this.suiteStorage.saveItem(suite)
+========
+  // Test Suite methods
+  async getTestSuites(): Promise<Suite[]> {
+    return this.testSuiteStorage.getItems()
+  }
+
+  async saveTestSuite(suite: Suite): Promise<Suite> {
+    return this.testSuiteStorage.saveItem(suite)
+>>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
   }
 
   async deleteSuite(id: string): Promise<boolean> {
     return this.suiteStorage.deleteItem(id)
   }
 
+<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
   async getSuiteById(id: string): Promise<Suite | undefined> {
     return this.suiteStorage.getItemById(id)
+========
+  async getTestSuiteById(id: string): Promise<Suite | undefined> {
+    return this.testSuiteStorage.getItemById(id)
+>>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
+=======
+  // Suite methods
+  async getTestSuites(): Promise<Suite[]> {
+    return this.suiteStorage.getItems()
+  }
+
+  async saveTestSuite(suite: Suite): Promise<Suite> {
+    return this.suiteStorage.saveItem(suite)
+  }
+
+  async deleteTestSuite(id: string): Promise<boolean> {
+    return this.suiteStorage.deleteItem(id)
+  }
+
+  async getTestSuiteById(id: string): Promise<Suite | undefined> {
+    return this.suiteStorage.getItemById(id)
+>>>>>>> main
   }
 
   // Kubernetes Integration - These methods are SparkTest-specific and would remain in the main service
@@ -268,7 +351,15 @@ export class SparkTestStorageService implements StorageService {
     try {
       const res = await fetch(`${API_BASE}/k8s/health`)
       if (!res.ok) throw new Error("Failed to check Kubernetes health")
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
       return (await res.json()) as KubernetesHealth
+========
+      return await res.json()
+>>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
+=======
+      return (await res.json()) as KubernetesHealth
+>>>>>>> main
     } catch (error) {
       throw new Error("Kubernetes integration not available")
     }

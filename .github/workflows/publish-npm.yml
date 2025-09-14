@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Enable Corepack and install pnpm
         run: |
@@ -55,17 +57,44 @@ jobs:
       - name: Build packages
         run: pnpm build:packages
 
-      - name: Publish @tatou/core
-        run: cd packages/core && npm publish --access public
+      - name: Setup git for changeset comparison
+        run: |
+          echo "Setting up git references for changeset..."
+          # Ensure we have the main branch reference for changeset comparison
+          git fetch origin main:main || echo "Main branch already available"
+          git branch -a
+          echo "Current git status:"
+          git status
+
+      - name: Check for changeset updates
+        run: |
+          echo "Checking changeset status..."
+          npx changeset status
+
+          # Check if there are any changesets to publish
+          # Handle both cases: empty output and proper JSON with empty releases array
+          CHANGESET_JSON=$(npx changeset status --output=json)
+          if [ -z "$CHANGESET_JSON" ]; then
+            echo "No changeset output, no packages to publish"
+            echo "HAS_CHANGESETS=false" >> $GITHUB_ENV
+          elif echo "$CHANGESET_JSON" | jq -e '.releases | length > 0' > /dev/null 2>&1; then
+            echo "HAS_CHANGESETS=true" >> $GITHUB_ENV
+            echo "Found packages to publish"
+          else
+            echo "HAS_CHANGESETS=false" >> $GITHUB_ENV
+            echo "No packages need to be published"
+          fi
+
+      - name: Publish packages with changesets
+        if: env.HAS_CHANGESETS == 'true'
+        run: |
+          echo "Publishing packages using changesets..."
+          npx changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish @tatou/storage-service
-        run: cd packages/storage-service && npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish @tatou/ui
-        run: cd packages/ui && npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: No packages to publish
+        if: env.HAS_CHANGESETS == 'false'
+        run: |
+          echo "🎉 No packages have changes to publish"
+          echo "All packages are up to date!"

@@ -1,6 +1,6 @@
 {
   "name": "@tatou/storage-service",
-  "version": "0.2.0",
+  "version": "2.0.0",
   "description": "Storage service implementations for SparkTest",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -56,6 +56,7 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
+    "lint": "echo 'No linting configured for storage-service package'",
     "prepublishOnly": "pnpm build"
   },
   "publishConfig": {

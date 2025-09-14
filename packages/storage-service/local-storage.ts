@@ -4,13 +4,36 @@ import type {
   Executor,
   Definition,
   Run,
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/local-storage.ts
   Suite,
+========
+  TestSuite,
+>>>>>>>> main:packages/storage/local-storage.ts
+=======
+  Suite,
+>>>>>>> main
   KubernetesHealth,
   JobLogs,
   JobStatus,
   JobDeleteResponse,
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/local-storage.ts
 } from "@tatou/core"
 import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "@tatou/core"
+========
+} from "../core/src/types"
+import {
+  sampleExecutors,
+  sampleDefinitions,
+  sampleRuns,
+  sampleTestSuites,
+} from "../core/src/samples"
+>>>>>>>> main:packages/storage/local-storage.ts
+=======
+} from "@tatou/core"
+import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "@tatou/core"
+>>>>>>> main
 
 export class LocalStorageService implements StorageService {
   async getExecutors(): Promise<Executor[]> {
@@ -126,6 +149,10 @@ export class LocalStorageService implements StorageService {
 
     return savedRun
   }
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/local-storage.ts
+=======
+>>>>>>> main
 
   private simulateTestExecution(run: Run): void {
     // Simulate realistic test execution timing (5-15 seconds)
@@ -197,6 +224,11 @@ export class LocalStorageService implements StorageService {
 
     await this.saveRun(completedRun)
   }
+<<<<<<< HEAD
+========
+>>>>>>>> main:packages/storage/local-storage.ts
+=======
+>>>>>>> main
   subscribeToRuns(
     callback: (payload: { eventType: string; new?: Run; old?: Run }) => void
   ): () => void {
@@ -230,18 +262,35 @@ export class LocalStorageService implements StorageService {
       } catch (err) {
         console.error("Polling error in subscribeToRuns:", err)
       }
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/local-storage.ts
     }, 2000) // Poll every 2 seconds for better real-time feedback
+========
+    }, 10000)
+>>>>>>>> main:packages/storage/local-storage.ts
+=======
+    }, 2000) // Poll every 2 seconds for better real-time feedback
+>>>>>>> main
 
     return () => clearInterval(interval)
   }
 
   // Suites
+<<<<<<< HEAD
   async getSuites(): Promise<Suite[]> {
     return getFromStorage("sparktest_test_suites", sampleSuites)
   }
 
   async saveSuite(suite: Suite): Promise<Suite> {
     const list = await this.getSuites()
+=======
+  async getTestSuites(): Promise<Suite[]> {
+    return getFromStorage("sparktest_test_suites", sampleSuites)
+  }
+
+  async saveTestSuite(suite: Suite): Promise<Suite> {
+    const list = await this.getTestSuites()
+>>>>>>> main
     const index = list.findIndex((s) => s.id === suite.id)
     if (index >= 0) {
       list[index] = suite
@@ -252,15 +301,25 @@ export class LocalStorageService implements StorageService {
     return suite
   }
 
+<<<<<<< HEAD
   async deleteSuite(id: string): Promise<boolean> {
     const list = await this.getSuites()
+=======
+  async deleteTestSuite(id: string): Promise<boolean> {
+    const list = await this.getTestSuites()
+>>>>>>> main
     const updated = list.filter((s) => s.id !== id)
     setToStorage("sparktest_test_suites", updated)
     return true
   }
 
+<<<<<<< HEAD
   async getSuiteById(id: string): Promise<Suite | undefined> {
     const list = await this.getSuites()
+=======
+  async getTestSuiteById(id: string): Promise<Suite | undefined> {
+    const list = await this.getTestSuites()
+>>>>>>> main
     return list.find((s) => s.id === id)
   }
 
@@ -285,7 +344,11 @@ export class LocalStorageService implements StorageService {
     throw new Error("Kubernetes integration not available in local storage mode")
   }
 
+<<<<<<< HEAD
   initialize(): void {
+=======
+  async initialize(): Promise<void> {
+>>>>>>> main
     if (typeof window === "undefined") return
     if (!localStorage.getItem("sparktest_executors")) {
       setToStorage("sparktest_executors", sampleExecutors)

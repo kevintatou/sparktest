@@ -30,7 +30,8 @@ yarn-error.log*
 next-env.d.ts
 
 # coverage
-coverage/
+coverage/*
+!coverage/.gitkeep
 .nyc_output/
 
 # Backend

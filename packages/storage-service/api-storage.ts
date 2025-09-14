@@ -7,7 +7,15 @@ import type {
   JobLogs,
   JobStatus,
   JobDeleteResponse,
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/api-storage.ts
 } from "@tatou/core"
+========
+} from "../types"
+>>>>>>>> main:packages/core/src/storage/api-storage.ts
+=======
+} from "@tatou/core"
+>>>>>>> main
 import { StorageService } from "./storage"
 
 const API_BASE = "http://localhost:3001/api"
@@ -191,12 +199,29 @@ export class ApiStorageService implements StorageService {
     return (await res.json()) as Run
   }
 
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/api-storage.ts
   // Suites
   async getSuites(): Promise<Suite[]> {
     const res = await fetch(`${API_BASE}/test-suites`)
     if (!res.ok) throw new Error("Failed to fetch test suites")
 
     const data = (await res.json()) as any[]
+========
+  // Test Suites
+=======
+  // Suites
+>>>>>>> main
+  async getTestSuites(): Promise<Suite[]> {
+    const res = await fetch(`${API_BASE}/test-suites`)
+    if (!res.ok) throw new Error("Failed to fetch test suites")
+
+<<<<<<< HEAD
+    const data = await res.json()
+>>>>>>>> main:packages/core/src/storage/api-storage.ts
+=======
+    const data = (await res.json()) as any[]
+>>>>>>> main
 
     // Convert snake_case to camelCase for each suite
     return data.map((suite: any) => ({
@@ -210,7 +235,15 @@ export class ApiStorageService implements StorageService {
     }))
   }
 
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/api-storage.ts
   async saveSuite(suite: Suite): Promise<Suite> {
+========
+  async saveTestSuite(suite: Suite): Promise<Suite> {
+>>>>>>>> main:packages/core/src/storage/api-storage.ts
+=======
+  async saveTestSuite(suite: Suite): Promise<Suite> {
+>>>>>>> main
     const method = suite.id ? "PUT" : "POST"
     const url = suite.id ? `${API_BASE}/test-suites/${suite.id}` : `${API_BASE}/test-suites`
 
@@ -246,7 +279,11 @@ export class ApiStorageService implements StorageService {
     return (await res.json()) as Suite
   }
 
+<<<<<<< HEAD
   async deleteSuite(id: string): Promise<boolean> {
+=======
+  async deleteTestSuite(id: string): Promise<boolean> {
+>>>>>>> main
     // Convert to UUID format if needed
     let uuidId = id
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
@@ -257,7 +294,15 @@ export class ApiStorageService implements StorageService {
     return res.ok
   }
 
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/api-storage.ts
   async getSuiteById(id: string): Promise<Suite | undefined> {
+========
+  async getTestSuiteById(id: string): Promise<Suite | undefined> {
+>>>>>>>> main:packages/core/src/storage/api-storage.ts
+=======
+  async getTestSuiteById(id: string): Promise<Suite | undefined> {
+>>>>>>> main
     // Convert to UUID format if needed
     let uuidId = id
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
@@ -267,7 +312,15 @@ export class ApiStorageService implements StorageService {
     const res = await fetch(`${API_BASE}/test-suites/${uuidId}`)
     if (!res.ok) throw new Error("Failed to fetch test suite")
 
+<<<<<<< HEAD
+<<<<<<<< HEAD:packages/storage-service/api-storage.ts
     const data = (await res.json()) as any
+========
+    const data = await res.json()
+>>>>>>>> main:packages/core/src/storage/api-storage.ts
+=======
+    const data = (await res.json()) as any
+>>>>>>> main
 
     // Convert snake_case back to camelCase
     return {
@@ -312,7 +365,7 @@ export class ApiStorageService implements StorageService {
     return (await res.json()) as JobDeleteResponse
   }
 
-  initialize(): void {
+  async initialize(): Promise<void> {
     // No-op for API mode
   }
 }

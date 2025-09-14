@@ -1,6 +1,6 @@
 {
   "name": "@tatou/core",
-  "version": "0.2.0",
+  "version": "2.0.0",
   "description": "Shared TypeScript types and utilities for SparkTest",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,9 +32,7 @@
       "default": "./dist/utils.js"
     },
     "./types": {
-      "types": "./dist/types.d.ts",
-      "import": "./dist/types.js",
-      "default": "./dist/types.js"
+      "types": "./dist/types.d.ts"
     }
   },
   "files": [
@@ -46,6 +44,7 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
+    "lint": "echo 'No linting configured for core package'",
     "prepublishOnly": "pnpm build"
   },
   "publishConfig": {

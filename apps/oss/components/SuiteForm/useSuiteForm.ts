@@ -83,7 +83,7 @@ export function useSuiteForm(existingSuite?: Suite) {
         }
 
         // Save the suite using the storage service
-        await storage.saveSuite(suiteData)
+        await storage.saveTestSuite(suiteData)
 
         toast({
           title: existingSuite ? "Suite updated" : "Suite created",

@@ -14,6 +14,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
+      reportsDirectory: "./coverage",
       include: [
         "lib/**/*.ts",
         "app/api/**/*.ts", // API routes only

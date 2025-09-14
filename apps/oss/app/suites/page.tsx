@@ -53,10 +53,10 @@ export default function SuitesPage() {
 
   // Filter suites based on search query
   const filteredSuites = suites.filter(
-    (suite) =>
+    (suite: Suite) =>
       suite.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       suite.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      suite.labels?.some((label) => label.toLowerCase().includes(searchQuery.toLowerCase()))
+      suite.labels?.some((label: string) => label.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   return (
@@ -169,7 +169,7 @@ export default function SuitesPage() {
         </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredSuites.map((suite) => (
+          {filteredSuites.map((suite: Suite) => (
             <Card
               key={suite.id}
               className="group hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border-slate-200 dark:border-slate-700"
@@ -202,7 +202,7 @@ export default function SuitesPage() {
 
                   {suite.labels && suite.labels.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {suite.labels.map((label) => (
+                      {suite.labels.map((label: string) => (
                         <Badge key={label} variant="secondary" className="text-xs">
                           {label}
                         </Badge>

@@ -154,14 +154,14 @@ export class HybridStorageService implements StorageService {
   }
 
   // Suites
-  async getSuites(): Promise<Suite[]> {
+  async getTestSuites(): Promise<Suite[]> {
     return this.tryApiWithFallback(
       () => this.apiStorage.getSuites(),
       () => this.localStorage.getSuites()
     )
   }
 
-  async saveSuite(suite: Suite): Promise<Suite> {
+  async saveTestSuite(suite: Suite): Promise<Suite> {
     return this.tryApiWithFallback(
       () => this.apiStorage.saveSuite(suite),
       () => this.localStorage.saveSuite(suite)
@@ -175,7 +175,7 @@ export class HybridStorageService implements StorageService {
     )
   }
 
-  async getSuiteById(id: string): Promise<Suite | undefined> {
+  async getTestSuiteById(id: string): Promise<Suite | undefined> {
     return this.tryApiWithFallback(
       () => this.apiStorage.getSuiteById(id),
       () => this.localStorage.getSuiteById(id)

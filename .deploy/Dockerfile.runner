@@ -1,0 +1,173 @@
+# GitHub Actions Self-Hosted Runner in Docker
+FROM ubuntu:22.04
+
+# Avoid interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    unzip \
+    git \
+    jq \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    python3 \
+    python3-pip \
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Docker CLI (needed for workflows that use Docker)
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y docker-ce-cli \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js and npm (needed for your frontend builds)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+# Install pnpm (your package manager)
+RUN npm install -g pnpm
+
+# Install Rust (needed for your backend builds)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+    && echo 'source $HOME/.cargo/env' >> ~/.bashrc
+
+# Create a non-root user for the runner
+RUN useradd -m -s /bin/bash runner \
+    && usermod -aG sudo runner \
+    && groupadd -f docker \
+    && usermod -aG docker runner \
+    && echo 'runner ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Switch to runner user
+USER runner
+WORKDIR /home/runner
+
+# Set up Rust environment for runner user
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/home/runner/.cargo/bin:${PATH}"
+
+# Download and extract GitHub Actions runner (latest version)
+ARG RUNNER_VERSION="2.327.1"
+ARG RUNNER_HASH="d68ac1f500b747d1271d9e52661c408d56cffd226974f68b7dc813e30b9e0575"
+
+RUN curl -o actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
+    && echo "${RUNNER_HASH}  actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz" | shasum -a 256 -c \
+    && tar xzf actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
+    && rm actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
+
+# Install runner dependencies
+RUN sudo ./bin/installdependencies.sh
+
+# Create and set permissions for work directory
+RUN mkdir -p /home/runner/_work \
+    && sudo chown -R runner:runner /home/runner/_work \
+    && chmod -R 755 /home/runner/_work
+
+# Create entrypoint script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+echo "🔧 Configuring GitHub Actions runner..."\n\
+\n\
+# Fix Docker socket permissions if needed\n\
+if [ -S /var/run/docker.sock ]; then\n\
+    echo "🐳 Setting up Docker access..."\n\
+    # Get the docker socket group ID\n\
+    DOCKER_SOCKET_GID=$(stat -c "%g" /var/run/docker.sock)\n\
+    # Create docker group with the same GID as the socket\n\
+    sudo groupadd -f -g $DOCKER_SOCKET_GID docker_host || true\n\
+    # Add runner to this group\n\
+    sudo usermod -aG docker_host runner || true\n\
+    sudo usermod -aG docker runner || true\n\
+    echo "✅ Docker access configured"\n\
+else\n\
+    echo "⚠️  Docker socket not found at /var/run/docker.sock"\n\
+fi\n\
+\n\
+# Validate required environment variables\n\
+if [ -z "$GH_RUNNER_TOKEN" ]; then\n\
+    echo "❌ Error: GH_RUNNER_TOKEN is not set"\n\
+    echo "   Get a new token from: https://github.com/kevintatou/sparktest/settings/actions/runners/new"\n\
+    echo "   Then run: export GH_RUNNER_TOKEN=\"your_token_here\""\n\
+    exit 1\n\
+fi\n\
+\n\
+if [ -z "$GH_REPO_URL" ]; then\n\
+    echo "❌ Error: GH_REPO_URL is not set"\n\
+    echo "   Set it with: export GH_REPO_URL=\"https://github.com/kevintatou/sparktest\""\n\
+    exit 1\n\
+fi\n\
+\n\
+echo "✅ Environment variables validated"\n\
+echo "   Repository: $GH_REPO_URL"\n\
+echo "   Labels: ${GH_RUNNER_LABELS:-self-hosted}"\n\
+echo "   Name: ${GH_RUNNER_NAME:-docker-runner}"\n\
+\n\
+# Ensure proper permissions on work directory\n\
+echo "🔧 Setting up work directory permissions..."\n\
+mkdir -p /home/runner/_work\n\
+sudo chown -R runner:runner /home/runner/_work\n\
+sudo chmod -R 755 /home/runner/_work\n\
+\n\
+# Remove existing configuration if it exists\n\
+echo "🧹 Cleaning up any existing configuration..."\n\
+./config.sh remove --token "$GH_RUNNER_TOKEN" 2>/dev/null || echo "No existing config to remove"\n\
+\n\
+# Configure the runner with better error handling\n\
+echo "⚙️  Configuring runner..."\n\
+if ! ./config.sh \\\n\
+    --url "$GH_REPO_URL" \\\n\
+    --token "$GH_RUNNER_TOKEN" \\\n\
+    --labels "${GH_RUNNER_LABELS:-self-hosted}" \\\n\
+    --name "${GH_RUNNER_NAME:-docker-runner}" \\\n\
+    --work "_work" \\\n\
+    --unattended \\\n\
+    --replace; then\n\
+    echo "❌ Runner configuration failed!"\n\
+    echo "   This usually means:"\n\
+    echo "   1. Token has expired - get a new one from GitHub"\n\
+    echo "   2. Repository URL is incorrect"\n\
+    echo "   3. Network connectivity issues"\n\
+    echo ""\n\
+    echo "💡 To get a new token:"\n\
+    echo "   1. Go to: https://github.com/kevintatou/sparktest/settings/actions/runners/new"\n\
+    echo "   2. Copy the token"\n\
+    echo "   3. Stop this container: docker stop github-runner"\n\
+    echo "   4. Update the token: export GH_RUNNER_TOKEN=\"new_token_here\""\n\
+    echo "   5. Restart: ./start-runner.sh"\n\
+    exit 1\n\
+fi\n\
+\n\
+# Ensure work directory permissions are correct after config\n\
+echo "🔧 Final permission check on work directory..."\n\
+sudo chown -R runner:runner /home/runner/_work\n\
+sudo chmod -R 755 /home/runner/_work\n\
+\n\
+echo "✅ Runner configured successfully"\n\
+echo "🏃 Starting runner..."\n\
+\n\
+# Start the runner\n\
+./run.sh\n\
+' > entrypoint.sh && chmod +x entrypoint.sh
+
+# Set default environment variables (non-sensitive only)
+ENV GH_REPO_URL=""
+ENV GH_RUNNER_LABELS="spark-runner"
+ENV GH_RUNNER_NAME="docker-runner"
+# Note: GH_RUNNER_TOKEN is passed at runtime via docker run -e for security
+
+# Expose the working directory
+VOLUME ["/home/runner/_work"]
+
+# Run the entrypoint script
+CMD ["./entrypoint.sh"]

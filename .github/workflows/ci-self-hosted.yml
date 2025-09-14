@@ -63,6 +63,11 @@ jobs:
       - name: Run frontend tests with coverage
         run: pnpm --filter "@tatou/oss" test:coverage
 
+      - name: Install system dependencies for Rust
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+
       - name: Run Rust clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
 

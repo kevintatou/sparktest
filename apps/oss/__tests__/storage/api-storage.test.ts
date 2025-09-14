@@ -788,7 +788,9 @@ describe("ApiStorageService", () => {
           ok: false,
         })
 
-        await expect(service.getSuiteById("suite1")).rejects.toThrow("Failed to fetch test suite")
+        await expect(service.getTestSuiteById("suite1")).rejects.toThrow(
+          "Failed to fetch test suite"
+        )
       })
     })
   })
