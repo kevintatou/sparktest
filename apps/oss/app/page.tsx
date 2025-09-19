@@ -2,7 +2,7 @@
 
 import { Suspense } from "react"
 import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -57,47 +57,19 @@ function TestRunsSkeleton() {
             ))}
         </div>
       </div>
-
-      {/* Test runs */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium">Recent Runs</h2>
-          <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-            <Filter className="h-4 w-4" />
-            Filter
-          </Button>
-        </div>
-
-        <div className="space-y-3">
-          {testRuns.map((test) => (
-            <Card key={test.id} className="hover:shadow-sm transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 flex-1">
-                    {getStatusIcon(test.status)}
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center gap-3">
-                        <h3 className="font-medium">{test.name}</h3>
-                        <Badge variant="outline" className="text-xs font-mono">
-                          {test.tag}
-                        </Badge>
-                        {getStatusBadge(test.status)}
-                      </div>
-                      <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                        <span>Duration: {formatDuration(test.duration)}</span>
-                        <span>Executed: {test.executed}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+      <div className="space-y-2">
+        {Array(6)
+          .fill(null)
+          .map((_, i) => (
+            <div key={i} className="flex items-center gap-4 rounded-lg border bg-card p-4">
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-4 w-8" />
+              <Skeleton className="h-4 flex-1" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-16" />
+            </div>
           ))}
-        </div>
-      </section>
+      </div>
     </div>
   )
 }

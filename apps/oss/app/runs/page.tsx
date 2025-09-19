@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { Plus, Play, Clock, CheckCircle, XCircle, AlertCircle, FileText, Cpu, Search } from "lucide-react"
+import { Plus, Play, Clock, CheckCircle2, XCircle, AlertTriangle, FileText, Cpu, Search } from "lucide-react"
 
 import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GitHubButton } from "@/components/github-button"
@@ -286,7 +287,7 @@ export default function TestRunsPage() {
                           <p className="text-sm text-muted-foreground">Run ID: {run.id}</p>
                         </div>
                       </div>
-                      <Badge className={getStatusColor(run.status)}>{run.status}</Badge>
+                      {getStatusBadge(run.status)}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
