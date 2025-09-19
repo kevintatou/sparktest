@@ -10,9 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { GitHubButton } from "@/components/github-button"
-import { FloatingCreateButton } from "@/components/floating-create-button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { formatDistanceToNow } from "@tatou/core"
 import type { Suite } from "@tatou/core/types"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
@@ -65,13 +63,14 @@ export default function SuitesPage() {
   )
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={false}>
       <AppSidebar />
       <SidebarInset>
         {/* Clean header */}
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-20">
+          <div className="flex h-16 items-center justify-between px-6">
             <div className="flex items-center gap-4">
+              <SidebarTrigger />
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input 
@@ -83,20 +82,22 @@ export default function SuitesPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <GitHubButton />
-              <ThemeToggle />
               <Button size="sm" className="gap-2" asChild>
                 <Link href="/suites/new">
                   <Plus className="h-4 w-4" />
                   New Suite
                 </Link>
               </Button>
+              <Avatar className="h-8 w-8">
+                <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+                <AvatarFallback>JD</AvatarFallback>
+              </Avatar>
             </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-20">
+        <main className="flex-1 space-y-8 p-6">
           <div>
             <h1 className="text-2xl font-semibold">Suites</h1>
             <p className="text-muted-foreground">Group related tests into logical test sets</p>
@@ -244,11 +245,8 @@ export default function SuitesPage() {
             itemName={suiteToDelete?.name}
             itemType="Suite"
           />
-
-          <FloatingCreateButton />
         </main>
       </SidebarInset>
-      <FloatingCreateButton />
     </SidebarProvider>
   )
 }

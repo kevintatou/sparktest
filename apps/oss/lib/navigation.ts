@@ -9,7 +9,6 @@ import {
   LayersIcon,
   CpuIcon,
 } from "lucide-react"
-<<<<<<<< HEAD:apps/oss/lib/navigation.ts
 import type { LucideIcon } from "lucide-react"
 
 export interface NavigationItem {
@@ -28,9 +27,6 @@ export interface SidebarState {
   isCreateOpen: boolean
   setIsCreateOpen: (open: boolean) => void
 }
-========
-import { NavigationItem, CreateOption } from "../types/navigation"
->>>>>>>> main:packages/core/src/constants/navigation.ts
 
 export const NAVIGATION_ITEMS: readonly NavigationItem[] = [
   { name: "Dashboard", href: "/", icon: Home },

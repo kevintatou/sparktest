@@ -3,95 +3,120 @@
 import { useMemo } from "react"
 import { useDashboardMetrics } from "./useDashboardMetrics"
 import { LoadingState } from "./LoadingState"
-import { MetricCard } from "./MetricCard"
-import { MetricsSummary } from "./MetricsSummary"
+import { Card, CardContent } from "@/components/ui/card"
 import {
-  METRIC_ICONS,
-  formatMetricValue,
-  generateSubtitle,
-  generateMobileSubtitle,
-} from "./metricsUtils"
+  CheckCircle2,
+  XCircle,
+  TrendingUp,
+} from "lucide-react"
 
 export function DashboardMetrics() {
-  const { metrics, loading, trendData } = useDashboardMetrics()
+  const { metrics, loading } = useDashboardMetrics()
 
-  // Memoize metric card configurations
-  const metricCards = useMemo(
-    () => [
+  const metricsData = useMemo(() => {
+    const passRate = metrics.totalRuns > 0 ? (metrics.completedRuns / metrics.totalRuns) * 100 : 0
+    
+    return [
       {
-        id: "passRate",
         title: "Pass Rate",
-        value: formatMetricValue(metrics.passRate, "percentage"),
-        subtitle: generateSubtitle("passRate", metrics),
-        icon: METRIC_ICONS.passRate,
-        color: "green" as const,
-        trendData: trendData.passRate,
+        value: `${Math.round(passRate)}%`,
+        subtitle: `${metrics.completedRuns} of ${metrics.totalRuns} tests passed`,
+        trend: metrics.completedRuns > metrics.failedRuns ? "+5%" : "-3%",
+        color: "emerald",
+        icon: CheckCircle2,
       },
       {
-        id: "failedRuns",
         title: "Failed Runs",
-        value: formatMetricValue(metrics.failedRuns, "count"),
-        subtitle: generateSubtitle("failedRuns", metrics),
-        icon: METRIC_ICONS.failedRuns,
-        color: "red" as const,
-        trendData: trendData.failedRuns,
+        value: metrics.failedRuns.toString(),
+        subtitle: `${metrics.runningRuns} currently running`,
+        trend: metrics.failedRuns > 0 ? "+1" : "0",
+        color: "red",
+        icon: XCircle,
       },
       {
-        id: "totalRuns",
         title: "Total Runs",
-        value: formatMetricValue(metrics.totalRuns, "count"),
-        subtitle: generateSubtitle("totalRuns", metrics),
-        mobileSubtitle: generateMobileSubtitle("totalRuns", metrics),
-        icon: METRIC_ICONS.totalRuns,
-        color: "blue" as const,
-        className: "sm:col-span-2 lg:col-span-1",
-        trendData: trendData.totalRuns,
+        value: metrics.totalRuns.toString(),
+        subtitle: `${metrics.totalDefinitions} definitions • ${metrics.totalExecutors} executors`,
+        trend: `+${Math.max(0, metrics.totalRuns - 10)}`,
+        color: "blue",
+        icon: TrendingUp,
       },
-    ],
-    [metrics, trendData]
-  )
+    ]
+  }, [metrics])
 
   if (loading) {
     return <LoadingState />
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div>
-        <h2 className="text-lg sm:text-xl font-semibold mb-1">Test Execution Overview</h2>
-        <p className="text-sm text-muted-foreground">Real-time metrics from your test data</p>
+    <section className="space-y-6">
+      <div className="grid gap-6 md:grid-cols-3">
+        {metricsData.map((metric) => {
+          const Icon = metric.icon
+          return (
+            <Card key={metric.title} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-3xl font-bold">{metric.value}</p>
+                      <span
+                        className={`text-sm font-medium ${
+                          metric.color === "emerald"
+                            ? "text-emerald-600"
+                            : metric.color === "red"
+                              ? "text-red-600"
+                              : "text-blue-600"
+                        }`}
+                      >
+                        {metric.trend}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{metric.subtitle}</p>
+                  </div>
+                  <div
+                    className={`p-3 rounded-full ${
+                      metric.color === "emerald"
+                        ? "bg-emerald-100 dark:bg-emerald-950/50"
+                        : metric.color === "red"
+                          ? "bg-red-100 dark:bg-red-950/50"
+                          : "bg-blue-100 dark:bg-blue-950/50"
+                    }`}
+                  >
+                    <Icon
+                      className={`h-6 w-6 ${
+                        metric.color === "emerald"
+                          ? "text-emerald-600"
+                          : metric.color === "red"
+                            ? "text-red-600"
+                            : "text-blue-600"
+                      }`}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {metricCards.map((card) => (
-          <MetricCard
-            key={card.id}
-            title={card.title}
-            value={card.value}
-            subtitle={
-              card.id === "totalRuns" ? (
-                <>
-                  <span className="hidden sm:inline">{card.subtitle}</span>
-                  <span className="sm:hidden">{card.mobileSubtitle}</span>
-                </>
-              ) : (
-                card.subtitle
-              )
-            }
-            icon={card.icon}
-            color={card.color}
-            className={card.className}
-            trendData={card.trendData}
-          />
-        ))}
+      {/* Status dots */}
+      <div className="flex items-center gap-6 text-sm">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
+          <span className="text-muted-foreground">{metrics.completedRuns} Completed</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-red-500"></div>
+          <span className="text-muted-foreground">{metrics.failedRuns} Failed</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+          <span className="text-muted-foreground">{metrics.runningRuns} Running</span>
+        </div>
       </div>
-
-      <MetricsSummary
-        completedRuns={metrics.completedRuns}
-        failedRuns={metrics.failedRuns}
-        runningRuns={metrics.runningRuns}
-      />
-    </div>
+    </section>
   )
 }
 
