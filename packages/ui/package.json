@@ -1,6 +1,6 @@
 {
   "name": "@tatou/ui",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Reusable UI components for SparkTest applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
