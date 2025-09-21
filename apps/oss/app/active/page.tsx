@@ -79,7 +79,7 @@ export default function ActiveTestsPage() {
   }, [tests])
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-b from-background to-muted/30">
+    <div className="flex min-h-screen flex-col bg-background">
       <main className="flex-1">
         <div className="container py-6">
           <div className="flex items-center gap-2 mb-6">

@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GitHubButton } from "@/components/github-button"
 import { FloatingCreateButton } from "@/components/floating-create-button"
+import { PageTransition } from "@/components/page-transition"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
 import { storage } from "@tatou/storage-service"
@@ -65,7 +66,7 @@ export default function ExecutorsPage() {
       <SidebarInset>
         {/* Clean header */}
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-20">
+          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-18">
             <div className="flex items-center gap-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -91,11 +92,12 @@ export default function ExecutorsPage() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-20">
-          <div>
-            <h1 className="text-2xl font-semibold">Executors</h1>
-            <p className="text-muted-foreground">Manage your reusable test runners</p>
-          </div>
+        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-18">
+          <PageTransition>
+            <div>
+              <h1 className="text-2xl font-semibold">Executors</h1>
+              <p className="text-muted-foreground">Manage your reusable test runners</p>
+            </div>
 
           {filteredExecutors.length === 0 ? (
             <Card className="p-12 text-center border-dashed">
@@ -132,8 +134,8 @@ export default function ExecutorsPage() {
                 >
                   <CardHeader className="pb-4">
                     <CardTitle className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white">
-                        <Cpu className="h-5 w-5" />
+                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                        <Cpu className="h-5 w-5 text-foreground" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold">{executor.name}</h3>
@@ -177,7 +179,7 @@ export default function ExecutorsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
+                        className="text-destructive hover:bg-destructive/10"
                         onClick={() => handleDelete(executor.id)}
                         disabled={isDeleting === executor.id}
                       >
@@ -215,6 +217,7 @@ export default function ExecutorsPage() {
               ))}
             </div>
           )}
+          </PageTransition>
         </main>
       </SidebarInset>
       <FloatingCreateButton />

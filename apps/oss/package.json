@@ -14,9 +14,6 @@
     "type-check": "tsc --noEmit || echo 'Type check completed with warnings' && exit 0"
   },
   "dependencies": {
-    "@tatou/core": "workspace:*",
-    "@tatou/storage-service": "workspace:*",
-    "@tatou/ui": "workspace:*",
     "@edge-runtime/vm": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "latest",
@@ -47,6 +44,9 @@
     "@radix-ui/react-toggle-group": "latest",
     "@radix-ui/react-tooltip": "latest",
     "@tanstack/react-query": "^5.83.0",
+    "@tatou/core": "workspace:*",
+    "@tatou/storage-service": "workspace:*",
+    "@tatou/ui": "workspace:*",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
@@ -60,6 +60,7 @@
     "cmdk": "latest",
     "date-fns": "4.1.0",
     "embla-carousel-react": "latest",
+    "framer-motion": "^12.23.16",
     "happy-dom": "latest",
     "input-otp": "latest",
     "jsdom": "latest",

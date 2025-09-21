@@ -38,11 +38,11 @@ export function DeleteConfirmationModal({
       <AlertDialogContent>
         <AlertDialogHeader>
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
-              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+            <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
             </div>
             <div>
-              <AlertDialogTitle className="text-lg font-semibold text-red-900 dark:text-red-100">
+              <AlertDialogTitle className="text-lg font-semibold text-destructive">
                 {title}
               </AlertDialogTitle>
             </div>
@@ -57,7 +57,7 @@ export function DeleteConfirmationModal({
               </strong>
             </div>
           )}
-          <div className="mt-3 text-sm text-red-600 dark:text-red-400">
+          <div className="mt-3 text-sm text-destructive">
             <strong>Warning:</strong> This action cannot be undone.
           </div>
         </AlertDialogDescription>
@@ -66,7 +66,7 @@ export function DeleteConfirmationModal({
           <AlertDialogAction
             onClick={onConfirm}
             disabled={isDeleting}
-            className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+            className="bg-destructive hover:bg-destructive/90 focus:ring-destructive"
           >
             {isDeleting ? (
               <>

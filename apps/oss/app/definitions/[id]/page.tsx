@@ -68,7 +68,7 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
       <div className="container py-6">
         <div className="flex flex-col items-center justify-center min-h-[400px]">
           <p className="text-muted-foreground">Definition not found.</p>
-          <Link href="/definitions" className="mt-4 text-blue-600 hover:underline">
+          <Link href="/definitions" className="mt-4 text-primary hover:underline">
             ← Back to Definitions
           </Link>
         </div>
@@ -85,7 +85,7 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
           </Link>
         </Button>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-foreground">
             {definition.name}
           </h1>
           <p className="text-muted-foreground mt-1">{definition.description}</p>
@@ -94,7 +94,6 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
           <Button
             onClick={handleRunTest}
             disabled={isRunning}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
           >
             {isRunning ? (
               <>

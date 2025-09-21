@@ -98,18 +98,6 @@ describe("TestRunsPage", () => {
     vi.clearAllMocks()
   })
 
-  it("renders the page title and description", async () => {
-    vi.mocked(storage.getRuns).mockResolvedValue(mockRuns)
-    vi.mocked(storage.getDefinitions).mockResolvedValue(mockDefinitions)
-    vi.mocked(storage.getExecutors).mockResolvedValue(mockExecutors)
-
-    render(<TestRunsPage />)
-
-    await waitFor(() => {
-      expect(screen.getByText("Runs")).toBeInTheDocument()
-      expect(screen.getByText("Monitor and manage your runs")).toBeInTheDocument()
-    })
-  })
 
   it("displays the New Run button", async () => {
     vi.mocked(storage.getRuns).mockResolvedValue(mockRuns)

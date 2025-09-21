@@ -3,27 +3,14 @@
 import { Suspense } from "react"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
 import { TestRunsList } from "@/components/test-runs-list"
 import { DashboardMetrics } from "@/components/dashboard-metrics"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GitHubButton } from "@/components/github-button"
 import { FloatingCreateButton } from "@/components/floating-create-button"
+import { SearchBox } from "@/components/search-box"
+import { PageTransition } from "@/components/page-transition"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Search,
-  Play,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  MoreHorizontal,
-  Filter,
-  TrendingUp,
-  AlertTriangle,
-} from "lucide-react"
 
 function MetricsSkeleton() {
   return (
@@ -48,25 +35,26 @@ function TestRunsSkeleton() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Skeleton className="h-6 w-48" />
-        <div className="flex gap-2">
-          {Array(4)
-            .fill(null)
-            .map((_, i) => (
-              <Skeleton key={i} className="h-8 w-20" />
-            ))}
-        </div>
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="h-8 w-16" />
       </div>
       <div className="space-y-2">
-        {Array(6)
+        {Array(5)
           .fill(null)
           .map((_, i) => (
             <div key={i} className="flex items-center gap-4 rounded-lg border bg-card p-4">
-              <Skeleton className="h-6 w-6 rounded-full" />
-              <Skeleton className="h-4 w-8" />
-              <Skeleton className="h-4 flex-1" />
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-4 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-3 w-12" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+              <Skeleton className="h-3 w-24" />
             </div>
           ))}
       </div>
@@ -81,12 +69,9 @@ export default function Dashboard() {
       <SidebarInset>
         {/* Clean header */}
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-20">
+          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-18">
             <div className="flex items-center gap-4">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input placeholder="Search..." className="pl-9 bg-muted/50 border-0 focus-visible:ring-1" />
-              </div>
+              <SearchBox />
             </div>
             <div className="flex items-center gap-3">
               <GitHubButton />
@@ -96,19 +81,18 @@ export default function Dashboard() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-20">
-          {/* Simple header */}
-          <div>
-            <h1 className="text-2xl font-semibold">Dashboard</h1>
-          </div>
+        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-18">
+          <PageTransition>
+ 
 
-          <Suspense fallback={<MetricsSkeleton />}>
-            <DashboardMetrics />
-          </Suspense>
+            <Suspense fallback={<MetricsSkeleton />}>
+              <DashboardMetrics />
+            </Suspense>
 
-          <Suspense fallback={<TestRunsSkeleton />}>
-            <TestRunsList />
-          </Suspense>
+            <Suspense fallback={<TestRunsSkeleton />}>
+              <TestRunsList />
+            </Suspense>
+          </PageTransition>
         </main>
       </SidebarInset>
       <FloatingCreateButton />

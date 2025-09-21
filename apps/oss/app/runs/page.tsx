@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GitHubButton } from "@/components/github-button"
 import { FloatingCreateButton } from "@/components/floating-create-button"
+import { PageTransition } from "@/components/page-transition"
 import { formatDistanceToNow } from "@tatou/core"
 import type { Run } from "@tatou/core/types"
 import { storage } from "@tatou/storage-service"
@@ -38,7 +39,7 @@ const LiveDuration = ({ run }: { run: Run }) => {
   }, [run.status, run.createdAt])
 
   if (run.status === "running") {
-    return <span className="font-medium text-blue-600 animate-pulse">{elapsed}s (running)</span>
+    return <span className="font-medium text-primary animate-pulse">{elapsed}s (running)</span>
   }
 
   return <span className="font-medium">{run.duration || 0}s</span>
@@ -47,11 +48,11 @@ const LiveDuration = ({ run }: { run: Run }) => {
 function getStatusIcon(status: string) {
   switch (status) {
     case "completed":
-      return <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+      return <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
     case "failed":
-      return <XCircle className="h-4 w-4 text-red-500" />
+      return <XCircle className="h-4 w-4 text-destructive" />
     case "running":
-      return <Clock className="h-4 w-4 text-blue-500 animate-pulse" />
+      return <Clock className="h-4 w-4 text-primary animate-pulse" />
     default:
       return <AlertTriangle className="h-4 w-4 text-amber-500" />
   }
@@ -63,26 +64,20 @@ function getStatusBadge(status: string) {
       return (
         <Badge
           variant="secondary"
-          className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800/50"
+          className="bg-green-50 text-green-700 border-green-200 dark:bg-green-950/50 dark:text-green-400 dark:border-green-800/50"
         >
           completed
         </Badge>
       )
     case "failed":
       return (
-        <Badge
-          variant="secondary"
-          className="bg-red-50 text-red-700 border-red-200 dark:bg-red-950/50 dark:text-red-400 dark:border-red-800/50"
-        >
+        <Badge variant="destructive">
           failed
         </Badge>
       )
     case "running":
       return (
-        <Badge
-          variant="secondary"
-          className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-400 dark:border-blue-800/50"
-        >
+        <Badge variant="secondary" className="bg-primary/10 text-primary">
           running
         </Badge>
       )
@@ -175,7 +170,7 @@ export default function TestRunsPage() {
       <SidebarInset>
         {/* Clean header */}
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-20">
+          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-18">
             <div className="flex items-center gap-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -201,11 +196,9 @@ export default function TestRunsPage() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-20">
-          <div>
-            <h1 className="text-2xl font-semibold">Runs</h1>
-            <p className="text-muted-foreground">Monitor and manage your runs</p>
-          </div>
+        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-18">
+          <PageTransition>
+
 
           {isLoading ? (
             <div className="space-y-4">
@@ -234,7 +227,7 @@ export default function TestRunsPage() {
           ) : runsError ? (
             <Card className="p-12 text-center">
               <div className="flex flex-col items-center gap-4">
-                <XCircle className="h-16 w-16 text-red-500" />
+                <XCircle className="h-16 w-16 text-destructive" />
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Failed to load runs</h3>
                   <p className="text-muted-foreground mb-4">
@@ -304,13 +297,13 @@ export default function TestRunsPage() {
                       </div>
                       <div>
                         <span className="text-muted-foreground">Test Definition:</span>
-                        <p className="font-medium text-blue-600 dark:text-blue-400">
+                        <p className="font-medium text-primary">
                           {getDefinitionName(run.definitionId)}
                         </p>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Executor:</span>
-                        <p className="font-medium text-purple-600 dark:text-purple-400">
+                        <p className="font-medium text-accent-foreground">
                           {getExecutorName(run.executorId)}
                         </p>
                       </div>
@@ -320,7 +313,7 @@ export default function TestRunsPage() {
                     {run.k8sJobName && (
                       <div className="bg-muted rounded-lg p-3">
                         <div className="flex items-center gap-2 mb-2">
-                          <Cpu className="h-4 w-4 text-blue-500" />
+                          <Cpu className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm font-medium">Kubernetes Job</span>
                         </div>
                         <p className="text-sm font-mono text-muted-foreground">
@@ -366,7 +359,7 @@ export default function TestRunsPage() {
                           variant="outline"
                           size="sm"
                           asChild
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-primary hover:text-primary/80"
                         >
                           <Link href={`/runs/${run.id}#logs`}>
                             <FileText className="mr-1 h-3 w-3" />
@@ -378,7 +371,7 @@ export default function TestRunsPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
+                          className="text-destructive hover:bg-destructive/10"
                           onClick={() => handleDeleteClick(run)}
                           disabled={deleteRunMutation.isPending}
                         >
@@ -413,7 +406,7 @@ export default function TestRunsPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950 dark:hover:bg-blue-900 dark:text-blue-300 dark:border-blue-800"
+                        className="bg-primary/10 hover:bg-primary/20 text-primary border-primary/20"
                       >
                         <Play className="mr-2 h-4 w-4" />
                         Retry
@@ -435,6 +428,7 @@ export default function TestRunsPage() {
             itemName={runToDelete?.name}
             itemType="Run"
           />
+          </PageTransition>
         </main>
       </SidebarInset>
       <FloatingCreateButton />

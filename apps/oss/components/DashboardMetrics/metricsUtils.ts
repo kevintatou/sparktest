@@ -19,30 +19,28 @@ export const METRIC_ICONS = {
 
 export const COLOR_SCHEMES = {
   green: {
-    cardBg:
-      "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20",
-    border: "border-green-200 dark:border-green-800",
-    title: "text-green-700 dark:text-green-300",
+    cardBg: "bg-background border",
+    border: "border-muted",
+    title: "text-green-600 dark:text-green-400",
     value: "text-green-700 dark:text-green-300",
-    subtitle: "text-green-600 dark:text-green-400",
+    subtitle: "text-muted-foreground",
     icon: "text-green-600 dark:text-green-400",
   },
   red: {
-    cardBg: "bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-950/20 dark:to-rose-950/20",
-    border: "border-red-200 dark:border-red-800",
-    title: "text-red-700 dark:text-red-300",
-    value: "text-red-700 dark:text-red-300",
-    subtitle: "text-red-600 dark:text-red-400",
-    icon: "text-red-600 dark:text-red-400",
+    cardBg: "bg-background border",
+    border: "border-muted",
+    title: "text-destructive",
+    value: "text-destructive",
+    subtitle: "text-muted-foreground",
+    icon: "text-destructive",
   },
   blue: {
-    cardBg:
-      "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20",
-    border: "border-blue-200 dark:border-blue-800",
-    title: "text-blue-700 dark:text-blue-300",
-    value: "text-blue-700 dark:text-blue-300",
-    subtitle: "text-blue-600 dark:text-blue-400",
-    icon: "text-blue-600 dark:text-blue-400",
+    cardBg: "bg-background border",
+    border: "border-muted",
+    title: "text-primary",
+    value: "text-primary",
+    subtitle: "text-muted-foreground",
+    icon: "text-primary",
   },
 } as const
 

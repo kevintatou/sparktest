@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GitHubButton } from "@/components/github-button"
 import { FloatingCreateButton } from "@/components/floating-create-button"
+import { PageTransition } from "@/components/page-transition"
 import { formatDistanceToNow } from "@tatou/core"
 import type { Suite } from "@tatou/core/types"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
@@ -70,7 +71,7 @@ export default function SuitesPage() {
       <SidebarInset>
         {/* Clean header */}
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-20">
+          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-18">
             <div className="flex items-center gap-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -96,12 +97,8 @@ export default function SuitesPage() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-20">
-          <div>
-            <h1 className="text-2xl font-semibold">Suites</h1>
-            <p className="text-muted-foreground">Group related tests into logical test sets</p>
-          </div>
-
+        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-18">
+          <PageTransition>
           {isLoading ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {Array(6)
@@ -127,7 +124,7 @@ export default function SuitesPage() {
           ) : error ? (
             <Card className="p-12 text-center">
               <div className="flex flex-col items-center gap-4">
-                <Layers className="h-16 w-16 text-red-500" />
+                <Layers className="h-16 w-16 text-destructive" />
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Failed to load suites</h3>
                   <p className="text-muted-foreground mb-4">
@@ -168,8 +165,8 @@ export default function SuitesPage() {
                 <Card key={suite.id} className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-4">
                     <CardTitle className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-950/50 flex items-center justify-center">
-                        <Layers className="h-5 w-5 text-blue-600" />
+                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                        <Layers className="h-5 w-5 text-foreground" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold">{suite.name}</h3>
@@ -213,7 +210,7 @@ export default function SuitesPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
+                        className="text-destructive hover:bg-destructive/10"
                         onClick={() => handleDeleteClick(suite)}
                         disabled={deleteSuiteMutation.isPending}
                       >
@@ -244,8 +241,7 @@ export default function SuitesPage() {
             itemName={suiteToDelete?.name}
             itemType="Suite"
           />
-
-          <FloatingCreateButton />
+          </PageTransition>
         </main>
       </SidebarInset>
       <FloatingCreateButton />

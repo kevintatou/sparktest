@@ -2,57 +2,50 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { CheckCircle2, XCircle, Clock, MoreHorizontal, Filter } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CheckCircle2, XCircle, Clock, MoreHorizontal, Filter, TrendingUp, Activity } from "lucide-react"
+import { useOptimizedNavigation } from "@/hooks/use-optimized-navigation"
 import { useRuns } from "@/hooks/use-queries"
 import type { Run } from "@tatou/core"
 
-function getStatusIcon(status: string) {
-  switch (status) {
-    case "completed":
-      return <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-    case "failed":
-      return <XCircle className="h-4 w-4 text-red-500" />
-    case "running":
-      return <Clock className="h-4 w-4 text-blue-500" />
-    default:
-      return <Clock className="h-4 w-4 text-amber-500" />
+const StatusConfig = {
+  completed: {
+    icon: CheckCircle2,
+    color: "text-green-600 dark:text-green-400",
+    bgColor: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/50 dark:text-green-400 dark:border-green-800/50",
+    label: "completed"
+  },
+  failed: {
+    icon: XCircle,
+    color: "text-destructive", 
+    bgColor: "bg-destructive/10 text-destructive border-destructive/20",
+    label: "failed"
+  },
+  running: {
+    icon: Clock,
+    color: "text-primary",
+    bgColor: "bg-primary/10 text-primary border-primary/20",
+    label: "running"
   }
+} as const
+
+function StatusIcon({ status }: { status: string }) {
+  const config = StatusConfig[status as keyof typeof StatusConfig]
+  if (!config) return <Clock className="h-4 w-4 text-muted-foreground" />
+  
+  const Icon = config.icon
+  return <Icon className={`h-4 w-4 ${config.color}`} />
 }
 
-function getStatusBadge(status: string) {
-  switch (status) {
-    case "completed":
-      return (
-        <Badge
-          variant="secondary"
-          className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800/50"
-        >
-          completed
-        </Badge>
-      )
-    case "failed":
-      return (
-        <Badge
-          variant="secondary"
-          className="bg-red-50 text-red-700 border-red-200 dark:bg-red-950/50 dark:text-red-400 dark:border-red-800/50"
-        >
-          failed
-        </Badge>
-      )
-    case "running":
-      return (
-        <Badge
-          variant="secondary"
-          className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-400 dark:border-blue-800/50"
-        >
-          running
-        </Badge>
-      )
-    default:
-      return <Badge variant="secondary">unknown</Badge>
-  }
+function StatusBadge({ status }: { status: string }) {
+  const config = StatusConfig[status as keyof typeof StatusConfig]
+  if (!config) return <Badge variant="secondary">unknown</Badge>
+  
+  return (
+    <Badge variant="secondary" className={config.bgColor}>
+      {config.label}
+    </Badge>
+  )
 }
 
 function formatDuration(run: Run) {
@@ -74,84 +67,125 @@ function formatExecutedTime(dateStr: string) {
   }
 }
 
+function RunItem({ run }: { run: Run }) {
+  const { navigate, preload } = useOptimizedNavigation()
+  const runUrl = `/runs/${run.id}`
+
+  return (
+    <Card 
+      className="hover:shadow-sm transition-all duration-200 cursor-pointer group border-l-4 border-l-muted hover:border-l-primary/50"
+      onClick={() => navigate(runUrl)}
+      onMouseEnter={() => preload(runUrl)}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <StatusIcon status={run.status} />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-medium truncate text-sm">
+                  {run.name || `Test Run ${run.id.slice(0, 8)}`}
+                </h3>
+                <StatusBadge status={run.status} />
+              </div>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="font-mono bg-muted/50 px-2 py-0.5 rounded text-[10px]">
+                  {run.id.slice(0, 8)}
+                </span>
+                <span>{formatDuration(run)}</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="hidden sm:block">{formatExecutedTime(run.createdAt)}</span>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => {
+                e.stopPropagation()
+                // Add dropdown menu functionality here
+              }}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+        <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+      </div>
+      <div className="space-y-2">
+        {Array(4).fill(null).map((_, i) => (
+          <Card key={i} className="p-4 animate-pulse">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="h-4 w-4 bg-muted rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 bg-muted rounded w-1/3" />
+                    <div className="h-4 w-16 bg-muted rounded" />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-3 w-12 bg-muted rounded" />
+                    <div className="h-3 w-16 bg-muted rounded" />
+                  </div>
+                </div>
+              </div>
+              <div className="h-3 w-24 bg-muted rounded" />
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function TestRunsList() {
   const { data: runs = [], isLoading } = useRuns()
-  const router = useRouter()
-
+  
   if (isLoading) {
-    return (
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium">Recent Runs</h2>
-          <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-            <Filter className="h-4 w-4" />
-            Filter
-          </Button>
-        </div>
-        <div className="space-y-3">
-          {Array(4).fill(null).map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="h-4 w-4 bg-muted rounded-full" />
-                    <div className="space-y-2 flex-1">
-                      <div className="h-4 bg-muted rounded w-1/2" />
-                      <div className="h-3 bg-muted rounded w-1/3" />
-                    </div>
-                  </div>
-                  <div className="h-8 w-8 bg-muted rounded" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-    )
+    return <LoadingSkeleton />
   }
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-2">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">Recent Runs</h2>
-        <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <Activity className=" h-5 w-5 text-muted-foreground" />
+          Recent Activity
+        </h2>
+        <Button variant="outline" size="sm" className="gap-2">
           <Filter className="h-4 w-4" />
           Filter
         </Button>
       </div>
 
-      <div className="space-y-3">
-        {runs.slice(0, 10).map((run) => (
-          <Card key={run.id} className="hover:shadow-sm transition-shadow cursor-pointer" onClick={() => router.push(`/runs/${run.id}`)}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 flex-1">
-                  {getStatusIcon(run.status)}
-                  <div className="space-y-1 flex-1">
-                    <div className="flex items-center gap-3">
-                      <h3 className="font-medium">{run.name || `Test Run ${run.id.slice(0, 8)}`}</h3>
-                      <Badge variant="outline" className="text-xs font-mono">
-                        {run.id.slice(0, 12)}
-                      </Badge>
-                      {getStatusBadge(run.status)}
-                    </div>
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <span>Duration: {formatDuration(run)}</span>
-                      <span>Executed: {formatExecutedTime(run.createdAt)}</span>
-                    </div>
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm" onClick={(e) => {
-                  e.stopPropagation()
-                  // Add dropdown menu functionality here
-                }}>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {runs.length === 0 ? (
+        <Card className="p-8 text-center border-dashed">
+          <div className="flex flex-col items-center gap-3">
+            <Activity className="h-8 w-8 text-muted-foreground" />
+            <div>
+              <h3 className="font-medium text-muted-foreground">No runs yet</h3>
+              <p className="text-sm text-muted-foreground">Create a test definition and run it to see results here.</p>
+            </div>
+          </div>
+        </Card>
+      ) : (
+        <div className="space-y-2">
+          {runs.slice(0, 10).map((run) => (
+            <RunItem key={run.id} run={run} />
+          ))}
+        </div>
+      )}
     </section>
   )
 }

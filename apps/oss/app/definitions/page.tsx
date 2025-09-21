@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GitHubButton } from "@/components/github-button"
 import { FloatingCreateButton } from "@/components/floating-create-button"
+import { PageTransition } from "@/components/page-transition"
 import { storage } from "@tatou/storage-service"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
@@ -103,7 +104,7 @@ export default function DefinitionsPage() {
       <SidebarInset>
         {/* Clean header */}
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-20">
+          <div className="flex h-16 items-center justify-between px-6 group-data-[collapsible=icon]:pl-18">
             <div className="flex items-center gap-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -129,12 +130,8 @@ export default function DefinitionsPage() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-20">
-          <div>
-            <h1 className="text-2xl font-semibold">Definitions</h1>
-            <p className="text-muted-foreground">Manage your reusable test blueprints</p>
-          </div>
-
+        <main className="flex-1 space-y-8 p-6 group-data-[collapsible=icon]:pl-18">
+          <PageTransition>
           {filteredDefinitions.length === 0 ? (
             <Card className="p-12 text-center border-dashed">
               <div className="flex flex-col items-center gap-4">
@@ -170,8 +167,8 @@ export default function DefinitionsPage() {
                 >
                   <CardHeader className="pb-4">
                     <CardTitle className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white">
-                        <FileText className="h-5 w-5" />
+                      <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                        <FileText className="h-5 w-5 text-foreground" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold">
@@ -210,7 +207,7 @@ export default function DefinitionsPage() {
                             href={definition.source}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 hover:underline"
+                            className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 hover:underline"
                           >
                             <Github className="h-3 w-3" />
                             GitHub
@@ -244,7 +241,7 @@ export default function DefinitionsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-200 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
+                        className="text-destructive hover:bg-destructive/10"
                         onClick={() => handleDeleteClick(definition)}
                         disabled={isDeleting === definition.id}
                       >
@@ -297,6 +294,7 @@ export default function DefinitionsPage() {
             itemName={definitionToDelete?.name}
             itemType="Definition"
           />
+          </PageTransition>
         </main>
       </SidebarInset>
       <FloatingCreateButton />

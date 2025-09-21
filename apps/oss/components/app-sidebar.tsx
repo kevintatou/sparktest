@@ -1,8 +1,10 @@
 "use client"
 
+import * as React from "react"
 import { Home, FileText, Network, Activity, Layers, Zap } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useOptimizedNavigation } from "@/hooks/use-optimized-navigation"
 import {
   Sidebar,
   SidebarContent,
@@ -47,12 +49,18 @@ const items = [
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { preload } = useOptimizedNavigation()
+
+  // Preload all navigation routes for faster switching
+  React.useEffect(() => {
+    items.forEach(item => preload(item.url))
+  }, [preload])
 
   return (
     <Sidebar collapsible="icon" className="border-r-2">
       <SidebarHeader className="border-b border-sidebar-border">
         <div className="flex items-center gap-3 px-3 py-4 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-white shrink-0">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shrink-0">
             <Zap className="h-6 w-6" />
           </div>
           <div className="group-data-[collapsible=icon]:hidden min-w-0">
@@ -63,9 +71,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden text-sidebar-foreground/70 uppercase text-xs font-semibold tracking-wider px-3 py-2">
-            Testing Platform
-          </SidebarGroupLabel>
+  
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1 px-2">
               {items.map((item) => (
@@ -76,7 +82,11 @@ export function AppSidebar() {
                     tooltip={item.title}
                     className="h-11 rounded-lg transition-all duration-200 hover:bg-sidebar-accent/50 data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground"
                   >
-                    <Link href={item.url} className="flex items-center gap-3 px-3">
+                    <Link 
+                      href={item.url} 
+                      className="flex items-center gap-3 px-3"
+                      onMouseEnter={() => preload(item.url)}
+                    >
                       <item.icon className="h-5 w-5 shrink-0" />
                       <span className="font-medium group-data-[collapsible=icon]:hidden">{item.title}</span>
                     </Link>

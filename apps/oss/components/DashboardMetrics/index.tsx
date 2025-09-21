@@ -49,7 +49,7 @@ export function DashboardMetrics() {
   }
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 mb-4">
       <div className="grid gap-6 md:grid-cols-3">
         {metricsData.map((metric) => {
           const Icon = metric.icon
@@ -64,10 +64,10 @@ export function DashboardMetrics() {
                       <span
                         className={`text-sm font-medium ${
                           metric.color === "emerald"
-                            ? "text-emerald-600"
+                            ? "text-green-600 dark:text-green-400"
                             : metric.color === "red"
-                              ? "text-red-600"
-                              : "text-blue-600"
+                              ? "text-destructive"
+                              : "text-primary"
                         }`}
                       >
                         {metric.trend}
@@ -78,19 +78,19 @@ export function DashboardMetrics() {
                   <div
                     className={`p-3 rounded-full ${
                       metric.color === "emerald"
-                        ? "bg-emerald-100 dark:bg-emerald-950/50"
+                        ? "bg-green-100 dark:bg-green-950/50"
                         : metric.color === "red"
-                          ? "bg-red-100 dark:bg-red-950/50"
-                          : "bg-blue-100 dark:bg-blue-950/50"
+                          ? "bg-destructive/10"
+                          : "bg-muted"
                     }`}
                   >
                     <Icon
                       className={`h-6 w-6 ${
                         metric.color === "emerald"
-                          ? "text-emerald-600"
+                          ? "text-green-600 dark:text-green-400"
                           : metric.color === "red"
-                            ? "text-red-600"
-                            : "text-blue-600"
+                            ? "text-destructive"
+                            : "text-primary"
                       }`}
                     />
                   </div>
@@ -100,22 +100,22 @@ export function DashboardMetrics() {
           )
         })}
       </div>
-
       {/* Status dots */}
       <div className="flex items-center gap-6 text-sm">
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
+          <div className="h-2 w-2 rounded-full bg-green-500 dark:bg-green-400"></div>
           <span className="text-muted-foreground">{metrics.completedRuns} Completed</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-red-500"></div>
+          <div className="h-2 w-2 rounded-full bg-destructive"></div>
           <span className="text-muted-foreground">{metrics.failedRuns} Failed</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+          <div className="h-2 w-2 rounded-full bg-primary"></div>
           <span className="text-muted-foreground">{metrics.runningRuns} Running</span>
         </div>
       </div>
+
     </section>
   )
 }
