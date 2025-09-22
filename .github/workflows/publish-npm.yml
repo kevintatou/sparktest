@@ -14,15 +14,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Enable Corepack and install pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@latest --activate
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "18"
           registry-url: "https://registry.npmjs.org/"
           cache: "pnpm"
           cache-dependency-path: pnpm-lock.yaml
@@ -52,7 +52,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       - name: Build packages
         run: pnpm build:packages
