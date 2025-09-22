@@ -2,8 +2,8 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, XCircle, Clock, MoreHorizontal, Filter, TrendingUp, Activity } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { CheckCircle2, XCircle, Clock, MoreHorizontal, Filter, Activity } from "lucide-react"
 import { useOptimizedNavigation } from "@/hooks/use-optimized-navigation"
 import { useRuns } from "@/hooks/use-queries"
 import type { Run } from "@tatou/core"

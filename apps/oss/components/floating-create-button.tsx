@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { Plus, FileText, Layers, Network } from "lucide-react"
-import Link from "next/link"
 import { useOptimizedNavigation } from "@/hooks/use-optimized-navigation"
 
 import { Button } from "@/components/ui/button"
