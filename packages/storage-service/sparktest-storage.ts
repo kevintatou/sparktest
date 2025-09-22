@@ -19,197 +19,41 @@ import type {
   JobLogs,
   JobStatus,
   JobDeleteResponse,
-<<<<<<< HEAD
-<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
-=======
->>>>>>> main
 } from "@tatou/core"
 import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "@tatou/core"
 
 const API_BASE = "http://localhost:8080/api"
-<<<<<<< HEAD
-========
-} from "../types"
-import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "../samples"
-
-const API_BASE = "http://localhost:3001/api"
->>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
-=======
->>>>>>> main
 
 export class SparkTestStorageService implements StorageService {
   private executorStorage: GenericHybridStorageService<Executor>
   private definitionStorage: GenericHybridStorageService<Definition>
   private runStorage: GenericHybridStorageService<Run>
-<<<<<<< HEAD
-<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
   private suiteStorage: GenericHybridStorageService<Suite>
-========
-  private testSuiteStorage: GenericHybridStorageService<Suite>
->>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
-=======
-  private suiteStorage: GenericHybridStorageService<Suite>
->>>>>>> main
 
   constructor() {
-    // Initialize executor storage
-    const executorLocalStorage = new GenericLocalStorageService<Executor>(
-      "sparktest_executors",
-      sampleExecutors,
-      (executor) => executor.id,
-      storageUtils
-    )
-    const executorApiStorage = new GenericApiStorageService<Executor>(
-      "test-executors",
-      API_BASE,
-      (executor) => executor.id
-    )
+    // Initialize storage services for each entity type
     this.executorStorage = new GenericHybridStorageService<Executor>(
-      executorApiStorage,
-      executorLocalStorage
+      new GenericApiStorageService(`/test-executors`, API_BASE, (item: Executor) => item.id),
+      new GenericLocalStorageService("sparktest_executors", sampleExecutors, (item: Executor) => item.id, storageUtils),
     )
 
-    // Initialize definition storage
-    const definitionLocalStorage = new GenericLocalStorageService<Definition>(
-      "sparktest_definitions",
-      sampleDefinitions,
-      (definition) => definition.id,
-      storageUtils
-    )
-    const definitionApiStorage = new GenericApiStorageService<Definition>(
-      "test-definitions",
-      API_BASE,
-      (definition) => definition.id
-    )
     this.definitionStorage = new GenericHybridStorageService<Definition>(
-      definitionApiStorage,
-      definitionLocalStorage
+      new GenericApiStorageService(`/test-definitions`, API_BASE, (item: Definition) => item.id),
+      new GenericLocalStorageService("sparktest_definitions", sampleDefinitions, (item: Definition) => item.id, storageUtils),
     )
 
-    // Initialize run storage with transformations
-    const runLocalStorage = new GenericLocalStorageService<Run>(
-      "sparktest_runs",
-      sampleRuns,
-      (run) => run.id,
-      storageUtils,
-      {
-        insertMode: "unshift",
-        maxItems: 50,
-      }
+    this.runStorage = new GenericHybridStorageService<Run>(
+      new GenericApiStorageService(`/test-runs`, API_BASE, (item: Run) => item.id),
+      new GenericLocalStorageService("sparktest_runs", sampleRuns, (item: Run) => item.id, storageUtils),
     )
-    const runApiStorage = new GenericApiStorageService<Run>(
-      "test-runs",
-      API_BASE,
-      (run) => run.id,
-      {
-        transformRequest: (run: Run) => ({
-          ...run,
-          created_at: run.createdAt,
-          definition_id: run.definitionId,
-          executor_id: run.executorId,
-          createdAt: undefined,
-          definitionId: undefined,
-          executorId: undefined,
-        }),
-        transformResponse: (data: any[]) => {
-          return data
-            .map((run: any) => {
-              const { created_at, definition_id, executor_id, ...rest } = run
-              let createdAt = ""
-              if (created_at && !isNaN(new Date(created_at).getTime())) {
-                createdAt = new Date(created_at).toISOString()
-              }
-              return {
-                ...rest,
-                createdAt,
-                definitionId: definition_id,
-                executorId: executor_id,
-              }
-            })
-            .filter((run: any) => !!run.createdAt && !isNaN(new Date(run.createdAt).getTime()))
-            .sort(
-              (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            )
-        },
-      }
-    )
-    this.runStorage = new GenericHybridStorageService<Run>(runApiStorage, runLocalStorage)
 
-<<<<<<< HEAD
-<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
-    // Initialize suite storage with transformations
-    const suiteLocalStorage = new GenericLocalStorageService<Suite>(
-========
-    // Initialize test suite storage with transformations
-    const testSuiteLocalStorage = new GenericLocalStorageService<Suite>(
->>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
-=======
-    // Initialize suite storage with transformations
-    const suiteLocalStorage = new GenericLocalStorageService<Suite>(
->>>>>>> main
-      "sparktest_test_suites",
-      sampleSuites,
-      (suite) => suite.id,
-      storageUtils
+    this.suiteStorage = new GenericHybridStorageService<Suite>(
+      new GenericApiStorageService(`/test-suites`, API_BASE, (item: Suite) => item.id),
+      new GenericLocalStorageService("sparktest_suites", sampleSuites, (item: Suite) => item.id, storageUtils),
     )
-<<<<<<< HEAD
-<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
-    const suiteApiStorage = new GenericApiStorageService<Suite>(
-========
-    const testSuiteApiStorage = new GenericApiStorageService<Suite>(
->>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
-=======
-    const suiteApiStorage = new GenericApiStorageService<Suite>(
->>>>>>> main
-      "test-suites",
-      API_BASE,
-      (suite) => suite.id,
-      {
-        transformRequest: (suite: Suite) => ({
-          ...suite,
-          id: suite.id || "00000000-0000-0000-0000-000000000000",
-          execution_mode: suite.executionMode,
-          test_definition_ids: suite.testDefinitionIds.map((id: string) => {
-            if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
-              return id
-            }
-            return `00000000-0000-0000-0000-${id.padStart(12, "0").substring(0, 12)}`
-          }),
-          labels: suite.labels || [],
-          description: suite.description || "",
-          created_at: suite.createdAt || new Date().toISOString(),
-          executionMode: undefined,
-          testDefinitionIds: undefined,
-          createdAt: undefined,
-        }),
-        transformResponse: (data: any[]) => {
-          return data.map((suite: any) => ({
-            id: suite.id,
-            name: suite.name,
-            description: suite.description || "",
-            testDefinitionIds: suite.test_definition_ids || [],
-            executionMode: suite.execution_mode as "sequential" | "parallel",
-            createdAt: suite.created_at || new Date().toISOString(),
-            labels: suite.labels || [],
-          }))
-        },
-      }
-    )
-<<<<<<< HEAD
-<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
-    this.suiteStorage = new GenericHybridStorageService<Suite>(suiteApiStorage, suiteLocalStorage)
-========
-    this.testSuiteStorage = new GenericHybridStorageService<Suite>(
-      testSuiteApiStorage,
-      testSuiteLocalStorage
-    )
->>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
-=======
-    this.suiteStorage = new GenericHybridStorageService<Suite>(suiteApiStorage, suiteLocalStorage)
->>>>>>> main
   }
 
-  // Executor methods
+  // Executors
   async getExecutors(): Promise<Executor[]> {
     return this.executorStorage.getItems()
   }
@@ -226,7 +70,7 @@ export class SparkTestStorageService implements StorageService {
     return this.executorStorage.getItemById(id)
   }
 
-  // Definition methods
+  // Definitions
   async getDefinitions(): Promise<Definition[]> {
     return this.definitionStorage.getItems()
   }
@@ -243,7 +87,7 @@ export class SparkTestStorageService implements StorageService {
     return this.definitionStorage.getItemById(id)
   }
 
-  // Run methods
+  // Runs
   async getRuns(): Promise<Run[]> {
     return this.runStorage.getItems()
   }
@@ -277,8 +121,7 @@ export class SparkTestStorageService implements StorageService {
       definitionId: def.id,
       executorId: def.executorId,
       variables: def.variables || {},
-      artifacts: [],
-      logs: ["> Starting test..."],
+      logs: ["Starting test..."],
     }
 
     return this.saveRun(run)
@@ -287,128 +130,111 @@ export class SparkTestStorageService implements StorageService {
   subscribeToRuns(
     callback: (payload: { eventType: string; new?: Run; old?: Run }) => void
   ): () => void {
-    return this.runStorage.subscribe((payload) => {
-      callback({
-        eventType: payload.eventType,
-        new: payload.new,
-        old: payload.old,
-      })
-    })
+    // For now, return a no-op unsubscribe function
+    // In a real implementation, this would set up WebSocket or other real-time updates
+    return () => {}
   }
 
-<<<<<<< HEAD
-<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
-  // Suite methods
+  // Suites
   async getSuites(): Promise<Suite[]> {
     return this.suiteStorage.getItems()
   }
 
   async saveSuite(suite: Suite): Promise<Suite> {
     return this.suiteStorage.saveItem(suite)
-========
-  // Test Suite methods
-  async getTestSuites(): Promise<Suite[]> {
-    return this.testSuiteStorage.getItems()
-  }
-
-  async saveTestSuite(suite: Suite): Promise<Suite> {
-    return this.testSuiteStorage.saveItem(suite)
->>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
   }
 
   async deleteSuite(id: string): Promise<boolean> {
     return this.suiteStorage.deleteItem(id)
   }
 
-<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
   async getSuiteById(id: string): Promise<Suite | undefined> {
     return this.suiteStorage.getItemById(id)
-========
-  async getTestSuiteById(id: string): Promise<Suite | undefined> {
-    return this.testSuiteStorage.getItemById(id)
->>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
-=======
-  // Suite methods
-  async getTestSuites(): Promise<Suite[]> {
-    return this.suiteStorage.getItems()
   }
 
-  async saveTestSuite(suite: Suite): Promise<Suite> {
-    return this.suiteStorage.saveItem(suite)
-  }
-
-  async deleteTestSuite(id: string): Promise<boolean> {
-    return this.suiteStorage.deleteItem(id)
-  }
-
-  async getTestSuiteById(id: string): Promise<Suite | undefined> {
-    return this.suiteStorage.getItemById(id)
->>>>>>> main
-  }
-
-  // Kubernetes Integration - These methods are SparkTest-specific and would remain in the main service
+  // Kubernetes Integration
   async getKubernetesHealth(): Promise<KubernetesHealth> {
     try {
-      const res = await fetch(`${API_BASE}/k8s/health`)
-      if (!res.ok) throw new Error("Failed to check Kubernetes health")
-<<<<<<< HEAD
-<<<<<<<< HEAD:packages/storage-service/sparktest-storage.ts
-      return (await res.json()) as KubernetesHealth
-========
-      return await res.json()
->>>>>>>> main:packages/core/src/storage/sparktest-storage.ts
-=======
-      return (await res.json()) as KubernetesHealth
->>>>>>> main
-    } catch (error) {
-      throw new Error("Kubernetes integration not available")
+      const response = await fetch(`${API_BASE}/k8s/health`)
+      if (!response.ok) throw new Error("Failed to check Kubernetes health")
+      return await response.json()
+    } catch {
+      // Fallback to mock data if API is not available
+      return {
+        kubernetes_connected: false,
+        timestamp: new Date().toISOString(),
+      }
     }
   }
 
   async getTestRunLogs(runId: string): Promise<JobLogs> {
     try {
-      const res = await fetch(`${API_BASE}/test-runs/${runId}/logs`)
-      if (!res.ok) throw new Error(`Failed to fetch logs for test run ${runId}`)
-      return (await res.json()) as JobLogs
-    } catch (error) {
-      throw new Error("Kubernetes integration not available")
+      const response = await fetch(`${API_BASE}/test-runs/${runId}/logs`)
+      if (!response.ok) throw new Error(`Failed to fetch logs for test run ${runId}`)
+      return await response.json()
+    } catch {
+      // Fallback to local storage data
+      const run = await this.getRunById(runId)
+      return {
+        job_name: run?.k8sJobName || `test-run-${runId}`,
+        pod_name: `pod-${runId}`,
+        logs: Array.isArray(run?.logs) ? run.logs.join('\n') : "No logs available",
+        timestamp: new Date().toISOString(),
+        status: run?.status || "unknown",
+      }
     }
   }
 
   async getJobLogs(jobName: string): Promise<JobLogs> {
     try {
-      const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}/logs`)
-      if (!res.ok) throw new Error(`Failed to fetch logs for job ${jobName}`)
-      return (await res.json()) as JobLogs
-    } catch (error) {
-      throw new Error("Kubernetes integration not available")
+      const response = await fetch(`${API_BASE}/k8s/jobs/${jobName}/logs`)
+      if (!response.ok) throw new Error(`Failed to fetch logs for job ${jobName}`)
+      return await response.json()
+    } catch {
+      return {
+        job_name: jobName,
+        pod_name: `pod-${jobName}`,
+        logs: `No logs available for job ${jobName}`,
+        timestamp: new Date().toISOString(),
+        status: "unknown",
+      }
     }
   }
 
   async getJobStatus(jobName: string): Promise<JobStatus> {
     try {
-      const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}/status`)
-      if (!res.ok) throw new Error(`Failed to fetch status for job ${jobName}`)
-      return (await res.json()) as JobStatus
-    } catch (error) {
-      throw new Error("Kubernetes integration not available")
+      const response = await fetch(`${API_BASE}/k8s/jobs/${jobName}/status`)
+      if (!response.ok) throw new Error(`Failed to fetch status for job ${jobName}`)
+      return await response.json()
+    } catch {
+      return {
+        job_name: jobName,
+        status: "unknown",
+        timestamp: new Date().toISOString(),
+      }
     }
   }
 
   async deleteJob(jobName: string): Promise<JobDeleteResponse> {
     try {
-      const res = await fetch(`${API_BASE}/k8s/jobs/${jobName}`, { method: "DELETE" })
-      if (!res.ok) throw new Error(`Failed to delete job ${jobName}`)
-      return (await res.json()) as JobDeleteResponse
+      const response = await fetch(`${API_BASE}/k8s/jobs/${jobName}`, { method: "DELETE" })
+      if (!response.ok) throw new Error(`Failed to delete job ${jobName}`)
+      return await response.json()
     } catch (error) {
-      throw new Error("Kubernetes integration not available")
+      return {
+        message: `Failed to delete job ${jobName}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        timestamp: new Date().toISOString(),
+      }
     }
   }
 
   async initialize(): Promise<void> {
-    await this.executorStorage.initialize()
-    await this.definitionStorage.initialize()
-    await this.runStorage.initialize()
-    await this.suiteStorage.initialize()
+    // Initialize all storage services
+    await Promise.all([
+      this.executorStorage.initialize?.(),
+      this.definitionStorage.initialize?.(),
+      this.runStorage.initialize?.(),
+      this.suiteStorage.initialize?.(),
+    ].filter(Boolean))
   }
 }

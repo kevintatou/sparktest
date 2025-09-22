@@ -7,15 +7,7 @@ import {
   JobLogs,
   JobStatus,
   JobDeleteResponse,
-<<<<<<< HEAD
-<<<<<<<< HEAD:packages/storage-service/storage.ts
 } from "@tatou/core"
-========
-} from "../types"
->>>>>>>> main:packages/core/src/storage/storage.ts
-=======
-} from "@tatou/core"
->>>>>>> main
 
 export interface StorageService {
   // Executors
@@ -43,25 +35,11 @@ export interface StorageService {
     callback: (payload: { eventType: string; new?: Run; old?: Run }) => void
   ) => () => void
 
-<<<<<<< HEAD
-<<<<<<<< HEAD:packages/storage-service/storage.ts
   // Suites
   getSuites(): Promise<Suite[]>
   saveSuite(suite: Suite): Promise<Suite>
   deleteSuite(id: string): Promise<boolean>
   getSuiteById(id: string): Promise<Suite | undefined>
-========
-=======
->>>>>>> main
-  // Test Suites
-  getTestSuites(): Promise<Suite[]>
-  saveTestSuite(suite: Suite): Promise<Suite>
-  deleteTestSuite(id: string): Promise<boolean>
-  getTestSuiteById(id: string): Promise<Suite | undefined>
-<<<<<<< HEAD
->>>>>>>> main:packages/core/src/storage/storage.ts
-=======
->>>>>>> main
 
   // Kubernetes Integration
   getKubernetesHealth(): Promise<KubernetesHealth>
