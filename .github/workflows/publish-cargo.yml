@@ -39,35 +39,18 @@ jobs:
       - name: Login to crates.io
         run: cargo login ${{ secrets.CRATES_IO_TOKEN }}
 
-      - name: Check cargo changeset status
+      - name: Extract version from tag
+        id: extract_version
         run: |
-          echo "Checking cargo changeset status..."
-          ./scripts/cargo-changeset.sh status
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "Publishing for tag: $TAG_NAME"
 
-          # Check if any crates need to be published
-          if [[ -d .cargo-changesets ]] && [[ $(find .cargo-changesets -name "*.md" 2>/dev/null | wc -l) -gt 0 ]]; then
-            echo "HAS_CARGO_CHANGESETS=true" >> $GITHUB_ENV
-          else
-            echo "HAS_CARGO_CHANGESETS=false" >> $GITHUB_ENV
-            echo "No cargo crates need to be published"
-          fi
-
-      - name: Apply changeset versions and publish crates
-        if: env.HAS_CARGO_CHANGESETS == 'true'
+      - name: Publish crates to crates.io
         run: |
-          echo "Applying cargo changesets and publishing..."
-          ./scripts/cargo-changeset.sh version
-          ./scripts/cargo-changeset.sh publish
-
-      - name: Publish individual crates (fallback for manual tags)
-        if: env.HAS_CARGO_CHANGESETS == 'false'
-        run: |
-          echo "No changesets found, checking if crates need individual publishing..."
-
-          # Check each crate individually to see if it needs publishing
           cd backend
-
-          # Function to check if a version is already published
+          
+          # Function to check if a version is already published and publish if needed
           check_and_publish() {
             local crate_name="$1"
             local crate_path="$2"
@@ -110,8 +93,3 @@ jobs:
           check_and_publish "sparktest-core" "core"
           check_and_publish "sparktest-api" "api"
           check_and_publish "sparktest-bin" "bin"
-
-      - name: No crates to publish
-        if: env.HAS_CARGO_CHANGESETS == 'false'
-        run: |
-          echo "🎉 All crates are up to date!"
