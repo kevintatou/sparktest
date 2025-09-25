@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "../test-utils"
 import { vi, describe, it, expect, beforeEach } from "vitest"
 import TestRunsPage from "@/app/runs/page"
-import { storage } from "@tatou/storage-service"
 import type { Run, Definition, Executor } from "@tatou/core/types"
 
 // Mock the storage service
