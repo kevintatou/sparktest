@@ -23,8 +23,7 @@
       "@/*": ["./src/*"],
       "@tatou/core": ["./packages/core/src"],
       "@tatou/core/*": ["./packages/core/src/*"],
-      "@tatou/storage-service": ["./packages/storage-service"],
-      "@tatou/storage-service/*": ["./packages/storage-service/*"]
+
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

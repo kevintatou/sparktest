@@ -1,7 +1,7 @@
 "use client"
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { useDefinitionForm } from "./useTestDefinitionForm"
+import { useTestDefinitionForm } from "./useTestDefinitionForm"
 import { ManualForm } from "./ManualForm"
 import { GitHubForm } from "./GitHubForm"
 
@@ -29,7 +29,10 @@ export function DefinitionForm({ existingTest }: DefinitionFormProps) {
     updateCommand,
     handleSubmit,
     handleGithubSubmit,
-  } = useDefinitionForm(existingTest)
+  } = useTestDefinitionForm({ 
+    initialDefinition: existingTest, 
+    mode: existingTest ? "edit" : "create" 
+  })
 
   return (
     <Tabs value={tab} onValueChange={setTab} className="w-full">

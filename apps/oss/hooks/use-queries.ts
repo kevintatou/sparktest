@@ -174,6 +174,68 @@ export function useDeleteRun() {
   })
 }
 
+export function useCreateSuite() {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  return useMutation({
+    mutationFn: async (suite: any) => {
+      const response = await fetch(`${API_BASE}/test-suites`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(suite)
+      })
+      if (!response.ok) throw new Error('Failed to create suite')
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.suites })
+      toast({
+        title: "Suite created",
+        description: "The test suite has been created successfully.",
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: "Error creating suite",
+        description: error instanceof Error ? error.message : "Failed to create the suite",
+        variant: "destructive",
+      })
+    },
+  })
+}
+
+export function useUpdateSuite() {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  return useMutation({
+    mutationFn: async ({ id, suite }: { id: string, suite: any }) => {
+      const response = await fetch(`${API_BASE}/test-suites/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(suite)
+      })
+      if (!response.ok) throw new Error('Failed to update suite')
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.suites })
+      toast({
+        title: "Suite updated",
+        description: "The test suite has been updated successfully.",
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: "Error updating suite",
+        description: error instanceof Error ? error.message : "Failed to update the suite",
+        variant: "destructive",
+      })
+    },
+  })
+}
+
 export function useDeleteSuite() {
   const queryClient = useQueryClient()
   const { toast } = useToast()

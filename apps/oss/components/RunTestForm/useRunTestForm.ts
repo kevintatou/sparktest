@@ -1,125 +1,119 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { useCreateRun } from "@/hooks/use-queries"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@tatou/storage-service"
 import type { Definition } from "@tatou/core/types"
 
-interface FormData {
-  name: string
-  image: string
-  commands: string[]
-  useCustomSettings: boolean
+interface UseRunTestFormProps {
+  definition?: Definition
 }
 
-export function useRunTestForm(definition: Definition) {
+export interface UseRunTestFormReturn {
+  formData: {
+    name: string
+    useCustomSettings: boolean
+    customImage: string
+    customCommands: string[]
+  }
+  setFormData: React.Dispatch<React.SetStateAction<{
+    name: string
+    useCustomSettings: boolean
+    customImage: string
+    customCommands: string[]
+  }>>
+  isLoading: boolean
+  isSubmitting: boolean
+  onSubmit: (e: React.FormEvent) => void
+  addCustomCommand: () => void
+  removeCustomCommand: (index: number) => void
+  updateCustomCommand: (index: number, value: string) => void
+}
+
+export function useRunTestForm({ definition }: UseRunTestFormProps): UseRunTestFormReturn {
   const router = useRouter()
   const { toast } = useToast()
+  const createRun = useCreateRun()
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formData, setFormData] = useState<FormData | null>(null)
+  const [formData, setFormData] = useState({
+    name: definition?.name ? `${definition.name} - ${new Date().toLocaleString()}` : "",
+    useCustomSettings: false,
+    customImage: definition?.image || "",
+    customCommands: definition?.commands || [""]
+  })
 
-  // Initialize form data when definition is available
-  useEffect(() => {
-    if (!definition) return
-    setFormData({
-      name: `${definition.name} Run`,
-      image: definition.image,
-      commands: [...definition.commands],
-      useCustomSettings: false,
-    })
-  }, [definition])
+  const isLoading = !definition
+  const isSubmitting = createRun.isPending
 
-  const addCommand = useCallback(() => {
-    if (!formData) return
-    setFormData({
-      ...formData,
-      commands: [...formData.commands, ""],
-    })
-  }, [formData])
+  const addCustomCommand = useCallback(() => {
+    setFormData(prev => ({
+      ...prev,
+      customCommands: [...prev.customCommands, ""]
+    }))
+  }, [])
 
-  const removeCommand = useCallback(
-    (index: number) => {
-      if (!formData) return
-      setFormData({
-        ...formData,
-        commands: formData.commands.filter((_, i) => i !== index),
+  const removeCustomCommand = useCallback((index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      customCommands: prev.customCommands.filter((_, i) => i !== index)
+    }))
+  }, [])
+
+  const updateCustomCommand = useCallback((index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      customCommands: prev.customCommands.map((cmd, i) => i === index ? value : cmd)
+    }))
+  }, [])
+
+  const onSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!definition) {
+      toast({
+        title: "Error",
+        description: "No test definition found",
+        variant: "destructive"
       })
-    },
-    [formData]
-  )
+      return
+    }
 
-  const updateCommand = useCallback(
-    (index: number, value: string) => {
-      if (!formData) return
-      setFormData({
-        ...formData,
-        commands: formData.commands.map((cmd, i) => (i === index ? value : cmd)),
-      })
-    },
-    [formData]
-  )
-
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault()
-      if (!formData) return
-
-      setIsSubmitting(true)
-
-      try {
-        const options = formData.useCustomSettings
-          ? {
-              name: formData.name,
-              image: formData.image,
-              commands: formData.commands.filter(Boolean),
-            }
-          : { name: formData.name }
-
-        const newRun = await storage.createRun(definition.id, options)
-
-        if (!newRun || !newRun.id) {
-          console.error("createRun did not return a valid run object:", newRun)
-          toast({
-            title: "Error starting test",
-            description: "Failed to create test run: missing run ID.",
-            variant: "destructive",
-          })
-          setIsSubmitting(false)
-          return
-        }
-
-        toast({
-          title: "Test started successfully",
-          description: `Test "${newRun.name}" is now running. You can monitor its progress on the runs page.`,
-          duration: 4000,
+    try {
+      const runData = {
+        definitionId: definition.id,
+        name: formData.name,
+        ...(formData.useCustomSettings && {
+          image: formData.customImage,
+          commands: formData.customCommands.filter(cmd => cmd.trim() !== "")
         })
-
-        router.push(`/runs/${newRun.id}`)
-      } catch (error) {
-        toast({
-          title: "Error starting test",
-          description: error instanceof Error ? error.message : "Unknown error occurred",
-          variant: "destructive",
-        })
-      } finally {
-        setIsSubmitting(false)
       }
-    },
-    [formData, definition.id, toast, router]
-  )
+
+      await createRun.mutateAsync(definition.id)
+      
+      toast({
+        title: "Test Run Started",
+        description: `Test run "${formData.name}" has been started successfully.`
+      })
+      
+      router.push("/runs")
+    } catch (error) {
+      toast({
+        title: "Failed to Start Test Run",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive"
+      })
+    }
+  }, [definition, formData, createRun, toast, router])
 
   return {
-    // State
-    isSubmitting,
     formData,
     setFormData,
-
-    // Actions
-    addCommand,
-    removeCommand,
-    updateCommand,
-    handleSubmit,
+    isLoading,
+    isSubmitting,
+    onSubmit,
+    addCustomCommand,
+    removeCustomCommand,
+    updateCustomCommand
   }
 }

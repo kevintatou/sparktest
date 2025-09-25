@@ -27,12 +27,48 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
     )
   }, [suite, allDefinitions])
 
+  useEffect(() => {
+    const loadSuiteAndDefinitions = async () => {
+      try {
+        // Load the suite from storage
+        const loadedSuite = await storage.getSuiteById(id)
+        if (!loadedSuite) {
+          toast({
+            title: "Suite not found",
+            description: `Could not find suite with ID: ${id}`,
+            variant: "destructive",
+          })
+          return
+        }
+
+        setSuite(loadedSuite)
+
+        // Load the definitions for this suite
+        const allDefs = await storage.getDefinitions()
+        const suiteDefinitions = allDefs.filter((def) =>
+          loadedSuite.testDefinitionIds.includes(def.id)
+        )
+        setDefinitions(suiteDefinitions)
+      } catch (error) {
+        console.error("Error loading suite details:", error)
+        toast({
+          title: "Error loading suite",
+          description: "Failed to load suite details. Please try again.",
+          variant: "destructive",
+        })
+      }
+    }
+
+    loadSuiteAndDefinitions()
+  }, [id, toast])
+
   const handleRunSuite = async () => {
     if (!suite) return
 
+    setIsRunning(true)
     try {
       // Get all test definitions in the suite
-      const validDefinitions = definitions.filter((def: Definition) => def !== undefined)
+      const validDefinitions = definitions.filter((def) => def !== undefined)
 
       if (validDefinitions.length === 0) {
         throw new Error("No valid test definitions found in suite")
@@ -42,13 +78,11 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
       if (suite.executionMode === "sequential") {
         // Run tests one after another
         for (const def of validDefinitions) {
-          await createRunMutation.mutateAsync(def.id)
+          await storage.createRun(def.id)
         }
       } else {
         // Run tests in parallel
-        await Promise.all(validDefinitions.map((def: Definition) => 
-          createRunMutation.mutateAsync(def.id)
-        ))
+        await Promise.all(validDefinitions.map((def) => storage.createRun(def.id)))
       }
 
       toast({
@@ -62,21 +96,12 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
         description: "Failed to start the test suite. Please check if all test definitions exist.",
         variant: "destructive",
       })
+    } finally {
+      setIsRunning(false)
     }
   }
 
-  if (suiteLoading) {
-    return (
-      <div className="container py-6">
-        <div className="flex flex-col items-center justify-center min-h-[400px]">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
-          <p className="text-muted-foreground mt-4">Loading suite...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (suiteError || !suite) {
+  if (!suite) {
     return (
       <div className="container py-6">
         <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -106,10 +131,10 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
         <div className="flex gap-2">
           <Button
             onClick={handleRunSuite}
-            disabled={createRunMutation.isPending}
+            disabled={isRunning}
             className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
           >
-            {createRunMutation.isPending ? (
+            {isRunning ? (
               <>
                 <svg
                   className="mr-2 h-4 w-4 animate-spin"
