@@ -1,26 +1,27 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DefinitionForm } from "@/components/test-definition-form"
-import { storage } from "@tatou/storage-service"
-import type { Definition } from "@tatou/core/types"
+import { useDefinition } from "@/hooks/use-queries"
 
 export default function EditDefinitionPage({ params }: { params: { id: string } }) {
   const { id } = params
-  const [definition, setDefinition] = useState<Definition | null>(null)
+  const { data: definition, isLoading, error } = useDefinition(id)
 
-  useEffect(() => {
-    const fetchDefinition = async () => {
-      const def = await storage.getDefinitionById(id)
-      setDefinition(def || null)
-    }
-    fetchDefinition()
-  }, [id])
+  if (isLoading) {
+    return (
+      <div className="container py-6 max-w-2xl mx-auto">
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+          <p className="text-muted-foreground mt-4">Loading definition...</p>
+        </div>
+      </div>
+    )
+  }
 
-  if (!definition) {
+  if (error || !definition) {
     return (
       <div className="container py-6 max-w-2xl mx-auto">
         <div className="flex flex-col items-center justify-center min-h-[400px]">

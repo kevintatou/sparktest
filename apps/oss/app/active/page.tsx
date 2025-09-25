@@ -8,60 +8,40 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { storage } from "@tatou/storage-service"
+import { useRuns } from "@/hooks/use-queries"
 import { formatDistanceToNow } from "@tatou/core"
 import type { Run } from "@tatou/core/types"
 
 export default function ActiveTestsPage() {
-  const [tests, setTests] = useState<Run[]>([])
+  const { data: allTests = [], isLoading } = useRuns()
   const [progressValues, setProgressValues] = useState<Record<string, number>>({})
-  const initializedRef = useRef(false)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  
+  // Filter running tests
+  const runningTests = allTests.filter((test: Run) => test.status === "running")
 
-  // Load tests from localStorage
+  // Initialize progress values for new running tests
   useEffect(() => {
-    const loadRunningTests = async () => {
-      if (!initializedRef.current) {
-        const allTests = await storage.getRuns()
-        const runningTests = allTests.filter((test) => test.status === "running")
-        setTests(runningTests)
-        initializedRef.current = true
-
-        // Initialize progress values for running tests
-        const initialProgress: Record<string, number> = {}
-        runningTests.forEach((test) => {
-          initialProgress[test.id] = Math.floor(Math.random() * 30) + 10 // Start between 10-40%
-        })
-        setProgressValues(initialProgress)
-
-        // Set up a refresh interval
-        intervalRef.current = setInterval(async () => {
-          const updatedTests = await storage.getRuns()
-          const runningTestsUpdate = updatedTests.filter((test) => test.status === "running")
-          setTests(runningTestsUpdate)
-        }, 5000)
-      }
-    }
-
-    loadRunningTests()
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [])
+    setProgressValues(prev => {
+      const newValues = { ...prev }
+      runningTests.forEach((test: Run) => {
+        if (!newValues[test.id]) {
+          newValues[test.id] = Math.floor(Math.random() * 30) + 10 // Start between 10-40%
+        }
+      })
+      return newValues
+    })
+  }, [runningTests.length])
 
   // Update progress values for running tests
   useEffect(() => {
-    if (tests.length === 0) return
+    if (runningTests.length === 0) return
 
     const progressInterval = setInterval(() => {
       setProgressValues((prev) => {
         const newValues = { ...prev }
         let updated = false
 
-        tests.forEach((test) => {
+        runningTests.forEach((test: Run) => {
           const increment = Math.floor(Math.random() * 5) + 1
           const currentValue = prev[test.id] || 0
 
@@ -76,7 +56,7 @@ export default function ActiveTestsPage() {
     }, 1000)
 
     return () => clearInterval(progressInterval)
-  }, [tests])
+  }, [runningTests.length])
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -92,7 +72,14 @@ export default function ActiveTestsPage() {
             <h1 className="text-2xl font-bold">Active Tests</h1>
           </div>
 
-          {tests.length === 0 ? (
+          {isLoading ? (
+            <Card className="p-8 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+                <p className="text-muted-foreground">Loading active tests...</p>
+              </div>
+            </Card>
+          ) : runningTests.length === 0 ? (
             <Card className="p-8 text-center">
               <p className="text-muted-foreground mb-4">No active tests at the moment.</p>
               <Button asChild>
@@ -101,7 +88,7 @@ export default function ActiveTestsPage() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {tests.map((test) => (
+              {runningTests.map((test: Run) => (
                 <Card key={test.id} className="overflow-hidden hover:shadow-md transition-all">
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
@@ -125,7 +112,7 @@ export default function ActiveTestsPage() {
                           {test.image} • Started {formatDistanceToNow(test.createdAt)}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-2">
-                          {test.command.map((cmd, i) => (
+                          {test.command.map((cmd: string, i: number) => (
                             <Badge key={i} variant="outline">
                               {cmd}
                             </Badge>

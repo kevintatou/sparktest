@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use chrono::Utc;
-use k8s_openapi::api::batch::v1::Job;
+use k8s_openapi::api::batch::v1::{Job, JobSpec};
 use k8s_openapi::api::core::v1::{Container, Pod, PodSpec, PodTemplateSpec};
 use k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 use kube::{
@@ -46,15 +46,9 @@ pub struct KubernetesError {
     pub details: Option<String>,
 }
 
-pub async fn create_k8s_job(
-    client: &Client,
-    job_name: &str,
-    image: &str,
-    command: &[String],
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let jobs: Api<Job> = Api::namespaced(client.clone(), "default");
-
-    let job = Job {
+/// Build a Kubernetes Job manifest (pure function)
+pub fn build_job(job_name: &str, image: &str, command: &[String]) -> Job {
+    Job {
         metadata: ObjectMeta {
             name: Some(job_name.to_string()),
             labels: Some(std::collections::BTreeMap::from([
@@ -63,7 +57,7 @@ pub async fn create_k8s_job(
             ])),
             ..Default::default()
         },
-        spec: Some(k8s_openapi::api::batch::v1::JobSpec {
+        spec: Some(JobSpec {
             template: PodTemplateSpec {
                 metadata: Some(ObjectMeta {
                     labels: Some(std::collections::BTreeMap::from([
@@ -84,14 +78,11 @@ pub async fn create_k8s_job(
                 }),
             },
             backoff_limit: Some(0),
-            ttl_seconds_after_finished: Some(3600), // Clean up after 1 hour
+            ttl_seconds_after_finished: Some(3600),
             ..Default::default()
         }),
         ..Default::default()
-    };
-
-    jobs.create(&PostParams::default(), &job).await?;
-    Ok(())
+    }
 }
 
 pub async fn monitor_job_and_update_status(
@@ -153,6 +144,14 @@ impl KubernetesClient {
         Ok(Self { client, config })
     }
 
+    /// Build and submit a Job to the cluster
+    pub async fn submit_job(&self, job_name: &str, image: &str, command: &[String]) -> Result<()> {
+        let jobs: Api<Job> = Api::namespaced(self.client.clone(), &self.config.namespace);
+        let job = build_job(job_name, image, command);
+        jobs.create(&PostParams::default(), &job).await?;
+        Ok(())
+    }
+
     /// Create a new Kubernetes client with custom configuration
     pub async fn new_with_config(config: KubeConfig) -> Result<Self> {
         let client = Self::create_authenticated_client().await?;
@@ -161,35 +160,34 @@ impl KubernetesClient {
 
     /// Create authenticated Kubernetes client with fallback mechanisms
     async fn create_authenticated_client() -> Result<Client> {
-        // Try different authentication methods in order of preference
+        // If override server set, attempt to load kubeconfig, patch server, and return
+        if let Ok(api_server) = std::env::var("K8S_API_SERVER") {
+            if let Ok(mut cfg) = kube::Config::from_kubeconfig(&kube::config::KubeConfigOptions::default()).await {
+                info!("Applying K8S_API_SERVER override: {}", api_server);
+                cfg.cluster_url = api_server.parse()?;
+                return Ok(Client::try_from(cfg)?);
+            }
+        }
 
-        // 1. Try in-cluster authentication (for pods running in Kubernetes)
+        // Try default resolution path
         if let Ok(client) = Client::try_default().await {
-            info!("Using in-cluster Kubernetes authentication");
+            info!("Kubernetes client created via try_default()");
             return Ok(client);
         }
 
-        // 2. Try kubeconfig from default locations
-        match kube::Config::from_kubeconfig(&kube::config::KubeConfigOptions::default()).await {
-            Ok(config) => {
-                info!("Using kubeconfig authentication");
-                return Ok(Client::try_from(config)?);
-            }
-            Err(e) => {
-                warn!("Failed to load kubeconfig: {}", e);
-            }
-        }
-
-        // 3. Try environment-based configuration
-        if let Ok(config) = Self::config_from_env() {
-            info!("Using environment-based Kubernetes authentication");
+        // Attempt kubeconfig explicit load
+        if let Ok(config) = kube::Config::from_kubeconfig(&kube::config::KubeConfigOptions::default()).await {
+            info!("Kubernetes client created from kubeconfig");
             return Ok(Client::try_from(config)?);
         }
 
-        // 4. Final fallback - try default client creation
-        Client::try_default()
-            .await
-            .context("Failed to create Kubernetes client with any authentication method")
+        // Environment / in-cluster fallback
+        if let Ok(config) = Self::config_from_env() {
+            info!("Kubernetes client created from environment");
+            return Ok(Client::try_from(config)?);
+        }
+
+        Err(anyhow::anyhow!("Unable to initialize Kubernetes client; set K8S_API_SERVER or ensure kubeconfig/in-cluster creds available"))
     }
 
     /// Create configuration from environment variables
@@ -367,6 +365,18 @@ impl KubernetesClient {
 
         info!("Successfully deleted job '{}'", job_name);
         Ok(())
+    }
+
+    /// List jobs (optionally filtered by label app=sparktest)
+    pub async fn list_jobs(&self) -> Result<Vec<String>> {
+        let jobs: Api<Job> = Api::namespaced(self.client.clone(), &self.config.namespace);
+        let lp = ListParams::default().labels("app=sparktest");
+        let list = jobs.list(&lp).await?;
+        Ok(list
+            .items
+            .into_iter()
+            .filter_map(|j| j.metadata.name)
+            .collect())
     }
 
     /// Get pod status

@@ -43,7 +43,7 @@ export function CommandsSection({
                 variant="outline"
                 size="icon"
                 onClick={() => removeCommand(index)}
-                className="hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20"
+                className="hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20"
               >
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Remove command</span>

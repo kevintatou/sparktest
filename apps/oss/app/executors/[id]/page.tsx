@@ -1,32 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { storage } from "@tatou/storage-service"
-import type { Executor } from "@tatou/core/types"
+import { useExecutor } from "@/hooks/use-queries"
 
 export default function ExecutorDetailsPage({ params }: { params: { id: string } }) {
-  const [executor, setExecutor] = useState<Executor | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { data: executor, isLoading, error } = useExecutor(params.id)
 
-  useEffect(() => {
-    const fetchExecutor = async () => {
-      try {
-        const exec = await storage.getExecutorById(params.id)
-        setExecutor(exec || null)
-      } catch (error) {
-        console.error("Error loading executor:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchExecutor()
-  }, [params.id])
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
@@ -35,7 +17,7 @@ export default function ExecutorDetailsPage({ params }: { params: { id: string }
     )
   }
 
-  if (!executor) {
+  if (error || !executor) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <p className="text-muted-foreground">Executor not found.</p>

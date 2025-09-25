@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/components/ui/use-toast"
+import { useCreateExecutor, useUpdateExecutor } from "@/hooks/use-queries"
 import type { Executor } from "@tatou/core/types"
-import { storage } from "@tatou/storage-service"
 
 interface ExecutorFormProps {
   existingExecutor?: Executor
@@ -15,7 +16,11 @@ interface ExecutorFormProps {
 
 export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
   const router = useRouter()
+  const { toast } = useToast()
   const isEditMode = !!existingExecutor
+
+  const createExecutorMutation = useCreateExecutor()
+  const updateExecutorMutation = useUpdateExecutor()
 
   const [formData, setFormData] = useState<Omit<Executor, "id"> & Partial<Pick<Executor, "id">>>({
     id: existingExecutor?.id,
@@ -35,8 +40,17 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.image) return
-    await storage.saveExecutor(formData as Executor)
-    router.push("/executors")
+
+    try {
+      if (isEditMode) {
+        await updateExecutorMutation.mutateAsync(formData as Executor)
+      } else {
+        await createExecutorMutation.mutateAsync(formData as Executor)
+      }
+      router.push("/executors")
+    } catch (error) {
+      // Error handling is done in the mutation
+    }
   }
 
   return (

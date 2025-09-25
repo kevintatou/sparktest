@@ -25,8 +25,8 @@ RUN pnpm build:packages && pnpm build:app
 # Runtime stage
 FROM node:20-alpine AS runtime
 
-# Install dumb-init for signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init for signal handling and curl for healthchecks
+RUN apk add --no-cache dumb-init curl
 
 # Create app user
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
@@ -48,5 +48,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_PUBLIC_USE_RUST_API=true
 ENV NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
 
 CMD ["dumb-init", "node", "apps/oss/server.js"]

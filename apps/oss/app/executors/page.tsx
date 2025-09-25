@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { Plus, Cpu, Edit, Trash2, Search } from "lucide-react"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -14,47 +14,30 @@ import { GitHubButton } from "@/components/github-button"
 import { FloatingCreateButton } from "@/components/floating-create-button"
 import { PageTransition } from "@/components/page-transition"
 import { useToast } from "@/components/ui/use-toast"
+import { useExecutors, useDeleteExecutor } from "@/hooks/use-queries"
 import { formatDistanceToNow } from "@tatou/core"
-import { storage } from "@tatou/storage-service"
 import type { Executor } from "@tatou/core/types"
 
 export default function ExecutorsPage() {
-  const { toast } = useToast()
-  const [executors, setExecutors] = useState<Executor[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
 
-  useEffect(() => {
-    const loadExecutors = async () => {
-      const exec = await storage.getExecutors()
-      setExecutors(exec)
-    }
-    loadExecutors()
-  }, [])
+  const { data: executors = [], isLoading } = useExecutors()
+  const deleteExecutorMutation = useDeleteExecutor()
 
   const handleDelete = async (id: string) => {
     setIsDeleting(id)
     try {
-      await storage.deleteExecutor(id)
-      const exec = await storage.getExecutors()
-      setExecutors(exec)
-      toast({
-        title: "Executor deleted",
-        description: "The executor has been removed successfully.",
-      })
+      await deleteExecutorMutation.mutateAsync(id)
     } catch {
-      toast({
-        title: "Error deleting executor",
-        description: "Failed to delete the executor.",
-        variant: "destructive",
-      })
+      // Error handling is done in the mutation
     } finally {
       setIsDeleting(null)
     }
   }
 
   const filteredExecutors = executors.filter(
-    (executor) =>
+    (executor: Executor) =>
       executor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       executor.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       executor.id.toLowerCase().includes(searchQuery.toLowerCase())
@@ -99,7 +82,14 @@ export default function ExecutorsPage() {
               <p className="text-muted-foreground">Manage your reusable test runners</p>
             </div>
 
-          {filteredExecutors.length === 0 ? (
+            {isLoading ? (
+              <Card className="p-12 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+                  <p className="text-muted-foreground">Loading executors...</p>
+                </div>
+              </Card>
+            ) : filteredExecutors.length === 0 ? (
             <Card className="p-12 text-center border-dashed">
               <div className="flex flex-col items-center gap-4">
                 <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
@@ -127,7 +117,7 @@ export default function ExecutorsPage() {
             </Card>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredExecutors.map((executor) => (
+              {filteredExecutors.map((executor: Executor) => (
                 <Card
                   key={executor.id}
                   className="group hover:shadow-md transition-shadow"
@@ -156,7 +146,7 @@ export default function ExecutorsPage() {
 
                       {executor.supportedFileTypes && executor.supportedFileTypes.length > 0 && (
                         <div className="flex flex-wrap gap-1">
-                          {executor.supportedFileTypes.map((type) => (
+                          {executor.supportedFileTypes.map((type: string) => (
                             <Badge key={type} variant="secondary" className="text-xs">
                               {type}
                             </Badge>

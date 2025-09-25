@@ -3,6 +3,22 @@ import * as matchers from "@testing-library/jest-dom/matchers"
 
 expect.extend(matchers)
 
+// Mock Next.js navigation
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(), // This is the missing method causing failures
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+  }),
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => "/test-path",
+  redirect: vi.fn(),
+  notFound: vi.fn(),
+}))
+
 // Mock matchMedia for mobile hook
 Object.defineProperty(window, "matchMedia", {
   writable: true,

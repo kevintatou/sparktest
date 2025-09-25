@@ -20,6 +20,22 @@ vi.mock("@/components/ui/use-toast", () => ({
   }),
 }))
 
+// Mock Next.js navigation
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+  }),
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => "/test-path",
+  redirect: vi.fn(),
+  notFound: vi.fn(),
+}))
+
 // Mock Next.js Link component
 vi.mock("next/link", () => ({
   default: ({ children, href }: { children: React.ReactNode; href: string }) => (

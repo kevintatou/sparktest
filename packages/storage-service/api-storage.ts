@@ -8,9 +8,10 @@ import type {
   JobStatus,
   JobDeleteResponse,
 } from "@tatou/core"
+import { API_BASE_URL } from "@tatou/core"
 import { StorageService } from "./storage"
 
-const API_BASE = "http://localhost:3001/api"
+const API_BASE = `${API_BASE_URL}/api`
 
 export class ApiStorageService implements StorageService {
   // Test Executors

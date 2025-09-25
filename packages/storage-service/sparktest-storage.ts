@@ -22,7 +22,9 @@ import type {
 } from "@tatou/core"
 import { sampleExecutors, sampleDefinitions, sampleRuns, sampleSuites } from "@tatou/core"
 
-const API_BASE = "http://localhost:8080/api"
+import { API_BASE_URL } from "@tatou/core"
+
+const API_BASE = `${API_BASE_URL}/api`
 
 export class SparkTestStorageService implements StorageService {
   private executorStorage: GenericHybridStorageService<Executor>

@@ -13,5 +13,5 @@ export type { StorageService }
 export * from "./generic"
 
 export const storage: StorageService = USE_RUST_API
-  ? new SparkTestStorageService() // Use the new SparkTest storage service
+  ? new ApiStorageService() // Use pure API storage service, not hybrid
   : new LocalStorageService()

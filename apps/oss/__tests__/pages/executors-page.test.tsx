@@ -26,6 +26,22 @@ vi.mock("next/link", () => ({
   ),
 }))
 
+// Mock Next.js navigation
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+  }),
+  useSearchParams: () => new URLSearchParams(),
+  usePathname: () => "/test-path",
+  redirect: vi.fn(),
+  notFound: vi.fn(),
+}))
+
 // Mock formatDistanceToNow
 vi.mock("@tatou/core", () => ({
   formatDistanceToNow: vi.fn(() => "3 hours ago"),

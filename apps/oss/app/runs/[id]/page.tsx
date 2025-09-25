@@ -13,8 +13,9 @@ import { GitHubButton } from "@/components/github-button"
 import { FloatingCreateButton } from "@/components/floating-create-button"
 import { SearchBox } from "@/components/search-box"
 import { PageTransition } from "@/components/page-transition"
-import { storage } from "@tatou/storage-service"
 import type { Run } from "@tatou/core/types"
+
+const API_BASE = "/api"
 
 export default function TestDetailsPage({ params }: { params: { id: string } }) {
   const [run, setRun] = useState<Run | undefined>(undefined)
@@ -23,8 +24,13 @@ export default function TestDetailsPage({ params }: { params: { id: string } }) 
   useEffect(() => {
     const loadDefinitionById = async () => {
       try {
-        const runData = await storage.getRunById(params.id)
-        setRun(runData)
+        const response = await fetch(`${API_BASE}/test-runs/${params.id}`)
+        if (response.ok) {
+          const runData = await response.json()
+          setRun(runData)
+        } else {
+          console.error("Failed to load test run:", response.status)
+        }
       } catch (error) {
         console.error("Error loading test run:", error)
       } finally {

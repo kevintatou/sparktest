@@ -16,7 +16,6 @@ import { FloatingCreateButton } from "@/components/floating-create-button"
 import { PageTransition } from "@/components/page-transition"
 import { formatDistanceToNow } from "@tatou/core"
 import type { Run } from "@tatou/core/types"
-import { storage } from "@tatou/storage-service"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 import { useRuns, useDefinitions, useExecutors, useDeleteRun } from "@/hooks/use-queries"
 
@@ -100,20 +99,7 @@ export default function TestRunsPage() {
 
   const isLoading = runsLoading || definitionsLoading || executorsLoading
 
-  // Subscribe to real-time run updates
-  useEffect(() => {
-    if (!initializedRef.current && testRuns.length > 0) {
-      const unsubscribe = storage.subscribeToRuns(
-        ({ eventType: _eventType, new: _newRun, old: _oldRun }) => {
-          // Real-time updates are handled by React Query's refetch functionality
-          // We could invalidate queries here if needed
-        }
-      )
-
-      initializedRef.current = true
-      return unsubscribe
-    }
-  }, [testRuns.length])
+  // Real-time updates are handled by React Query's automatic refetching
 
   // Helper function to get definition name from ID
   const getDefinitionName = (definitionId?: string) => {
@@ -154,15 +140,17 @@ export default function TestRunsPage() {
     setRunToDelete(null)
   }
 
-  // Filter runs based on search query
-  const filteredRuns = testRuns.filter(
-    (run) =>
-      run.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      run.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      run.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      getDefinitionName(run.definitionId).toLowerCase().includes(searchQuery.toLowerCase()) ||
-      getExecutorName(run.executorId).toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Filter and sort runs based on search query (newest first)
+  const filteredRuns = testRuns
+    .filter(
+      (run) =>
+        run.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        run.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        run.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        getDefinitionName(run.definitionId).toLowerCase().includes(searchQuery.toLowerCase()) ||
+        getExecutorName(run.executorId).toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
   return (
     <SidebarProvider defaultOpen={true}>

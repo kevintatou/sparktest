@@ -1,14 +1,8 @@
 use sparktest_api::create_app;
-use sqlx::{postgres::PgPoolOptions, sqlite::SqlitePoolOptions, Pool, Postgres, Sqlite};
+use sqlx::postgres::PgPoolOptions;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-
-#[allow(dead_code)]
-enum DatabasePool {
-    Postgres(Pool<Postgres>),
-    Sqlite(Pool<Sqlite>),
-}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -24,49 +18,26 @@ async fn main() -> anyhow::Result<()> {
     // Load environment variables
     dotenvy::dotenv().ok();
 
-    // Get database URL from environment
-    let database_url =
-        std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite:../data/sparktest.db".to_string());
+    // Get database URL from environment - PostgreSQL only
+    let database_url = std::env::var("DATABASE_URL")
+        .unwrap_or_else(|_| "postgresql://sparktest:sparktest_dev_password@localhost:5432/sparktest".to_string());
 
-    tracing::info!("Connecting to database: {}", database_url);
+    tracing::info!("Connecting to PostgreSQL database: {}", database_url);
 
-    // Connect to database based on URL scheme
-    let _pool =
-        if database_url.starts_with("postgresql://") || database_url.starts_with("postgres://") {
-            tracing::info!("Using PostgreSQL database");
-            let pg_pool = PgPoolOptions::new()
-                .max_connections(5)
-                .connect(&database_url)
-                .await
-                .expect("Failed to connect to PostgreSQL database");
+    // Connect to PostgreSQL database
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&database_url)
+        .await
+        .expect("Failed to connect to PostgreSQL database");
 
-            // Run PostgreSQL migrations
-            sqlx::migrate!("./migrations")
-                .run(&pg_pool)
-                .await
-                .expect("Failed to run PostgreSQL migrations");
+    // Run PostgreSQL migrations
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .expect("Failed to run PostgreSQL migrations");
 
-            DatabasePool::Postgres(pg_pool)
-        } else {
-            tracing::info!("Using SQLite database");
-            // Create data directory if it doesn't exist
-            std::fs::create_dir_all("../data").ok();
-
-            let sqlite_pool = SqlitePoolOptions::new()
-                .max_connections(5)
-                .connect(&database_url)
-                .await
-                .expect("Failed to connect to SQLite database");
-
-            // For now, skip migrations for SQLite as we'd need separate migration files
-            // In a real implementation, you'd have separate migration directories
-            tracing::warn!("SQLite migrations not implemented - using in-memory state");
-
-            DatabasePool::Sqlite(sqlite_pool)
-        };
-
-    // Create the application
-    let app = create_app();
+    let app = create_app(pool);
 
     // Get port from environment
     let port = std::env::var("PORT")

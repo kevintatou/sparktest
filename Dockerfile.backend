@@ -1,11 +1,19 @@
 # Production Dockerfile for SparkTest Rust Backend
-FROM rustlang/rust:nightly-slim AS builder
+FROM debian:bookworm-slim AS builder
 
-# Install system dependencies
+# Install Rust and build dependencies
 RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
     pkg-config \
     libssl-dev \
+    libpq-dev \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /app
 
@@ -23,14 +31,14 @@ RUN if [ ! -f Cargo.lock ]; then \
 # Build the application
 RUN cargo build --release --bin sparktest-bin
 
-# Runtime stage
+# Runtime stage - use the same base image to ensure GLIBC compatibility
 FROM debian:bookworm-slim
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     libssl3 \
-    sqlite3 \
+    libpq5 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -56,7 +64,7 @@ EXPOSE 8080
 
 # Environment variables
 ENV RUST_LOG=info
-ENV DATABASE_URL=sqlite:./data/sparktest.db
+ENV DATABASE_URL=postgresql://sparktest:sparktest@localhost:5432/sparktest
 ENV PORT=8080
 
 # Health check
