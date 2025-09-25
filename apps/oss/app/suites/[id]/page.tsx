@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useEffect, useState } from "react"
+import { use, useMemo } from "react"
 import Link from "next/link"
 import { ArrowLeft, Play, Edit, Clock, Users, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,58 +9,30 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
-import { storage } from "@tatou/storage-service"
+import { useSuite, useDefinitions, useCreateRun } from "@/hooks/use-queries"
 import type { Definition, Suite } from "@tatou/core/types"
 
 export default function SuiteDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { toast } = useToast()
-  const [suite, setSuite] = useState<Suite | null>(null)
-  const [definitions, setDefinitions] = useState<Definition[]>([])
-  const [isRunning, setIsRunning] = useState(false)
-
-  useEffect(() => {
-    const loadSuiteAndDefinitions = async () => {
-      try {
-        // Load the suite from storage
-        const loadedSuite = await storage.getSuiteById(id)
-        if (!loadedSuite) {
-          toast({
-            title: "Suite not found",
-            description: `Could not find suite with ID: ${id}`,
-            variant: "destructive",
-          })
-          return
-        }
-
-        setSuite(loadedSuite)
-
-        // Load the definitions for this suite
-        const allDefs = await storage.getDefinitions()
-        const suiteDefinitions = allDefs.filter((def) =>
-          loadedSuite.testDefinitionIds.includes(def.id)
-        )
-        setDefinitions(suiteDefinitions)
-      } catch (error) {
-        console.error("Error loading suite details:", error)
-        toast({
-          title: "Error loading suite",
-          description: "Failed to load suite details. Please try again.",
-          variant: "destructive",
-        })
-      }
-    }
-
-    loadSuiteAndDefinitions()
-  }, [id, toast])
+  const { data: suite, isLoading: suiteLoading, error: suiteError } = useSuite(id)
+  const { data: allDefinitions = [] } = useDefinitions()
+  const createRunMutation = useCreateRun()
+  
+  // Filter definitions for this suite
+  const definitions = useMemo(() => {
+    if (!suite || !allDefinitions.length) return []
+    return allDefinitions.filter((def: Definition) => 
+      suite.testDefinitionIds.includes(def.id)
+    )
+  }, [suite, allDefinitions])
 
   const handleRunSuite = async () => {
     if (!suite) return
 
-    setIsRunning(true)
     try {
       // Get all test definitions in the suite
-      const validDefinitions = definitions.filter((def) => def !== undefined)
+      const validDefinitions = definitions.filter((def: Definition) => def !== undefined)
 
       if (validDefinitions.length === 0) {
         throw new Error("No valid test definitions found in suite")
@@ -70,11 +42,13 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
       if (suite.executionMode === "sequential") {
         // Run tests one after another
         for (const def of validDefinitions) {
-          await storage.createRun(def.id)
+          await createRunMutation.mutateAsync(def.id)
         }
       } else {
         // Run tests in parallel
-        await Promise.all(validDefinitions.map((def) => storage.createRun(def.id)))
+        await Promise.all(validDefinitions.map((def: Definition) => 
+          createRunMutation.mutateAsync(def.id)
+        ))
       }
 
       toast({
@@ -88,12 +62,21 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
         description: "Failed to start the test suite. Please check if all test definitions exist.",
         variant: "destructive",
       })
-    } finally {
-      setIsRunning(false)
     }
   }
 
-  if (!suite) {
+  if (suiteLoading) {
+    return (
+      <div className="container py-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+          <p className="text-muted-foreground mt-4">Loading suite...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (suiteError || !suite) {
     return (
       <div className="container py-6">
         <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -123,10 +106,10 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
         <div className="flex gap-2">
           <Button
             onClick={handleRunSuite}
-            disabled={isRunning}
+            disabled={createRunMutation.isPending}
             className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
           >
-            {isRunning ? (
+            {createRunMutation.isPending ? (
               <>
                 <svg
                   className="mr-2 h-4 w-4 animate-spin"
