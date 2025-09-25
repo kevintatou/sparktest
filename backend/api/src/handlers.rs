@@ -1,9 +1,9 @@
-use crate::k8s::{KubernetesClient, monitor_job_and_update_status};
-use axum::{extract::Path, http::StatusCode, response::Json, Json as JsonBody, Extension};
+use crate::k8s::{monitor_job_and_update_status, KubernetesClient};
+use axum::{extract::Path, http::StatusCode, response::Json, Extension, Json as JsonBody};
+use chrono;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
-use chrono;
 
 #[derive(Serialize)]
 pub struct HealthResponse {
@@ -25,7 +25,9 @@ pub async fn health_check() -> Json<HealthResponse> {
     })
 }
 
-pub async fn get_runs(Extension(pool): Extension<PgPool>) -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
+pub async fn get_runs(
+    Extension(pool): Extension<PgPool>,
+) -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
     match sqlx::query_as::<_, (Uuid, String, String, Vec<String>, String, chrono::DateTime<chrono::Utc>, Option<i32>, Option<Vec<String>>, Option<Uuid>, Option<Uuid>)>(
         "SELECT id, name, image, command, status, created_at, duration, logs, test_definition_id, executor_id FROM test_runs ORDER BY created_at DESC"
     )
@@ -90,26 +92,30 @@ pub async fn create_run(
         // Use the single command directly under sh -c for consistency
         vec!["sh".into(), "-c".into(), req.commands[0].clone()]
     } else {
-        vec![
-            "sh".into(),
-            "-c".into(),
-            req.commands.join(" && "),
-        ]
+        vec!["sh".into(), "-c".into(), req.commands.join(" && ")]
     };
 
     // Attempt to create the Kubernetes job (build client per request)
     match KubernetesClient::new().await {
         Ok(client) => {
             if let Err(e) = client.submit_job(&job_name, &req.image, &k8s_command).await {
-                tracing::error!("Failed to create Kubernetes job for run {}: {}", run_uuid, e);
+                tracing::error!(
+                    "Failed to create Kubernetes job for run {}: {}",
+                    run_uuid,
+                    e
+                );
                 // Mark run as failed immediately
                 if let Err(upd_err) = sqlx::query("UPDATE test_runs SET status = $1 WHERE id = $2")
                     .bind("failed")
                     .bind(run_uuid)
                     .execute(&pool)
-                    .await {
-                        tracing::error!("Failed to update run status after job creation failure: {}", upd_err);
-                    }
+                    .await
+                {
+                    tracing::error!(
+                        "Failed to update run status after job creation failure: {}",
+                        upd_err
+                    );
+                }
                 // Build response with jobCreated=false
                 let run = serde_json::json!({
                     "id": run_uuid,
@@ -163,7 +169,7 @@ pub async fn create_run(
 
 pub async fn get_run(
     Path(id): Path<Uuid>,
-    Extension(pool): Extension<PgPool>
+    Extension(pool): Extension<PgPool>,
 ) -> Result<Json<serde_json::Value>, StatusCode> {
     match sqlx::query_as::<_, (Uuid, String, String, Vec<String>, String, Option<Uuid>, chrono::DateTime<chrono::Utc>, Option<i32>, Option<Vec<String>>, Option<Uuid>)>(
         "SELECT id, name, image, command, status, test_definition_id, created_at, duration, logs, executor_id FROM test_runs WHERE id = $1"
@@ -197,7 +203,7 @@ pub async fn get_run(
 
 pub async fn delete_run(
     Path(id): Path<Uuid>,
-    Extension(pool): Extension<PgPool>
+    Extension(pool): Extension<PgPool>,
 ) -> Result<StatusCode, StatusCode> {
     match sqlx::query("DELETE FROM test_runs WHERE id = $1")
         .bind(id.to_string())
@@ -332,7 +338,9 @@ pub async fn list_jobs() -> Json<serde_json::Value> {
     }
 }
 
-pub async fn get_definitions(Extension(pool): Extension<PgPool>) -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
+pub async fn get_definitions(
+    Extension(pool): Extension<PgPool>,
+) -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
     match sqlx::query_as::<_, (Uuid, String, String, Vec<String>, Option<String>, chrono::DateTime<chrono::Utc>)>(
         "SELECT id, name, image, commands, description, created_at FROM test_definitions ORDER BY created_at DESC"
     )
@@ -362,7 +370,9 @@ pub async fn get_definitions(Extension(pool): Extension<PgPool>) -> Result<Json<
     }
 }
 
-pub async fn get_executors(Extension(pool): Extension<PgPool>) -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
+pub async fn get_executors(
+    Extension(pool): Extension<PgPool>,
+) -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
     match sqlx::query_as::<_, (Uuid, String, Option<String>, String, String, Vec<String>, Vec<String>, Option<String>)>(
         "SELECT id, name, description, image, default_command, supported_file_types, environment_variables, icon FROM test_executors ORDER BY name"
     )
@@ -394,7 +404,9 @@ pub async fn get_executors(Extension(pool): Extension<PgPool>) -> Result<Json<Ve
     }
 }
 
-pub async fn get_suites(Extension(pool): Extension<PgPool>) -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
+pub async fn get_suites(
+    Extension(pool): Extension<PgPool>,
+) -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
     match sqlx::query_as::<_, (Uuid, String, Option<String>, String, Vec<String>, Vec<Uuid>, chrono::DateTime<chrono::Utc>)>(
         "SELECT id, name, description, execution_mode, labels, test_definition_ids, created_at FROM test_suites ORDER BY created_at DESC"
     )
@@ -427,7 +439,7 @@ pub async fn get_suites(Extension(pool): Extension<PgPool>) -> Result<Json<Vec<s
 
 pub async fn run_suite(
     Path(suite_id): Path<String>,
-    Extension(pool): Extension<PgPool>
+    Extension(pool): Extension<PgPool>,
 ) -> Result<Json<serde_json::Value>, StatusCode> {
     // Parse the suite_id as UUID
     let suite_uuid = match Uuid::parse_str(&suite_id) {
@@ -451,7 +463,15 @@ pub async fn run_suite(
         }
     };
 
-    let (suite_uuid, suite_name, _description, execution_mode, _labels, test_definition_ids, _created_at) = suite;
+    let (
+        suite_uuid,
+        suite_name,
+        _description,
+        execution_mode,
+        _labels,
+        test_definition_ids,
+        _created_at,
+    ) = suite;
 
     // Get all test definitions for this suite
     let definitions = match get_suite_definitions(&pool, &test_definition_ids).await {
@@ -472,7 +492,7 @@ pub async fn run_suite(
 
     // Create runs for each definition
     let mut created_runs = Vec::new();
-    
+
     for def in definitions {
         let run_uuid = Uuid::new_v4();
         let now = chrono::Utc::now();
@@ -505,13 +525,19 @@ pub async fn run_suite(
 
         let mut job_created = false;
         if let Ok(client) = KubernetesClient::new().await {
-            if client.submit_job(&job_name, &def.image, &k8s_command).await.is_ok() {
+            if client
+                .submit_job(&job_name, &def.image, &k8s_command)
+                .await
+                .is_ok()
+            {
                 job_created = true;
                 // Spawn monitor task
                 let pool_clone = pool.clone();
                 let job_name_clone = job_name.clone();
                 tokio::spawn(async move {
-                    if let Err(e) = monitor_job_and_update_status(run_uuid, job_name_clone, pool_clone).await {
+                    if let Err(e) =
+                        monitor_job_and_update_status(run_uuid, job_name_clone, pool_clone).await
+                    {
                         tracing::error!("Job monitor failed for run {}: {}", run_uuid, e);
                     }
                 });
@@ -552,18 +578,19 @@ pub async fn run_suite(
 }
 
 async fn get_suite_definitions(
-    pool: &PgPool, 
-    definition_ids: &[Uuid]
+    pool: &PgPool,
+    definition_ids: &[Uuid],
 ) -> Result<Vec<TestDefinition>, sqlx::Error> {
     let mut definitions = Vec::new();
-    
+
     for &def_id in definition_ids {
         if let Some(def) = sqlx::query_as::<_, (Uuid, String, String, Vec<String>)>(
-            "SELECT id, name, image, commands FROM test_definitions WHERE id = $1"
+            "SELECT id, name, image, commands FROM test_definitions WHERE id = $1",
         )
         .bind(def_id)
         .fetch_optional(pool)
-        .await? {
+        .await?
+        {
             definitions.push(TestDefinition {
                 id: def.0,
                 name: def.1,
@@ -572,7 +599,7 @@ async fn get_suite_definitions(
             });
         }
     }
-    
+
     Ok(definitions)
 }
 

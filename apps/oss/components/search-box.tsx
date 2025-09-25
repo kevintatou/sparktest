@@ -5,24 +5,19 @@ import { Input } from "@/components/ui/input"
 import { useSearch } from "@/hooks/use-search"
 
 export function SearchBox() {
-  const {
-    searchQuery,
-    setSearchQuery,
-    searchResults,
-    isSearching,
-    handleSearchSelect,
-  } = useSearch()
+  const { searchQuery, setSearchQuery, searchResults, isSearching, handleSearchSelect } =
+    useSearch()
 
   return (
     <div className="relative flex-1 max-w-md">
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-      <Input 
-        placeholder="Search..." 
-        className="pl-9 bg-muted/50 border-0 focus-visible:ring-1" 
+      <Input
+        placeholder="Search..."
+        className="pl-9 bg-muted/50 border-0 focus-visible:ring-1"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      
+
       {/* Search Results */}
       {(searchResults.length > 0 || (isSearching && searchQuery.trim())) && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-50 max-h-64 overflow-y-auto">

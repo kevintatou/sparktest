@@ -69,12 +69,12 @@ jobs:
           cd packages/core
           npm publish --access public
           cd ../..
-          
+
           # Publish UI package  
           cd packages/ui
           npm publish --access public
           cd ../..
-          
+
           # Publish OSS app (if it has a package.json with publishConfig)
           if [ -f "apps/oss/package.json" ] && grep -q '"publishConfig"' apps/oss/package.json; then
             cd apps/oss

@@ -33,7 +33,7 @@ export function useSuiteForm(existingSuite?: Suite): UseSuiteFormReturn {
   const router = useRouter()
   const { toast } = useToast()
   const { data: definitions = [] } = useDefinitions()
-  
+
   const mode = existingSuite ? "edit" : "create"
 
   const [formData, setFormData] = useState<TestSuite>({
@@ -41,7 +41,7 @@ export function useSuiteForm(existingSuite?: Suite): UseSuiteFormReturn {
     description: existingSuite?.description || "",
     executionMode: existingSuite?.executionMode || "sequential",
     labels: existingSuite?.labels || [],
-    testDefinitionIds: existingSuite?.testDefinitionIds || []
+    testDefinitionIds: existingSuite?.testDefinitionIds || [],
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -68,86 +68,95 @@ export function useSuiteForm(existingSuite?: Suite): UseSuiteFormReturn {
   }, [formData])
 
   const updateField = useCallback(<K extends keyof TestSuite>(field: K, value: TestSuite[K]) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }))
   }, [])
 
-  const addLabel = useCallback((label: string) => {
-    const trimmed = label.trim().toLowerCase()
-    if (trimmed && !formData.labels.includes(trimmed)) {
-      setFormData(prev => ({
-        ...prev,
-        labels: [...prev.labels, trimmed]
-      }))
-    }
-  }, [formData.labels])
+  const addLabel = useCallback(
+    (label: string) => {
+      const trimmed = label.trim().toLowerCase()
+      if (trimmed && !formData.labels.includes(trimmed)) {
+        setFormData((prev) => ({
+          ...prev,
+          labels: [...prev.labels, trimmed],
+        }))
+      }
+    },
+    [formData.labels]
+  )
 
   const removeLabel = useCallback((index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      labels: prev.labels.filter((_, i) => i !== index)
+      labels: prev.labels.filter((_, i) => i !== index),
     }))
   }, [])
 
-  const addDefinition = useCallback((definitionId: string) => {
-    if (!formData.testDefinitionIds.includes(definitionId)) {
-      setFormData(prev => ({
-        ...prev,
-        testDefinitionIds: [...prev.testDefinitionIds, definitionId]
-      }))
-    }
-  }, [formData.testDefinitionIds])
+  const addDefinition = useCallback(
+    (definitionId: string) => {
+      if (!formData.testDefinitionIds.includes(definitionId)) {
+        setFormData((prev) => ({
+          ...prev,
+          testDefinitionIds: [...prev.testDefinitionIds, definitionId],
+        }))
+      }
+    },
+    [formData.testDefinitionIds]
+  )
 
   const removeDefinition = useCallback((definitionId: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      testDefinitionIds: prev.testDefinitionIds.filter(id => id !== definitionId)
+      testDefinitionIds: prev.testDefinitionIds.filter((id) => id !== definitionId),
     }))
   }, [])
 
-  const onSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validateForm()) {
-      return
-    }
+  const onSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
 
-    setIsSubmitting(true)
-
-    try {
-      const url = mode === "create" ? "/api/test-suites" : `/api/test-suites/${existingSuite?.id}`
-      const method = mode === "create" ? "POST" : "PUT"
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to ${mode} suite`)
+      if (!validateForm()) {
+        return
       }
 
-      toast({
-        title: `Suite ${mode === "create" ? "Created" : "Updated"}`,
-        description: `Test suite "${formData.name}" has been ${mode === "create" ? "created" : "updated"} successfully.`
-      })
+      setIsSubmitting(true)
 
-      router.push("/suites")
-    } catch (error) {
-      toast({
-        title: `Failed to ${mode} Suite`,
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive"
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }, [formData, validateForm, mode, existingSuite, toast, router])
+      try {
+        const url = mode === "create" ? "/api/test-suites" : `/api/test-suites/${existingSuite?.id}`
+        const method = mode === "create" ? "POST" : "PUT"
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        })
+
+        if (!response.ok) {
+          throw new Error(`Failed to ${mode} suite`)
+        }
+
+        toast({
+          title: `Suite ${mode === "create" ? "Created" : "Updated"}`,
+          description: `Test suite "${formData.name}" has been ${mode === "create" ? "created" : "updated"} successfully.`,
+        })
+
+        router.push("/suites")
+      } catch (error) {
+        toast({
+          title: `Failed to ${mode} Suite`,
+          description: error instanceof Error ? error.message : "An unexpected error occurred",
+          variant: "destructive",
+        })
+      } finally {
+        setIsSubmitting(false)
+      }
+    },
+    [formData, validateForm, mode, existingSuite, toast, router]
+  )
 
   const handleSubmit = onSubmit
 
@@ -161,6 +170,6 @@ export function useSuiteForm(existingSuite?: Suite): UseSuiteFormReturn {
     errors,
     addLabel,
     removeLabel,
-    handleSubmit
+    handleSubmit,
   }
 }

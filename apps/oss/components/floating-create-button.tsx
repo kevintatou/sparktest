@@ -18,7 +18,7 @@ const createRoutes = [
     label: "Test Definition",
   },
   {
-    href: "/suites/new", 
+    href: "/suites/new",
     icon: Layers,
     label: "Test Suite",
   },
@@ -34,7 +34,7 @@ export function FloatingCreateButton() {
 
   // Preload all create routes on mount for faster navigation
   React.useEffect(() => {
-    createRoutes.forEach(route => preload(route.href))
+    createRoutes.forEach((route) => preload(route.href))
   }, [preload])
 
   const handleItemClick = (href: string) => {
@@ -50,15 +50,15 @@ export function FloatingCreateButton() {
             <span className="sr-only">Create new</span>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="center" 
-          side="top" 
+        <DropdownMenuContent
+          align="center"
+          side="top"
           sideOffset={8}
           alignOffset={0}
           className="w-52 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-2xl rounded-xl p-2 animate-in slide-in-from-bottom-2 duration-200"
         >
           {createRoutes.map((item) => (
-            <DropdownMenuItem 
+            <DropdownMenuItem
               key={item.href}
               className="cursor-pointer rounded-lg h-12 px-3 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center text-slate-900 dark:text-slate-100"
               onClick={() => handleItemClick(item.href)}

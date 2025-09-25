@@ -66,16 +66,11 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
           </Link>
         </Button>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-foreground">
-            {definition.name}
-          </h1>
+          <h1 className="text-3xl font-bold text-foreground">{definition.name}</h1>
           <p className="text-muted-foreground mt-1">{definition.description}</p>
         </div>
         <div className="flex gap-2">
-          <Button
-            onClick={handleRunTest}
-            disabled={createRunMutation.isPending}
-          >
+          <Button onClick={handleRunTest} disabled={createRunMutation.isPending}>
             {createRunMutation.isPending ? (
               <>
                 <svg

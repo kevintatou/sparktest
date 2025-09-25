@@ -1,8 +1,7 @@
 use crate::handlers::*;
 use axum::{
     routing::{delete, get, post},
-    Router,
-    Extension,
+    Extension, Router,
 };
 use sqlx::PgPool;
 use tower_http::cors::CorsLayer;
@@ -21,8 +20,8 @@ pub fn create_app(pool: PgPool) -> Router {
         .route("/k8s/health", get(k8s_health))
         .route("/k8s/logs/:job_name", get(get_job_logs))
         .route("/k8s/status/:job_name", get(get_job_status))
-    .route("/k8s/jobs", get(list_jobs))
-    .route("/k8s/jobs/:job_name", delete(delete_job));
+        .route("/k8s/jobs", get(list_jobs))
+        .route("/k8s/jobs/:job_name", delete(delete_job));
 
     Router::new()
         .nest("/api", api_routes)

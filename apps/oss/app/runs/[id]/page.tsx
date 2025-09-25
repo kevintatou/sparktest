@@ -64,7 +64,9 @@ export default function TestDetailsPage({ params }: { params: { id: string } }) 
           <div className="flex min-h-screen flex-col items-center justify-center">
             <div className="text-center">
               <h1 className="text-2xl font-bold mb-2">Test not found</h1>
-              <p className="text-muted-foreground mb-6">The test you are looking for does not exist.</p>
+              <p className="text-muted-foreground mb-6">
+                The test you are looking for does not exist.
+              </p>
               <Button asChild className="shadow-sm">
                 <Link href="/">Go back to dashboard</Link>
               </Button>

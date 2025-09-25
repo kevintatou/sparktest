@@ -19,8 +19,9 @@ async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
 
     // Get database URL from environment - PostgreSQL only
-    let database_url = std::env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "postgresql://sparktest:sparktest_dev_password@localhost:5432/sparktest".to_string());
+    let database_url = std::env::var("DATABASE_URL").unwrap_or_else(|_| {
+        "postgresql://sparktest:sparktest_dev_password@localhost:5432/sparktest".to_string()
+    });
 
     tracing::info!("Connecting to PostgreSQL database: {}", database_url);
 

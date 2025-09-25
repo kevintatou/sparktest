@@ -19,7 +19,10 @@ function MetricsSkeleton() {
         {Array(3)
           .fill(null)
           .map((_, i) => (
-            <div key={i} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-6 space-y-4">
+            <div
+              key={i}
+              className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-6 space-y-4"
+            >
               <Skeleton className="h-4 w-20 bg-slate-200 dark:bg-slate-700" />
               <Skeleton className="h-8 w-16 bg-slate-200 dark:bg-slate-700" />
               <Skeleton className="h-3 w-32 bg-slate-100 dark:bg-slate-600" />
@@ -80,8 +83,12 @@ export default function Dashboard() {
           <PageTransition>
             {/* Welcome section */}
             <div className="mb-8">
-              <h1 className="text-2xl font-medium text-slate-900 dark:text-slate-100 mb-2">Dashboard</h1>
-              <p className="text-slate-600 dark:text-slate-400">Monitor your test runs and system health</p>
+              <h1 className="text-2xl font-medium text-slate-900 dark:text-slate-100 mb-2">
+                Dashboard
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400">
+                Monitor your test runs and system health
+              </p>
             </div>
 
             <div className="space-y-8">

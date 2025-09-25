@@ -24,7 +24,7 @@ export interface UseSearchReturn {
 export function useSearch(): UseSearchReturn {
   const [searchQuery, setSearchQuery] = useState("")
   const router = useRouter()
-  
+
   const { data: definitions = [], isLoading: definitionsLoading } = useDefinitions()
   const { data: runs = [], isLoading: runsLoading } = useRuns()
   const { data: executors = [], isLoading: executorsLoading } = useExecutors()
@@ -48,24 +48,21 @@ export function useSearch(): UseSearchReturn {
           title: def.name,
           description: def.description,
           type: "definition",
-          url: `/definitions/${def.id}`
+          url: `/definitions/${def.id}`,
         })
       }
     })
 
     // Search runs
     runs.forEach((run: any) => {
-      if (
-        run.name?.toLowerCase().includes(query) ||
-        run.status?.toLowerCase().includes(query)
-      ) {
+      if (run.name?.toLowerCase().includes(query) || run.status?.toLowerCase().includes(query)) {
         results.push({
           id: run.id,
           title: run.name,
           description: `Status: ${run.status}`,
           type: "run",
           status: run.status,
-          url: `/runs/${run.id}`
+          url: `/runs/${run.id}`,
         })
       }
     })
@@ -81,7 +78,7 @@ export function useSearch(): UseSearchReturn {
           title: executor.name,
           description: executor.description,
           type: "executor",
-          url: `/executors/${executor.id}`
+          url: `/executors/${executor.id}`,
         })
       }
     })
@@ -89,16 +86,19 @@ export function useSearch(): UseSearchReturn {
     return results.slice(0, 10) // Limit to 10 results
   }, [searchQuery, definitions, runs, executors])
 
-  const handleSearchSelect = useCallback((result: SearchResult) => {
-    router.push(result.url)
-    setSearchQuery("") // Clear search after selection
-  }, [router])
+  const handleSearchSelect = useCallback(
+    (result: SearchResult) => {
+      router.push(result.url)
+      setSearchQuery("") // Clear search after selection
+    },
+    [router]
+  )
 
   return {
     searchQuery,
     setSearchQuery,
     searchResults,
     isSearching,
-    handleSearchSelect
+    handleSearchSelect,
   }
 }

@@ -15,13 +15,13 @@ import type { Run } from "@tatou/core/types"
 export default function ActiveTestsPage() {
   const { data: allTests = [], isLoading } = useRuns()
   const [progressValues, setProgressValues] = useState<Record<string, number>>({})
-  
+
   // Filter running tests
   const runningTests = allTests.filter((test: Run) => test.status === "running")
 
   // Initialize progress values for new running tests
   useEffect(() => {
-    setProgressValues(prev => {
+    setProgressValues((prev) => {
       const newValues = { ...prev }
       runningTests.forEach((test: Run) => {
         if (!newValues[test.id]) {

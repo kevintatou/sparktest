@@ -60,7 +60,11 @@ services:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "IP=$(hostname -i | awk '{print $1}'); curl -fs http://$IP:3000 || curl -fs http://localhost:3000"]
+      test:
+        [
+          "CMD-SHELL",
+          "IP=$(hostname -i | awk '{print $1}'); curl -fs http://$IP:3000 || curl -fs http://localhost:3000",
+        ]
       interval: 15s
       timeout: 5s
       retries: 5

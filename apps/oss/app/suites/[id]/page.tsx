@@ -18,13 +18,11 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
   const { data: suite, isLoading: suiteLoading, error: suiteError } = useSuite(id)
   const { data: allDefinitions = [] } = useDefinitions()
   const createRunMutation = useCreateRun()
-  
+
   // Filter definitions for this suite
   const definitions = useMemo(() => {
     if (!suite || !allDefinitions.length) return []
-    return allDefinitions.filter((def: Definition) => 
-      suite.testDefinitionIds.includes(def.id)
-    )
+    return allDefinitions.filter((def: Definition) => suite.testDefinitionIds.includes(def.id))
   }, [suite, allDefinitions])
 
   useEffect(() => {

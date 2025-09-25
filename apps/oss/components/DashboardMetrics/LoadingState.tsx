@@ -12,7 +12,10 @@ export function LoadingState() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-6 animate-pulse">
+          <div
+            key={i}
+            className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-6 animate-pulse"
+          >
             <div className="pb-2">
               <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div>
             </div>

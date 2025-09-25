@@ -20,7 +20,7 @@ export interface UseRunDetailsReturn {
 
 export function useRunDetails({ run }: UseRunDetailsProps): UseRunDetailsReturn {
   const [activeRun, setActiveRun] = useState<Run>(run)
-  
+
   // Fetch related data
   const { data: definition, isLoading: definitionLoading } = useDefinition(run.definitionId || "")
   const { data: executor, isLoading: executorLoading } = useExecutor(run.executorId || "")
@@ -38,22 +38,25 @@ export function useRunDetails({ run }: UseRunDetailsProps): UseRunDetailsReturn 
     return isNaN(parsed.getTime()) ? new Date() : parsed
   }, [])
 
-  const formatDate = useCallback((date: string | null): string => {
-    if (!date) return "N/A"
-    try {
-      return new Intl.DateTimeFormat('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        timeZoneName: 'short'
-      }).format(safeDate(date))
-    } catch {
-      return "Invalid Date"
-    }
-  }, [safeDate])
+  const formatDate = useCallback(
+    (date: string | null): string => {
+      if (!date) return "N/A"
+      try {
+        return new Intl.DateTimeFormat("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZoneName: "short",
+        }).format(safeDate(date))
+      } catch {
+        return "Invalid Date"
+      }
+    },
+    [safeDate]
+  )
 
   const copyToClipboard = useCallback(async (text: string) => {
     try {
@@ -69,7 +72,7 @@ export function useRunDetails({ run }: UseRunDetailsProps): UseRunDetailsReturn 
       textArea.focus()
       textArea.select()
       try {
-        document.execCommand('copy')
+        document.execCommand("copy")
       } catch (fallbackErr) {
         console.error("Fallback copy also failed:", fallbackErr)
       }
@@ -84,6 +87,6 @@ export function useRunDetails({ run }: UseRunDetailsProps): UseRunDetailsReturn 
     loading,
     safeDate,
     formatDate,
-    copyToClipboard
+    copyToClipboard,
   }
 }

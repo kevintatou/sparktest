@@ -14,7 +14,7 @@ import type { Run } from "@tatou/core/types"
 
 export function TestList() {
   const [progressValues, setProgressValues] = useState<Record<string, number>>({})
-  
+
   const { data: tests = [], isLoading } = useRuns()
 
   // Simulate real-time updates for running tests

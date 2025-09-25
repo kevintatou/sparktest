@@ -12,11 +12,9 @@ import type { Definition } from "@tatou/core/types"
 export function DefinitionsList() {
   const [runningTests, setRunningTests] = useState<string[]>([])
   const { toast } = useToast()
-  
+
   const { data: testDefinitions = [], isLoading: loading } = useDefinitions()
   const createRunMutation = useCreateRun()
-
-
 
   const handleRunTest = async (testId: string) => {
     setRunningTests((prev) => [...prev, testId])

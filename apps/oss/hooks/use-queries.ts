@@ -23,7 +23,7 @@ export function useRuns() {
     queryKey: queryKeys.runs,
     queryFn: async () => {
       const response = await fetch(`${API_BASE}/test-runs`)
-      if (!response.ok) throw new Error('Failed to fetch runs')
+      if (!response.ok) throw new Error("Failed to fetch runs")
       return response.json()
     },
     refetchInterval: 2000, // Refetch every 2 seconds to get live updates
@@ -35,7 +35,7 @@ export function useRun(id: string) {
     queryKey: queryKeys.run(id),
     queryFn: async () => {
       const response = await fetch(`${API_BASE}/test-runs/${id}`)
-      if (!response.ok) throw new Error('Failed to fetch run')
+      if (!response.ok) throw new Error("Failed to fetch run")
       return response.json()
     },
   })
@@ -47,7 +47,7 @@ export function useDefinitions() {
     queryKey: queryKeys.definitions,
     queryFn: async () => {
       const response = await fetch(`${API_BASE}/test-definitions`)
-      if (!response.ok) throw new Error('Failed to fetch definitions')
+      if (!response.ok) throw new Error("Failed to fetch definitions")
       return response.json()
     },
   })
@@ -58,7 +58,7 @@ export function useDefinition(id: string) {
     queryKey: queryKeys.definition(id),
     queryFn: async () => {
       const response = await fetch(`${API_BASE}/test-definitions/${id}`)
-      if (!response.ok) throw new Error('Failed to fetch definition')
+      if (!response.ok) throw new Error("Failed to fetch definition")
       return response.json()
     },
     enabled: !!id,
@@ -71,7 +71,7 @@ export function useExecutors() {
     queryKey: queryKeys.executors,
     queryFn: async () => {
       const response = await fetch(`${API_BASE}/test-executors`)
-      if (!response.ok) throw new Error('Failed to fetch executors')
+      if (!response.ok) throw new Error("Failed to fetch executors")
       return response.json()
     },
   })
@@ -82,7 +82,7 @@ export function useExecutor(id: string) {
     queryKey: queryKeys.executor(id),
     queryFn: async () => {
       const response = await fetch(`${API_BASE}/test-executors/${id}`)
-      if (!response.ok) throw new Error('Failed to fetch executor')
+      if (!response.ok) throw new Error("Failed to fetch executor")
       return response.json()
     },
     enabled: !!id,
@@ -95,7 +95,7 @@ export function useSuites() {
     queryKey: queryKeys.suites,
     queryFn: async () => {
       const response = await fetch(`${API_BASE}/test-suites`)
-      if (!response.ok) throw new Error('Failed to fetch suites')
+      if (!response.ok) throw new Error("Failed to fetch suites")
       return response.json()
     },
   })
@@ -106,7 +106,7 @@ export function useSuite(id: string) {
     queryKey: queryKeys.suite(id),
     queryFn: async () => {
       const response = await fetch(`${API_BASE}/test-suites/${id}`)
-      if (!response.ok) throw new Error('Failed to fetch suite')
+      if (!response.ok) throw new Error("Failed to fetch suite")
       return response.json()
     },
     enabled: !!id,
@@ -121,11 +121,11 @@ export function useCreateRun() {
   return useMutation({
     mutationFn: async (definitionId: string) => {
       const response = await fetch(`${API_BASE}/test-runs`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ definitionId })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ definitionId }),
       })
-      if (!response.ok) throw new Error('Failed to create run')
+      if (!response.ok) throw new Error("Failed to create run")
       return response.json()
     },
     onSuccess: () => {
@@ -152,9 +152,9 @@ export function useDeleteRun() {
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch(`${API_BASE}/test-runs/${id}`, {
-        method: 'DELETE'
+        method: "DELETE",
       })
-      if (!response.ok) throw new Error('Failed to delete run')
+      if (!response.ok) throw new Error("Failed to delete run")
       return response.json()
     },
     onSuccess: () => {
@@ -181,11 +181,11 @@ export function useCreateSuite() {
   return useMutation({
     mutationFn: async (suite: any) => {
       const response = await fetch(`${API_BASE}/test-suites`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(suite)
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(suite),
       })
-      if (!response.ok) throw new Error('Failed to create suite')
+      if (!response.ok) throw new Error("Failed to create suite")
       return response.json()
     },
     onSuccess: () => {
@@ -210,13 +210,13 @@ export function useUpdateSuite() {
   const { toast } = useToast()
 
   return useMutation({
-    mutationFn: async ({ id, suite }: { id: string, suite: any }) => {
+    mutationFn: async ({ id, suite }: { id: string; suite: any }) => {
       const response = await fetch(`${API_BASE}/test-suites/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(suite)
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(suite),
       })
-      if (!response.ok) throw new Error('Failed to update suite')
+      if (!response.ok) throw new Error("Failed to update suite")
       return response.json()
     },
     onSuccess: () => {
@@ -243,9 +243,9 @@ export function useDeleteSuite() {
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch(`${API_BASE}/test-suites/${id}`, {
-        method: 'DELETE'
+        method: "DELETE",
       })
-      if (!response.ok) throw new Error('Failed to delete suite')
+      if (!response.ok) throw new Error("Failed to delete suite")
       return response.json()
     },
     onSuccess: () => {
@@ -272,10 +272,10 @@ export function useRunSuite() {
   return useMutation({
     mutationFn: async (suiteId: string) => {
       const response = await fetch(`${API_BASE}/test-suites/${suiteId}/run`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       })
-      if (!response.ok) throw new Error('Failed to run suite')
+      if (!response.ok) throw new Error("Failed to run suite")
       return response.json()
     },
     onSuccess: () => {
@@ -302,11 +302,11 @@ export function useCreateExecutor() {
   return useMutation({
     mutationFn: async (executor: any) => {
       const response = await fetch(`${API_BASE}/test-executors`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(executor)
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(executor),
       })
-      if (!response.ok) throw new Error('Failed to create executor')
+      if (!response.ok) throw new Error("Failed to create executor")
       return response.json()
     },
     onSuccess: () => {
@@ -333,11 +333,11 @@ export function useUpdateExecutor() {
   return useMutation({
     mutationFn: async (executor: any) => {
       const response = await fetch(`${API_BASE}/test-executors/${executor.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(executor)
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(executor),
       })
-      if (!response.ok) throw new Error('Failed to update executor')
+      if (!response.ok) throw new Error("Failed to update executor")
       return response.json()
     },
     onSuccess: () => {
@@ -364,9 +364,9 @@ export function useDeleteExecutor() {
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch(`${API_BASE}/test-executors/${id}`, {
-        method: 'DELETE'
+        method: "DELETE",
       })
-      if (!response.ok) throw new Error('Failed to delete executor')
+      if (!response.ok) throw new Error("Failed to delete executor")
       return response.json()
     },
     onSuccess: () => {

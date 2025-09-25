@@ -29,9 +29,9 @@ export function DefinitionForm({ existingTest }: DefinitionFormProps) {
     updateCommand,
     handleSubmit,
     handleGithubSubmit,
-  } = useTestDefinitionForm({ 
-    initialDefinition: existingTest, 
-    mode: existingTest ? "edit" : "create" 
+  } = useTestDefinitionForm({
+    initialDefinition: existingTest,
+    mode: existingTest ? "edit" : "create",
   })
 
   return (

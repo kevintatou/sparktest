@@ -84,6 +84,7 @@ cd sparktest
 ```
 
 This starts:
+
 - **PostgreSQL** database on `:5432`
 - **Rust backend** API on `:8080`
 - **Next.js frontend** on `:3000`

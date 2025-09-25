@@ -162,7 +162,9 @@ impl KubernetesClient {
     async fn create_authenticated_client() -> Result<Client> {
         // If override server set, attempt to load kubeconfig, patch server, and return
         if let Ok(api_server) = std::env::var("K8S_API_SERVER") {
-            if let Ok(mut cfg) = kube::Config::from_kubeconfig(&kube::config::KubeConfigOptions::default()).await {
+            if let Ok(mut cfg) =
+                kube::Config::from_kubeconfig(&kube::config::KubeConfigOptions::default()).await
+            {
                 info!("Applying K8S_API_SERVER override: {}", api_server);
                 cfg.cluster_url = api_server.parse()?;
                 return Ok(Client::try_from(cfg)?);
@@ -176,7 +178,9 @@ impl KubernetesClient {
         }
 
         // Attempt kubeconfig explicit load
-        if let Ok(config) = kube::Config::from_kubeconfig(&kube::config::KubeConfigOptions::default()).await {
+        if let Ok(config) =
+            kube::Config::from_kubeconfig(&kube::config::KubeConfigOptions::default()).await
+        {
             info!("Kubernetes client created from kubeconfig");
             return Ok(Client::try_from(config)?);
         }

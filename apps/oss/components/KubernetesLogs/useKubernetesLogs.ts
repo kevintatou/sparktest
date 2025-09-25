@@ -34,20 +34,20 @@ export function useKubernetesLogs(runId: string): UseKubernetesLogsReturn {
     try {
       setError(null)
       const response = await fetch(`/api/runs/${runId}/logs`)
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch logs: ${response.statusText}`)
       }
 
       const data = await response.json()
-      
+
       // Transform the logs data to match our interface
       const transformedLogs: KubernetesLog[] = (data.logs || []).map((log: any, index: number) => ({
         id: `${runId}-${index}`,
         timestamp: log.timestamp || new Date().toISOString(),
         level: log.level || "info",
         message: log.message || log,
-        container: log.container
+        container: log.container,
       }))
 
       setLogs(transformedLogs)
@@ -70,12 +70,12 @@ export function useKubernetesLogs(runId: string): UseKubernetesLogsReturn {
     if (logs.length === 0) return
 
     const logContent = logs
-      .map(log => `[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}`)
-      .join('\n')
+      .map((log) => `[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}`)
+      .join("\n")
 
-    const blob = new Blob([logContent], { type: 'text/plain' })
+    const blob = new Blob([logContent], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
+    const a = document.createElement("a")
     a.href = url
     a.download = `kubernetes-logs-${runId}.txt`
     document.body.appendChild(a)
@@ -108,6 +108,6 @@ export function useKubernetesLogs(runId: string): UseKubernetesLogsReturn {
     refresh,
     downloadLogs,
     autoRefresh,
-    setAutoRefresh
+    setAutoRefresh,
   }
 }

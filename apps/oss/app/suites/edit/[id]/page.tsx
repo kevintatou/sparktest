@@ -10,7 +10,6 @@ export default function EditSuitePage({ params }: { params: { id: string } }) {
   const { id } = params
   const { data: suite, isLoading, error } = useSuite(id)
 
-
   if (isLoading) {
     return (
       <div className="container py-6 max-w-2xl mx-auto">

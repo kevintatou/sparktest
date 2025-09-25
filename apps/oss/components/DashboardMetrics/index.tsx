@@ -3,18 +3,14 @@
 import { useMemo } from "react"
 import { useDashboardMetrics } from "./useDashboardMetrics"
 import { LoadingState } from "./LoadingState"
-import {
-  CheckCircle2,
-  XCircle,
-  TrendingUp,
-} from "lucide-react"
+import { CheckCircle2, XCircle, TrendingUp } from "lucide-react"
 
 export function DashboardMetrics() {
   const { metrics, loading } = useDashboardMetrics()
 
   const metricsData = useMemo(() => {
     const passRate = metrics.totalRuns > 0 ? (metrics.completedRuns / metrics.totalRuns) * 100 : 0
-    
+
     return [
       {
         title: "Pass Rate",
@@ -54,15 +50,19 @@ export function DashboardMetrics() {
         {metricsData.map((metric) => {
           const Icon = metric.icon
           return (
-            <div 
-              key={metric.title} 
+            <div
+              key={metric.title}
               className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-6 hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200"
             >
               <div className="flex items-start justify-between">
                 <div className="space-y-3">
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{metric.title}</p>
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                    {metric.title}
+                  </p>
                   <div className="flex items-baseline gap-2">
-                    <p className="text-3xl font-semibold text-slate-900 dark:text-slate-100">{metric.value}</p>
+                    <p className="text-3xl font-semibold text-slate-900 dark:text-slate-100">
+                      {metric.value}
+                    </p>
                     <span
                       className={`text-sm font-medium ${
                         metric.color === "success"
@@ -101,12 +101,14 @@ export function DashboardMetrics() {
           )
         })}
       </div>
-      
+
       {/* Status indicators */}
       <div className="flex items-center gap-8 text-sm">
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
-          <span className="text-slate-500 dark:text-slate-400">{metrics.completedRuns} Completed</span>
+          <span className="text-slate-500 dark:text-slate-400">
+            {metrics.completedRuns} Completed
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-rose-500"></div>

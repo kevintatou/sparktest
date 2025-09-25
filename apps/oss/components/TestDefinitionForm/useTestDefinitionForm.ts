@@ -41,7 +41,10 @@ export interface UseTestDefinitionFormReturn {
   updateCommand: (index: number, value: string) => void
 }
 
-export function useTestDefinitionForm({ initialDefinition, mode }: UseTestDefinitionFormProps): UseTestDefinitionFormReturn {
+export function useTestDefinitionForm({
+  initialDefinition,
+  mode,
+}: UseTestDefinitionFormProps): UseTestDefinitionFormReturn {
   const router = useRouter()
   const { toast } = useToast()
   const { data: executors = [], isLoading: isLoadingExecutors } = useExecutors()
@@ -51,7 +54,7 @@ export function useTestDefinitionForm({ initialDefinition, mode }: UseTestDefini
     description: initialDefinition?.description || "",
     image: initialDefinition?.image || "",
     commands: initialDefinition?.commands || [""],
-    executorId: initialDefinition?.executorId || ""
+    executorId: initialDefinition?.executorId || "",
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -79,7 +82,7 @@ export function useTestDefinitionForm({ initialDefinition, mode }: UseTestDefini
       newErrors.executorId = "Executor selection is required"
     }
 
-    const validCommands = formData.commands.filter(cmd => cmd.trim() !== "")
+    const validCommands = formData.commands.filter((cmd) => cmd.trim() !== "")
     if (validCommands.length === 0) {
       newErrors.commands = "At least one command is required"
     }
@@ -88,108 +91,123 @@ export function useTestDefinitionForm({ initialDefinition, mode }: UseTestDefini
     return Object.keys(newErrors).length === 0
   }, [formData])
 
-  const updateField = useCallback(<K extends keyof TestDefinition>(field: K, value: TestDefinition[K]) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
-    
-    // Clear error for this field
-    if (errors[field]) {
-      setErrors(prev => {
-        const { [field]: removed, ...rest } = prev
-        return rest
-      })
-    }
-  }, [errors])
+  const updateField = useCallback(
+    <K extends keyof TestDefinition>(field: K, value: TestDefinition[K]) => {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }))
+
+      // Clear error for this field
+      if (errors[field]) {
+        setErrors((prev) => {
+          const { [field]: removed, ...rest } = prev
+          return rest
+        })
+      }
+    },
+    [errors]
+  )
 
   const addCommand = useCallback(() => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      commands: [...prev.commands, ""]
+      commands: [...prev.commands, ""],
     }))
   }, [])
 
   const removeCommand = useCallback((index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      commands: prev.commands.filter((_, i) => i !== index)
+      commands: prev.commands.filter((_, i) => i !== index),
     }))
   }, [])
 
-  const updateCommand = useCallback((index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      commands: prev.commands.map((cmd, i) => i === index ? value : cmd)
-    }))
-    
-    // Clear commands error if user is adding content
-    if (errors.commands && value.trim()) {
-      setErrors(prev => {
-        const { commands, ...rest } = prev
-        return rest
-      })
-    }
-  }, [errors])
+  const updateCommand = useCallback(
+    (index: number, value: string) => {
+      setFormData((prev) => ({
+        ...prev,
+        commands: prev.commands.map((cmd, i) => (i === index ? value : cmd)),
+      }))
 
-  const onSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validateForm()) {
-      return
-    }
+      // Clear commands error if user is adding content
+      if (errors.commands && value.trim()) {
+        setErrors((prev) => {
+          const { commands, ...rest } = prev
+          return rest
+        })
+      }
+    },
+    [errors]
+  )
 
-    setIsSubmitting(true)
+  const onSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
 
-    try {
-      // Filter out empty commands
-      const cleanedFormData = {
-        ...formData,
-        commands: formData.commands.filter(cmd => cmd.trim() !== "")
+      if (!validateForm()) {
+        return
       }
 
-      const url = mode === "create" ? "/api/test-definitions" : `/api/test-definitions/${initialDefinition?.id}`
-      const method = mode === "create" ? "POST" : "PUT"
+      setIsSubmitting(true)
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(cleanedFormData)
-      })
+      try {
+        // Filter out empty commands
+        const cleanedFormData = {
+          ...formData,
+          commands: formData.commands.filter((cmd) => cmd.trim() !== ""),
+        }
 
-      if (!response.ok) {
-        throw new Error(`Failed to ${mode} test definition`)
+        const url =
+          mode === "create"
+            ? "/api/test-definitions"
+            : `/api/test-definitions/${initialDefinition?.id}`
+        const method = mode === "create" ? "POST" : "PUT"
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(cleanedFormData),
+        })
+
+        if (!response.ok) {
+          throw new Error(`Failed to ${mode} test definition`)
+        }
+
+        toast({
+          title: `Test Definition ${mode === "create" ? "Created" : "Updated"}`,
+          description: `Test definition "${formData.name}" has been ${mode === "create" ? "created" : "updated"} successfully.`,
+        })
+
+        router.push("/definitions")
+      } catch (error) {
+        toast({
+          title: `Failed to ${mode} Test Definition`,
+          description: error instanceof Error ? error.message : "An unexpected error occurred",
+          variant: "destructive",
+        })
+      } finally {
+        setIsSubmitting(false)
       }
-
-      toast({
-        title: `Test Definition ${mode === "create" ? "Created" : "Updated"}`,
-        description: `Test definition "${formData.name}" has been ${mode === "create" ? "created" : "updated"} successfully.`
-      })
-
-      router.push("/definitions")
-    } catch (error) {
-      toast({
-        title: `Failed to ${mode} Test Definition`,
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive"
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
-  }, [formData, validateForm, mode, initialDefinition, toast, router])
+    },
+    [formData, validateForm, mode, initialDefinition, toast, router]
+  )
 
   const handleSubmit = onSubmit
-  const handleGithubSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    // GitHub form submission logic would go here
-    toast({
-      title: "GitHub Integration",
-      description: "GitHub-backed test definitions are not yet implemented.",
-      variant: "destructive"
-    })
-  }, [toast])
+  const handleGithubSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      // GitHub form submission logic would go here
+      toast({
+        title: "GitHub Integration",
+        description: "GitHub-backed test definitions are not yet implemented.",
+        variant: "destructive",
+      })
+    },
+    [toast]
+  )
 
   return {
     formData,
@@ -210,6 +228,6 @@ export function useTestDefinitionForm({ initialDefinition, mode }: UseTestDefini
     updateField,
     addCommand,
     removeCommand,
-    updateCommand
+    updateCommand,
   }
 }
