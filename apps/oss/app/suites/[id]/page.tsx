@@ -9,15 +9,14 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
-import { useSuite, useDefinitions, useCreateRun } from "@/hooks/use-queries"
-import type { Definition, Suite } from "@tatou/core/types"
+import { useSuite, useDefinitions } from "@/hooks/use-queries"
+import type { Definition } from "@tatou/core/types"
 
 export default function SuiteDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { toast } = useToast()
-  const { data: suite, isLoading: suiteLoading, error: suiteError } = useSuite(id)
+  const { data: suite } = useSuite(id)
   const { data: allDefinitions = [] } = useDefinitions()
-  const createRunMutation = useCreateRun()
 
   // Filter definitions for this suite
   const definitions = useMemo(() => {

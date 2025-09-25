@@ -13,7 +13,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { GitHubButton } from "@/components/github-button"
 import { FloatingCreateButton } from "@/components/floating-create-button"
 import { PageTransition } from "@/components/page-transition"
-import { useToast } from "@/components/ui/use-toast"
+
 import { useExecutors, useDeleteExecutor } from "@/hooks/use-queries"
 import { formatDistanceToNow } from "@tatou/core"
 import type { Executor } from "@tatou/core/types"

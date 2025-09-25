@@ -83,6 +83,7 @@ export function useRunTestForm({ definition }: UseRunTestFormProps): UseRunTestF
       }
 
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const runData = {
           definitionId: definition.id,
           name: formData.name,

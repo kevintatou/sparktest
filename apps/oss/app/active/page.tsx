@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft, Clock } from "lucide-react"
 
@@ -23,14 +23,14 @@ export default function ActiveTestsPage() {
   useEffect(() => {
     setProgressValues((prev) => {
       const newValues = { ...prev }
-      runningTests.forEach((test: Run) => {
-        if (!newValues[test.id]) {
-          newValues[test.id] = Math.floor(Math.random() * 30) + 10 // Start between 10-40%
+      runningTests.forEach((test) => {
+        if (!(test.id in newValues)) {
+          newValues[test.id] = 0
         }
       })
       return newValues
     })
-  }, [runningTests.length])
+  }, [runningTests])
 
   // Update progress values for running tests
   useEffect(() => {
@@ -56,7 +56,7 @@ export default function ActiveTestsPage() {
     }, 1000)
 
     return () => clearInterval(progressInterval)
-  }, [runningTests.length])
+  }, [runningTests])
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

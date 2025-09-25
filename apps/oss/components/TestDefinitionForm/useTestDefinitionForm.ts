@@ -101,6 +101,7 @@ export function useTestDefinitionForm({
       // Clear error for this field
       if (errors[field]) {
         setErrors((prev) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [field]: removed, ...rest } = prev
           return rest
         })
@@ -133,6 +134,7 @@ export function useTestDefinitionForm({
       // Clear commands error if user is adding content
       if (errors.commands && value.trim()) {
         setErrors((prev) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { commands, ...rest } = prev
           return rest
         })

@@ -21,6 +21,7 @@ export function DefinitionsList() {
 
     try {
       await createRunMutation.mutateAsync(testId)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Error handling is done in the mutation
     } finally {
@@ -28,6 +29,7 @@ export function DefinitionsList() {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDeleteTest = async (testId: string) => {
     // TODO: Implement delete definition functionality
     toast({

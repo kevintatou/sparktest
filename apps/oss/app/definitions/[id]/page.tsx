@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
 import { useDefinition, useCreateRun } from "@/hooks/use-queries"
-import type { Definition } from "@tatou/core/types"
+
 
 export default function DefinitionDetailsPage({ params }: { params: { id: string } }) {
   const { toast } = useToast()

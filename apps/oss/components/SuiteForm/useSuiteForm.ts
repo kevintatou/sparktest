@@ -67,6 +67,7 @@ export function useSuiteForm(existingSuite?: Suite): UseSuiteFormReturn {
     return Object.keys(newErrors).length === 0
   }, [formData])
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const updateField = useCallback(<K extends keyof TestSuite>(field: K, value: TestSuite[K]) => {
     setFormData((prev) => ({
       ...prev,
@@ -94,6 +95,7 @@ export function useSuiteForm(existingSuite?: Suite): UseSuiteFormReturn {
     }))
   }, [])
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const addDefinition = useCallback(
     (definitionId: string) => {
       if (!formData.testDefinitionIds.includes(definitionId)) {
@@ -106,6 +108,7 @@ export function useSuiteForm(existingSuite?: Suite): UseSuiteFormReturn {
     [formData.testDefinitionIds]
   )
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const removeDefinition = useCallback((definitionId: string) => {
     setFormData((prev) => ({
       ...prev,

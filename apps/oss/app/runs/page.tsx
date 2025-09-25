@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   Plus,
@@ -101,7 +101,7 @@ export default function TestRunsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [runToDelete, setRunToDelete] = useState<Run | null>(null)
-  const initializedRef = useRef(false)
+
 
   const isLoading = runsLoading || definitionsLoading || executorsLoading
 
