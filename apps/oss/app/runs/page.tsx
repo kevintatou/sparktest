@@ -102,7 +102,6 @@ export default function TestRunsPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [runToDelete, setRunToDelete] = useState<Run | null>(null)
 
-
   const isLoading = runsLoading || definitionsLoading || executorsLoading
 
   // Real-time updates are handled by React Query's automatic refetching

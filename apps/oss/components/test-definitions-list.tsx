@@ -21,7 +21,7 @@ export function DefinitionsList() {
 
     try {
       await createRunMutation.mutateAsync(testId)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Error handling is done in the mutation
     } finally {

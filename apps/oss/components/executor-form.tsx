@@ -49,7 +49,7 @@ export function ExecutorForm({ existingExecutor }: ExecutorFormProps) {
         await createExecutorMutation.mutateAsync(formData as Executor)
       }
       router.push("/executors")
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Error handling is done in the mutation
     }

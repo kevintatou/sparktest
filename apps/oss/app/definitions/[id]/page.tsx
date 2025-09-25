@@ -9,7 +9,6 @@ import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
 import { useDefinition, useCreateRun } from "@/hooks/use-queries"
 
-
 export default function DefinitionDetailsPage({ params }: { params: { id: string } }) {
   const { toast } = useToast()
   const { data: definition, isLoading, error } = useDefinition(params.id)
