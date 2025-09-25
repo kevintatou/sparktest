@@ -63,7 +63,7 @@ else
 This release corresponds to the version bump in the monorepo.
 All packages in the monorepo are now at the corresponding version:
 - @tatou/core
-- @tatou/storage-service
+- @tatou/ui
 - @tatou/oss
 - sparktest-core
 - sparktest-api  

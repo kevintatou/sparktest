@@ -10,7 +10,6 @@ RUN npm install -g pnpm@latest
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY apps/oss/package.json ./apps/oss/
 COPY packages/core/package.json ./packages/core/
-COPY packages/storage-service/package.json ./packages/storage-service/
 COPY packages/ui/package.json ./packages/ui/
 
 # Install dependencies

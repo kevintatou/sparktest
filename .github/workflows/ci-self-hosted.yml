@@ -39,8 +39,6 @@ jobs:
           pnpm --filter '@tatou/core' build
           echo "Building UI package..."  
           pnpm --filter '@tatou/ui' build
-          echo "Building storage-service package..."
-          pnpm --filter '@tatou/storage-service' build
           echo "Checking if core dist files exist..."
           ls -la packages/core/dist/ || echo "Core dist directory not found"
 

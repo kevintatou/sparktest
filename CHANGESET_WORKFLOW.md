@@ -6,7 +6,7 @@ This document describes how to use changesets for managing independent versionin
 
 The SparkTest monorepo contains:
 
-- **NPM packages**: `@tatou/core`, `@tatou/storage-service`, `@tatou/ui`
+- **NPM packages**: `@tatou/core`, `@tatou/ui`
 - **Cargo crates**: `sparktest-core`, `sparktest-api`, `sparktest-bin`
 
 Previously, all packages shared the same version and were published together, causing issues with duplicate version publishing. Now we use changesets to:

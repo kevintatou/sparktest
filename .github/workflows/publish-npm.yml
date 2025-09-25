@@ -75,11 +75,6 @@ jobs:
           npm publish --access public
           cd ../..
           
-          # Publish storage service package
-          cd packages/storage-service
-          npm publish --access public
-          cd ../..
-          
           # Publish OSS app (if it has a package.json with publishConfig)
           if [ -f "apps/oss/package.json" ] && grep -q '"publishConfig"' apps/oss/package.json; then
             cd apps/oss
