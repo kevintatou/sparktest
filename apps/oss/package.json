@@ -45,7 +45,6 @@
     "@radix-ui/react-tooltip": "latest",
     "@tanstack/react-query": "^5.83.0",
     "@tatou/core": "workspace:*",
-    "@tatou/storage-service": "workspace:*",
     "@tatou/ui": "workspace:*",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
