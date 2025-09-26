@@ -85,7 +85,7 @@ pub async fn create_run(
     }
 
     // Derive a Kubernetes job name from the run id
-    let job_name = format!("test-run-{}", run_uuid);
+    let job_name = format!("test-run-{run_uuid}");
 
     // Build a shell command to run sequential commands if multiple provided
     let k8s_command: Vec<String> = if req.commands.len() == 1 {
@@ -516,7 +516,7 @@ pub async fn run_suite(
         }
 
         // Create Kubernetes job
-        let job_name = format!("test-run-{}", run_uuid);
+        let job_name = format!("test-run-{run_uuid}");
         let k8s_command: Vec<String> = if def.commands.len() == 1 {
             vec!["sh".into(), "-c".into(), def.commands[0].clone()]
         } else {
