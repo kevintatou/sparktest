@@ -1,19 +1,37 @@
 # SparkTest Kubernetes Deployment
 
-Fixes the GLIBC compatibility and SQLite database issues from [GitHub Issue #159](https://github.com/kevintatou/sparktest/issues/159).
+Simple deployment for Minikube and K3s that addresses GLIBC compatibility and database connectivity issues from GitHub Issue #159.
 
-## Usage
+## Quick Start
 
 ```bash
-# Build images
-docker build -f k8s/Dockerfile.backend.k8s -t sparktest-backend:local .
-docker build -f k8s/Dockerfile.frontend -t sparktest-frontend:local .
+# For Minikube (build in Minikube's Docker environment)
+eval $(minikube docker-env)
 
-# Deploy everything
+# Build images (using root Dockerfiles - more optimized)
+docker build -f Dockerfile.backend -t sparktest-backend:local .
+docker build -f Dockerfile -t sparktest-frontend:local .
+
+# Deploy everything (includes PostgreSQL database)
 kubectl apply -f k8s/deployment.yaml
 
-# Access frontend
-kubectl port-forward service/sparktest-frontend-service 3000:3000 -n sparktest
+# Wait for all pods to be ready
+kubectl wait --for=condition=ready pod --all -n sparktest --timeout=300s
+
+# Access the application (run in background)
+kubectl port-forward -n sparktest service/sparktest-backend-service 8080:8080 > /dev/null 2>&1 &
+kubectl port-forward -n sparktest service/sparktest-frontend-service 3000:3000 > /dev/null 2>&1 &
 ```
 
-Open http://localhost:3000 for the SparkTest UI.
+## Access
+
+- **Frontend UI**: http://localhost:3000
+- **Backend API**: http://localhost:8080
+- **Health Check**: http://localhost:8080/api/health
+
+## Components
+
+- **Backend**: Rust API with PostgreSQL database
+- **Frontend**: Next.js application 
+- **Database**: PostgreSQL 15 with persistent storage
+- **Networking**: ClusterIP services with port-forwarding for local access
