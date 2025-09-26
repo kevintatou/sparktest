@@ -1,0 +1,80 @@
+# Kubernetes-optimized Dockerfile for SparkTest Rust Backend
+# This version addresses GLIBC compatibility and proper SQLite handling for K8s
+
+# Build stage with Alpine for better compatibility  
+FROM rust:alpine AS builder
+
+# Install build dependencies for Alpine
+RUN apk add --no-cache \
+    musl-dev \
+    pkgconfig \
+    openssl-dev \
+    openssl-libs-static \
+    sqlite-dev \
+    sqlite-static \
+    gcc \
+    g++ \
+    make
+
+# Set environment variables for static linking
+ENV RUSTFLAGS="-C target-feature=+crt-static"
+ENV PKG_CONFIG_ALL_STATIC=1
+ENV PKG_CONFIG_ALL_FEATURE_crt_static=1
+
+WORKDIR /app
+
+# Copy workspace files
+COPY Cargo.* ./
+COPY backend/ ./backend/
+
+# Generate Cargo.lock if it doesn't exist
+RUN if [ ! -f Cargo.lock ]; then \
+        echo "Cargo.lock not found, generating it..." && \
+        cargo generate-lockfile; \
+    fi
+
+# Build with static linking for maximum compatibility
+RUN cargo build --release --target x86_64-unknown-linux-musl --bin sparktest-bin
+
+# Runtime stage - use minimal Alpine image
+FROM alpine:latest
+
+# Install minimal runtime dependencies
+RUN apk add --no-cache \
+    ca-certificates \
+    tzdata
+
+# Create app user and directories
+RUN addgroup -g 1001 sparktest && \
+    adduser -D -u 1001 -G sparktest sparktest
+
+# Create required directories
+RUN mkdir -p /app/data /app/migrations && \
+    chown -R sparktest:sparktest /app
+
+WORKDIR /app
+
+# Copy the statically linked binary
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/sparktest-bin /app/sparktest-backend
+COPY --from=builder /app/backend/bin/migrations /app/migrations
+
+# Set permissions
+RUN chown -R sparktest:sparktest /app && \
+    chmod +x /app/sparktest-backend
+
+# Switch to non-root user
+USER sparktest
+
+# Expose port
+EXPOSE 8080
+
+# Environment variables for K8s deployment
+ENV RUST_LOG=info
+ENV PORT=8080
+ENV DATABASE_URL=sqlite:/app/data/sparktest.db
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
+
+CMD ["./sparktest-backend"]
