@@ -6,9 +6,7 @@
     "paths": {
       "@/*": ["./*"],
       "@tatou/core": ["../../packages/core/src"],
-      "@tatou/core/*": ["../../packages/core/src/*"],
-      "@tatou/storage-service": ["../../packages/storage-service"],
-      "@tatou/storage-service/*": ["../../packages/storage-service/*"]
+      "@tatou/core/*": ["../../packages/core/src/*"]
     },
     "plugins": [
       {

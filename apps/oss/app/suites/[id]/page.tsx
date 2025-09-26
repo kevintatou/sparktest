@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useEffect, useState } from "react"
+import { use, useMemo } from "react"
 import Link from "next/link"
 import { ArrowLeft, Play, Edit, Clock, Users, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,15 +9,20 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
-import { storage } from "@tatou/storage-service"
-import type { Definition, Suite } from "@tatou/core/types"
+import { useSuite, useDefinitions } from "@/hooks/use-queries"
+import type { Definition } from "@tatou/core/types"
 
 export default function SuiteDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const { toast } = useToast()
-  const [suite, setSuite] = useState<Suite | null>(null)
-  const [definitions, setDefinitions] = useState<Definition[]>([])
-  const [isRunning, setIsRunning] = useState(false)
+  const { data: suite } = useSuite(id)
+  const { data: allDefinitions = [] } = useDefinitions()
+
+  // Filter definitions for this suite
+  const definitions = useMemo(() => {
+    if (!suite || !allDefinitions.length) return []
+    return allDefinitions.filter((def: Definition) => suite.testDefinitionIds.includes(def.id))
+  }, [suite, allDefinitions])
 
   useEffect(() => {
     const loadSuiteAndDefinitions = async () => {

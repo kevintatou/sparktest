@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@tatou/storage-service"
-import type { Executor, Definition } from "@tatou/core/types"
+import { useExecutors } from "@/hooks/use-queries"
 
-interface FormData {
+interface TestDefinition {
+  id?: string
   name: string
   description: string
   image: string
@@ -14,62 +14,101 @@ interface FormData {
   executorId: string
 }
 
-export function useDefinitionForm(existingTest?: Definition) {
+interface UseTestDefinitionFormProps {
+  initialDefinition?: TestDefinition
+  mode: "create" | "edit"
+}
+
+export interface UseTestDefinitionFormReturn {
+  formData: TestDefinition
+  setFormData: React.Dispatch<React.SetStateAction<TestDefinition>>
+  isSubmitting: boolean
+  errors: Record<string, string>
+  executors: any[]
+  isLoadingExecutors: boolean
+  tab: string
+  setTab: (tab: string) => void
+  githubUrl: string
+  setGithubUrl: (url: string) => void
+  githubPath: string
+  setGithubPath: (path: string) => void
+  onSubmit: (e: React.FormEvent) => void
+  handleSubmit: (e: React.FormEvent) => void
+  handleGithubSubmit: (e: React.FormEvent) => void
+  updateField: <K extends keyof TestDefinition>(field: K, value: TestDefinition[K]) => void
+  addCommand: () => void
+  removeCommand: (index: number) => void
+  updateCommand: (index: number, value: string) => void
+}
+
+export function useTestDefinitionForm({
+  initialDefinition,
+  mode,
+}: UseTestDefinitionFormProps): UseTestDefinitionFormReturn {
   const router = useRouter()
   const { toast } = useToast()
+  const { data: executors = [], isLoading: isLoadingExecutors } = useExecutors()
+
+  const [formData, setFormData] = useState<TestDefinition>({
+    name: initialDefinition?.name || "",
+    description: initialDefinition?.description || "",
+    image: initialDefinition?.image || "",
+    commands: initialDefinition?.commands || [""],
+    executorId: initialDefinition?.executorId || "",
+  })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [tab, setTab] = useState("manual")
-  const [executors, setExecutors] = useState<Executor[]>([])
-  const [isLoadingExecutors, setIsLoadingExecutors] = useState(false)
-  const [formData, setFormData] = useState<FormData>({
-    name: existingTest?.name || "",
-    description: existingTest?.description || "",
-    image: existingTest?.image || "",
-    commands: existingTest?.commands || [""],
-    executorId: existingTest?.executorId ? existingTest.executorId : "none",
-  })
   const [githubUrl, setGithubUrl] = useState("")
-  const [githubPath, setGithubPath] = useState("/tests")
+  const [githubPath, setGithubPath] = useState("")
 
-  // Fetch executors on mount
-  useEffect(() => {
-    const fetchExecutors = async () => {
-      setIsLoadingExecutors(true)
-      try {
-        const data = await storage.getExecutors()
-        setExecutors(data)
-      } catch (error) {
-        console.error("Failed to fetch executors:", error)
-        toast({
-          title: "Error fetching executors",
-          description:
-            "Failed to load available executors. You can still create a test definition without selecting an executor.",
-          variant: "destructive",
+  const validateForm = useCallback(() => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Test name is required"
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = "Description is required"
+    }
+
+    if (!formData.image.trim()) {
+      newErrors.image = "Docker image is required"
+    }
+
+    if (!formData.executorId) {
+      newErrors.executorId = "Executor selection is required"
+    }
+
+    const validCommands = formData.commands.filter((cmd) => cmd.trim() !== "")
+    if (validCommands.length === 0) {
+      newErrors.commands = "At least one command is required"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }, [formData])
+
+  const updateField = useCallback(
+    <K extends keyof TestDefinition>(field: K, value: TestDefinition[K]) => {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }))
+
+      // Clear error for this field
+      if (errors[field]) {
+        setErrors((prev) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [field]: removed, ...rest } = prev
+          return rest
         })
-      } finally {
-        setIsLoadingExecutors(false)
       }
-    }
-    fetchExecutors()
-  }, [toast])
-
-  // Auto-populate image and commands when executor is selected
-  useEffect(() => {
-    if (formData.executorId && formData.executorId !== "none" && executors.length > 0) {
-      const selectedExecutor = executors.find((e) => e.id === formData.executorId)
-      if (selectedExecutor) {
-        setFormData((prev) => ({
-          ...prev,
-          image: selectedExecutor.image,
-          commands:
-            selectedExecutor.command && selectedExecutor.command.length > 0
-              ? selectedExecutor.command
-              : ["echo hello"],
-        }))
-      }
-    }
-  }, [formData.executorId, executors])
+    },
+    [errors]
+  )
 
   const addCommand = useCallback(() => {
     setFormData((prev) => ({
@@ -85,92 +124,112 @@ export function useDefinitionForm(existingTest?: Definition) {
     }))
   }, [])
 
-  const updateCommand = useCallback((index: number, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      commands: prev.commands.map((cmd, i) => (i === index ? value : cmd)),
-    }))
-  }, [])
+  const updateCommand = useCallback(
+    (index: number, value: string) => {
+      setFormData((prev) => ({
+        ...prev,
+        commands: prev.commands.map((cmd, i) => (i === index ? value : cmd)),
+      }))
 
-  const handleSubmit = useCallback(
+      // Clear commands error if user is adding content
+      if (errors.commands && value.trim()) {
+        setErrors((prev) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { commands, ...rest } = prev
+          return rest
+        })
+      }
+    },
+    [errors]
+  )
+
+  const onSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault()
+
+      if (!validateForm()) {
+        return
+      }
+
       setIsSubmitting(true)
 
       try {
-        // Save to localStorage
-        const submissionData: Definition = {
+        // Filter out empty commands
+        const cleanedFormData = {
           ...formData,
-          id: existingTest?.id || Date.now().toString(),
-          commands: formData.commands.filter(Boolean),
-          createdAt: existingTest?.createdAt || new Date().toISOString(),
-          executorId: formData.executorId === "none" ? undefined : formData.executorId,
+          commands: formData.commands.filter((cmd) => cmd.trim() !== ""),
         }
-        storage.saveDefinition(submissionData)
+
+        const url =
+          mode === "create"
+            ? "/api/test-definitions"
+            : `/api/test-definitions/${initialDefinition?.id}`
+        const method = mode === "create" ? "POST" : "PUT"
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(cleanedFormData),
+        })
+
+        if (!response.ok) {
+          throw new Error(`Failed to ${mode} test definition`)
+        }
 
         toast({
-          title: existingTest ? "Test definition updated" : "Test definition created",
-          description: `Test "${formData.name}" has been ${existingTest ? "updated" : "created"} successfully.`,
+          title: `Test Definition ${mode === "create" ? "Created" : "Updated"}`,
+          description: `Test definition "${formData.name}" has been ${mode === "create" ? "created" : "updated"} successfully.`,
         })
 
         router.push("/definitions")
       } catch (error) {
         toast({
-          title: `Error ${existingTest ? "updating" : "creating"} test definition`,
-          description: error instanceof Error ? error.message : "Unknown error occurred",
+          title: `Failed to ${mode} Test Definition`,
+          description: error instanceof Error ? error.message : "An unexpected error occurred",
           variant: "destructive",
         })
       } finally {
         setIsSubmitting(false)
       }
     },
-    [formData, existingTest, toast, router]
+    [formData, validateForm, mode, initialDefinition, toast, router]
   )
 
+  const handleSubmit = onSubmit
   const handleGithubSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault()
-      setIsSubmitting(true)
-      try {
-        // Here you would call your backend API to trigger a sync for this repo
-        // For now, just show a toast
-        toast({
-          title: "GitHub Sync Triggered",
-          description: `Syncing definitions from ${githubUrl}${githubPath}`,
-        })
-        router.push("/definitions")
-      } catch (error) {
-        toast({
-          title: "Error syncing from GitHub",
-          description: error instanceof Error ? error.message : "Unknown error occurred",
-          variant: "destructive",
-        })
-      } finally {
-        setIsSubmitting(false)
-      }
+      // GitHub form submission logic would go here
+      toast({
+        title: "GitHub Integration",
+        description: "GitHub-backed test definitions are not yet implemented.",
+        variant: "destructive",
+      })
     },
-    [githubUrl, githubPath, toast, router]
+    [toast]
   )
 
   return {
-    // State
-    isSubmitting,
-    tab,
-    setTab,
-    executors,
-    isLoadingExecutors,
     formData,
     setFormData,
+    isSubmitting,
+    errors,
+    executors,
+    isLoadingExecutors,
+    tab,
+    setTab,
     githubUrl,
     setGithubUrl,
     githubPath,
     setGithubPath,
-
-    // Actions
+    onSubmit,
+    handleSubmit,
+    handleGithubSubmit,
+    updateField,
     addCommand,
     removeCommand,
     updateCommand,
-    handleSubmit,
-    handleGithubSubmit,
   }
 }

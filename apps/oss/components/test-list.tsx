@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { CheckCircle, Clock, XCircle } from "lucide-react"
 
@@ -8,55 +8,24 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { storage } from "@tatou/storage-service"
+import { useRuns } from "@/hooks/use-queries"
 import { formatDistanceToNow } from "@tatou/core"
 import type { Run } from "@tatou/core/types"
 
 export function TestList() {
-  const [tests, setTests] = useState<Run[]>([])
   const [progressValues, setProgressValues] = useState<Record<string, number>>({})
-  const initializedRef = useRef(false)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Load tests from localStorage only once on mount
-  useEffect(() => {
-    if (!initializedRef.current) {
-      // Initialize storage on component mount
-      storage.getRuns().then((data) => {
-        setTests(data)
-      })
-      initializedRef.current = true
-
-      // Set up a refresh interval to check for updates
-      intervalRef.current = setInterval(async () => {
-        const updatedTests = await storage.getRuns()
-        setTests((prev) => {
-          // Only update if the tests have actually changed
-          if (JSON.stringify(prev) !== JSON.stringify(updatedTests)) {
-            return updatedTests
-          }
-          return prev
-        })
-      }, 5000)
-    }
-
-    // Clean up interval on unmount
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [])
+  const { data: tests = [], isLoading } = useRuns()
 
   // Simulate real-time updates for running tests
   useEffect(() => {
-    const runningTests = tests.filter((test) => test.status === "running")
+    const runningTests = tests.filter((test: Run) => test.status === "running")
     if (runningTests.length === 0) return
 
     // Initialize progress values for running tests that don't have values yet
     setProgressValues((prev) => {
       const newValues = { ...prev }
-      runningTests.forEach((test) => {
+      runningTests.forEach((test: Run) => {
         if (!newValues[test.id]) {
           newValues[test.id] = Math.floor(Math.random() * 30) + 10 // Start between 10-40%
         }
@@ -69,7 +38,7 @@ export function TestList() {
         let updated = false
         const newValues = { ...prev }
 
-        runningTests.forEach((test) => {
+        runningTests.forEach((test: Run) => {
           // Increment progress by a random amount
           const increment = Math.floor(Math.random() * 5) + 1
           const currentValue = prev[test.id] || 0
@@ -77,22 +46,6 @@ export function TestList() {
           if (currentValue < 100) {
             newValues[test.id] = Math.min(100, currentValue + increment)
             updated = true
-          }
-
-          // If progress reaches 100%, update test status
-          if (newValues[test.id] === 100 && currentValue !== 100) {
-            setTimeout(() => {
-              // Update the test status in localStorage
-              const newStatus: "completed" | "failed" = Math.random() > 0.2 ? "completed" : "failed"
-              const updatedTest: Run = {
-                ...test,
-                status: newStatus,
-              }
-              storage.saveRun(updatedTest)
-
-              // Update the local state
-              setTests((prevTests) => prevTests.map((t) => (t.id === test.id ? updatedTest : t)))
-            }, 1000)
           }
         })
 
@@ -102,7 +55,18 @@ export function TestList() {
     }, 1000)
 
     return () => clearInterval(progressInterval)
-  }, [tests]) // Only depend on tests, not progressValues
+  }, [tests])
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+          <p className="mt-4 text-muted-foreground">Loading test runs...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
@@ -113,7 +77,7 @@ export function TestList() {
           </p>
         </Card>
       ) : (
-        tests.map((test) => (
+        tests.map((test: Run) => (
           <Card key={test.id} className="overflow-hidden transition-all hover:shadow-md">
             <div className="flex flex-col sm:flex-row">
               <div className="flex flex-1 items-start gap-4 p-4">
@@ -149,7 +113,7 @@ export function TestList() {
                     {test.image} • {formatDistanceToNow(test.createdAt)}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {test.command.map((cmd, i) => (
+                    {test.command.map((cmd: string, i: number) => (
                       <Badge key={i} variant="outline">
                         {cmd}
                       </Badge>

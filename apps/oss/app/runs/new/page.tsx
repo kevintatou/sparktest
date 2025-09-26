@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
@@ -12,27 +12,12 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { GitHubButton } from "@/components/github-button"
 import { SearchBox } from "@/components/search-box"
 import { PageTransition } from "@/components/page-transition"
-import { storage } from "@tatou/storage-service"
+import { useDefinitions } from "@/hooks/use-queries"
 import type { Definition } from "@tatou/core/types"
 
 export default function NewRunPage() {
-  const [definitions, setDefinitions] = useState<Definition[]>([])
+  const { data: definitions = [], isLoading } = useDefinitions()
   const [selected, setSelected] = useState<Definition | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchDefinitions = async () => {
-      try {
-        const defs = await storage.getDefinitions()
-        setDefinitions(defs)
-      } catch (error) {
-        console.error("Error loading test definitions:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchDefinitions()
-  }, [])
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -65,7 +50,7 @@ export default function NewRunPage() {
                 <h1 className="text-2xl font-bold">Create Test Run</h1>
               </div>
 
-              {loading ? (
+              {isLoading ? (
                 <div className="text-center py-10">
                   <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
                   <p className="mt-4 text-muted-foreground">Loading test definitions...</p>
@@ -80,7 +65,7 @@ export default function NewRunPage() {
                 <div className="space-y-4">
                   <p className="text-muted-foreground">Choose a test definition to start a run:</p>
                   <ul className="space-y-2">
-                    {definitions.map((def) => (
+                    {definitions.map((def: Definition) => (
                       <li key={def.id}>
                         <Button
                           variant="outline"

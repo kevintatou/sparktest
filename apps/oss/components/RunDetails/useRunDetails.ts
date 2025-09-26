@@ -1,79 +1,84 @@
-import { useState, useEffect, useMemo } from "react"
-import { Run, Definition, Executor } from "@tatou/core/types"
-import { storage } from "@tatou/storage-service"
-import { useToast } from "@/components/ui/use-toast"
+"use client"
+
+import { useState, useEffect, useCallback } from "react"
+import { useDefinition, useExecutor } from "@/hooks/use-queries"
+import type { Run } from "@tatou/core/types"
 
 interface UseRunDetailsProps {
   run: Run
 }
 
-export function useRunDetails({ run }: UseRunDetailsProps) {
-  const { toast } = useToast()
-  const [definition, setDefinition] = useState<Definition | null>(null)
-  const [executor, setExecutor] = useState<Executor | null>(null)
-  const [loading, setLoading] = useState(true)
+export interface UseRunDetailsReturn {
+  activeRun: Run
+  definition: any
+  executor: any
+  loading: boolean
+  safeDate: (date: string | null) => Date
+  formatDate: (date: string | null) => string
+  copyToClipboard: (text: string) => void
+}
 
-  // Memoize the safe run object to prevent unnecessary re-renders
-  const activeRun = useMemo<Run>(() => {
-    const safeCreatedAt =
-      run?.createdAt && !Number.isNaN(Date.parse(run.createdAt))
-        ? run.createdAt
-        : new Date().toISOString()
+export function useRunDetails({ run }: UseRunDetailsProps): UseRunDetailsReturn {
+  const [activeRun, setActiveRun] = useState<Run>(run)
 
-    return {
-      ...run,
-      createdAt: safeCreatedAt,
-      k8sJobName: run.k8sJobName || `test-run-${run.id}`, // Generate job name if not provided
-    }
+  // Fetch related data
+  const { data: definition, isLoading: definitionLoading } = useDefinition(run.definitionId || "")
+  const { data: executor, isLoading: executorLoading } = useExecutor(run.executorId || "")
+
+  const loading = definitionLoading || executorLoading
+
+  // Update active run when prop changes
+  useEffect(() => {
+    setActiveRun(run)
   }, [run])
 
-  // Load related definition and executor
-  useEffect(() => {
-    const loadRelatedData = async () => {
+  const safeDate = useCallback((date: string | null): Date => {
+    if (!date) return new Date()
+    const parsed = new Date(date)
+    return isNaN(parsed.getTime()) ? new Date() : parsed
+  }, [])
+
+  const formatDate = useCallback(
+    (date: string | null): string => {
+      if (!date) return "N/A"
       try {
-        if (activeRun.definitionId) {
-          const def = await storage.getDefinitionById(activeRun.definitionId)
-          setDefinition(def || null)
-
-          if (def?.executorId) {
-            const exec = await storage.getExecutorById(def.executorId)
-            setExecutor(exec || null)
-          }
-        }
-      } catch (error) {
-        console.error("Error loading related data:", error)
-      } finally {
-        setLoading(false)
+        return new Intl.DateTimeFormat("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZoneName: "short",
+        }).format(safeDate(date))
+      } catch {
+        return "Invalid Date"
       }
+    },
+    [safeDate]
+  )
+
+  const copyToClipboard = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      // Could add a toast notification here if needed
+      console.log("Copied to clipboard:", text)
+    } catch (err) {
+      console.error("Failed to copy to clipboard:", err)
+      // Fallback method
+      const textArea = document.createElement("textarea")
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      try {
+        document.execCommand("copy")
+      } catch (fallbackErr) {
+        console.error("Fallback copy also failed:", fallbackErr)
+      }
+      document.body.removeChild(textArea)
     }
-
-    loadRelatedData()
-  }, [activeRun.definitionId])
-
-  // Memoized utility functions
-  const safeDate = useMemo(
-    () => (d: string | undefined) => new Date(d && !Number.isNaN(Date.parse(d)) ? d : Date.now()),
-    []
-  )
-
-  const formatDate = useMemo(
-    () => (dateString: string) => {
-      const date = new Date(dateString)
-      return date.toLocaleString()
-    },
-    []
-  )
-
-  const copyToClipboard = useMemo(
-    () => (text: string, label: string) => {
-      navigator.clipboard.writeText(text)
-      toast({
-        title: "Copied to clipboard",
-        description: `${label} copied to clipboard`,
-      })
-    },
-    [toast]
-  )
+  }, [])
 
   return {
     activeRun,

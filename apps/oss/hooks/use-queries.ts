@@ -1,9 +1,9 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { storage } from "@tatou/storage-service"
 import { useToast } from "@/components/ui/use-toast"
-import type { Suite } from "@tatou/core/types"
+
+const API_BASE = "/api"
 
 // Query keys
 export const queryKeys = {
@@ -21,15 +21,23 @@ export const queryKeys = {
 export function useRuns() {
   return useQuery({
     queryKey: queryKeys.runs,
-    queryFn: () => storage.getRuns(),
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/test-runs`)
+      if (!response.ok) throw new Error("Failed to fetch runs")
+      return response.json()
+    },
+    refetchInterval: 2000, // Refetch every 2 seconds to get live updates
   })
 }
 
 export function useRun(id: string) {
   return useQuery({
     queryKey: queryKeys.run(id),
-    queryFn: () => storage.getRunById(id),
-    enabled: !!id,
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/test-runs/${id}`)
+      if (!response.ok) throw new Error("Failed to fetch run")
+      return response.json()
+    },
   })
 }
 
@@ -37,14 +45,22 @@ export function useRun(id: string) {
 export function useDefinitions() {
   return useQuery({
     queryKey: queryKeys.definitions,
-    queryFn: () => storage.getDefinitions(),
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/test-definitions`)
+      if (!response.ok) throw new Error("Failed to fetch definitions")
+      return response.json()
+    },
   })
 }
 
 export function useDefinition(id: string) {
   return useQuery({
     queryKey: queryKeys.definition(id),
-    queryFn: () => storage.getDefinitionById(id),
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/test-definitions/${id}`)
+      if (!response.ok) throw new Error("Failed to fetch definition")
+      return response.json()
+    },
     enabled: !!id,
   })
 }
@@ -53,14 +69,22 @@ export function useDefinition(id: string) {
 export function useExecutors() {
   return useQuery({
     queryKey: queryKeys.executors,
-    queryFn: () => storage.getExecutors(),
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/test-executors`)
+      if (!response.ok) throw new Error("Failed to fetch executors")
+      return response.json()
+    },
   })
 }
 
 export function useExecutor(id: string) {
   return useQuery({
     queryKey: queryKeys.executor(id),
-    queryFn: () => storage.getExecutorById(id),
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/test-executors/${id}`)
+      if (!response.ok) throw new Error("Failed to fetch executor")
+      return response.json()
+    },
     enabled: !!id,
   })
 }
@@ -69,14 +93,22 @@ export function useExecutor(id: string) {
 export function useSuites() {
   return useQuery({
     queryKey: queryKeys.suites,
-    queryFn: () => storage.getTestSuites(),
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/test-suites`)
+      if (!response.ok) throw new Error("Failed to fetch suites")
+      return response.json()
+    },
   })
 }
 
 export function useSuite(id: string) {
   return useQuery({
     queryKey: queryKeys.suite(id),
-    queryFn: () => storage.getTestSuiteById(id),
+    queryFn: async () => {
+      const response = await fetch(`${API_BASE}/test-suites/${id}`)
+      if (!response.ok) throw new Error("Failed to fetch suite")
+      return response.json()
+    },
     enabled: !!id,
   })
 }
@@ -87,7 +119,15 @@ export function useCreateRun() {
   const { toast } = useToast()
 
   return useMutation({
-    mutationFn: (definitionId: string) => storage.createRun(definitionId),
+    mutationFn: async (definitionId: string) => {
+      const response = await fetch(`${API_BASE}/test-runs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ definitionId }),
+      })
+      if (!response.ok) throw new Error("Failed to create run")
+      return response.json()
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.runs })
       toast({
@@ -110,7 +150,13 @@ export function useDeleteRun() {
   const { toast } = useToast()
 
   return useMutation({
-    mutationFn: (id: string) => storage.deleteRun(id),
+    mutationFn: async (id: string) => {
+      const response = await fetch(`${API_BASE}/test-runs/${id}`, {
+        method: "DELETE",
+      })
+      if (!response.ok) throw new Error("Failed to delete run")
+      return response.json()
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.runs })
       toast({
@@ -128,12 +174,80 @@ export function useDeleteRun() {
   })
 }
 
+export function useCreateSuite() {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  return useMutation({
+    mutationFn: async (suite: any) => {
+      const response = await fetch(`${API_BASE}/test-suites`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(suite),
+      })
+      if (!response.ok) throw new Error("Failed to create suite")
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.suites })
+      toast({
+        title: "Suite created",
+        description: "The test suite has been created successfully.",
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: "Error creating suite",
+        description: error instanceof Error ? error.message : "Failed to create the suite",
+        variant: "destructive",
+      })
+    },
+  })
+}
+
+export function useUpdateSuite() {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  return useMutation({
+    mutationFn: async ({ id, suite }: { id: string; suite: any }) => {
+      const response = await fetch(`${API_BASE}/test-suites/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(suite),
+      })
+      if (!response.ok) throw new Error("Failed to update suite")
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.suites })
+      toast({
+        title: "Suite updated",
+        description: "The test suite has been updated successfully.",
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: "Error updating suite",
+        description: error instanceof Error ? error.message : "Failed to update the suite",
+        variant: "destructive",
+      })
+    },
+  })
+}
+
 export function useDeleteSuite() {
   const queryClient = useQueryClient()
   const { toast } = useToast()
 
   return useMutation({
-    mutationFn: (id: string) => storage.deleteTestSuite(id),
+    mutationFn: async (id: string) => {
+      const response = await fetch(`${API_BASE}/test-suites/${id}`, {
+        method: "DELETE",
+      })
+      if (!response.ok) throw new Error("Failed to delete suite")
+      return response.json()
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.suites })
       toast({
@@ -156,48 +270,116 @@ export function useRunSuite() {
   const { toast } = useToast()
 
   return useMutation({
-    mutationFn: async (suite: Suite) => {
-      // Get all test definitions in the suite
-      const definitions = await Promise.all(
-        suite.testDefinitionIds.map((id) => storage.getDefinitionById(id))
-      )
-
-      // Filter out any undefined definitions
-      const validDefinitions = definitions.filter((def) => def !== undefined)
-
-      if (validDefinitions.length === 0) {
-        throw new Error("No valid test definitions found in suite")
-      }
-
-      // Create runs for each definition based on execution mode
-      if (suite.executionMode === "sequential") {
-        // Run tests one after another
-        for (const def of validDefinitions) {
-          if (def) {
-            await storage.createRun(def.id)
-          }
-        }
-      } else {
-        // Run tests in parallel
-        await Promise.all(validDefinitions.map((def) => def && storage.createRun(def.id)))
-      }
-
-      return validDefinitions.length
+    mutationFn: async (suiteId: string) => {
+      const response = await fetch(`${API_BASE}/test-suites/${suiteId}/run`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      })
+      if (!response.ok) throw new Error("Failed to run suite")
+      return response.json()
     },
-    onSuccess: (count, suite) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.runs })
       toast({
-        title: "Suite started",
-        description: `Running ${count} tests in ${suite.executionMode} mode.`,
+        title: "Suite run started",
+        description: "Your suite run has been started successfully.",
       })
     },
     onError: (error) => {
       toast({
-        title: "Error starting suite",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Failed to start the suite. Please check if all test definitions exist.",
+        title: "Failed to start suite run",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      })
+    },
+  })
+}
+
+export function useCreateExecutor() {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  return useMutation({
+    mutationFn: async (executor: any) => {
+      const response = await fetch(`${API_BASE}/test-executors`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(executor),
+      })
+      if (!response.ok) throw new Error("Failed to create executor")
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.executors })
+      toast({
+        title: "Executor created",
+        description: "Your executor has been created successfully.",
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to create executor",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      })
+    },
+  })
+}
+
+export function useUpdateExecutor() {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  return useMutation({
+    mutationFn: async (executor: any) => {
+      const response = await fetch(`${API_BASE}/test-executors/${executor.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(executor),
+      })
+      if (!response.ok) throw new Error("Failed to update executor")
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.executors })
+      toast({
+        title: "Executor updated",
+        description: "Your executor has been updated successfully.",
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to update executor",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      })
+    },
+  })
+}
+
+export function useDeleteExecutor() {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`${API_BASE}/test-executors/${id}`, {
+        method: "DELETE",
+      })
+      if (!response.ok) throw new Error("Failed to delete executor")
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.executors })
+      toast({
+        title: "Executor deleted",
+        description: "The executor has been removed successfully.",
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: "Error deleting executor",
+        description: error instanceof Error ? error.message : "Failed to delete the executor",
         variant: "destructive",
       })
     },

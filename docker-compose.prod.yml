@@ -1,6 +1,25 @@
-version: "3.8"
-
 services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    container_name: sparktest-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=sparktest
+      - POSTGRES_USER=sparktest
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-sparktest_prod_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sparktest
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sparktest -d sparktest"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Frontend Next.js application
   frontend:
     build:
@@ -16,7 +35,8 @@ services:
       - NEXT_PUBLIC_USE_RUST_API=true
       - NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - sparktest
     healthcheck:
@@ -38,9 +58,11 @@ services:
     environment:
       - RUST_ENV=production
       - RUST_LOG=info
-      - DATABASE_URL=sqlite:///app/data/sparktest.db
-    volumes:
-      - backend_data:/app/data
+      - DATABASE_URL=postgresql://sparktest:${POSTGRES_PASSWORD:-sparktest_prod_password}@postgres:5432/sparktest
+      - PORT=8080
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - sparktest
     healthcheck:
@@ -48,12 +70,12 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
 
 networks:
   sparktest:
     driver: bridge
 
 volumes:
-  backend_data:
+  postgres_data:
     driver: local

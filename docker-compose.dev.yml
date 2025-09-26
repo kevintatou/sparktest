@@ -1,0 +1,79 @@
+services:
+  # PostgreSQL database (dev)
+  postgres:
+    image: postgres:15-alpine
+    container_name: sparktest-postgres-dev
+    restart: unless-stopped
+    ports:
+      - "5433:5432" # use 5433 on host to avoid collision if local Postgres already running
+    environment:
+      - POSTGRES_DB=sparktest
+      - POSTGRES_USER=sparktest
+      - POSTGRES_PASSWORD=sparktest_dev_password
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - sparktest-dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sparktest -d sparktest"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+    # Rust backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: sparktest-backend-dev
+    restart: unless-stopped
+    network_mode: host
+    user: "0:0"
+    environment:
+      - RUST_ENV=development
+      - RUST_LOG=debug
+      - DATABASE_URL=postgresql://sparktest:sparktest_dev_password@localhost:5433/sparktest
+      - PORT=8080
+      - K8S_API_SERVER=https://192.168.49.2:8443
+      - KUBECONFIG=/root/.kube/config
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - /home/kevin/.minikube:/home/kevin/.minikube:ro
+      - /home/kevin/.kube:/root/.kube:ro
+
+  # Frontend Next.js application
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sparktest-frontend-dev
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_USE_RUST_API=true
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "IP=$(hostname -i | awk '{print $1}'); curl -fs http://$IP:3000 || curl -fs http://localhost:3000",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+networks:
+  sparktest-dev:
+    driver: bridge
+
+volumes:
+  postgres_data_dev:
+    driver: local

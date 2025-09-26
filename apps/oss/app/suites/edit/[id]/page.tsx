@@ -1,50 +1,16 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SuiteForm } from "@/components/suite-form"
-import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@tatou/storage-service"
-import type { Suite } from "@tatou/core/types"
+import { useSuite } from "@/hooks/use-queries"
 
 export default function EditSuitePage({ params }: { params: { id: string } }) {
   const { id } = params
-  const { toast } = useToast()
-  const [suite, setSuite] = useState<Suite | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { data: suite, isLoading, error } = useSuite(id)
 
-  useEffect(() => {
-    const loadSuite = async () => {
-      setLoading(true)
-      try {
-        const loadedSuite = await storage.getSuiteById(id)
-        if (!loadedSuite) {
-          toast({
-            title: "Suite not found",
-            description: `Could not find suite with ID: ${id}`,
-            variant: "destructive",
-          })
-          return
-        }
-        setSuite(loadedSuite)
-      } catch (error) {
-        console.error("Error loading suite:", error)
-        toast({
-          title: "Error loading suite",
-          description: "Failed to load suite details. Please try again.",
-          variant: "destructive",
-        })
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadSuite()
-  }, [id, toast])
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="container py-6 max-w-2xl mx-auto">
         <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -76,7 +42,7 @@ export default function EditSuitePage({ params }: { params: { id: string } }) {
     )
   }
 
-  if (!suite) {
+  if (error || !suite) {
     return (
       <div className="container py-6 max-w-2xl mx-auto">
         <div className="flex flex-col items-center justify-center min-h-[400px]">

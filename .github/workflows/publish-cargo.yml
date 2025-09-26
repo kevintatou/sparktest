@@ -49,7 +49,7 @@ jobs:
       - name: Publish crates to crates.io
         run: |
           cd backend
-          
+
           # Function to check if a version is already published and publish if needed
           check_and_publish() {
             local crate_name="$1"

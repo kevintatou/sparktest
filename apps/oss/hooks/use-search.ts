@@ -1,108 +1,98 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { storage } from "@tatou/storage-service"
+import { useDefinitions, useRuns, useExecutors } from "./use-queries"
 
 export interface SearchResult {
   id: string
-  name: string
-  type: string
-  href: string
-  description?: string
+  title: string
+  description: string
+  type: "definition" | "run" | "executor"
+  status?: string
+  url: string
 }
 
-export function useSearch() {
+export interface UseSearchReturn {
+  searchQuery: string
+  setSearchQuery: (query: string) => void
+  searchResults: SearchResult[]
+  isSearching: boolean
+  handleSearchSelect: (result: SearchResult) => void
+}
+
+export function useSearch(): UseSearchReturn {
   const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
-  const [isSearching, setIsSearching] = useState(false)
   const router = useRouter()
 
-  // Search functionality
-  useEffect(() => {
-    const performSearch = async () => {
-      if (!searchQuery.trim()) {
-        setSearchResults([])
-        return
+  const { data: definitions = [], isLoading: definitionsLoading } = useDefinitions()
+  const { data: runs = [], isLoading: runsLoading } = useRuns()
+  const { data: executors = [], isLoading: executorsLoading } = useExecutors()
+
+  const isSearching = definitionsLoading || runsLoading || executorsLoading
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return []
+
+    const query = searchQuery.toLowerCase()
+    const results: SearchResult[] = []
+
+    // Search definitions
+    definitions.forEach((def: any) => {
+      if (
+        def.name?.toLowerCase().includes(query) ||
+        def.description?.toLowerCase().includes(query)
+      ) {
+        results.push({
+          id: def.id,
+          title: def.name,
+          description: def.description,
+          type: "definition",
+          url: `/definitions/${def.id}`,
+        })
       }
+    })
 
-      setIsSearching(true)
-      try {
-        const [runs, definitions, executors, suites] = await Promise.all([
-          storage.getRuns(),
-          storage.getDefinitions(), 
-          storage.getExecutors(),
-          storage.getTestSuites(),
-        ])
-
-        const query = searchQuery.toLowerCase()
-        const results: SearchResult[] = []
-
-        // Search runs
-        runs.forEach((run) => {
-          if (run.name?.toLowerCase().includes(query) || run.id.toLowerCase().includes(query)) {
-            results.push({ 
-              ...run, 
-              type: "run", 
-              href: `/runs/${run.id}`,
-              name: run.name || run.id
-            })
-          }
+    // Search runs
+    runs.forEach((run: any) => {
+      if (run.name?.toLowerCase().includes(query) || run.status?.toLowerCase().includes(query)) {
+        results.push({
+          id: run.id,
+          title: run.name,
+          description: `Status: ${run.status}`,
+          type: "run",
+          status: run.status,
+          url: `/runs/${run.id}`,
         })
-
-        // Search definitions
-        definitions.forEach((def) => {
-          if (
-            def.name.toLowerCase().includes(query) ||
-            def.description?.toLowerCase().includes(query)
-          ) {
-            results.push({ ...def, type: "definition", href: `/definitions/${def.id}` })
-          }
-        })
-
-        // Search executors
-        executors.forEach((exec) => {
-          if (
-            exec.name.toLowerCase().includes(query) ||
-            exec.description?.toLowerCase().includes(query)
-          ) {
-            results.push({ ...exec, type: "executor", href: `/executors/${exec.id}` })
-          }
-        })
-
-        // Search suites
-        suites.forEach((suite) => {
-          if (
-            suite.name.toLowerCase().includes(query) ||
-            suite.description?.toLowerCase().includes(query)
-          ) {
-            results.push({ ...suite, type: "suite", href: `/suites/${suite.id}` })
-          }
-        })
-
-        setSearchResults(results.slice(0, 8)) // Limit to 8 results
-      } catch (error) {
-        console.error("Search failed:", error)
-        setSearchResults([])
-      } finally {
-        setIsSearching(false)
       }
-    }
+    })
 
-    const debounceTimer = setTimeout(performSearch, 300)
-    return () => clearTimeout(debounceTimer)
-  }, [searchQuery])
+    // Search executors
+    executors.forEach((executor: any) => {
+      if (
+        executor.name?.toLowerCase().includes(query) ||
+        executor.description?.toLowerCase().includes(query)
+      ) {
+        results.push({
+          id: executor.id,
+          title: executor.name,
+          description: executor.description,
+          type: "executor",
+          url: `/executors/${executor.id}`,
+        })
+      }
+    })
 
-  const handleSearchSelect = (result: SearchResult) => {
-    router.push(result.href)
-    setSearchQuery("")
-    setSearchResults([])
-  }
+    return results.slice(0, 10) // Limit to 10 results
+  }, [searchQuery, definitions, runs, executors])
 
-  const clearSearch = () => {
-    setSearchQuery("")
-    setSearchResults([])
-  }
+  const handleSearchSelect = useCallback(
+    (result: SearchResult) => {
+      router.push(result.url)
+      setSearchQuery("") // Clear search after selection
+    },
+    [router]
+  )
 
   return {
     searchQuery,
@@ -110,6 +100,5 @@ export function useSearch() {
     searchResults,
     isSearching,
     handleSearchSelect,
-    clearSearch,
   }
 }

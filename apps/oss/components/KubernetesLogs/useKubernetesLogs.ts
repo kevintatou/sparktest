@@ -1,123 +1,113 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@tatou/storage-service"
-import type { JobLogs, KubernetesHealth } from "@tatou/core/types"
 
-interface UseKubernetesLogsProps {
-  runId: string
-  jobName?: string
+export interface KubernetesLog {
+  id: string
+  timestamp: string
+  level: "info" | "warning" | "error"
+  message: string
+  container?: string
 }
 
-export function useKubernetesLogs({ runId, jobName: _jobName }: UseKubernetesLogsProps) {
-  const { toast } = useToast()
-  const [logs, setLogs] = useState<JobLogs | null>(null)
-  const [loading, setLoading] = useState(false)
+export interface UseKubernetesLogsReturn {
+  logs: KubernetesLog[]
+  isLoading: boolean
+  error: string | null
+  isRefreshing: boolean
+  refresh: () => void
+  downloadLogs: () => void
+  autoRefresh: boolean
+  setAutoRefresh: (enabled: boolean) => void
+}
+
+export function useKubernetesLogs(runId: string): UseKubernetesLogsReturn {
+  const [logs, setLogs] = useState<KubernetesLog[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [kubernetesHealth, setKubernetesHealth] = useState<KubernetesHealth | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [autoRefresh, setAutoRefresh] = useState(false)
 
-  const checkKubernetesHealth = useCallback(async () => {
+  const fetchLogs = useCallback(async () => {
+    if (!runId) return
+
     try {
-      const health = await storage.getKubernetesHealth()
-      setKubernetesHealth(health)
-    } catch (error) {
-      console.warn("Kubernetes health check failed:", error)
-      setKubernetesHealth({ kubernetes_connected: false, timestamp: new Date().toISOString() })
-    }
-  }, [])
-
-  const fetchLogs = useCallback(
-    async (showToast = true) => {
-      if (!kubernetesHealth?.kubernetes_connected) {
-        setError("Kubernetes is not available")
-        return
-      }
-
-      setLoading(true)
       setError(null)
+      const response = await fetch(`/api/runs/${runId}/logs`)
 
-      try {
-        // Try to get logs by run ID first, fallback to job name
-        const logData = await storage.getTestRunLogs(runId)
-        setLogs(logData)
-
-        // Enable auto-refresh for running jobs
-        if (logData.status === "running") {
-          setAutoRefresh(true)
-        } else {
-          setAutoRefresh(false)
-        }
-
-        if (showToast) {
-          toast({
-            title: "Logs retrieved",
-            description: `Successfully fetched logs for ${logData.job_name}`,
-          })
-        }
-      } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : "Failed to fetch logs"
-        setError(errorMessage)
-
-        if (showToast) {
-          toast({
-            title: "Error fetching logs",
-            description: errorMessage,
-            variant: "destructive",
-          })
-        }
-      } finally {
-        setLoading(false)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch logs: ${response.statusText}`)
       }
-    },
-    [runId, kubernetesHealth?.kubernetes_connected, toast]
-  )
+
+      const data = await response.json()
+
+      // Transform the logs data to match our interface
+      const transformedLogs: KubernetesLog[] = (data.logs || []).map((log: any, index: number) => ({
+        id: `${runId}-${index}`,
+        timestamp: log.timestamp || new Date().toISOString(),
+        level: log.level || "info",
+        message: log.message || log,
+        container: log.container,
+      }))
+
+      setLogs(transformedLogs)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch logs"
+      setError(message)
+      console.error("Error fetching Kubernetes logs:", err)
+    } finally {
+      setIsLoading(false)
+      setIsRefreshing(false)
+    }
+  }, [runId])
+
+  const refresh = useCallback(() => {
+    setIsRefreshing(true)
+    fetchLogs()
+  }, [fetchLogs])
 
   const downloadLogs = useCallback(() => {
-    if (!logs) return
+    if (logs.length === 0) return
 
-    const blob = new Blob([logs.logs], { type: "text/plain" })
+    const logContent = logs
+      .map((log) => `[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}`)
+      .join("\n")
+
+    const blob = new Blob([logContent], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `${logs.job_name}-logs.txt`
+    a.download = `kubernetes-logs-${runId}.txt`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }, [logs, runId])
 
-    toast({
-      title: "Logs downloaded",
-      description: `Downloaded logs for ${logs.job_name}`,
-    })
-  }, [logs, toast])
-
-  // Check Kubernetes health on mount
+  // Initial fetch
   useEffect(() => {
-    checkKubernetesHealth()
-  }, [checkKubernetesHealth])
+    fetchLogs()
+  }, [fetchLogs])
 
-  // Auto-refresh logs for running jobs
+  // Auto-refresh functionality
   useEffect(() => {
-    if (!autoRefresh || !logs || logs.status !== "running") return
+    if (!autoRefresh) return
 
     const interval = setInterval(() => {
-      fetchLogs(false) // Silent refresh
-    }, 5000)
+      fetchLogs()
+    }, 5000) // Refresh every 5 seconds
 
     return () => clearInterval(interval)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoRefresh, logs?.status, fetchLogs])
+  }, [autoRefresh, fetchLogs])
 
   return {
     logs,
-    loading,
+    isLoading,
     error,
-    kubernetesHealth,
-    autoRefresh,
-    fetchLogs,
+    isRefreshing,
+    refresh,
     downloadLogs,
-    checkKubernetesHealth,
+    autoRefresh,
+    setAutoRefresh,
   }
 }

@@ -1,123 +1,178 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@tatou/storage-service"
-import type { Suite, Definition } from "@tatou/core/types"
 
-interface FormData {
-  id: string
+interface TestSuite {
+  id?: string
   name: string
   description: string
-  testDefinitionIds: string[]
-  executionMode: "sequential" | "parallel"
+  executionMode: "parallel" | "sequential"
   labels: string[]
+  testDefinitionIds: string[]
 }
 
-export function useSuiteForm(existingSuite?: Suite) {
+import type { Suite, Definition } from "@tatou/core/types"
+import { useDefinitions } from "@/hooks/use-queries"
+
+export interface UseSuiteFormReturn {
+  formData: TestSuite
+  setFormData: React.Dispatch<React.SetStateAction<TestSuite>>
+  isSubmitting: boolean
+  definitions: Definition[]
+  newLabel: string
+  setNewLabel: (label: string) => void
+  errors: Record<string, string>
+  addLabel: (label: string) => void
+  removeLabel: (index: number) => void
+  handleSubmit: (e: React.FormEvent) => void
+}
+
+export function useSuiteForm(existingSuite?: Suite): UseSuiteFormReturn {
   const router = useRouter()
   const { toast } = useToast()
+  const { data: definitions = [] } = useDefinitions()
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [definitions, setDefinitions] = useState<Definition[]>([])
-  const [formData, setFormData] = useState<FormData>({
-    id: existingSuite?.id || "",
+  const mode = existingSuite ? "edit" : "create"
+
+  const [formData, setFormData] = useState<TestSuite>({
     name: existingSuite?.name || "",
     description: existingSuite?.description || "",
-    testDefinitionIds: existingSuite?.testDefinitionIds || [],
     executionMode: existingSuite?.executionMode || "sequential",
     labels: existingSuite?.labels || [],
+    testDefinitionIds: existingSuite?.testDefinitionIds || [],
   })
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [newLabel, setNewLabel] = useState("")
 
-  // Load test definitions on mount
-  useEffect(() => {
-    const loadDefinitions = async () => {
-      const defs = await storage.getDefinitions()
-      setDefinitions(defs)
-    }
-    loadDefinitions()
-  }, [])
+  const validateForm = useCallback(() => {
+    const newErrors: Record<string, string> = {}
 
-  const addLabel = useCallback(() => {
-    if (newLabel.trim() && !formData.labels.includes(newLabel.trim())) {
-      setFormData((prev) => ({
-        ...prev,
-        labels: [...prev.labels, newLabel.trim()],
-      }))
-      setNewLabel("")
+    if (!formData.name.trim()) {
+      newErrors.name = "Suite name is required"
     }
-  }, [newLabel, formData.labels])
 
-  const removeLabel = useCallback((labelToRemove: string) => {
+    if (!formData.description.trim()) {
+      newErrors.description = "Description is required"
+    }
+
+    if (formData.testDefinitionIds.length === 0) {
+      newErrors.testDefinitions = "At least one test definition is required"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }, [formData])
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const updateField = useCallback(<K extends keyof TestSuite>(field: K, value: TestSuite[K]) => {
     setFormData((prev) => ({
       ...prev,
-      labels: prev.labels.filter((label) => label !== labelToRemove),
+      [field]: value,
     }))
   }, [])
 
-  const toggleDefinition = useCallback((definitionId: string) => {
+  const addLabel = useCallback(
+    (label: string) => {
+      const trimmed = label.trim().toLowerCase()
+      if (trimmed && !formData.labels.includes(trimmed)) {
+        setFormData((prev) => ({
+          ...prev,
+          labels: [...prev.labels, trimmed],
+        }))
+      }
+    },
+    [formData.labels]
+  )
+
+  const removeLabel = useCallback((index: number) => {
     setFormData((prev) => ({
       ...prev,
-      testDefinitionIds: prev.testDefinitionIds.includes(definitionId)
-        ? prev.testDefinitionIds.filter((id) => id !== definitionId)
-        : [...prev.testDefinitionIds, definitionId],
+      labels: prev.labels.filter((_, i) => i !== index),
     }))
   }, [])
 
-  const handleSubmit = useCallback(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const addDefinition = useCallback(
+    (definitionId: string) => {
+      if (!formData.testDefinitionIds.includes(definitionId)) {
+        setFormData((prev) => ({
+          ...prev,
+          testDefinitionIds: [...prev.testDefinitionIds, definitionId],
+        }))
+      }
+    },
+    [formData.testDefinitionIds]
+  )
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const removeDefinition = useCallback((definitionId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      testDefinitionIds: prev.testDefinitionIds.filter((id) => id !== definitionId),
+    }))
+  }, [])
+
+  const onSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault()
+
+      if (!validateForm()) {
+        return
+      }
+
       setIsSubmitting(true)
 
       try {
-        // Validate form data
-        if (formData.testDefinitionIds.length === 0) {
-          throw new Error("Please select at least one test definition")
-        }
+        const url = mode === "create" ? "/api/test-suites" : `/api/test-suites/${existingSuite?.id}`
+        const method = mode === "create" ? "POST" : "PUT"
 
-        const suiteData: Suite = {
-          ...formData,
-          createdAt: existingSuite?.createdAt || new Date().toISOString(),
-        }
+        const response = await fetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        })
 
-        // Save the suite using the storage service
-        await storage.saveTestSuite(suiteData)
+        if (!response.ok) {
+          throw new Error(`Failed to ${mode} suite`)
+        }
 
         toast({
-          title: existingSuite ? "Suite updated" : "Suite created",
-          description: `Test suite "${formData.name}" has been ${existingSuite ? "updated" : "created"} successfully.`,
+          title: `Suite ${mode === "create" ? "Created" : "Updated"}`,
+          description: `Test suite "${formData.name}" has been ${mode === "create" ? "created" : "updated"} successfully.`,
         })
 
         router.push("/suites")
       } catch (error) {
-        console.error("Error saving test suite:", error)
         toast({
-          title: `Error ${existingSuite ? "updating" : "creating"} suite`,
-          description: error instanceof Error ? error.message : "Unknown error occurred",
+          title: `Failed to ${mode} Suite`,
+          description: error instanceof Error ? error.message : "An unexpected error occurred",
           variant: "destructive",
         })
       } finally {
         setIsSubmitting(false)
       }
     },
-    [formData, existingSuite, toast, router]
+    [formData, validateForm, mode, existingSuite, toast, router]
   )
 
+  const handleSubmit = onSubmit
+
   return {
-    // State
-    isSubmitting,
-    definitions,
     formData,
     setFormData,
+    isSubmitting,
+    definitions,
     newLabel,
     setNewLabel,
-
-    // Actions
+    errors,
     addLabel,
     removeLabel,
-    toggleDefinition,
     handleSubmit,
   }
 }

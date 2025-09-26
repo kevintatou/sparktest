@@ -26,7 +26,7 @@ You can also trigger deployment manually:
   - **MVP Mode**: Uses local storage for data persistence
   - No backend dependency for simplified deployment
 - **Backend**: Rust API with Axum framework (Port 8080) - _Commented out in MVP_
-  - Available when enabled: SQLite database for persistence
+  - PostgreSQL database for persistence
   - Can be re-enabled by uncommenting in docker-compose.yml
 
 ### Health Checks:

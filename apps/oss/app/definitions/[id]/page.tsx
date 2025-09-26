@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Play, Edit, Clock, ImageIcon, Terminal } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -8,35 +7,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
-import { storage } from "@tatou/storage-service"
-import type { Definition } from "@tatou/core/types"
+import { useDefinition, useCreateRun } from "@/hooks/use-queries"
 
 export default function DefinitionDetailsPage({ params }: { params: { id: string } }) {
   const { toast } = useToast()
-  const [definition, setDefinition] = useState<Definition | null>(null)
-  const [isRunning, setIsRunning] = useState(false)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchDefinition = async () => {
-      try {
-        const def = await storage.getDefinitionById(params.id)
-        setDefinition(def || null)
-      } catch (_error) {
-        console.error("Error loading test definition:", _error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchDefinition()
-  }, [params.id])
+  const { data: definition, isLoading, error } = useDefinition(params.id)
+  const createRunMutation = useCreateRun()
 
   const handleRunTest = async () => {
     if (!definition) return
 
-    setIsRunning(true)
     try {
-      await storage.createRun(definition.id)
+      await createRunMutation.mutateAsync(definition.id)
       toast({
         title: "Test started",
         description: "Your test run has been created and is starting.",
@@ -47,12 +29,10 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
         description: "Failed to create the test run.",
         variant: "destructive",
       })
-    } finally {
-      setIsRunning(false)
     }
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="container py-6">
         <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -63,7 +43,7 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
     )
   }
 
-  if (!definition) {
+  if (error || !definition) {
     return (
       <div className="container py-6">
         <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -85,17 +65,12 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
           </Link>
         </Button>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold text-foreground">
-            {definition.name}
-          </h1>
+          <h1 className="text-3xl font-bold text-foreground">{definition.name}</h1>
           <p className="text-muted-foreground mt-1">{definition.description}</p>
         </div>
         <div className="flex gap-2">
-          <Button
-            onClick={handleRunTest}
-            disabled={isRunning}
-          >
-            {isRunning ? (
+          <Button onClick={handleRunTest} disabled={createRunMutation.isPending}>
+            {createRunMutation.isPending ? (
               <>
                 <svg
                   className="mr-2 h-4 w-4 animate-spin"

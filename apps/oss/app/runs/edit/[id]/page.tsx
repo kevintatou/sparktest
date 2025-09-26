@@ -1,33 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { DefinitionForm } from "@/components/test-definition-form"
-import { storage } from "@tatou/storage-service"
-import type { Definition } from "@tatou/core/types"
+import { useDefinition } from "@/hooks/use-queries"
 
 export default function EditTestPage({ params }: { params: { id: string } }) {
-  const [definition, setDefinition] = useState<Definition | undefined>(undefined)
-  const [loading, setLoading] = useState(true)
+  const { data: definition, isLoading, error } = useDefinition(params.id)
 
-  useEffect(() => {
-    const loadDefinitionById = async () => {
-      try {
-        const def = await storage.getDefinitionById(params.id)
-        setDefinition(def)
-      } catch (error) {
-        console.error("Error loading test definition:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadDefinitionById()
-  }, [params.id])
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30">
         <div className="text-center">
@@ -38,7 +21,7 @@ export default function EditTestPage({ params }: { params: { id: string } }) {
     )
   }
 
-  if (!definition) {
+  if (error || !definition) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30">
         <div className="text-center">

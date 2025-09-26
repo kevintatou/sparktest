@@ -47,3 +47,8 @@ Cargo.lock
 # OS
 .DS_Store
 Thumbs.db
+
+# Kubernetes/Minikube
+.kube/
+minikube-linux-amd64
+*.kube

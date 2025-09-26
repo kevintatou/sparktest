@@ -41,7 +41,7 @@ export function NewTestForm() {
 
   useEffect(() => {
     const fetchDefs = async () => {
-      const res = await fetch("http://localhost:3001/api/test-definitions")
+      const res = await fetch("http://localhost:8080/api/test-definitions")
       const defs = await res.json()
       setDefinitions(defs)
     }
@@ -74,7 +74,7 @@ export function NewTestForm() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch("http://localhost:3001/api/test-runs", {
+      const response = await fetch("http://localhost:8080/api/test-runs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

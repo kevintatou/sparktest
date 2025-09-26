@@ -66,13 +66,118 @@
 - **Frontend**: Next.js 14 UI for test execution monitoring
 - **Backend**: Rust API for job orchestration and data management
 - **Kubernetes**: Native job execution with live log streaming
-- **Storage**: PostgreSQL (production), SQLite (dev), LocalStorage (demo)
+- **Storage**: PostgreSQL (production/development), LocalStorage (demo)
 
 ---
 
 ## 🚀 Quick Start
 
-### Frontend Development
+### 🐳 Full Stack Development (Recommended)
+
+The easiest way to run SparkTest with PostgreSQL backend:
+
+```bash
+# Clone and start everything with Docker
+git clone https://github.com/kevintatou/sparktest.git
+cd sparktest
+./start-dev.sh
+```
+
+This starts:
+
+- **PostgreSQL** database on `:5432`
+- **Rust backend** API on `:8080`
+- **Next.js frontend** on `:3000`
+
+Open [http://localhost:3000](http://localhost:3000) to see SparkTest with real database persistence.
+
+### 🎯 Frontend-Only Development
+
+For rapid UI development using localStorage (no backend required):
+
+```bash
+# Install dependencies and start frontend
+pnpm install
+pnpm dev
+```
+
+This starts the frontend on `:3000` with sample data from localStorage.
+
+### 🦀 Backend Development
+
+For backend-only development:
+
+```bash
+# Start PostgreSQL
+docker run -d --name postgres-sparktest \
+  -e POSTGRES_DB=sparktest \
+  -e POSTGRES_USER=sparktest \
+  -e POSTGRES_PASSWORD=sparktest_dev_password \
+  -p 5432:5432 postgres:15-alpine
+
+# Run backend
+cd backend
+RUST_LOG=debug DATABASE_URL="postgresql://sparktest:sparktest_dev_password@localhost:5432/sparktest" \
+cargo run --bin sparktest-bin
+```
+
+### 🐘 PostgreSQL Development Setup
+
+SparkTest backend requires PostgreSQL (SQLite support has been removed for simplicity).
+
+#### Option 1: Use Local PostgreSQL (Recommended)
+
+```bash
+# Install PostgreSQL if not already installed
+sudo apt install postgresql postgresql-contrib  # Ubuntu/Debian
+brew install postgresql  # macOS
+
+# Start PostgreSQL service
+sudo systemctl start postgresql  # Linux
+brew services start postgresql  # macOS
+
+# Create database and user
+sudo -u postgres psql
+CREATE DATABASE sparktest;
+CREATE USER sparktest WITH PASSWORD 'sparktest_dev_password';
+GRANT ALL PRIVILEGES ON DATABASE sparktest TO sparktest;
+\q
+
+# Set environment variable
+export DATABASE_URL="postgresql://sparktest:sparktest_dev_password@localhost:5432/sparktest"
+
+# Run backend
+cd backend && cargo run --bin sparktest-bin
+```
+
+#### Option 2: Use Docker PostgreSQL
+
+```bash
+# Start PostgreSQL container (change port if 5432 is in use)
+docker run -d --name sparktest-postgres \
+  -e POSTGRES_DB=sparktest \
+  -e POSTGRES_USER=sparktest \
+  -e POSTGRES_PASSWORD=sparktest_dev_password \
+  -p 5433:5432 \
+  postgres:15-alpine
+
+# Set environment variable
+export DATABASE_URL="postgresql://sparktest:sparktest_dev_password@localhost:5433/sparktest"
+
+# Run backend
+cd backend && cargo run --bin sparktest-bin
+```
+
+#### Option 3: Full Docker Development
+
+```bash
+# Use docker-compose for full stack (if ports are available)
+docker-compose -f docker-compose.dev.yml up
+```
+
+### Legacy Development Sections
+
+#### Frontend Development
 
 ```bash
 cd apps/oss

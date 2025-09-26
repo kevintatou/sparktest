@@ -1,74 +1,42 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState } from "react"
 import { Plus, Play, Edit, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { storage } from "@tatou/storage-service"
+import { useDefinitions, useCreateRun } from "@/hooks/use-queries"
 import type { Definition } from "@tatou/core/types"
 
 export function DefinitionsList() {
-  const [testDefinitions, setDefinitions] = useState<Definition[]>([])
-  const [loading, setLoading] = useState(true)
   const [runningTests, setRunningTests] = useState<string[]>([])
   const { toast } = useToast()
 
-  const loadDefinitions = useCallback(async () => {
-    try {
-      const data = await storage.getDefinitions()
-      setDefinitions(data)
-    } catch (error) {
-      toast({
-        title: "Error loading test definitions",
-        description: error instanceof Error ? error.message : "Unknown error",
-        variant: "destructive",
-      })
-    } finally {
-      setLoading(false)
-    }
-  }, [toast])
-
-  useEffect(() => {
-    loadDefinitions()
-  }, [loadDefinitions])
+  const { data: testDefinitions = [], isLoading: loading } = useDefinitions()
+  const createRunMutation = useCreateRun()
 
   const handleRunTest = async (testId: string) => {
     setRunningTests((prev) => [...prev, testId])
 
     try {
-      await storage.createRun(testId)
-      toast({
-        title: "Test started",
-        description: "Your test is now running in the background",
-      })
+      await createRunMutation.mutateAsync(testId)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      toast({
-        title: "Error starting test",
-        description: error instanceof Error ? error.message : "Unknown error",
-        variant: "destructive",
-      })
+      // Error handling is done in the mutation
     } finally {
       setRunningTests((prev) => prev.filter((id) => id !== testId))
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDeleteTest = async (testId: string) => {
-    try {
-      await storage.deleteDefinition(testId)
-      setDefinitions((prev) => prev.filter((test) => test.id !== testId))
-      toast({
-        title: "Test definition deleted",
-        description: "The test definition has been removed",
-      })
-    } catch (error) {
-      toast({
-        title: "Error deleting test",
-        description: error instanceof Error ? error.message : "Unknown error",
-        variant: "destructive",
-      })
-    }
+    // TODO: Implement delete definition functionality
+    toast({
+      title: "Delete not implemented",
+      description: "Delete functionality needs to be implemented",
+      variant: "destructive",
+    })
   }
 
   if (loading) {
@@ -98,14 +66,14 @@ export function DefinitionsList() {
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {testDefinitions.map((test) => (
+          {testDefinitions.map((test: Definition) => (
             <Card key={test.id} className="flex flex-col">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   {test.name}
                   {test.labels && test.labels.length > 0 && (
                     <div className="flex gap-1">
-                      {test.labels.slice(0, 2).map((label) => (
+                      {test.labels.slice(0, 2).map((label: string) => (
                         <Badge key={label} variant="outline" className="text-xs">
                           {label}
                         </Badge>
@@ -156,7 +124,7 @@ export function DefinitionsList() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDeleteTest(test.id)}
-                  className="text-red-600 hover:text-red-700"
+                  className="text-rose-600 hover:text-rose-700"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
