@@ -4,6 +4,8 @@ Simple deployment for Minikube and K3s that addresses GLIBC compatibility and da
 
 ## Quick Start
 
+**⚠️ Security Note**: Before deploying, update the database password in `k8s/deployment.yaml` - replace `CHANGE_ME_PASSWORD` with a secure password.
+
 ```bash
 # For Minikube (build in Minikube's Docker environment)
 eval $(minikube docker-env)
