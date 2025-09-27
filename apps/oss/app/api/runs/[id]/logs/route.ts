@@ -4,7 +4,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:808
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    // First, get the run to extract the k8s job name
+    // First, get the run to verify it exists
     const runResponse = await fetch(`${BACKEND_URL}/api/test-runs/${params.id}`)
 
     if (!runResponse.ok) {
@@ -13,16 +13,12 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     const run = await runResponse.json()
     
-    // Check if the run has a k8s job name
-    if (!run.k8sJobName) {
-      return NextResponse.json(
-        { error: "No Kubernetes job associated with this run" },
-        { status: 404 }
-      )
-    }
+    // Reconstruct the k8s job name using the same pattern as the backend
+    // Backend creates job names as: format!("test-run-{run_uuid}")
+    const k8sJobName = `test-run-${params.id}`
 
-    // Fetch logs from the k8s logs endpoint
-    const logsResponse = await fetch(`${BACKEND_URL}/api/k8s/logs/${run.k8sJobName}`)
+    // Fetch logs from the k8s logs endpoint using the reconstructed job name
+    const logsResponse = await fetch(`${BACKEND_URL}/api/k8s/logs/${k8sJobName}`)
 
     if (!logsResponse.ok) {
       throw new Error(`Failed to fetch logs: ${logsResponse.statusText}`)
