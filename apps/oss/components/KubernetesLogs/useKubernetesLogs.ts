@@ -5,7 +5,6 @@ import type { JobLogs, KubernetesHealth } from "@tatou/core/types"
 
 export interface UseKubernetesLogsParams {
   runId: string
-  jobName?: string
 }
 
 export interface UseKubernetesLogsReturn {
@@ -18,7 +17,7 @@ export interface UseKubernetesLogsReturn {
   checkKubernetesHealth: () => void
 }
 
-export function useKubernetesLogs({ runId, jobName: _jobName }: UseKubernetesLogsParams): UseKubernetesLogsReturn {
+export function useKubernetesLogs({ runId }: UseKubernetesLogsParams): UseKubernetesLogsReturn {
   const [logs, setLogs] = useState<JobLogs | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
