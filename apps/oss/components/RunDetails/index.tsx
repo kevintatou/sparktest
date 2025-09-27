@@ -43,7 +43,7 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
       <KubernetesTimeline run={activeRun} formatDate={formatDate} safeDate={safeDate} />
 
       {/* Kubernetes Logs */}
-      <KubernetesLogs runId={activeRun.id} jobName={activeRun.k8sJobName} />
+      <KubernetesLogs runId={activeRun.id} />
     </div>
   )
 }
