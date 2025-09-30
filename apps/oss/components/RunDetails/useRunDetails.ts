@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useDefinition, useExecutor } from "@/hooks/use-queries"
-import type { Run } from "@tatou/core/types"
+import type { Run, Definition, Executor } from "@tatou/core/types"
 
 interface UseRunDetailsProps {
   run: Run
@@ -10,8 +10,8 @@ interface UseRunDetailsProps {
 
 export interface UseRunDetailsReturn {
   activeRun: Run
-  definition: any
-  executor: any
+  definition: Definition | undefined
+  executor: Executor | undefined
   loading: boolean
   safeDate: (date: string | null) => Date
   formatDate: (date: string | null) => string

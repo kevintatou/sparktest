@@ -13,13 +13,12 @@ import { LogsContent } from "./LogsContent"
 
 interface KubernetesLogsProps {
   runId: string
-  jobName?: string
   className?: string
 }
 
-export function KubernetesLogs({ runId, jobName, className }: KubernetesLogsProps) {
+export function KubernetesLogs({ runId, className }: KubernetesLogsProps) {
   const { logs, loading, error, kubernetesHealth, fetchLogs, downloadLogs, checkKubernetesHealth } =
-    useKubernetesLogs({ runId, jobName })
+    useKubernetesLogs({ runId })
 
   if (!kubernetesHealth) {
     return <LoadingState className={className} />

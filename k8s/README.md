@@ -34,6 +34,6 @@ kubectl port-forward -n sparktest service/sparktest-frontend-service 3000:3000 >
 ## Components
 
 - **Backend**: Rust API with PostgreSQL database
-- **Frontend**: Next.js application 
+- **Frontend**: Next.js application
 - **Database**: PostgreSQL 15 with persistent storage
 - **Networking**: ClusterIP services with port-forwarding for local access
