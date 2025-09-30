@@ -10,7 +10,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     if (!runResponse.ok) {
       throw new Error(`Failed to fetch run: ${runResponse.statusText}`)
     }
-    
+
     // Reconstruct the k8s job name using the same pattern as the backend
     // Backend creates job names as: format!("test-run-{run_uuid}")
     const k8sJobName = `test-run-${params.id}`
@@ -26,9 +26,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
     return NextResponse.json(logsData)
   } catch (error) {
     console.error("Error fetching run logs:", error)
-    return NextResponse.json(
-      { error: "Failed to fetch run logs" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch run logs" }, { status: 500 })
   }
 }
