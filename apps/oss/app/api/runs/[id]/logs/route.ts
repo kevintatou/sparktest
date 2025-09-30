@@ -10,8 +10,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
     if (!runResponse.ok) {
       throw new Error(`Failed to fetch run: ${runResponse.statusText}`)
     }
-
-    const run = await runResponse.json()
     
     // Reconstruct the k8s job name using the same pattern as the backend
     // Backend creates job names as: format!("test-run-{run_uuid}")

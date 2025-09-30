@@ -4,6 +4,7 @@ import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
 import { useExecutors } from "@/hooks/use-queries"
+import type { Executor } from "@tatou/core/types"
 
 interface TestDefinition {
   id?: string
@@ -24,7 +25,7 @@ export interface UseTestDefinitionFormReturn {
   setFormData: React.Dispatch<React.SetStateAction<TestDefinition>>
   isSubmitting: boolean
   errors: Record<string, string>
-  executors: any[]
+  executors: Executor[]
   isLoadingExecutors: boolean
   tab: string
   setTab: (tab: string) => void
