@@ -1,5 +1,5 @@
-# Build stage
-FROM rust:1.75-slim as builder
+# Build stage  
+FROM rust:latest as builder
 
 WORKDIR /app
 
@@ -13,13 +13,15 @@ RUN apt-get update && apt-get install -y \
 COPY Cargo.toml Cargo.lock ./
 COPY backend/controller ./backend/controller
 COPY backend/core ./backend/core
+COPY backend/api ./backend/api
+COPY backend/bin ./backend/bin
 
 # Build the controller
 WORKDIR /app/backend/controller
 RUN cargo build --release
 
 # Runtime stage
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
