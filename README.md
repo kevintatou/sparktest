@@ -282,11 +282,26 @@ For teams preferring declarative Kubernetes manifests.
    kubectl apply -f k8s/crd/testrun.yaml
    ```
 
-2. **Deploy the controller:**
+2. **Set up RBAC permissions:**
    ```bash
-   # See k8s/CRD_README.md for full deployment instructions
+   kubectl apply -f k8s/controller-rbac.yaml
+   ```
+
+3. **Build and deploy the controller:**
+   ```bash
+   # Build the controller image
+   cd backend/controller
+   docker build -t sparktest-controller:latest .
+   
+   # Load into your cluster (for k3d/kind)
+   k3d image import sparktest-controller:latest -c your-cluster-name
+   # OR for kind: kind load docker-image sparktest-controller:latest
+   
+   # Deploy the controller
    kubectl apply -f k8s/controller-deployment.yaml
    ```
+   
+   See `k8s/CRD_README.md` for detailed instructions.
 
 #### Step 1: Create a Test Definition (Same as Method 1)
 

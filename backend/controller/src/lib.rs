@@ -2,7 +2,7 @@ pub mod crd;
 pub mod reconciler;
 
 pub use crd::TestRun;
-pub use reconciler::{reconcile, error_policy, ReconcilerContext, build_job};
+pub use reconciler::{reconcile, error_policy, ReconcilerContext, ReconcileError, build_job};
 
 use futures::StreamExt;
 use kube::{
