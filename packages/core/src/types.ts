@@ -33,6 +33,12 @@ export interface Run {
   containerStarted?: string
   completed?: string
   failed?: string
+  // Origin tracking
+  origin?: "api" | "crd"
+  k8sRef?: {
+    namespace: string
+    name: string
+  }
 }
 
 export type Executor = {

@@ -7,6 +7,7 @@ import { RunOverview } from "./RunOverview"
 import { DefinitionDetails } from "./DefinitionDetails"
 import { ExecutorDetails } from "./ExecutorDetails"
 import { KubernetesTimeline } from "./KubernetesTimeline"
+import { CrdSourceDetails } from "./CrdSourceDetails"
 import type React from "react"
 
 interface TestDetailsProps {
@@ -30,6 +31,9 @@ export const RunDetails: React.FC<TestDetailsProps> = ({ test: run }) => {
         safeDate={safeDate}
         copyToClipboard={copyToClipboard}
       />
+
+      {/* CRD Source Details (only shown for CRD runs) */}
+      <CrdSourceDetails run={activeRun} copyToClipboard={copyToClipboard} />
 
       {/* Test Definition Details */}
       {definition && (

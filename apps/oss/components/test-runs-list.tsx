@@ -88,6 +88,14 @@ function RunItem({ run }: { run: Run }) {
                 {run.name || `Test Run ${run.id.slice(0, 8)}`}
               </h3>
               <StatusBadge status={run.status} />
+              {run.origin === "crd" && (
+                <span
+                  className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full"
+                  title="Started from TestRun CRD"
+                >
+                  CRD
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
               <span className="font-mono bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-xs">

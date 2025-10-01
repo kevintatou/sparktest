@@ -16,6 +16,16 @@ pub struct CreateRunRequest {
     pub name: String,
     pub image: String,
     pub commands: Vec<String>,
+    #[serde(default)]
+    pub origin: Option<String>,
+    #[serde(rename = "k8sRef")]
+    pub k8s_ref: Option<K8sRefInput>,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct K8sRefInput {
+    pub namespace: String,
+    pub name: String,
 }
 
 pub async fn health_check() -> Json<HealthResponse> {
@@ -28,8 +38,8 @@ pub async fn health_check() -> Json<HealthResponse> {
 pub async fn get_runs(
     Extension(pool): Extension<PgPool>,
 ) -> Result<Json<Vec<serde_json::Value>>, StatusCode> {
-    match sqlx::query_as::<_, (Uuid, String, String, Vec<String>, String, chrono::DateTime<chrono::Utc>, Option<i32>, Option<Vec<String>>, Option<Uuid>, Option<Uuid>)>(
-        "SELECT id, name, image, command, status, created_at, duration, logs, test_definition_id, executor_id FROM test_runs ORDER BY created_at DESC"
+    match sqlx::query_as::<_, (Uuid, String, String, Vec<String>, String, chrono::DateTime<chrono::Utc>, Option<i32>, Option<Vec<String>>, Option<Uuid>, Option<Uuid>, Option<String>, Option<String>, Option<String>)>(
+        "SELECT id, name, image, command, status, created_at, duration, logs, test_definition_id, executor_id, origin::text, k8s_ref_namespace, k8s_ref_name FROM test_runs ORDER BY created_at DESC"
     )
     .fetch_all(&pool)
     .await
@@ -37,8 +47,8 @@ pub async fn get_runs(
         Ok(rows) => {
             let runs: Vec<serde_json::Value> = rows
                 .into_iter()
-                .map(|(id, name, image, command, status, created_at, duration, logs, test_definition_id, executor_id)| {
-                    serde_json::json!({
+                .map(|(id, name, image, command, status, created_at, duration, logs, test_definition_id, executor_id, origin, k8s_ref_namespace, k8s_ref_name)| {
+                    let mut run_json = serde_json::json!({
                         "id": id,
                         "name": name,
                         "image": image,
@@ -48,8 +58,19 @@ pub async fn get_runs(
                         "duration": duration,
                         "logs": logs,
                         "testDefinitionId": test_definition_id,
-                        "executorId": executor_id
-                    })
+                        "executorId": executor_id,
+                        "origin": origin.unwrap_or_else(|| "api".to_string())
+                    });
+                    
+                    // Add k8sRef if both namespace and name are present
+                    if let (Some(ns), Some(n)) = (k8s_ref_namespace, k8s_ref_name) {
+                        run_json["k8sRef"] = serde_json::json!({
+                            "namespace": ns,
+                            "name": n
+                        });
+                    }
+                    
+                    run_json
                 })
                 .collect();
             Ok(Json(runs))
@@ -68,9 +89,18 @@ pub async fn create_run(
     let run_uuid = Uuid::new_v4();
     let now = chrono::Utc::now();
 
-    // Insert the run first with status 'running'
+    // Determine origin (default to "api" if not provided)
+    let origin = req.origin.as_deref().unwrap_or("api");
+    
+    // Extract k8s_ref fields if provided
+    let (k8s_ref_namespace, k8s_ref_name) = match &req.k8s_ref {
+        Some(k8s_ref) => (Some(k8s_ref.namespace.clone()), Some(k8s_ref.name.clone())),
+        None => (None, None),
+    };
+
+    // Insert the run first with status 'running', including origin and k8s_ref
     if let Err(e) = sqlx::query(
-        "INSERT INTO test_runs (id, name, image, command, status, created_at) VALUES ($1, $2, $3, $4, $5, $6)"
+        "INSERT INTO test_runs (id, name, image, command, status, created_at, origin, k8s_ref_namespace, k8s_ref_name) VALUES ($1, $2, $3, $4, $5, $6, $7::run_origin, $8, $9)"
     )
     .bind(run_uuid)
     .bind(&req.name)
@@ -78,6 +108,9 @@ pub async fn create_run(
     .bind(&req.commands) // TEXT[]
     .bind("running")
     .bind(now)
+    .bind(origin)
+    .bind(&k8s_ref_namespace)
+    .bind(&k8s_ref_name)
     .execute(&pool)
     .await {
         tracing::error!("Failed to insert test run: {}", e);
@@ -171,15 +204,15 @@ pub async fn get_run(
     Path(id): Path<Uuid>,
     Extension(pool): Extension<PgPool>,
 ) -> Result<Json<serde_json::Value>, StatusCode> {
-    match sqlx::query_as::<_, (Uuid, String, String, Vec<String>, String, Option<Uuid>, chrono::DateTime<chrono::Utc>, Option<i32>, Option<Vec<String>>, Option<Uuid>)>(
-        "SELECT id, name, image, command, status, test_definition_id, created_at, duration, logs, executor_id FROM test_runs WHERE id = $1"
+    match sqlx::query_as::<_, (Uuid, String, String, Vec<String>, String, Option<Uuid>, chrono::DateTime<chrono::Utc>, Option<i32>, Option<Vec<String>>, Option<Uuid>, Option<String>, Option<String>, Option<String>)>(
+        "SELECT id, name, image, command, status, test_definition_id, created_at, duration, logs, executor_id, origin::text, k8s_ref_namespace, k8s_ref_name FROM test_runs WHERE id = $1"
     )
     .bind(id)
     .fetch_optional(&pool)
     .await
     {
-        Ok(Some((id, name, image, command, status, test_definition_id, created_at, duration, logs, executor_id))) => {
-            let run = serde_json::json!({
+        Ok(Some((id, name, image, command, status, test_definition_id, created_at, duration, logs, executor_id, origin, k8s_ref_namespace, k8s_ref_name))) => {
+            let mut run = serde_json::json!({
                 "id": id,
                 "name": name,
                 "image": image,
@@ -189,8 +222,18 @@ pub async fn get_run(
                 "createdAt": created_at,
                 "duration": duration,
                 "logs": logs,
-                "executorId": executor_id
+                "executorId": executor_id,
+                "origin": origin.unwrap_or_else(|| "api".to_string())
             });
+            
+            // Add k8sRef if both namespace and name are present
+            if let (Some(ns), Some(n)) = (k8s_ref_namespace, k8s_ref_name) {
+                run["k8sRef"] = serde_json::json!({
+                    "namespace": ns,
+                    "name": n
+                });
+            }
+            
             Ok(Json(run))
         }
         Ok(None) => Err(StatusCode::NOT_FOUND),

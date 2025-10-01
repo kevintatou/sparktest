@@ -1,0 +1,28 @@
+[package]
+name = "sparktest-controller"
+version = "2.1.0"
+edition = "2021"
+description = "Kubernetes controller for SparkTest TestRun CRD"
+license = "MIT"
+repository = "https://github.com/kevintatou/sparktest"
+homepage = "https://github.com/kevintatou/sparktest"
+
+[dependencies]
+sparktest-core = { path = "../core" }
+kube = { version = "0.90", features = ["runtime", "derive"] }
+k8s-openapi = { version = "0.21", default-features = false, features = ["v1_28"] }
+tokio = { version = "1.36", features = ["full"] }
+futures = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+schemars = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+anyhow = "1.0"
+reqwest = { version = "0.11", features = ["json"] }
+uuid = { version = "1", features = ["serde", "v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "2.0"
+
+[dev-dependencies]
+tokio-test = "0.4"
