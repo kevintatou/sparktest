@@ -18,15 +18,15 @@ use std::collections::BTreeMap;
 pub struct TestRunSpec {
     /// UUID of the test definition to run
     pub definition_id: String,
-    
+
     /// Environment variables to inject into the test run
     #[serde(default)]
     pub env: BTreeMap<String, String>,
-    
+
     /// Maximum duration in seconds before timing out the test
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timeout_seconds: Option<i32>,
-    
+
     /// Seconds to keep the Job after it finishes before cleanup
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ttl_seconds_after_finished: Option<i32>,
@@ -39,15 +39,15 @@ pub struct TestRunStatus {
     /// Current phase of the test run
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phase: Option<TestRunPhase>,
-    
+
     /// Timestamp when the test run started
     #[serde(skip_serializing_if = "Option::is_none")]
     pub started_at: Option<String>,
-    
+
     /// Timestamp when the test run finished
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finished_at: Option<String>,
-    
+
     /// List of status conditions
     #[serde(default)]
     pub conditions: Vec<TestRunCondition>,
@@ -70,18 +70,18 @@ pub struct TestRunCondition {
     /// Type of condition
     #[serde(rename = "type")]
     pub type_: String,
-    
+
     /// Status of the condition (True, False, Unknown)
     pub status: String,
-    
+
     /// Machine-readable reason
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
-    
+
     /// Human-readable message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
-    
+
     /// Last time the condition transitioned
     pub last_transition_time: String,
 }
@@ -96,9 +96,15 @@ impl TestRunStatus {
             conditions: Vec::new(),
         }
     }
-    
+
     /// Add a condition to the status
-    pub fn add_condition(&mut self, type_: String, status: String, reason: Option<String>, message: Option<String>) {
+    pub fn add_condition(
+        &mut self,
+        type_: String,
+        status: String,
+        reason: Option<String>,
+        message: Option<String>,
+    ) {
         let now = chrono::Utc::now().to_rfc3339();
         self.conditions.push(TestRunCondition {
             type_,

@@ -61,7 +61,7 @@ pub async fn get_runs(
                         "executorId": executor_id,
                         "origin": origin.unwrap_or_else(|| "api".to_string())
                     });
-                    
+
                     // Add k8sRef if both namespace and name are present
                     if let (Some(ns), Some(n)) = (k8s_ref_namespace, k8s_ref_name) {
                         run_json["k8sRef"] = serde_json::json!({
@@ -69,7 +69,7 @@ pub async fn get_runs(
                             "name": n
                         });
                     }
-                    
+
                     run_json
                 })
                 .collect();
@@ -91,7 +91,7 @@ pub async fn create_run(
 
     // Determine origin (default to "api" if not provided)
     let origin = req.origin.as_deref().unwrap_or("api");
-    
+
     // Extract k8s_ref fields if provided
     let (k8s_ref_namespace, k8s_ref_name) = match &req.k8s_ref {
         Some(k8s_ref) => (Some(k8s_ref.namespace.clone()), Some(k8s_ref.name.clone())),
@@ -225,7 +225,7 @@ pub async fn get_run(
                 "executorId": executor_id,
                 "origin": origin.unwrap_or_else(|| "api".to_string())
             });
-            
+
             // Add k8sRef if both namespace and name are present
             if let (Some(ns), Some(n)) = (k8s_ref_namespace, k8s_ref_name) {
                 run["k8sRef"] = serde_json::json!({
@@ -233,7 +233,7 @@ pub async fn get_run(
                     "name": n
                 });
             }
-            
+
             Ok(Json(run))
         }
         Ok(None) => Err(StatusCode::NOT_FOUND),

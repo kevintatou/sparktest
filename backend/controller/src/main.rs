@@ -1,15 +1,15 @@
 use anyhow::Result;
+use futures::StreamExt;
+use kube::runtime::controller::{Action, Controller};
+use kube::runtime::watcher::Config;
 use kube::{Client, ResourceExt};
 use sparktest_controller::{
-    reconciler::{reconcile, ReconcilerContext, ReconcileError},
+    reconciler::{reconcile, ReconcileError, ReconcilerContext},
     TestRun,
 };
 use std::sync::Arc;
 use tokio::time::Duration;
-use tracing::{info, error};
-use futures::StreamExt;
-use kube::runtime::controller::{Action, Controller};
-use kube::runtime::watcher::Config;
+use tracing::{error, info};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -39,41 +39,41 @@ async fn main() -> Result<()> {
     });
 
     // Set up the controller
-    Controller::new(
-        kube::Api::<TestRun>::all(client.clone()),
-        Config::default(),
-    )
-    .run(
-        |testrun, ctx| async move {
-            let name = testrun.name_any();
-            let namespace = testrun.namespace().unwrap_or_else(|| "default".to_string());
-            
-            info!("Reconciling TestRun {}/{}", namespace, name);
-            
-            match reconcile(testrun, ctx).await {
-                Ok(action) => {
-                    info!("Reconciled TestRun {}/{} successfully", namespace, name);
-                    Ok(action)
+    Controller::new(kube::Api::<TestRun>::all(client.clone()), Config::default())
+        .run(
+            |testrun, ctx| async move {
+                let name = testrun.name_any();
+                let namespace = testrun.namespace().unwrap_or_else(|| "default".to_string());
+
+                info!("Reconciling TestRun {}/{}", namespace, name);
+
+                match reconcile(testrun, ctx).await {
+                    Ok(action) => {
+                        info!("Reconciled TestRun {}/{} successfully", namespace, name);
+                        Ok(action)
+                    }
+                    Err(e) => {
+                        error!(
+                            "Failed to reconcile TestRun {}/{}: {:?}",
+                            namespace, name, e
+                        );
+                        Ok(Action::requeue(Duration::from_secs(60)))
+                    }
                 }
-                Err(e) => {
-                    error!("Failed to reconcile TestRun {}/{}: {:?}", namespace, name, e);
-                    Ok(Action::requeue(Duration::from_secs(60)))
-                }
+            },
+            |_testrun, error: &ReconcileError, _ctx| {
+                error!("Reconciliation error: {:?}", error);
+                Action::requeue(Duration::from_secs(60))
+            },
+            context,
+        )
+        .for_each(|res| async move {
+            match res {
+                Ok(o) => info!("Reconciled: {:?}", o),
+                Err(e) => error!("Reconciliation error: {:?}", e),
             }
-        },
-        |_testrun, error: &ReconcileError, _ctx| {
-            error!("Reconciliation error: {:?}", error);
-            Action::requeue(Duration::from_secs(60))
-        },
-        context,
-    )
-    .for_each(|res| async move {
-        match res {
-            Ok(o) => info!("Reconciled: {:?}", o),
-            Err(e) => error!("Reconciliation error: {:?}", e),
-        }
-    })
-    .await;
+        })
+        .await;
 
     Ok(())
 }

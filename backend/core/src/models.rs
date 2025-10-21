@@ -2,17 +2,12 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum RunOrigin {
+    #[default]
     Api,
     Crd,
-}
-
-impl Default for RunOrigin {
-    fn default() -> Self {
-        RunOrigin::Api
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

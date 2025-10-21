@@ -2,7 +2,7 @@ pub mod crd;
 pub mod reconciler;
 
 pub use crd::TestRun;
-pub use reconciler::{reconcile, error_policy, ReconcilerContext, ReconcileError, build_job};
+pub use reconciler::{build_job, error_policy, reconcile, ReconcileError, ReconcilerContext};
 
 use futures::StreamExt;
 use kube::{
@@ -14,7 +14,7 @@ use std::sync::Arc;
 /// Start the TestRun controller
 pub async fn start_controller(backend_url: String) {
     tracing::info!("Starting TestRun controller");
-    
+
     let client = match Client::try_default().await {
         Ok(c) => c,
         Err(e) => {
@@ -22,14 +22,14 @@ pub async fn start_controller(backend_url: String) {
             return;
         }
     };
-    
+
     let context = Arc::new(ReconcilerContext {
         client: client.clone(),
         backend_url,
     });
-    
+
     let testruns = kube::Api::<TestRun>::all(client.clone());
-    
+
     Controller::new(testruns, Config::default())
         .run(reconcile, error_policy, context)
         .for_each(|res| async move {
