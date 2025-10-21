@@ -5,6 +5,8 @@
 
 **SparkTest** is a lightweight, developer-focused test orchestrator for Kubernetes. Define tests as Docker containers, run them as Kubernetes Jobs, and view results in a clean, modern UI — no YAML editing required.
 
+> **Note:** Portions of this codebase were developed with assistance from GitHub Copilot and other AI coding tools.
+
 ## 📋 Table of Contents
 
 - [Features](#-features)
