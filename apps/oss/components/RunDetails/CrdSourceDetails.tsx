@@ -24,9 +24,7 @@ export const CrdSourceDetails = ({ run, copyToClipboard }: CrdSourceDetailsProps
 
   return (
     <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-6">
-      <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">
-        Source
-      </h2>
+      <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-slate-100">Source</h2>
 
       <div className="space-y-4">
         <div className="flex items-center gap-2 mb-4">

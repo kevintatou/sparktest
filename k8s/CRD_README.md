@@ -50,13 +50,13 @@ spec:
     spec:
       serviceAccountName: sparktest-controller
       containers:
-      - name: controller
-        image: your-registry/sparktest-controller:latest
-        env:
-        - name: SPARKTEST_BACKEND_URL
-          value: "http://sparktest-backend:3001/api"
-        - name: RUST_LOG
-          value: "info"
+        - name: controller
+          image: your-registry/sparktest-controller:latest
+          env:
+            - name: SPARKTEST_BACKEND_URL
+              value: "http://sparktest-backend:3001/api"
+            - name: RUST_LOG
+              value: "info"
 ```
 
 ### 3. Create RBAC Resources
@@ -75,18 +75,18 @@ kind: ClusterRole
 metadata:
   name: sparktest-controller
 rules:
-- apiGroups: ["sparktest.dev"]
-  resources: ["testruns"]
-  verbs: ["get", "list", "watch", "update", "patch"]
-- apiGroups: ["sparktest.dev"]
-  resources: ["testruns/status"]
-  verbs: ["get", "update", "patch"]
-- apiGroups: ["batch"]
-  resources: ["jobs"]
-  verbs: ["get", "list", "create", "delete"]
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "list"]
+  - apiGroups: ["sparktest.dev"]
+    resources: ["testruns"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: ["sparktest.dev"]
+    resources: ["testruns/status"]
+    verbs: ["get", "update", "patch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -97,9 +97,9 @@ roleRef:
   kind: ClusterRole
   name: sparktest-controller
 subjects:
-- kind: ServiceAccount
-  name: sparktest-controller
-  namespace: sparktest
+  - kind: ServiceAccount
+    name: sparktest-controller
+    namespace: sparktest
 ```
 
 ## Usage
@@ -115,7 +115,7 @@ metadata:
   name: k6-smoke-001
   namespace: sparktest
 spec:
-  definitionId: b7e6c1e2-1a2b-4c3d-8e9f-100000000006  # K6 Load Tests
+  definitionId: b7e6c1e2-1a2b-4c3d-8e9f-100000000006 # K6 Load Tests
   env:
     TARGET_URL: https://api.example.com
     TEST_DURATION: "30s"
@@ -139,6 +139,7 @@ kubectl get testrun k6-smoke-001 -n sparktest
 ```
 
 Output:
+
 ```
 NAME            PHASE       DEFINITION                              AGE
 k6-smoke-001    Running     b7e6c1e2-1a2b-4c3d-8e9f-100000000006   1m
@@ -168,12 +169,12 @@ This will also delete the associated Kubernetes Job.
 
 ## TestRun Spec Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `definitionId` | string | Yes | UUID of the test definition to run |
-| `env` | object | No | Environment variables to inject (key-value pairs) |
-| `timeoutSeconds` | integer | No | Maximum duration in seconds before timing out |
-| `ttlSecondsAfterFinished` | integer | No | Seconds to keep the Job after it finishes |
+| Field                     | Type    | Required | Description                                       |
+| ------------------------- | ------- | -------- | ------------------------------------------------- |
+| `definitionId`            | string  | Yes      | UUID of the test definition to run                |
+| `env`                     | object  | No       | Environment variables to inject (key-value pairs) |
+| `timeoutSeconds`          | integer | No       | Maximum duration in seconds before timing out     |
+| `ttlSecondsAfterFinished` | integer | No       | Seconds to keep the Job after it finishes         |
 
 ## TestRun Status
 
@@ -228,11 +229,13 @@ The controller updates the TestRun status automatically:
 ### TestRun stuck in Pending
 
 Check controller logs:
+
 ```bash
 kubectl logs -n sparktest deployment/sparktest-controller
 ```
 
 Common issues:
+
 - Test definition ID not found
 - Backend API not reachable
 - RBAC permissions missing
@@ -240,6 +243,7 @@ Common issues:
 ### Job not created
 
 Verify the controller has permissions:
+
 ```bash
 kubectl auth can-i create jobs --as=system:serviceaccount:sparktest:sparktest-controller
 ```
@@ -247,6 +251,7 @@ kubectl auth can-i create jobs --as=system:serviceaccount:sparktest:sparktest-co
 ### Status not updating
 
 Check if the controller is running:
+
 ```bash
 kubectl get pods -n sparktest -l app=sparktest-controller
 ```

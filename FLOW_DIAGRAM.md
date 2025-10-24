@@ -98,6 +98,7 @@
 ## Data Flow
 
 ### 1. CRD Creation
+
 ```yaml
 apiVersion: sparktest.dev/v1alpha1
 kind: TestRun
@@ -112,11 +113,12 @@ spec:
 ```
 
 ### 2. Controller Reconciliation
+
 ```rust
 // Watch for TestRun resources
 Controller::new(testruns, Config::default())
   .run(reconcile, error_policy, context)
-  
+
 // On create:
 // 1. Fetch definition from backend
 // 2. Build Job with env vars
@@ -126,6 +128,7 @@ Controller::new(testruns, Config::default())
 ```
 
 ### 3. Backend Storage
+
 ```sql
 INSERT INTO test_runs (
   id, name, image, command, status,
@@ -136,6 +139,7 @@ INSERT INTO test_runs (
 ```
 
 ### 4. API Response
+
 ```json
 {
   "id": "...",
@@ -150,14 +154,15 @@ INSERT INTO test_runs (
 ```
 
 ### 5. Frontend Rendering
+
 ```tsx
 // In RunsList
-{run.origin === "crd" && (
-  <span className="...">CRD</span>
-)}
+{
+  run.origin === "crd" && <span className="...">CRD</span>
+}
 
 // In RunDetails
-<CrdSourceDetails run={run} />
+;<CrdSourceDetails run={run} />
 ```
 
 ## Status Updates
@@ -213,9 +218,9 @@ Backend (Rust)          Frontend (TypeScript)
 ──────────────          ─────────────────────
 ✅ 7 API tests          ⏸️ UI tests (deferred)
 ✅ 5 Controller tests   ⏸️ Integration tests
-✅ 6 Core tests         
-──────────────          
-✅ 18 total passing     
+✅ 6 Core tests
+──────────────
+✅ 18 total passing
 ```
 
 ## Key Features

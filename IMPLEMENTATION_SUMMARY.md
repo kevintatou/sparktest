@@ -7,14 +7,17 @@ This document summarizes the implementation of TestRun CRD support for SparkTest
 ### Backend
 
 #### Core Models
+
 - `backend/core/src/models.rs` - Added `RunOrigin` enum and `K8sRef` struct to `TestRun`
 - `backend/core/src/lib.rs` - Added 4 new unit tests for origin and k8sRef
 
 #### API
+
 - `backend/api/src/handlers.rs` - Updated `get_runs`, `get_run`, and `create_run` to handle origin/k8sRef
 - `backend/migrations/0002_add_origin_and_k8s_ref.sql` - Database migration for new columns
 
 #### Controller (New)
+
 - `backend/controller/Cargo.toml` - Controller package definition
 - `backend/controller/src/crd.rs` - TestRun CRD types using kube-derive
 - `backend/controller/src/reconciler.rs` - Reconciliation logic with 5 unit tests
@@ -24,9 +27,11 @@ This document summarizes the implementation of TestRun CRD support for SparkTest
 ### Frontend
 
 #### Type Definitions
+
 - `packages/core/src/types.ts` - Added `origin` and `k8sRef` to Run interface
 
 #### Components
+
 - `apps/oss/components/test-runs-list.tsx` - Added CRD badge rendering
 - `apps/oss/components/RunDetails/index.tsx` - Integrated CrdSourceDetails component
 - `apps/oss/components/RunDetails/CrdSourceDetails.tsx` - New component for CRD source info
@@ -34,10 +39,12 @@ This document summarizes the implementation of TestRun CRD support for SparkTest
 ### Kubernetes
 
 #### CRD Definition
+
 - `k8s/crd/testrun.yaml` - TestRun v1alpha1 CRD manifest
 - `k8s/examples/testrun-example.yaml` - Example TestRun manifest
 
 #### Documentation
+
 - `k8s/CRD_README.md` - Comprehensive documentation for CRD usage
 
 ## Test Coverage
@@ -45,6 +52,7 @@ This document summarizes the implementation of TestRun CRD support for SparkTest
 ### Backend Tests (18 total, all passing)
 
 **sparktest-api (7 passed)**
+
 - test_health_check
 - test_delete_job
 - test_get_job_status
@@ -54,6 +62,7 @@ This document summarizes the implementation of TestRun CRD support for SparkTest
 - test_kubernetes_client_creation
 
 **sparktest-controller (5 passed)**
+
 - test_build_job_single_command
 - test_build_job_multiple_commands
 - test_build_job_with_env
@@ -61,6 +70,7 @@ This document summarizes the implementation of TestRun CRD support for SparkTest
 - test_build_job_with_ttl
 
 **sparktest-core (6 passed)**
+
 - test_executor_creation
 - test_test_definition_creation
 - test_test_run_creation
@@ -71,17 +81,20 @@ This document summarizes the implementation of TestRun CRD support for SparkTest
 ## Database Schema Changes
 
 Added to `test_runs` table:
+
 - `origin` - ENUM('api', 'crd') NOT NULL DEFAULT 'api'
 - `k8s_ref_namespace` - TEXT (nullable)
 - `k8s_ref_name` - TEXT (nullable)
 
 Indexes:
+
 - `idx_test_runs_origin` on `origin`
 - `idx_test_runs_k8s_ref` on `(k8s_ref_namespace, k8s_ref_name)`
 
 ## API Changes
 
 ### Request Format
+
 ```json
 {
   "name": "Test Run",
@@ -96,6 +109,7 @@ Indexes:
 ```
 
 ### Response Format
+
 ```json
 {
   "id": "...",
@@ -123,6 +137,7 @@ Indexes:
 ### Error Handling
 
 Custom `ReconcileError` enum with:
+
 - `KubeError` - Kubernetes API errors
 - `RequestError` - HTTP client errors
 - `MissingField` - Required field validation
@@ -130,10 +145,12 @@ Custom `ReconcileError` enum with:
 ## Frontend Features
 
 ### Run List
+
 - Blue "CRD" badge for CRD-originated runs
 - Tooltip: "Started from TestRun CRD"
 
 ### Run Details
+
 - **Source Section** (CRD runs only):
   - Namespace (with copy button)
   - TestRun name (with copy button)
@@ -144,17 +161,20 @@ Custom `ReconcileError` enum with:
 ## Deployment
 
 ### Prerequisites
+
 - Kubernetes 1.24+
 - SparkTest backend accessible from cluster
 - RBAC permissions for controller
 
 ### Components
+
 1. TestRun CRD
 2. Controller Deployment
 3. ServiceAccount
 4. ClusterRole + ClusterRoleBinding
 
 ### Environment Variables
+
 - `SPARKTEST_BACKEND_URL` - Backend API endpoint (required)
 - `RUST_LOG` - Log level (default: info)
 

@@ -4,7 +4,7 @@ metadata:
   name: k6-smoke-001
   namespace: sparktest
 spec:
-  definitionId: b7e6c1e2-1a2b-4c3d-8e9f-100000000006  # K6 Load Tests
+  definitionId: b7e6c1e2-1a2b-4c3d-8e9f-100000000006 # K6 Load Tests
   env:
     TARGET_URL: https://api.example.com
     TEST_DURATION: "30s"
