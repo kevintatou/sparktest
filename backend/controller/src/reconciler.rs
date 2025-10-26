@@ -82,7 +82,7 @@ pub async fn reconcile(
 
     // Check if Job exists
     let jobs: Api<Job> = Api::namespaced(ctx.client.clone(), &namespace);
-    let job_name = format!("testrun-{}", name);
+    let job_name = format!("testrun-{name}");
 
     match jobs.get(&job_name).await {
         Ok(job) => {
@@ -120,7 +120,7 @@ async fn handle_deletion(
 
     // Delete the associated Job
     let jobs: Api<Job> = Api::namespaced(ctx.client.clone(), &namespace);
-    let job_name = format!("testrun-{}", name);
+    let job_name = format!("testrun-{name}");
 
     if jobs.get(&job_name).await.is_ok() {
         tracing::info!("Deleting Job {}/{}", namespace, job_name);
@@ -185,14 +185,13 @@ async fn create_job_and_register_run(
     let backend_url = &ctx.backend_url;
     let client = reqwest::Client::new();
 
-    let definition_url = format!("{}/test-definitions/{}", backend_url, def_id);
+    let definition_url = format!("{backend_url}/test-definitions/{def_id}");
     let def_response = client.get(&definition_url).send().await?;
 
     if !def_response.status().is_success() {
         let status_code = def_response.status();
         return Err(ReconcileError::MissingField(format!(
-            "Test definition not found: {}",
-            status_code
+            "Test definition not found: {status_code}"
         )));
     }
 
@@ -241,7 +240,7 @@ async fn create_job_and_register_run(
         }
     });
 
-    let runs_url = format!("{}/test-runs", backend_url);
+    let runs_url = format!("{backend_url}/test-runs");
     let run_response = client.post(&runs_url).json(&run_payload).send().await?;
 
     if !run_response.status().is_success() {
@@ -397,8 +396,8 @@ async fn update_status(
     status.add_condition(
         "PhaseUpdated".to_string(),
         "True".to_string(),
-        Some(format!("{:?}", phase)),
-        Some(format!("Phase updated to {:?}", phase)),
+        Some(format!("{phase:?}")),
+        Some(format!("Phase updated to {phase:?}")),
     );
 
     let patch = json!({
