@@ -3,5 +3,6 @@ resolver = "2"
 members = [
     "backend/core",
     "backend/api", 
-    "backend/bin"
+    "backend/bin",
+    "backend/controller"
 ]

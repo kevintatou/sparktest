@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sparktest-controller
+  namespace: sparktest
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sparktest-controller
+rules:
+  - apiGroups: ["sparktest.dev"]
+    resources: ["testruns"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  - apiGroups: ["sparktest.dev"]
+    resources: ["testruns/status"]
+    verbs: ["get", "update", "patch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sparktest-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: sparktest-controller
+subjects:
+  - kind: ServiceAccount
+    name: sparktest-controller
+    namespace: sparktest

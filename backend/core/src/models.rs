@@ -2,6 +2,20 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[serde(rename_all = "lowercase")]
+pub enum RunOrigin {
+    #[default]
+    Api,
+    Crd,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct K8sRef {
+    pub namespace: String,
+    pub name: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TestRun {
     pub id: Uuid,
@@ -24,6 +38,9 @@ pub struct TestRun {
     pub container_started: Option<DateTime<Utc>>,
     pub completed: Option<DateTime<Utc>>,
     pub failed: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub origin: RunOrigin,
+    pub k8s_ref: Option<K8sRef>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

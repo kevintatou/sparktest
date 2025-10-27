@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sparktest-controller
+  namespace: sparktest
+  labels:
+    app: sparktest-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sparktest-controller
+  template:
+    metadata:
+      labels:
+        app: sparktest-controller
+    spec:
+      serviceAccountName: sparktest-controller
+      containers:
+        - name: controller
+          # TODO: Build and push controller image
+          # For now, you need to build locally:
+          # cd backend/controller && docker build -t sparktest-controller:latest .
+          image: sparktest-controller:latest
+          imagePullPolicy: Never # Change to IfNotPresent when using registry
+          env:
+            - name: SPARKTEST_BACKEND_URL
+              value: "http://sparktest-backend-service:8080/api"
+            - name: RUST_LOG
+              value: "info,sparktest_controller=debug"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3

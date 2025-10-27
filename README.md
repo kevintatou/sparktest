@@ -5,6 +5,8 @@
 
 **SparkTest** is a lightweight, developer-focused test orchestrator for Kubernetes. Define tests as Docker containers, run them as Kubernetes Jobs, and view results in a clean, modern UI — no YAML editing required.
 
+> **Note:** Portions of this codebase were developed with assistance from GitHub Copilot and other AI coding tools.
+
 ## 📋 Table of Contents
 
 - [Features](#-features)
@@ -15,8 +17,11 @@
   - [Frontend Development](#frontend-development)
   - [Backend Development](#backend-development)
   - [Running Tests on Kubernetes](#-want-to-run-tests-on-kubernetes)
-  - [Demo Data](#-want-to-see-demo-data)
-  - [Testing](#testing)
+- [Usage Guide](#-usage-guide)
+  - [Method 1: API/GUI Workflow](#method-1-apigui-workflow-recommended)
+  - [Method 2: CRD Workflow](#method-2-crd-workflow-kubernetes-native)
+- [Demo Data](#-want-to-see-demo-data)
+- [Testing](#testing)
 - [Contributing](#-contributing)
 - [Troubleshooting](#-troubleshooting)
 - [License](#-license)
@@ -40,6 +45,7 @@
 - 📂 **Git-backed Definitions** – Auto-register tests from `/tests/*.json`
 - 💾 **Mock Mode** – Instant demo using localStorage
 - 🦀 **Rust Backend** – Fast API layer using Axum + Kubernetes + PostgreSQL
+- ☸️ **CRD Support** – Optional Kubernetes-native workflow with TestRun CRD
 
 ---
 
@@ -212,6 +218,213 @@ cd backend && cargo run
 Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI!
 
 📚 [More details in the Kubernetes guide](backend/KUBERNETES.md)
+
+---
+
+## 📖 Usage Guide
+
+SparkTest offers two ways to run tests: **API/GUI workflow** (traditional) and **CRD workflow** (Kubernetes-native).
+
+### Method 1: API/GUI Workflow (Recommended)
+
+The traditional approach using the REST API and web interface.
+
+#### Step 1: Create a Test Definition
+
+**Via GUI:**
+
+1. Navigate to "Definitions" in the SparkTest UI
+2. Click "New Definition"
+3. Fill in:
+   - **Name**: "K6 Load Test"
+   - **Image**: `grafana/k6:latest`
+   - **Commands**: `["run", "/scripts/test.js"]`
+4. Save and note the generated `definitionId`
+
+**Via API:**
+
+```bash
+curl -X POST http://localhost:8080/api/test-definitions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "K6 Load Test",
+    "description": "Load test for API endpoints",
+    "image": "grafana/k6:latest",
+    "commands": ["run", "/scripts/test.js"]
+  }'
+
+# Response includes: "id": "b7e6c1e2-1a2b-4c3d-8e9f-100000000006"
+```
+
+#### Step 2: Run the Test
+
+**Via GUI:**
+
+1. Navigate to "Runs"
+2. Click "New Run" and select your definition
+3. Add environment variables if needed
+4. Click "Run Test"
+
+**Via API:**
+
+```bash
+curl -X POST http://localhost:8080/api/test-runs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Load Test Run",
+    "image": "grafana/k6:latest",
+    "commands": ["run", "/scripts/test.js"]
+  }'
+```
+
+### Method 2: CRD Workflow (Kubernetes-Native)
+
+For teams preferring declarative Kubernetes manifests.
+
+#### Prerequisites
+
+1. **Install the TestRun CRD:**
+
+   ```bash
+   kubectl apply -f k8s/crd/testrun.yaml
+   ```
+
+2. **Set up RBAC permissions:**
+
+   ```bash
+   kubectl apply -f k8s/controller-rbac.yaml
+   ```
+
+3. **Build and deploy the controller:**
+
+   ```bash
+   # Build the controller image
+   cd backend/controller
+   docker build -t sparktest-controller:latest .
+
+   # Load into your cluster (for k3d/kind)
+   k3d image import sparktest-controller:latest -c your-cluster-name
+   # OR for kind: kind load docker-image sparktest-controller:latest
+
+   # Deploy the controller
+   kubectl apply -f k8s/controller-deployment.yaml
+   ```
+
+   See `k8s/CRD_README.md` for detailed instructions.
+
+#### Step 1: Create a Test Definition (Same as Method 1)
+
+You still need to create a test definition first via GUI or API:
+
+```bash
+# Create definition via API
+curl -X POST http://localhost:8080/api/test-definitions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "K6 Load Test",
+    "description": "Load test for API endpoints",
+    "image": "grafana/k6:latest",
+    "commands": ["run", "/scripts/test.js"]
+  }'
+
+# Save the returned definitionId: b7e6c1e2-1a2b-4c3d-8e9f-100000000006
+```
+
+#### Step 2: Create a TestRun CRD
+
+Create a `testrun.yaml` file:
+
+```yaml
+apiVersion: sparktest.dev/v1alpha1
+kind: TestRun
+metadata:
+  name: k6-load-test-001
+  namespace: sparktest
+spec:
+  # Reference the definition ID from Step 1
+  definitionId: b7e6c1e2-1a2b-4c3d-8e9f-100000000006
+
+  # Optional: Override environment variables
+  env:
+    TARGET_URL: https://api.example.com
+    TEST_DURATION: "30s"
+    VUS: "10"
+
+  # Optional: Set timeout (in seconds)
+  timeoutSeconds: 900
+
+  # Optional: Auto-cleanup after completion
+  ttlSecondsAfterFinished: 3600
+```
+
+Apply the TestRun:
+
+```bash
+kubectl apply -f testrun.yaml
+```
+
+#### Step 3: Monitor the Test
+
+**Via kubectl:**
+
+```bash
+# Check status
+kubectl get testrun k6-load-test-001 -n sparktest
+
+# Get detailed info
+kubectl describe testrun k6-load-test-001 -n sparktest
+
+# Watch for updates
+kubectl get testrun k6-load-test-001 -n sparktest -w
+```
+
+**Via SparkTest UI:**
+
+- The run appears automatically in the "Runs" page
+- Look for the blue **CRD** badge next to the run name
+- Click the run to see kubectl commands and Kubernetes details
+
+### Comparison: API/GUI vs CRD
+
+| Feature             | API/GUI Workflow              | CRD Workflow              |
+| ------------------- | ----------------------------- | ------------------------- |
+| **Setup**           | None (default)                | Requires CRD + controller |
+| **Test Creation**   | GUI or `curl`                 | `kubectl apply`           |
+| **Version Control** | JSON in Git                   | YAML in Git               |
+| **Monitoring**      | SparkTest UI                  | kubectl + SparkTest UI    |
+| **Best For**        | Quick testing, UI-first teams | GitOps, K8s-native teams  |
+
+### Common Workflows
+
+**Reusing a Definition:**
+
+```bash
+# Create definition once
+DEFINITION_ID=$(curl -X POST ... | jq -r '.id')
+
+# Run it multiple times with different configs
+
+# Via API:
+curl -X POST http://localhost:8080/api/test-runs -d "..."
+
+# Via CRD:
+kubectl apply -f testrun-staging.yaml  # definitionId: $DEFINITION_ID
+kubectl apply -f testrun-prod.yaml     # definitionId: $DEFINITION_ID
+```
+
+**Cleaning up:**
+
+```bash
+# API: Delete via UI or
+curl -X DELETE http://localhost:8080/api/test-runs/{runId}
+
+# CRD: Delete via kubectl
+kubectl delete testrun k6-load-test-001 -n sparktest
+```
+
+📚 For detailed CRD documentation, see [k8s/CRD_README.md](k8s/CRD_README.md)
+
+---
 
 ### 🎯 Want to See Demo Data?
 

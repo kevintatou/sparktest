@@ -1,0 +1,93 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: testruns.sparktest.dev
+spec:
+  group: sparktest.dev
+  scope: Namespaced
+  names:
+    plural: testruns
+    singular: testrun
+    kind: TestRun
+    shortNames: [strun]
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required: [spec]
+          properties:
+            spec:
+              type: object
+              required: [definitionId]
+              properties:
+                definitionId:
+                  type: string
+                  description: "UUID of the test definition to run"
+                env:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: "Environment variables to inject into the test run"
+                timeoutSeconds:
+                  type: integer
+                  description: "Maximum duration in seconds before timing out the test"
+                  minimum: 1
+                ttlSecondsAfterFinished:
+                  type: integer
+                  description: "Seconds to keep the Job after it finishes before cleanup"
+                  minimum: 0
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  enum: [Pending, Running, Succeeded, Failed, TimedOut]
+                  description: "Current phase of the test run"
+                startedAt:
+                  type: string
+                  format: date-time
+                  description: "Timestamp when the test run started"
+                finishedAt:
+                  type: string
+                  format: date-time
+                  description: "Timestamp when the test run finished"
+                conditions:
+                  type: array
+                  description: "List of status conditions for the test run"
+                  items:
+                    type: object
+                    required: [type, status, lastTransitionTime]
+                    properties:
+                      type:
+                        type: string
+                        description: "Type of condition (e.g., JobCreated, RunRegistered)"
+                      status:
+                        type: string
+                        description: "Status of the condition (True, False, Unknown)"
+                      reason:
+                        type: string
+                        description: "Machine-readable reason for the condition"
+                      message:
+                        type: string
+                        description: "Human-readable message with details"
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                        description: "Last time the condition transitioned"
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+          description: Current phase of the test run
+        - name: Definition
+          type: string
+          jsonPath: .spec.definitionId
+          description: Test definition ID
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp

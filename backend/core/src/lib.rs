@@ -33,11 +33,78 @@ mod tests {
             container_started: None,
             completed: None,
             failed: None,
+            origin: RunOrigin::Api,
+            k8s_ref: None,
         };
 
         assert_eq!(test_run.name, "Test Run");
         assert_eq!(test_run.status, "pending");
         assert!(!test_run.commands.is_empty());
+        assert_eq!(test_run.origin, RunOrigin::Api);
+        assert!(test_run.k8s_ref.is_none());
+    }
+
+    #[test]
+    fn test_run_origin_defaults_to_api() {
+        let json = r#"{
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "name": "Test",
+            "image": "test:latest",
+            "commands": ["echo"],
+            "status": "pending",
+            "created_at": "2025-01-01T00:00:00Z"
+        }"#;
+        let run: TestRun = serde_json::from_str(json).unwrap();
+        assert_eq!(run.origin, RunOrigin::Api);
+    }
+
+    #[test]
+    fn test_run_with_crd_origin() {
+        let test_run = TestRun {
+            id: Uuid::new_v4(),
+            name: "CRD Test Run".to_string(),
+            image: "test:latest".to_string(),
+            commands: vec!["echo".to_string()],
+            status: "pending".to_string(),
+            created_at: Utc::now(),
+            definition_id: None,
+            executor_id: None,
+            suite_id: None,
+            variables: None,
+            artifacts: None,
+            duration: None,
+            retries: None,
+            logs: None,
+            k8s_job_name: None,
+            pod_scheduled: None,
+            container_created: None,
+            container_started: None,
+            completed: None,
+            failed: None,
+            origin: RunOrigin::Crd,
+            k8s_ref: Some(K8sRef {
+                namespace: "sparktest".to_string(),
+                name: "test-run-001".to_string(),
+            }),
+        };
+
+        assert_eq!(test_run.origin, RunOrigin::Crd);
+        assert!(test_run.k8s_ref.is_some());
+        let k8s_ref = test_run.k8s_ref.unwrap();
+        assert_eq!(k8s_ref.namespace, "sparktest");
+        assert_eq!(k8s_ref.name, "test-run-001");
+    }
+
+    #[test]
+    fn test_k8s_ref_serialization() {
+        let k8s_ref = K8sRef {
+            namespace: "default".to_string(),
+            name: "my-testrun".to_string(),
+        };
+        let json = serde_json::to_string(&k8s_ref).unwrap();
+        let deserialized: K8sRef = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.namespace, "default");
+        assert_eq!(deserialized.name, "my-testrun");
     }
 
     #[test]
