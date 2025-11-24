@@ -1,5 +1,6 @@
 {
-  "buildCommand": "cd ../.. && pnpm install --no-frozen-lockfile && pnpm build:packages && cd apps/oss && pnpm build",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm build:packages && cd apps/oss && pnpm build",
   "devCommand": "pnpm dev",
   "framework": "nextjs"
 }
