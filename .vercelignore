@@ -52,10 +52,10 @@ copy-to-droplet.sh
 data/
 
 # Package manager
-pnpm-lock.yaml
+# pnpm-lock.yaml
 package-lock.json
 yarn.lock
 
 # Only include the OSS app
-packages/
+# packages/
 !apps/oss/
