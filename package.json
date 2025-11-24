@@ -4,6 +4,9 @@
   "private": true,
   "description": "SparkTest monorepo for OSS packages and application",
   "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "build": "pnpm build:core && pnpm build:ui",
     "build:core": "pnpm --filter '@tatou/core' build",
