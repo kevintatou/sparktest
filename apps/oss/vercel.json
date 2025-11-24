@@ -1,5 +1,5 @@
 {
-  "installCommand": "corepack enable && corepack prepare pnpm@10.12.4 --activate && pnpm install --no-frozen-lockfile",
+  "installCommand": "corepack enable && corepack prepare pnpm@9.15.0 --activate && pnpm install --no-frozen-lockfile",
   "buildCommand": "cd ../.. && pnpm build:packages && cd apps/oss && pnpm build",
   "devCommand": "pnpm dev",
   "framework": "nextjs"
