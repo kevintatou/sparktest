@@ -4,7 +4,6 @@
   "outputDirectory": "apps/oss/.next",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "rootDirectory": "apps/oss",
   "git": {
     "deploymentEnabled": {
       "main": false,
