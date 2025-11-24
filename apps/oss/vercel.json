@@ -2,5 +2,5 @@
   "installCommand": "cd ../.. && npx pnpm@9.15.0 install --no-frozen-lockfile",
   "buildCommand": "cd ../.. && pnpm build:packages && cd apps/oss && pnpm build",
   "devCommand": "pnpm dev",
-  "framework": null
+  "framework": "nextjs"
 }
