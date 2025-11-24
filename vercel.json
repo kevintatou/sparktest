@@ -1,36 +1,17 @@
 {
-  "version": 2,
-  "buildCommand": "cd apps/oss && npm run build",
-  "outputDirectory": "apps/oss/.next",
-  "installCommand": "npm install",
   "framework": "nextjs",
   "git": {
     "deploymentEnabled": {
-      "main": false,
-      "copilot/fix-142": false
+      "main": false
     }
   },
   "github": {
-    "enabled": false,
-    "autoAlias": false,
-    "autoJobCancelation": false
+    "enabled": false
   },
-  "builds": [
-    {
-      "src": "apps/oss/package.json",
-      "use": "@vercel/next",
-      "config": {
-        "distDir": ".next"
-      }
-    }
-  ],
   "functions": {
     "apps/oss/app/**": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "NODE_ENV": "production"
   },
   "headers": [
     {
