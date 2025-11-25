@@ -1,4 +1,4 @@
-name: Build & Lint (Self-Hosted)
+name: Build & Lint
 
 on:
   push:
@@ -23,13 +23,23 @@ on:
 jobs:
   build:
     name: Build & Lint Check
-    runs-on: [self-hosted, spark-runner] # Use your droplet runner with spark-runner label
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Skip setup steps since they're already on your machine
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
       - name: Install dependencies
         run: pnpm install
 
