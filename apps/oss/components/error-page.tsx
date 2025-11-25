@@ -4,23 +4,6 @@ import { useEffect } from "react"
 import { AlertTriangle, XCircle, RefreshCw, Home, Plus } from "lucide-react"
 import Link from "next/link"
 
-interface ErrorDetailsProps {
-  error: Error & { digest?: string }
-}
-
-function ErrorDetails({ error }: ErrorDetailsProps) {
-  if (process.env.NODE_ENV !== "development" || !error.message) {
-    return null
-  }
-
-  return (
-    <div className="mt-6 p-3 bg-slate-100 dark:bg-slate-700 rounded-lg text-left">
-      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Error details:</p>
-      <code className="text-xs text-red-600 dark:text-red-400 break-all">{error.message}</code>
-    </div>
-  )
-}
-
 interface ErrorPageProps {
   error: Error & { digest?: string }
   reset: () => void
@@ -39,6 +22,7 @@ export function ErrorPage({
   createLink,
 }: ErrorPageProps) {
   useEffect(() => {
+    // Log error to console for debugging (not shown to users)
     console.error("Page error:", error)
   }, [error])
 
@@ -88,8 +72,6 @@ export function ErrorPage({
             Go Home
           </Link>
         </div>
-
-        <ErrorDetails error={error} />
       </div>
     </div>
   )

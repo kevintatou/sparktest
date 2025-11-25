@@ -7,178 +7,57 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, spark-runner]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Docker access and validate environment
+      - name: Deploy to server via SSH
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
-          echo "🐳 Setting up Docker access..."
-          echo "Current user: $(whoami)"
-          echo "User groups: $(groups)"
-          echo ""
-
-          # Check if docker command exists
-          if command -v docker &> /dev/null; then
-            echo "✅ Docker command found"
-            docker --version
-          else
-            echo "❌ Docker command not found"
-            exit 1
-          fi
-
-          # Check Docker socket info
-          echo "🔍 Docker socket information:"
-          if [ -S /var/run/docker.sock ]; then
-            ls -la /var/run/docker.sock
-            DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
-            echo "Docker socket group ID: $DOCKER_GID"
-          else
-            echo "❌ Docker socket not found"
-            exit 1
-          fi
-
-          # Fix Docker access permanently
-          echo "� Fixing Docker access..."
-
-          # Method 1: Add user to existing docker group and create one with correct GID
-          sudo groupadd -f -g $DOCKER_GID docker_host || true
-          sudo usermod -aG docker $(whoami) || true
-          sudo usermod -aG docker_host $(whoami) || true
-
-          # Method 2: Fix socket permissions as backup
-          sudo chown :docker /var/run/docker.sock || true
-          sudo chmod 666 /var/run/docker.sock || true
-
-          # Method 3: Use newgrp to apply group membership immediately
-          echo "🔌 Testing Docker access..."
-
-          # Test Docker access with different methods
-          if docker info > /dev/null 2>&1; then
-            echo "✅ Docker accessible directly"
-          elif newgrp docker <<< 'docker info > /dev/null 2>&1' 2>/dev/null; then
-            echo "✅ Docker accessible via newgrp docker"
-            # Export this for other steps
-            echo "DOCKER_ACCESS_METHOD=newgrp_docker" >> $GITHUB_ENV
-          elif newgrp docker_host <<< 'docker info > /dev/null 2>&1' 2>/dev/null; then
-            echo "✅ Docker accessible via newgrp docker_host"
-            echo "DOCKER_ACCESS_METHOD=newgrp_docker_host" >> $GITHUB_ENV
-          else
-            echo "⚠️  Direct Docker access still not working, but container should handle this"
-            echo "Continuing with deployment..."
-          fi
-
-          echo ""
-          echo "🔍 Validating deployment environment..."
-
-          # Test Docker functionality with fallback methods
-          echo "🐳 Testing Docker functionality..."
-          DOCKER_CMD="docker info"
-
-          if docker info &> /dev/null; then
-            echo "✅ Docker is working correctly"
-            docker version --format 'Docker version: {{.Server.Version}}'
-          elif [ "$DOCKER_ACCESS_METHOD" = "newgrp_docker" ] && newgrp docker <<< 'docker info' &> /dev/null; then
-            echo "✅ Docker working with newgrp docker"
-            DOCKER_CMD="newgrp docker <<< 'docker'"
-          elif [ "$DOCKER_ACCESS_METHOD" = "newgrp_docker_host" ] && newgrp docker_host <<< 'docker info' &> /dev/null; then
-            echo "✅ Docker working with newgrp docker_host"  
-            DOCKER_CMD="newgrp docker_host <<< 'docker'"
-          else
-            echo "❌ Docker is not working properly"
-            echo "Debug info:"
-            echo "Current groups: $(groups)"
-            echo "Docker socket: $(ls -la /var/run/docker.sock 2>/dev/null || echo 'not found')"
-            exit 1
-          fi
-
-          # Test Docker Compose
-          echo "📦 Testing Docker Compose..."
-          if docker compose version &> /dev/null; then
-            echo "✅ Docker Compose is available"
-            docker compose version
-          elif newgrp docker <<< 'docker compose version' &> /dev/null; then
-            echo "✅ Docker Compose working with newgrp"
-          else
-            echo "❌ Docker Compose not found or not working"
-            exit 1
-          fi
-
           echo "📍 Deploying SparkTest MVP from release: ${{ github.event.release.tag_name || 'manual-deploy' }}"
-      - name: Deploy SparkTest MVP
-        run: |
-          set -e
-
-          # Function to run Docker commands with proper access
-          run_docker() {
-            if docker "$@" 2>/dev/null; then
-              return 0
-            elif [ "$DOCKER_ACCESS_METHOD" = "newgrp_docker" ]; then
-              newgrp docker <<< "docker $*"
-            elif [ "$DOCKER_ACCESS_METHOD" = "newgrp_docker_host" ]; then
-              newgrp docker_host <<< "docker $*"
-            else
-              docker "$@"
-            fi
-          }
-
-          echo "🧹 Cleaning up existing deployment..."
-          # Stop and remove existing containers (don't fail if nothing exists)
-          run_docker compose -f docker-compose.prod.yml down --remove-orphans || echo "ℹ️  No existing deployment found to clean up"
-
-          # Remove old images to free space (keep last 2 versions)
-          echo "🗑️  Cleaning up old Docker images..."
-          run_docker image prune -f || echo "ℹ️  No images to prune"
-
-          echo "📦 Building and deploying SparkTest MVP..."
-          # Build and start services with better error handling
-          if ! run_docker compose -f docker-compose.prod.yml up --build -d; then
-            echo "❌ Error: Failed to deploy SparkTest MVP"
-            echo "🔧 Attempting diagnosis..."
-            
-            # Show docker compose version for debugging
-            run_docker compose version || echo "Could not get docker compose version"
-            
-            # Check if docker-compose.prod.yml exists and is valid
-            if [ ! -f "docker-compose.prod.yml" ]; then
-              echo "❌ docker-compose.prod.yml not found!"
-              ls -la *.yml *.yaml || echo "No YAML files found"
-              exit 1
-            fi
-            
-            echo "📋 Docker compose config validation:"
-            run_docker compose -f docker-compose.prod.yml config --quiet || echo "Config validation failed"
-            
-            echo "📋 Checking logs for errors..."
-            run_docker compose -f docker-compose.prod.yml logs --tail 50 || echo "Could not get logs"
-            
-            echo "📋 System resources:"
-            df -h || echo "Could not check disk space"
-            free -h || echo "Could not check memory"
-            
-            exit 1
+          
+          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_USER" ] || [ -z "$DEPLOY_KEY" ]; then
+            echo "⚠️  Deployment secrets not configured. Skipping remote deployment."
+            echo "To enable deployment, configure DEPLOY_HOST, DEPLOY_USER, and DEPLOY_KEY secrets."
+            exit 0
           fi
 
-          echo "⏳ Waiting for services to be healthy..."
-          sleep 45
+          # Setup SSH
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
-          # Check service health with timeout
-          echo "📋 Service status:"
-          if ! run_docker compose -f docker-compose.prod.yml ps; then
-            echo "⚠️  Could not get service status, trying with different approach..."
-            run_docker ps -a || echo "Could not list containers"
-          fi
+          # Deploy via SSH
+          ssh -i ~/.ssh/deploy_key "$DEPLOY_USER@$DEPLOY_HOST" << 'ENDSSH'
+            set -e
+            cd ~/sparktest || exit 1
+            
+            echo "🔄 Pulling latest code..."
+            git pull origin main
+            
+            echo "🧹 Cleaning up existing deployment..."
+            docker compose -f docker-compose.prod.yml down --remove-orphans || true
+            docker image prune -f || true
+            
+            echo "📦 Building and deploying SparkTest MVP..."
+            docker compose -f docker-compose.prod.yml up --build -d
+            
+            echo "⏳ Waiting for services to be healthy..."
+            sleep 45
+            
+            echo "📋 Service status:"
+            docker compose -f docker-compose.prod.yml ps
+            
+            echo "✅ SparkTest MVP deployed successfully!"
+          ENDSSH
 
-          echo "📋 Recent logs:"
-          run_docker compose -f docker-compose.prod.yml logs --tail 20 || echo "Could not get recent logs"
-
-          # Get server IP
-          SERVER_IP=$(hostname -I | awk '{print $1}' || echo "localhost")
-
-          echo "✅ SparkTest MVP deployed successfully!"
-          echo "🌐 Frontend: http://$SERVER_IP"
-          echo "🔧 Backend API: http://$SERVER_IP:8080"
+          # Cleanup
+          rm -f ~/.ssh/deploy_key
 
       - name: Deployment summary
         if: always()
@@ -186,29 +65,4 @@ jobs:
           echo "🎉 SparkTest MVP deployment workflow completed!"
           echo ""
           echo "📊 Deployment status: ${{ job.status }}"
-          echo "🏷️  Release version: ${{ github.event.release.tag_name }}"
-          echo ""
-          if [ "${{ job.status }}" != "success" ]; then
-            echo "❌ Deployment failed. Common issues:"
-            echo "- Docker not available or not running"
-            echo "- Insufficient resources (CPU/Memory/Disk)"
-            echo "- Port conflicts (80, 8080 already in use)"
-            echo "- Build failures in Rust or Node.js"
-            echo ""
-            echo "🔧 To troubleshoot:"
-            echo "- Check runner system resources"
-            echo "- Verify Docker and Docker Compose installation"
-            echo "- Review action logs above for specific errors"
-            echo "- Check available ports: sudo netstat -tlnp | grep ':80\\|:8080'"
-          else
-            echo "✅ SparkTest MVP is now running!"
-            echo ""
-            echo "🌐 Access your application:"
-            echo "   Frontend: http://$(hostname -I | awk '{print $1}'):80"
-            echo "   Backend API: http://$(hostname -I | awk '{print $1}'):8080"
-            echo ""
-            echo "🔧 Management commands:"
-            echo "   View logs: docker compose -f docker-compose.prod.yml logs -f"
-            echo "   Stop services: docker compose -f docker-compose.prod.yml down"
-            echo "   Restart: docker compose -f docker-compose.prod.yml restart"
-            fi
+          echo "🏷️  Release version: ${{ github.event.release.tag_name || 'manual-deploy' }}"
