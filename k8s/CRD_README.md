@@ -1,10 +1,23 @@
 # SparkTest TestRun CRD & Controller
 
+> ⚠️ **This is an OPTIONAL feature.** SparkTest works great without the CRD controller using the API/GUI workflow. Only set up the controller if you need Kubernetes-native declarative workflows (GitOps, `kubectl apply`, etc.).
+
 This document describes how to install and use the SparkTest TestRun Custom Resource Definition (CRD) and controller.
 
 ## Overview
 
 The TestRun CRD allows you to trigger test runs declaratively using Kubernetes manifests. Runs created via CRDs appear in the SparkTest UI alongside API-started runs, clearly marked with a `CRD` badge.
+
+**When you might want this**:
+- You prefer `kubectl apply` over clicking in a UI
+- You're using GitOps workflows (ArgoCD, Flux, etc.)
+- You want to version control test runs as YAML manifests
+- You're integrating with CI/CD that uses kubectl
+
+**When you DON'T need this**:
+- You're happy using the Web UI or REST API (most users!)
+- You want the simplest setup possible
+- You're just getting started with SparkTest
 
 ## Prerequisites
 

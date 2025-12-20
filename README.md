@@ -31,8 +31,10 @@
 ## 📋 Prerequisites
 
 **Required**: Node.js 18+, pnpm 8+, Rust 1.70+, Docker, Git  
-**Optional**: kubectl, k3d/minikube (for Kubernetes), PostgreSQL (production)  
+**Optional**: kubectl, k3d/minikube (for Kubernetes testing)  
 **System**: 4GB+ RAM, 2GB+ storage, Linux/macOS/Windows+WSL2
+
+> **Note**: PostgreSQL is embedded in Docker setup. The CRD controller is **optional** - see [What Works Out of the Box](#-what-works-out-of-the-box) below.
 
 ---
 
@@ -46,6 +48,32 @@
 - 💾 **Mock Mode** – Instant demo using localStorage
 - 🦀 **Rust Backend** – Fast API layer using Axum + Kubernetes + PostgreSQL
 - ☸️ **CRD Support** – Optional Kubernetes-native workflow with TestRun CRD
+
+---
+
+## 🎯 What Works Out of the Box
+
+SparkTest is designed to work immediately with the **API/GUI workflow** (Method 1 below). The **CRD workflow** (Method 2) is completely optional and requires additional setup.
+
+### ✅ API/GUI Workflow (Default - Works Immediately)
+
+- ✅ Create test definitions via Web UI or REST API
+- ✅ Run tests as Kubernetes Jobs
+- ✅ View live logs in the UI
+- ✅ Full PostgreSQL persistence
+- ✅ Works with k3d, minikube, kind, or any Kubernetes cluster
+
+**No additional setup needed beyond starting the backend!**
+
+### 📦 CRD Workflow (Optional - Requires Controller)
+
+- ⚙️ Create tests using `kubectl apply` with YAML manifests
+- ⚙️ Kubernetes-native GitOps workflow
+- ⚙️ Requires deploying the SparkTest controller (see [k8s/CONTROLLER_SETUP.md](k8s/CONTROLLER_SETUP.md))
+
+**Only needed if you prefer declarative Kubernetes workflows over API/GUI.**
+
+> 💡 **New to SparkTest?** Start with the API/GUI workflow. You can add the CRD controller later if needed.
 
 ---
 
@@ -217,7 +245,11 @@ cd backend && cargo run
 
 Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI!
 
-📚 [More details in the Kubernetes guide](backend/KUBERNETES.md)
+📚 **More Kubernetes options**:
+- [backend/KUBERNETES.md](backend/KUBERNETES.md) - Quick start guide for any K8s cluster
+- [MINIKUBE.md](MINIKUBE.md) - Detailed Minikube setup guide with troubleshooting
+
+> **Note**: The CRD controller is optional - see [Method 2](#method-2-crd-workflow-kubernetes-native) below for details.
 
 ---
 
@@ -279,7 +311,9 @@ curl -X POST http://localhost:8080/api/test-runs \
 
 ### Method 2: CRD Workflow (Kubernetes-Native)
 
-For teams preferring declarative Kubernetes manifests.
+> ⚠️ **This workflow is OPTIONAL** and only recommended for teams using GitOps or preferring Kubernetes-native declarative workflows. Most users should use Method 1 (API/GUI) instead.
+
+For teams preferring declarative Kubernetes manifests and `kubectl` commands.
 
 #### Prerequisites
 
@@ -386,7 +420,7 @@ kubectl get testrun k6-load-test-001 -n sparktest -w
 
 ### Comparison: API/GUI vs CRD
 
-| Feature             | API/GUI Workflow              | CRD Workflow              |
+| Feature             | API/GUI Workflow              | CRD Workflow (Optional)   |
 | ------------------- | ----------------------------- | ------------------------- |
 | **Setup**           | None (default)                | Requires CRD + controller |
 | **Test Creation**   | GUI or `curl`                 | `kubectl apply`           |
@@ -423,6 +457,8 @@ kubectl delete testrun k6-load-test-001 -n sparktest
 ```
 
 📚 For detailed CRD documentation, see [k8s/CRD_README.md](k8s/CRD_README.md)
+
+> **Remember**: The CRD workflow is completely optional. SparkTest works great with just the API/GUI workflow!
 
 ---
 
