@@ -1,20 +1,6 @@
 # SparkTest Controller Setup Guide
 
-> ⚠️ **This is an OPTIONAL feature.** The SparkTest controller is only needed if you want to use the CRD workflow (creating test runs with `kubectl apply`). The default API/GUI workflow works without any controller setup.
-
 This guide walks you through setting up the SparkTest controller for TestRun CRD support.
-
-## Do I Need This?
-
-**You DON'T need the controller if**:
-- ✅ You're using the Web UI to create and run tests (most users)
-- ✅ You're using the REST API directly with curl or scripts
-- ✅ You want the simplest possible setup
-
-**You DO need the controller if**:
-- 📝 You want to create test runs using `kubectl apply` with YAML files
-- 📝 You're using GitOps workflows (ArgoCD, Flux, etc.)
-- 📝 You prefer Kubernetes-native declarative configuration
 
 ## Prerequisites
 

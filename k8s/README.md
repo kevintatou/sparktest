@@ -1,33 +1,10 @@
 # SparkTest Kubernetes Deployment
 
-> 💡 **Quick Start**: See [MINIKUBE.md](../MINIKUBE.md) for a beginner-friendly guide to running SparkTest on Minikube.
-
-This directory contains Kubernetes deployment manifests for SparkTest. 
-
-## What's Here
-
-### Core Application Deployment
-- `deployment.yaml` - Full SparkTest deployment (backend + frontend + PostgreSQL)
-- `README.md` - This file
-
-### CRD Workflow (Optional)
-- `crd/testrun.yaml` - TestRun Custom Resource Definition
-- `controller-rbac.yaml` - RBAC for the optional CRD controller
-- `controller-deployment.yaml` - Deployment for the optional CRD controller
-- `CRD_README.md` - Documentation for CRD workflow
-- `CONTROLLER_SETUP.md` - Setup guide for CRD controller
-- `examples/` - Example TestRun CRD manifests
+Simple deployment for Minikube and K3s that addresses GLIBC compatibility and database connectivity issues from GitHub Issue #159.
 
 ## Quick Start
 
-Simple deployment for Minikube and K3s that addresses GLIBC compatibility and database connectivity issues from GitHub Issue #159.
-
-### ⚠️ Important Notes
-
-1. **CRD Controller is Optional**: The controller is only needed for `kubectl apply` workflows. Most users should use the API/GUI workflow instead.
-2. **Security**: Before deploying, update the database password in `k8s/deployment.yaml` - replace `CHANGE_ME_PASSWORD` with a secure password.
-
-### Deploy SparkTest
+**⚠️ Security Note**: Before deploying, update the database password in `k8s/deployment.yaml` - replace `CHANGE_ME_PASSWORD` with a secure password.
 
 ```bash
 # For Minikube (build in Minikube's Docker environment)
