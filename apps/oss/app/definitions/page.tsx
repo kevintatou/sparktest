@@ -7,6 +7,7 @@ import { Plus, Play, Edit, Trash2, FileText, Github, ExternalLink, Search, XCirc
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GitHubButton } from "@/components/github-button"
 import { FloatingCreateButton } from "@/components/floating-create-button"
@@ -186,12 +187,7 @@ export default function DefinitionsPage() {
                     <p className="text-slate-600 dark:text-slate-400 mb-4">
                       Unable to connect to the backend. Please check that the API server is running.
                     </p>
-                    <button
-                      onClick={() => refetch()}
-                      className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
-                    >
-                      Retry
-                    </button>
+                    <Button onClick={() => refetch()}>Retry</Button>
                   </div>
                 </div>
               </div>
