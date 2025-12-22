@@ -92,7 +92,7 @@ function getStatusBadge(status: string) {
 }
 
 export default function TestRunsPage() {
-  const { data: testRuns = [], isLoading: runsLoading, error: runsError } = useRuns()
+  const { data: testRuns = [], isLoading: runsLoading, error: runsError, refetch: refetchRuns } = useRuns()
   const { data: definitions = [], isLoading: definitionsLoading } = useDefinitions()
   const { data: executors = [], isLoading: executorsLoading } = useExecutors()
 
@@ -222,8 +222,9 @@ export default function TestRunsPage() {
                   <div>
                     <h3 className="text-lg font-semibold mb-2">Failed to load runs</h3>
                     <p className="text-muted-foreground mb-4">
-                      There was an error loading the test runs. Please try refreshing the page.
+                      Unable to connect to the backend. Please check that the API server is running.
                     </p>
+                    <Button onClick={() => refetchRuns()}>Retry</Button>
                   </div>
                 </div>
               </Card>
