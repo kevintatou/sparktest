@@ -22,7 +22,7 @@ const API_BASE = "/api"
 export default function DefinitionsPage() {
   const { toast } = useToast()
   const router = useRouter()
-  const { data: definitions = [], isLoading, error } = useDefinitions()
+  const { data: definitions = [], isLoading, error, refetch } = useDefinitions()
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [isRunning, setIsRunning] = useState<string | null>(null)
@@ -40,8 +40,8 @@ export default function DefinitionsPage() {
         title: "Definition deleted",
         description: "The definition has been removed successfully.",
       })
-      // Trigger a refresh - React Query will handle this via refetch
-      window.location.reload()
+      // Refetch the data using React Query
+      await refetch()
     } catch {
       toast({
         title: "Error",
@@ -187,7 +187,7 @@ export default function DefinitionsPage() {
                       Unable to connect to the backend. Please check that the API server is running.
                     </p>
                     <button
-                      onClick={() => window.location.reload()}
+                      onClick={() => refetch()}
                       className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
                     >
                       Retry
