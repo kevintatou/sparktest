@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Plus, Play, Edit, Trash2, FileText, Github, ExternalLink, Search } from "lucide-react"
+import { Plus, Play, Edit, Trash2, FileText, Github, ExternalLink, Search, XCircle } from "lucide-react"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
@@ -15,44 +15,33 @@ import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
 import type { Definition } from "@tatou/core/types"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
+import { useDefinitions } from "@/hooks/use-queries"
 
 const API_BASE = "/api"
 
 export default function DefinitionsPage() {
   const { toast } = useToast()
   const router = useRouter()
-  const [definitions, setDefinitions] = useState<Definition[]>([])
+  const { data: definitions = [], isLoading, error } = useDefinitions()
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [isRunning, setIsRunning] = useState<string | null>(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [definitionToDelete, setDefinitionToDelete] = useState<Definition | null>(null)
 
-  useEffect(() => {
-    const loadDefinitions = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/test-definitions`)
-        const defs = await response.json()
-        setDefinitions(defs)
-      } catch (error) {
-        console.error("Failed to load definitions:", error)
-        setDefinitions([]) // Show empty state on error
-      }
-    }
-    loadDefinitions()
-  }, [])
-
   const handleDelete = async (id: string) => {
     setIsDeleting(id)
     try {
-      await fetch(`${API_BASE}/test-definitions/${id}`, { method: "DELETE" })
-      const response = await fetch(`${API_BASE}/test-definitions`)
-      const defs = await response.json()
-      setDefinitions(defs)
+      const response = await fetch(`${API_BASE}/test-definitions/${id}`, { method: "DELETE" })
+      if (!response.ok) {
+        throw new Error("Failed to delete definition")
+      }
       toast({
         title: "Definition deleted",
         description: "The definition has been removed successfully.",
       })
+      // Trigger a refresh - React Query will handle this via refetch
+      window.location.reload()
     } catch {
       toast({
         title: "Error",
@@ -164,7 +153,49 @@ export default function DefinitionsPage() {
               </p>
             </div>
 
-            {filteredDefinitions.length === 0 ? (
+            {isLoading ? (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {Array(6)
+                  .fill(null)
+                  .map((_, i) => (
+                    <div key={i} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm animate-pulse">
+                      <div className="p-6 pb-4">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="h-10 w-10 rounded-lg bg-slate-200 dark:bg-slate-700"></div>
+                          <div className="flex-1 space-y-2">
+                            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32"></div>
+                            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-24"></div>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
+                          <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : error ? (
+              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-12 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <XCircle className="h-16 w-16 text-red-500 dark:text-red-400" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                      Failed to load definitions
+                    </h3>
+                    <p className="text-slate-600 dark:text-slate-400 mb-4">
+                      Unable to connect to the backend. Please check that the API server is running.
+                    </p>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
+                    >
+                      Retry
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : filteredDefinitions.length === 0 ? (
               <div className="bg-white dark:bg-slate-800 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 p-12 text-center">
                 <div className="flex flex-col items-center gap-4">
                   <div className="h-16 w-16 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
