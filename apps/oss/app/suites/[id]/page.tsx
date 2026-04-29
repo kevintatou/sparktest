@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
-import { useSuite, useDefinitions } from "@/hooks/use-queries"
+import { useSuite, useDefinitions, useRunSuite } from "@/hooks/use-queries"
 import type { Definition } from "@tatou/core/types"
 
 export default function SuiteDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -17,6 +17,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
   const { toast } = useToast()
   const { data: suite } = useSuite(id)
   const { data: allDefinitions = [] } = useDefinitions()
+  const runSuiteMutation = useRunSuite()
 
   // Filter definitions for this suite
   const definitions = useMemo(() => {
@@ -24,67 +25,19 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
     return allDefinitions.filter((def: Definition) => suite.testDefinitionIds.includes(def.id))
   }, [suite, allDefinitions])
 
-  useEffect(() => {
-    const loadSuiteAndDefinitions = async () => {
-      try {
-        // Load the suite from storage
-        const loadedSuite = await storage.getSuiteById(id)
-        if (!loadedSuite) {
-          toast({
-            title: "Suite not found",
-            description: `Could not find suite with ID: ${id}`,
-            variant: "destructive",
-          })
-          return
-        }
-
-        setSuite(loadedSuite)
-
-        // Load the definitions for this suite
-        const allDefs = await storage.getDefinitions()
-        const suiteDefinitions = allDefs.filter((def) =>
-          loadedSuite.testDefinitionIds.includes(def.id)
-        )
-        setDefinitions(suiteDefinitions)
-      } catch (error) {
-        console.error("Error loading suite details:", error)
-        toast({
-          title: "Error loading suite",
-          description: "Failed to load suite details. Please try again.",
-          variant: "destructive",
-        })
-      }
-    }
-
-    loadSuiteAndDefinitions()
-  }, [id, toast])
-
   const handleRunSuite = async () => {
     if (!suite) return
 
-    setIsRunning(true)
     try {
-      // Get all test definitions in the suite
-      const validDefinitions = definitions.filter((def) => def !== undefined)
-
-      if (validDefinitions.length === 0) {
+      if (definitions.length === 0) {
         throw new Error("No valid test definitions found in suite")
       }
 
-      // Create runs for each definition based on execution mode
-      if (suite.executionMode === "sequential") {
-        // Run tests one after another
-        for (const def of validDefinitions) {
-          await storage.createRun(def.id)
-        }
-      } else {
-        // Run tests in parallel
-        await Promise.all(validDefinitions.map((def) => storage.createRun(def.id)))
-      }
+      await runSuiteMutation.mutateAsync(suite.id)
 
       toast({
         title: "Test suite started",
-        description: `Running ${validDefinitions.length} tests in ${suite.executionMode} mode.`,
+        description: `Running ${definitions.length} tests in ${suite.executionMode} mode.`,
       })
     } catch (error) {
       console.error("Error running test suite:", error)
@@ -93,10 +46,10 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
         description: "Failed to start the test suite. Please check if all test definitions exist.",
         variant: "destructive",
       })
-    } finally {
-      setIsRunning(false)
     }
   }
+
+  const isRunning = runSuiteMutation.isPending
 
   if (!suite) {
     return (
@@ -186,7 +139,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
                 <p className="text-muted-foreground">No test definitions found for this suite.</p>
               ) : (
                 <div className="space-y-4">
-                  {definitions.map((definition, index) => (
+                  {definitions.map((definition: Definition, index: number) => (
                     <div key={definition.id}>
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
@@ -196,7 +149,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
                             <Badge variant="outline" className="text-xs">
                               {definition.image}
                             </Badge>
-                            {definition.labels?.map((label) => (
+                            {definition.labels?.map((label: string) => (
                               <Badge key={label} variant="secondary" className="text-xs">
                                 {label}
                               </Badge>
@@ -237,7 +190,7 @@ export default function SuiteDetailsPage({ params }: { params: Promise<{ id: str
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Labels</label>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {suite.labels.map((label) => (
+                    {suite.labels.map((label: string) => (
                       <Badge key={label} variant="secondary" className="text-xs">
                         {label}
                       </Badge>

@@ -24,8 +24,8 @@ export interface UseSuiteFormReturn {
   newLabel: string
   setNewLabel: (label: string) => void
   errors: Record<string, string>
-  addLabel: (label: string) => void
-  removeLabel: (index: number) => void
+  addLabel: () => void
+  removeLabel: (label: string) => void
   handleSubmit: (e: React.FormEvent) => void
 }
 
@@ -75,23 +75,21 @@ export function useSuiteForm(existingSuite?: Suite): UseSuiteFormReturn {
     }))
   }, [])
 
-  const addLabel = useCallback(
-    (label: string) => {
-      const trimmed = label.trim().toLowerCase()
-      if (trimmed && !formData.labels.includes(trimmed)) {
-        setFormData((prev) => ({
-          ...prev,
-          labels: [...prev.labels, trimmed],
-        }))
-      }
-    },
-    [formData.labels]
-  )
+  const addLabel = useCallback(() => {
+    const trimmed = newLabel.trim().toLowerCase()
+    if (trimmed && !formData.labels.includes(trimmed)) {
+      setFormData((prev) => ({
+        ...prev,
+        labels: [...prev.labels, trimmed],
+      }))
+      setNewLabel("")
+    }
+  }, [formData.labels, newLabel])
 
-  const removeLabel = useCallback((index: number) => {
+  const removeLabel = useCallback((label: string) => {
     setFormData((prev) => ({
       ...prev,
-      labels: prev.labels.filter((_, i) => i !== index),
+      labels: prev.labels.filter((existingLabel) => existingLabel !== label),
     }))
   }, [])
 

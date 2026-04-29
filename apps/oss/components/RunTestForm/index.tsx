@@ -29,18 +29,18 @@ export function RunTestForm({ def: definition }: RunTestFormProps) {
     isSubmitting,
     formData,
     setFormData,
-    addCommand,
-    removeCommand,
-    updateCommand,
-    handleSubmit,
-  } = useRunTestForm(definition)
+    addCustomCommand,
+    removeCustomCommand,
+    updateCustomCommand,
+    onSubmit,
+  } = useRunTestForm({ definition })
 
   if (!formData) {
     return <LoadingState />
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={onSubmit}>
       <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Run Test: {definition.name}</CardTitle>
@@ -71,12 +71,12 @@ export function RunTestForm({ def: definition }: RunTestFormProps) {
 
           {formData.useCustomSettings ? (
             <CustomSettingsSection
-              image={formData.image}
-              commands={formData.commands}
-              onImageChange={(image) => setFormData({ ...formData, image })}
-              onAddCommand={addCommand}
-              onRemoveCommand={removeCommand}
-              onUpdateCommand={updateCommand}
+              image={formData.customImage}
+              commands={formData.customCommands}
+              onImageChange={(customImage) => setFormData({ ...formData, customImage })}
+              onAddCommand={addCustomCommand}
+              onRemoveCommand={removeCustomCommand}
+              onUpdateCommand={updateCustomCommand}
             />
           ) : (
             <DefaultSettingsDisplay definition={definition} />

@@ -25,7 +25,7 @@ import { GitHubButton } from "@/components/github-button"
 import { FloatingCreateButton } from "@/components/floating-create-button"
 import { PageTransition } from "@/components/page-transition"
 import { formatDistanceToNow } from "@tatou/core"
-import type { Run } from "@tatou/core/types"
+import type { Definition, Executor, Run } from "@tatou/core/types"
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal"
 import { useRuns, useDefinitions, useExecutors, useDeleteRun } from "@/hooks/use-queries"
 
@@ -92,9 +92,12 @@ function getStatusBadge(status: string) {
 }
 
 export default function TestRunsPage() {
-  const { data: testRuns = [], isLoading: runsLoading, error: runsError } = useRuns()
-  const { data: definitions = [], isLoading: definitionsLoading } = useDefinitions()
-  const { data: executors = [], isLoading: executorsLoading } = useExecutors()
+  const { data: runsData = [], isLoading: runsLoading, error: runsError } = useRuns()
+  const { data: definitionsData = [], isLoading: definitionsLoading } = useDefinitions()
+  const { data: executorsData = [], isLoading: executorsLoading } = useExecutors()
+  const testRuns = runsData as Run[]
+  const definitions = definitionsData as Definition[]
+  const executors = executorsData as Executor[]
 
   const deleteRunMutation = useDeleteRun()
 
@@ -109,14 +112,14 @@ export default function TestRunsPage() {
   // Helper function to get definition name from ID
   const getDefinitionName = (definitionId?: string) => {
     if (!definitionId) return "Unknown"
-    const definition = definitions.find((d) => d.id === definitionId)
+    const definition = definitions.find((d: Definition) => d.id === definitionId)
     return definition?.name || `Definition ${definitionId}`
   }
 
   // Helper function to get executor name from ID
   const getExecutorName = (executorId?: string) => {
     if (!executorId) return "Unknown"
-    const executor = executors.find((e) => e.id === executorId)
+    const executor = executors.find((e: Executor) => e.id === executorId)
     return executor?.name || `Executor ${executorId}`
   }
 
@@ -148,14 +151,14 @@ export default function TestRunsPage() {
   // Filter and sort runs based on search query (newest first)
   const filteredRuns = testRuns
     .filter(
-      (run) =>
+      (run: Run) =>
         run.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         run.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
         run.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         getDefinitionName(run.definitionId).toLowerCase().includes(searchQuery.toLowerCase()) ||
         getExecutorName(run.executorId).toLowerCase().includes(searchQuery.toLowerCase())
     )
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort((a: Run, b: Run) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -255,7 +258,7 @@ export default function TestRunsPage() {
               </Card>
             ) : (
               <div className="space-y-4">
-                {filteredRuns.map((run) => (
+                {filteredRuns.map((run: Run) => (
                   <Card key={run.id} className="group hover:shadow-md transition-shadow">
                     <CardHeader className="pb-4">
                       <CardTitle className="flex items-center justify-between">

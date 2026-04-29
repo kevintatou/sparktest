@@ -6,7 +6,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
   try {
     const body = await request.json()
 
-    const response = await fetch(`${BACKEND_URL}/test-definitions/${params.id}/run`, {
+    const response = await fetch(`${BACKEND_URL}/api/test-definitions/${params.id}/run`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

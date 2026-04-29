@@ -51,15 +51,15 @@ export function DeleteConfirmationModal({
         <AlertDialogDescription className="text-slate-600 dark:text-slate-400">
           {description}
           {itemName && (
-            <div className="mt-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
+            <span className="mt-3 block rounded-lg bg-slate-100 p-3 dark:bg-slate-800">
               <strong className="text-slate-900 dark:text-slate-100">
                 {itemType}: {itemName}
               </strong>
-            </div>
+            </span>
           )}
-          <div className="mt-3 text-sm text-destructive">
+          <span className="mt-3 block text-sm text-destructive">
             <strong>Warning:</strong> This action cannot be undone.
-          </div>
+          </span>
         </AlertDialogDescription>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>

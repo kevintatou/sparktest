@@ -13,7 +13,8 @@ import { formatDistanceToNow } from "@tatou/core"
 import type { Run } from "@tatou/core/types"
 
 export default function ActiveTestsPage() {
-  const { data: allTests = [], isLoading } = useRuns()
+  const { data: runsData = [], isLoading } = useRuns()
+  const allTests = runsData as Run[]
   const [progressValues, setProgressValues] = useState<Record<string, number>>({})
 
   // Filter running tests

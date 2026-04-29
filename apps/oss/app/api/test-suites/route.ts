@@ -17,3 +17,26 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch test suites" }, { status: 500 })
   }
 }
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const response = await fetch(`${BACKEND_URL}/api/test-suites`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Backend responded with status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return NextResponse.json(data, { status: 201 })
+  } catch (error) {
+    console.error("Error creating test suite:", error)
+    return NextResponse.json({ error: "Failed to create test suite" }, { status: 500 })
+  }
+}

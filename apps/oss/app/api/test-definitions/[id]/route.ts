@@ -4,7 +4,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:808
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
-    const response = await fetch(`${BACKEND_URL}/test-definitions/${params.id}`, {
+    const response = await fetch(`${BACKEND_URL}/api/test-definitions/${params.id}`, {
       method: "DELETE",
     })
 
@@ -21,7 +21,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const response = await fetch(`${BACKEND_URL}/test-definitions/${params.id}`)
+    const response = await fetch(`${BACKEND_URL}/api/test-definitions/${params.id}`)
 
     if (!response.ok) {
       throw new Error(`Backend responded with status: ${response.status}`)
@@ -39,7 +39,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   try {
     const body = await request.json()
 
-    const response = await fetch(`${BACKEND_URL}/test-definitions/${params.id}`, {
+    const response = await fetch(`${BACKEND_URL}/api/test-definitions/${params.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

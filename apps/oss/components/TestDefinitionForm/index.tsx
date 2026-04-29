@@ -12,6 +12,13 @@ interface DefinitionFormProps {
 }
 
 export function DefinitionForm({ existingTest }: DefinitionFormProps) {
+  const initialDefinition = existingTest
+    ? {
+        ...existingTest,
+        executorId: existingTest.executorId || "",
+      }
+    : undefined
+
   const {
     isSubmitting,
     tab,
@@ -30,7 +37,7 @@ export function DefinitionForm({ existingTest }: DefinitionFormProps) {
     handleSubmit,
     handleGithubSubmit,
   } = useTestDefinitionForm({
-    initialDefinition: existingTest,
+    initialDefinition,
     mode: existingTest ? "edit" : "create",
   })
 

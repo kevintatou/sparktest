@@ -161,15 +161,16 @@ function LoadingSkeleton() {
 }
 
 export function TestRunsList() {
-  const { data: runs = [], isLoading } = useRuns()
+  const { data: runsData = [], isLoading } = useRuns()
+  const runs = runsData as Run[]
 
   if (isLoading) {
     return <LoadingSkeleton />
   }
 
   // Sort runs by newest first for recent activity
-  const sortedRuns = runs.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  const sortedRuns = [...runs].sort(
+    (a: Run, b: Run) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
 
   return (
@@ -199,7 +200,7 @@ export function TestRunsList() {
         </div>
       ) : (
         <div className="space-y-3">
-          {sortedRuns.slice(0, 10).map((run) => (
+          {sortedRuns.slice(0, 10).map((run: Run) => (
             <RunItem key={run.id} run={run} />
           ))}
         </div>

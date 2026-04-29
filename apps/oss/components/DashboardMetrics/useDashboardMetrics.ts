@@ -1,4 +1,4 @@
-import { useRuns } from "@/hooks/use-queries"
+import { useDefinitions, useExecutors, useRuns } from "@/hooks/use-queries"
 import { useMemo } from "react"
 import type { Run } from "@tatou/core/types"
 
@@ -7,10 +7,14 @@ export interface DashboardMetrics {
   completedRuns: number
   failedRuns: number
   runningRuns: number
+  totalDefinitions: number
+  totalExecutors: number
 }
 
 export function useDashboardMetrics() {
   const { data: runs = [], isLoading } = useRuns()
+  const { data: definitions = [], isLoading: definitionsLoading } = useDefinitions()
+  const { data: executors = [], isLoading: executorsLoading } = useExecutors()
 
   const metrics = useMemo(() => {
     const totalRuns = runs.length
@@ -23,11 +27,13 @@ export function useDashboardMetrics() {
       completedRuns,
       failedRuns,
       runningRuns,
+      totalDefinitions: definitions.length,
+      totalExecutors: executors.length,
     }
-  }, [runs])
+  }, [runs, definitions, executors])
 
   return {
     metrics,
-    loading: isLoading,
+    loading: isLoading || definitionsLoading || executorsLoading,
   }
 }

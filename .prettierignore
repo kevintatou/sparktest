@@ -10,3 +10,8 @@ coverage/
 **/.git
 .changeset/
 .cargo-changesets/
+.codex
+.minikube/
+AGENTS.md
+CLAUDE.md
+resume.md

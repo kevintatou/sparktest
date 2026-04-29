@@ -8,10 +8,12 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "@tatou/core"
 import { useDefinition, useCreateRun } from "@/hooks/use-queries"
+import type { Definition } from "@tatou/core/types"
 
 export default function DefinitionDetailsPage({ params }: { params: { id: string } }) {
   const { toast } = useToast()
-  const { data: definition, isLoading, error } = useDefinition(params.id)
+  const { data: definitionData, isLoading, error } = useDefinition(params.id)
+  const definition = definitionData as Definition | undefined
   const createRunMutation = useCreateRun()
 
   const handleRunTest = async () => {
@@ -122,7 +124,7 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {definition.commands.map((command, index) => (
+                {definition.commands.map((command: string, index: number) => (
                   <div key={index} className="flex items-center gap-2">
                     <Badge variant="outline" className="text-xs w-8 justify-center">
                       {index + 1}
@@ -153,7 +155,7 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
                       </code>
                       <span>=</span>
                       <code className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-sm">
-                        {value}
+                        {String(value)}
                       </code>
                     </div>
                   ))}
@@ -190,7 +192,7 @@ export default function DefinitionDetailsPage({ params }: { params: { id: string
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Labels</label>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {definition.labels.map((label) => (
+                    {definition.labels.map((label: string) => (
                       <Badge key={label} variant="secondary" className="text-xs">
                         {label}
                       </Badge>

@@ -34,7 +34,7 @@ export function SearchBox() {
                   <span className="text-xs bg-muted px-1.5 py-0.5 rounded capitalize font-medium">
                     {result.type}
                   </span>
-                  <span className="font-medium text-sm">{result.name}</span>
+                  <span className="font-medium text-sm">{result.title}</span>
                 </div>
                 {result.description && (
                   <div className="text-xs text-muted-foreground mt-1 truncate">

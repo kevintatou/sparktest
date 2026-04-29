@@ -119,11 +119,22 @@ export function useCreateRun() {
   const { toast } = useToast()
 
   return useMutation({
-    mutationFn: async (definitionId: string) => {
-      const response = await fetch(`${API_BASE}/test-runs`, {
+    mutationFn: async (
+      input:
+        | string
+        | {
+            definitionId: string
+            name?: string
+            image?: string
+            commands?: string[]
+          }
+    ) => {
+      const payload = typeof input === "string" ? { definitionId: input } : input
+      const { definitionId, ...body } = payload
+      const response = await fetch(`${API_BASE}/test-definitions/${definitionId}/run`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ definitionId }),
+        body: JSON.stringify(body),
       })
       if (!response.ok) throw new Error("Failed to create run")
       return response.json()
@@ -155,7 +166,7 @@ export function useDeleteRun() {
         method: "DELETE",
       })
       if (!response.ok) throw new Error("Failed to delete run")
-      return response.json()
+      return response.status === 204 ? null : response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.runs })
@@ -246,7 +257,7 @@ export function useDeleteSuite() {
         method: "DELETE",
       })
       if (!response.ok) throw new Error("Failed to delete suite")
-      return response.json()
+      return response.status === 204 ? null : response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.suites })
@@ -367,7 +378,7 @@ export function useDeleteExecutor() {
         method: "DELETE",
       })
       if (!response.ok) throw new Error("Failed to delete executor")
-      return response.json()
+      return response.status === 204 ? null : response.json()
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.executors })

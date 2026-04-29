@@ -54,7 +54,7 @@ export default function SuitesPage() {
   }
 
   const handleRunSuite = (suite: Suite) => {
-    runSuiteMutation.mutate(suite)
+    runSuiteMutation.mutate(suite.id)
   }
 
   // Filter suites based on search query

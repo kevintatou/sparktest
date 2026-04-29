@@ -13,8 +13,8 @@ export interface UseRunDetailsReturn {
   definition: Definition | undefined
   executor: Executor | undefined
   loading: boolean
-  safeDate: (date: string | null) => Date
-  formatDate: (date: string | null) => string
+  safeDate: (date: string | null | undefined) => Date
+  formatDate: (date: string | null | undefined) => string
   copyToClipboard: (text: string) => void
 }
 
@@ -32,14 +32,14 @@ export function useRunDetails({ run }: UseRunDetailsProps): UseRunDetailsReturn 
     setActiveRun(run)
   }, [run])
 
-  const safeDate = useCallback((date: string | null): Date => {
+  const safeDate = useCallback((date: string | null | undefined): Date => {
     if (!date) return new Date()
     const parsed = new Date(date)
     return isNaN(parsed.getTime()) ? new Date() : parsed
   }, [])
 
   const formatDate = useCallback(
-    (date: string | null): string => {
+    (date: string | null | undefined): string => {
       if (!date) return "N/A"
       try {
         return new Intl.DateTimeFormat("en-US", {
