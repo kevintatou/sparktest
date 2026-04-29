@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server"
+import { isDemoStoreEnabled, runDefinition } from "@/lib/demo-store"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   try {
     const body = await request.json()
+
+    if (isDemoStoreEnabled()) {
+      const run = await runDefinition(params.id, body)
+      if (!run) {
+        return NextResponse.json({ error: "Definition not found" }, { status: 404 })
+      }
+      return NextResponse.json(run, { status: 201 })
+    }
 
     const response = await fetch(`${BACKEND_URL}/api/test-definitions/${params.id}/run`, {
       method: "POST",

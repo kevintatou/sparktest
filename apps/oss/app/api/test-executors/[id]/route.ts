@@ -1,9 +1,18 @@
 import { NextResponse } from "next/server"
+import { getExecutor, isDemoStoreEnabled } from "@/lib/demo-store"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
+    if (isDemoStoreEnabled()) {
+      const executor = await getExecutor(params.id)
+      if (!executor) {
+        return NextResponse.json({ error: "Executor not found" }, { status: 404 })
+      }
+      return NextResponse.json(executor)
+    }
+
     const response = await fetch(`${BACKEND_URL}/api/test-executors/${params.id}`)
 
     if (!response.ok) {

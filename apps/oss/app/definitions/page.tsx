@@ -205,9 +205,12 @@ export default function DefinitionsPage() {
                           <FileText className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-slate-900 dark:text-slate-100 truncate">
+                          <Link
+                            href={`/definitions/${definition.id}`}
+                            className="block truncate font-medium text-slate-900 transition-colors hover:text-slate-600 hover:underline dark:text-slate-100 dark:hover:text-slate-300"
+                          >
                             {definition.name}
-                          </h3>
+                          </Link>
                           <p className="text-sm text-slate-500 dark:text-slate-400 truncate">
                             {definition.image}
                           </p>

@@ -1,9 +1,18 @@
 import { NextResponse } from "next/server"
+import { getRun, getRunLogs, isDemoStoreEnabled } from "@/lib/demo-store"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
+    if (isDemoStoreEnabled()) {
+      const run = await getRun(params.id)
+      if (!run) {
+        return NextResponse.json({ error: "Run not found" }, { status: 404 })
+      }
+      return NextResponse.json(getRunLogs(run))
+    }
+
     // First, get the run to verify it exists
     const runResponse = await fetch(`${BACKEND_URL}/api/test-runs/${params.id}`)
 

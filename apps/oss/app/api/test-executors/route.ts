@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server"
+import { isDemoStoreEnabled, listExecutors } from "@/lib/demo-store"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"
 
 export async function GET() {
   try {
+    if (isDemoStoreEnabled()) {
+      return NextResponse.json(await listExecutors())
+    }
+
     const response = await fetch(`${BACKEND_URL}/api/test-executors`)
 
     if (!response.ok) {

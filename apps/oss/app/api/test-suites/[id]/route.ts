@@ -1,7 +1,16 @@
 import { NextRequest } from "next/server"
+import { getSuite, isDemoStoreEnabled } from "@/lib/demo-store"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    if (isDemoStoreEnabled()) {
+      const suite = await getSuite(params.id)
+      if (!suite) {
+        return Response.json({ error: "Suite not found" }, { status: 404 })
+      }
+      return Response.json(suite)
+    }
+
     const backendUrl = process.env.BACKEND_URL || "http://localhost:8080"
 
     const response = await fetch(`${backendUrl}/api/test-suites/${params.id}`)

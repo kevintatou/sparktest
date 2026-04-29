@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server"
+import { createDefinition, isDemoStoreEnabled, listDefinitions } from "@/lib/demo-store"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"
 
 export async function GET() {
   try {
+    if (isDemoStoreEnabled()) {
+      return NextResponse.json(await listDefinitions())
+    }
+
     console.log(`Fetching from: ${BACKEND_URL}/api/test-definitions`)
     const response = await fetch(`${BACKEND_URL}/api/test-definitions`)
 
@@ -26,6 +31,10 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+
+    if (isDemoStoreEnabled()) {
+      return NextResponse.json(await createDefinition(body), { status: 201 })
+    }
 
     const response = await fetch(`${BACKEND_URL}/api/test-definitions`, {
       method: "POST",

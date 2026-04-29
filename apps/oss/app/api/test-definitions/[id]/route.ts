@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server"
+import {
+  deleteDefinition,
+  getDefinition,
+  isDemoStoreEnabled,
+  updateDefinition,
+} from "@/lib/demo-store"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
+    if (isDemoStoreEnabled()) {
+      await deleteDefinition(params.id)
+      return new NextResponse(null, { status: 204 })
+    }
+
     const response = await fetch(`${BACKEND_URL}/api/test-definitions/${params.id}`, {
       method: "DELETE",
     })
@@ -21,6 +32,14 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
+    if (isDemoStoreEnabled()) {
+      const definition = await getDefinition(params.id)
+      if (!definition) {
+        return NextResponse.json({ error: "Definition not found" }, { status: 404 })
+      }
+      return NextResponse.json(definition)
+    }
+
     const response = await fetch(`${BACKEND_URL}/api/test-definitions/${params.id}`)
 
     if (!response.ok) {
@@ -38,6 +57,14 @@ export async function GET(request: Request, { params }: { params: { id: string }
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
     const body = await request.json()
+
+    if (isDemoStoreEnabled()) {
+      const definition = await updateDefinition(params.id, body)
+      if (!definition) {
+        return NextResponse.json({ error: "Definition not found" }, { status: 404 })
+      }
+      return NextResponse.json(definition)
+    }
 
     const response = await fetch(`${BACKEND_URL}/api/test-definitions/${params.id}`, {
       method: "PUT",
