@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { requireDemoWriteToken } from "@/lib/api-auth"
 import { deleteRun, getRun, isDemoStoreEnabled } from "@/lib/demo-store"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"
@@ -29,6 +30,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = requireDemoWriteToken(request)
+    if (unauthorized) return unauthorized
+
     if (isDemoStoreEnabled()) {
       await deleteRun(params.id)
       return new NextResponse(null, { status: 204 })

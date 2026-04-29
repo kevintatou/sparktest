@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { requireDemoWriteToken } from "@/lib/api-auth"
 import { getExecutor, isDemoStoreEnabled } from "@/lib/demo-store"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080"
@@ -29,6 +30,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = requireDemoWriteToken(request)
+    if (unauthorized) return unauthorized
+
     const body = await request.json()
     const response = await fetch(`${BACKEND_URL}/api/test-executors/${params.id}`, {
       method: "PUT",
@@ -52,6 +56,9 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = requireDemoWriteToken(request)
+    if (unauthorized) return unauthorized
+
     const response = await fetch(`${BACKEND_URL}/api/test-executors/${params.id}`, {
       method: "DELETE",
     })

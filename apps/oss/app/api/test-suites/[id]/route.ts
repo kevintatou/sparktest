@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server"
+import { requireDemoWriteToken } from "@/lib/api-auth"
 import { getSuite, isDemoStoreEnabled } from "@/lib/demo-store"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
@@ -30,6 +31,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = requireDemoWriteToken(request)
+    if (unauthorized) return unauthorized
+
     const backendUrl = process.env.BACKEND_URL || "http://localhost:8080"
 
     const response = await fetch(`${backendUrl}/api/test-suites/${params.id}`, {
@@ -50,6 +54,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = requireDemoWriteToken(request)
+    if (unauthorized) return unauthorized
+
     const backendUrl = process.env.BACKEND_URL || "http://localhost:8080"
     const body = await request.json()
 

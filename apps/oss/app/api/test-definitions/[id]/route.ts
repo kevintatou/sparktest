@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { requireDemoWriteToken } from "@/lib/api-auth"
 import {
   deleteDefinition,
   getDefinition,
@@ -10,6 +11,9 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:808
 
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = requireDemoWriteToken(request)
+    if (unauthorized) return unauthorized
+
     if (isDemoStoreEnabled()) {
       await deleteDefinition(params.id)
       return new NextResponse(null, { status: 204 })
@@ -56,6 +60,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
+    const unauthorized = requireDemoWriteToken(request)
+    if (unauthorized) return unauthorized
+
     const body = await request.json()
 
     if (isDemoStoreEnabled()) {
