@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 
 export function GitHubButton() {
   const handleGitHubClick = () => {
-    window.open("https://github.com/your-org/sparktest", "_blank", "noopener,noreferrer")
+    window.open("https://github.com/kevintatou/sparktest", "_blank", "noopener,noreferrer")
   }
 
   return (
