@@ -32,8 +32,7 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
-      - NEXT_PUBLIC_USE_RUST_API=true
-      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
     depends_on:
       backend:
         condition: service_healthy

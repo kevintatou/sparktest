@@ -34,14 +34,17 @@ services:
       - RUST_LOG=debug
       - DATABASE_URL=postgresql://sparktest:sparktest_dev_password@localhost:5433/sparktest
       - PORT=8080
-      - K8S_API_SERVER=https://192.168.49.2:8443
+      - K8S_API_SERVER=${K8S_API_SERVER:-https://192.168.49.2:8443}
       - KUBECONFIG=/root/.kube/config
     depends_on:
       postgres:
         condition: service_healthy
     volumes:
-      - /home/kevin/.minikube:/home/kevin/.minikube:ro
-      - /home/kevin/.kube:/root/.kube:ro
+      # Mounts your local kube/minikube config so the backend can reach a local cluster.
+      # Kubernetes is optional for local dev — if these paths don't exist, comment them out;
+      # the backend runs fine without a cluster, it just can't execute test Jobs.
+      - ${MINIKUBE_HOME:-${HOME}/.minikube}:${MINIKUBE_HOME:-${HOME}/.minikube}:ro
+      - ${KUBE_CONFIG_DIR:-${HOME}/.kube}:/root/.kube:ro
 
   # Frontend Next.js application
   frontend:
@@ -54,8 +57,7 @@ services:
     environment:
       - NODE_ENV=development
       - NEXT_TELEMETRY_DISABLED=1
-      - NEXT_PUBLIC_USE_RUST_API=true
-      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
     depends_on:
       backend:
         condition: service_healthy

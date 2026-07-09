@@ -13,28 +13,33 @@ if ! docker info >/dev/null 2>&1; then
     exit 1
 fi
 
-# Check if docker-compose is available
-if ! command -v docker-compose >/dev/null 2>&1; then
-    echo "❌ docker-compose not found. Please install docker-compose."
+# Prefer the docker-compose plugin (`docker compose`); fall back to the
+# standalone `docker-compose` binary if that's what's installed.
+if docker compose version >/dev/null 2>&1; then
+    COMPOSE="docker compose"
+elif command -v docker-compose >/dev/null 2>&1; then
+    COMPOSE="docker-compose"
+else
+    echo "❌ Neither 'docker compose' nor 'docker-compose' found. Please install Docker Compose."
     exit 1
 fi
 
 echo "📦 Building and starting services..."
 echo "   - PostgreSQL database on :5432"
-echo "   - Rust backend API on :8080" 
+echo "   - Rust backend API on :8080"
 echo "   - Next.js frontend on :3000"
 echo "   - Frontend will call backend via internal host 'backend' (Docker network)"
 echo ""
 
 # Start services
-docker-compose -f docker-compose.dev.yml up --build -d
+$COMPOSE -f docker-compose.dev.yml up --build -d
 
 echo "⏳ Waiting for services to be healthy..."
 
-if docker-compose -f docker-compose.dev.yml ps postgres >/dev/null 2>&1; then
+if $COMPOSE -f docker-compose.dev.yml ps postgres >/dev/null 2>&1; then
     # Wait for PostgreSQL
     echo "   Waiting for PostgreSQL..."
-    until docker-compose -f docker-compose.dev.yml exec -T postgres pg_isready -U sparktest -d sparktest >/dev/null 2>&1; do
+    until $COMPOSE -f docker-compose.dev.yml exec -T postgres pg_isready -U sparktest -d sparktest >/dev/null 2>&1; do
             sleep 2
     done
     echo "   ✅ PostgreSQL ready"
@@ -69,5 +74,5 @@ echo "📊 View logs:"
 echo "   docker-compose -f docker-compose.dev.yml logs -f [service]"
 echo ""
 echo "🛑 Stop services:"
-echo "   docker-compose -f docker-compose.dev.yml down"
+echo "   $COMPOSE -f docker-compose.dev.yml down"
 echo ""

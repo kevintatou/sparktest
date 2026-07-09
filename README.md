@@ -78,127 +78,41 @@
 
 ## 🚀 Quick Start
 
-### 🐳 Full Stack Development (Recommended)
+### 🚀 Quickstart (Recommended)
 
-The easiest way to run SparkTest with PostgreSQL backend:
-
-```bash
-# Clone and start everything with Docker
-git clone https://github.com/kevintatou/sparktest.git
-cd sparktest
-./start-dev.sh
-```
-
-This starts:
-
-- **PostgreSQL** database on `:5432`
-- **Rust backend** API on `:8080`
-- **Next.js frontend** on `:3000`
-
-Open [http://localhost:3000](http://localhost:3000) to see SparkTest with real database persistence.
-
-### 🎯 Frontend-Only Development
-
-For rapid UI development using localStorage (no backend required):
+Three steps, no Docker Compose required — verified to work standalone:
 
 ```bash
-# Install dependencies and start frontend
-pnpm install
-pnpm dev
-```
-
-This starts the frontend on `:3000` with sample data from localStorage.
-
-### 🦀 Backend Development
-
-For backend-only development:
-
-```bash
-# Start PostgreSQL
-docker run -d --name postgres-sparktest \
+# 1. Start PostgreSQL (any container runtime works; change the host port if 5432 is taken)
+docker run -d --name sparktest-postgres \
   -e POSTGRES_DB=sparktest \
   -e POSTGRES_USER=sparktest \
   -e POSTGRES_PASSWORD=sparktest_dev_password \
   -p 5432:5432 postgres:15-alpine
 
-# Run backend
-cd backend
-RUST_LOG=debug DATABASE_URL="postgresql://sparktest:sparktest_dev_password@localhost:5432/sparktest" \
-cargo run --bin sparktest-bin
-```
-
-### 🐘 PostgreSQL Development Setup
-
-SparkTest backend requires PostgreSQL (SQLite support has been removed for simplicity).
-
-#### Option 1: Use Local PostgreSQL (Recommended)
-
-```bash
-# Install PostgreSQL if not already installed
-sudo apt install postgresql postgresql-contrib  # Ubuntu/Debian
-brew install postgresql  # macOS
-
-# Start PostgreSQL service
-sudo systemctl start postgresql  # Linux
-brew services start postgresql  # macOS
-
-# Create database and user
-sudo -u postgres psql
-CREATE DATABASE sparktest;
-CREATE USER sparktest WITH PASSWORD 'sparktest_dev_password';
-GRANT ALL PRIVILEGES ON DATABASE sparktest TO sparktest;
-\q
-
-# Set environment variable
+# 2. Start the Rust backend (auto-runs migrations, serves :8080)
 export DATABASE_URL="postgresql://sparktest:sparktest_dev_password@localhost:5432/sparktest"
+cargo run -p sparktest-bin
 
-# Run backend
-cd backend && cargo run --bin sparktest-bin
-```
-
-#### Option 2: Use Docker PostgreSQL
-
-```bash
-# Start PostgreSQL container (change port if 5432 is in use)
-docker run -d --name sparktest-postgres \
-  -e POSTGRES_DB=sparktest \
-  -e POSTGRES_USER=sparktest \
-  -e POSTGRES_PASSWORD=sparktest_dev_password \
-  -p 5433:5432 \
-  postgres:15-alpine
-
-# Set environment variable
-export DATABASE_URL="postgresql://sparktest:sparktest_dev_password@localhost:5433/sparktest"
-
-# Run backend
-cd backend && cargo run --bin sparktest-bin
-```
-
-#### Option 3: Full Docker Development
-
-```bash
-# Use docker-compose for full stack (if ports are available)
-docker-compose -f docker-compose.dev.yml up
-```
-
-### Legacy Development Sections
-
-#### Frontend Development
-
-```bash
-cd apps/oss
+# 3. Start the frontend (serves :3000, defaults to talking to localhost:8080)
 pnpm install
+pnpm build:packages
 pnpm dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see the UI.
+Open [http://localhost:3000](http://localhost:3000). No frontend env vars are required for this path — `NEXT_PUBLIC_BACKEND_URL` defaults to `http://localhost:8080`. See `.env.example` and `apps/oss/.env.example` for the full list of optional variables.
 
-### Backend Development
+### 🐳 Full Stack via Docker Compose (Alternative)
+
+One-command startup if you'd rather not run Postgres/Rust/Next separately:
 
 ```bash
-cd backend
-cargo run
+git clone https://github.com/kevintatou/sparktest.git
+cd sparktest
+./start-dev.sh
 ```
+
+This builds and starts PostgreSQL (`:5432`), the Rust backend (`:8080`), and the Next.js frontend (`:3000`) via `docker-compose.dev.yml`. Works with either the `docker compose` plugin or the standalone `docker-compose` binary. Kubernetes/minikube integration is optional — the compose file mounts `~/.kube` and `~/.minikube` (override with `KUBE_CONFIG_DIR`/`MINIKUBE_HOME` if yours live elsewhere), but the backend runs fine without a cluster; it just can't execute test Jobs.
 
 ### 🎯 Want to Run Tests on Kubernetes?
 
