@@ -34,7 +34,7 @@ pnpm run cargo-changeset version --dry-run
 pnpm run cargo-changeset publish --dry-run
 ```
 
-See `TESTING_CHANGESETS.md` for detailed testing instructions.
+See `docs/TESTING_CHANGESETS.md` for detailed testing instructions.
 
 ### Creating a Changeset
 

@@ -207,7 +207,7 @@ cargo fmt --check --all
 cargo clippy --all-targets -- -D warnings
 ```
 
-Changesets (`pnpm changeset`, `pnpm changeset:version`, `pnpm changeset:publish`) drive NPM package versioning for `@tatou/core`/`@tatou/ui`; `./scripts/cargo-changeset.sh` (aliased as `pnpm cargo-changeset*`) does the equivalent for the Rust crates. See `CHANGESET_WORKFLOW.md` if you need the full release flow.
+Changesets (`pnpm changeset`, `pnpm changeset:version`, `pnpm changeset:publish`) drive NPM package versioning for `@tatou/core`/`@tatou/ui`; `./scripts/cargo-changeset.sh` (aliased as `pnpm cargo-changeset*`) does the equivalent for the Rust crates. See `docs/CHANGESET_WORKFLOW.md` if you need the full release flow.
 
 ## Database
 
@@ -343,11 +343,12 @@ cargo clean && cargo build
 ## Key Files to Know
 
 - `README.md` - User-facing documentation
-- `FLOW_DIAGRAM.md` - Complete CRD workflow visualization
+- `CONTRIBUTING.md` - Contribution guidelines and PR checklist
+- `docs/FLOW_DIAGRAM.md` - Complete CRD workflow visualization
 - `backend/KUBERNETES.md` - K8s integration quick start
 - `k8s/CRD_README.md` - CRD installation and usage guide
-- `DEMO_DATA_GUIDE.md` - Sample test scenarios
-- `CHANGESET_WORKFLOW.md` - NPM/Cargo release process via changesets
+- `docs/DEMO_DATA_GUIDE.md` - Sample test scenarios
+- `docs/CHANGESET_WORKFLOW.md` - NPM/Cargo release process via changesets
 - `apps/oss/lib/demo-store.ts` - Supabase-backed demo store implementation (public Vercel deployment)
-- `railway.json` - Full-stack ("deploy your own") Railway service definitions
-- `scripts/provision-k3s-vps.sh` - One-command k3s install for connecting a real Kubernetes cluster to a Railway/self-hosted backend
+- `railway.json` / `.do/app.yaml` - Full-stack ("deploy your own") Railway / DigitalOcean service definitions
+- `scripts/provision-k3s-vps.sh` - One-command k3s install for connecting a real Kubernetes cluster to a Railway/DO/self-hosted backend
