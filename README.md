@@ -43,7 +43,6 @@
 - 🚀 **Test Runs** – Launch containerized tests as Kubernetes Jobs
 - 🧾 **Test Suites** – Group related tests and trigger them together
 - 📂 **Git-backed Definitions** – Auto-register tests from `/tests/*.json`
-- 💾 **Mock Mode** – Instant demo using localStorage
 - 🦀 **Rust Backend** – Fast API layer using Axum + Kubernetes + PostgreSQL
 - ☸️ **CRD Support** – Optional Kubernetes-native workflow with TestRun CRD
 
@@ -72,13 +71,13 @@
 - **Frontend**: Next.js 14 UI for test execution monitoring
 - **Backend**: Rust API for job orchestration and data management
 - **Kubernetes**: Native job execution with live log streaming
-- **Storage**: PostgreSQL (production/development), LocalStorage (demo)
+- **Storage**: PostgreSQL (self-hosted), Supabase (public Vercel demo)
 
 ---
 
 ## 🚀 Quick Start
 
-### 🚀 Quickstart (Recommended)
+### Recommended: run each piece directly
 
 Three steps, no Docker Compose required — verified to work standalone:
 
@@ -369,14 +368,14 @@ pnpm type-check    # TypeScript checks
 1. Fork and clone the repository
 2. Set up development environment
 3. Make changes following code standards
-4. Test thoroughly in mock and Kubernetes modes
+4. Test thoroughly against the Rust backend and, if relevant, Kubernetes
 5. Submit pull request with clear description
 
 ### Development Setup
 
 ```bash
-# Clone and install dependencies
-git clone https://github.com/YOUR_USERNAME/sparktest.git
+# Clone your fork and install dependencies
+git clone https://github.com/<your-username>/sparktest.git
 cd sparktest && pnpm install && pnpm build:packages
 
 # Frontend development
@@ -410,7 +409,7 @@ cargo test && cargo clippy
 
 - Update from main and resolve conflicts
 - All tests pass (frontend + backend)
-- Test manually in mock and API modes
+- Test manually against the Rust backend
 - Clear description linking related issues
 - Screenshots for UI changes
 
