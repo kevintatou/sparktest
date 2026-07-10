@@ -44,6 +44,8 @@ pnpm install && pnpm build:packages && pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000). No frontend env vars needed — see `.env.example` / `apps/oss/.env.example` for the full optional list.
 
+Port `5432`/`3000`/`8080` already in use (e.g. a local Postgres install, or another dev server)? Change the `-p` host port and matching `DATABASE_URL` in step 1/2, or set `PORT`/`NEXT_PUBLIC_BACKEND_URL` for the backend/frontend — Next.js also auto-picks the next free port (3001, ...) if 3000 is busy.
+
 **Prefer one command?** `./start-dev.sh` starts the same three pieces via Docker Compose instead (works with either `docker compose` or `docker-compose`).
 
 **Want tests to actually run?** Install [k3d](https://k3d.io) (`curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash`), run `k3d cluster create sparktest`, then restart the backend — it auto-detects Kubernetes via `~/.kube/config`. Full walkthrough: [backend/KUBERNETES.md](backend/KUBERNETES.md).
