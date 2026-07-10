@@ -125,7 +125,7 @@ curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 k3d cluster create sparktest
 
 # Restart the backend - it will auto-detect Kubernetes!
-cd backend && cargo run
+cargo run -p sparktest-bin
 ```
 
 Now your tests will run as Kubernetes Jobs and you'll see live logs in the UI!
@@ -382,7 +382,7 @@ cd sparktest && pnpm install && pnpm build:packages
 cd apps/oss && pnpm dev
 
 # Backend development (separate terminal)
-cd backend && cargo run
+cargo run -p sparktest-bin
 
 # Kubernetes (optional)
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
