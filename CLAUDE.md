@@ -294,7 +294,7 @@ SparkTest supports two modes:
 ## Deployment
 
 - **Frontend (public demo)**: Vercel, deployed via `.github/workflows/deploy-vercel.yml` on GitHub release publish (or manual `workflow_dispatch`). Backed by Supabase, not the Rust backend — see "Three Deployment Modes".
-- **Backend**: Self-hosted via GitHub Actions (see `.github/workflows/deploy.yml`)
+- **Full stack ("deploy your own")**: `railway.json` and `.do/app.yaml` describe Postgres + Rust backend + frontend as Railway / DigitalOcean App Platform services respectively — see the deploy buttons in README.md. Neither PaaS provides a real Kubernetes API, so test execution requires pointing the backend at an external cluster via `KUBECONFIG`/`K8S_API_SERVER`. `scripts/provision-k3s-vps.sh` turns any fresh VPS into a single-node k3s cluster for this purpose in one command.
 - **Production Config**: Uses environment variables for DB connection and K8s access
 
 ## Port Configuration
@@ -349,3 +349,5 @@ cargo clean && cargo build
 - `DEMO_DATA_GUIDE.md` - Sample test scenarios
 - `CHANGESET_WORKFLOW.md` - NPM/Cargo release process via changesets
 - `apps/oss/lib/demo-store.ts` - Supabase-backed demo store implementation (public Vercel deployment)
+- `railway.json` - Full-stack ("deploy your own") Railway service definitions
+- `scripts/provision-k3s-vps.sh` - One-command k3s install for connecting a real Kubernetes cluster to a Railway/self-hosted backend

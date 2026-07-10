@@ -5,6 +5,16 @@
 
 **SparkTest** is a lightweight, developer-focused test orchestrator for Kubernetes. Define tests as Docker containers, run them as Kubernetes Jobs, and view results in a clean, modern UI — no YAML editing required.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/kevintatou/sparktest&root-directory=apps/oss&env=NEXT_PUBLIC_BACKEND_URL,SPARKTEST_SUPABASE_URL,SPARKTEST_SUPABASE_SERVICE_ROLE_KEY&envDescription=Frontend-only+deploy.+Either+point+NEXT_PUBLIC_BACKEND_URL+at+a+running+SparkTest+backend%2C+or+set+the+two+SPARKTEST_SUPABASE_*+vars+to+back+it+with+Supabase+instead.&project-name=sparktest-oss)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template?template=https://github.com/kevintatou/sparktest)
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/kevintatou/sparktest/tree/main)
+
+- **Deploy with Vercel** — frontend only. Fastest way to see the UI; you provide either a running SparkTest backend URL or Supabase credentials to back it with data (see [Three Deployment Modes](#-full-stack-development) below).
+- **Deploy on Railway** or **Deploy to DigitalOcean App Platform** — full stack (Postgres + Rust backend + frontend), one click, from `railway.json` / `.do/app.yaml`. Neither provides a real Kubernetes API, so test execution requires pointing the backend at an external cluster — no PaaS deploy button anywhere gives you that (Railway/Render/Fly/DO App Platform all run containers on their own orchestration, not something `kubectl` can reach). Everything else (definitions, executors, suites, UI) works out of the box; to actually run tests as Jobs, provision a cluster and connect it:
+  1. Get any VPS (a $6–12/mo droplet is plenty) and run `scripts/provision-k3s-vps.sh` against it — installs [k3s](https://k3s.io) and prints a kubeconfig.
+  2. Paste that kubeconfig into the backend service as `KUBECONFIG` (file variable), or set `K8S_API_SERVER` if you already manage the kubeconfig another way.
+  3. Restart the backend — `/api/k8s/health` should report `kubernetes_connected: true`.
+
 > **Note:** Portions of this codebase were developed with assistance from GitHub Copilot and other AI coding tools.
 
 ## 📋 Table of Contents

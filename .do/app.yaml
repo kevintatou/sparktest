@@ -1,0 +1,52 @@
+name: sparktest
+region: nyc
+
+databases:
+  - name: postgres
+    engine: PG
+    version: "15"
+    production: false
+
+services:
+  - name: backend
+    dockerfile_path: Dockerfile.backend
+    source_dir: /
+    github:
+      repo: kevintatou/sparktest
+      branch: main
+      deploy_on_push: true
+    http_port: 8080
+    health_check:
+      http_path: /api/health
+    envs:
+      - key: DATABASE_URL
+        value: ${postgres.DATABASE_URL}
+        scope: RUN_TIME
+      - key: RUST_LOG
+        value: info
+      - key: PORT
+        value: "8080"
+      - key: KUBECONFIG
+        value: ""
+        type: SECRET
+      - key: K8S_API_SERVER
+        value: ""
+
+  - name: frontend
+    dockerfile_path: Dockerfile
+    source_dir: /
+    github:
+      repo: kevintatou/sparktest
+      branch: main
+      deploy_on_push: true
+    http_port: 3000
+    routes:
+      - path: /
+    envs:
+      - key: NEXT_PUBLIC_BACKEND_URL
+        value: ${backend.PUBLIC_URL}
+        scope: RUN_TIME
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
