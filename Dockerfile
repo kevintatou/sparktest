@@ -3,8 +3,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install pnpm directly
-RUN npm install -g pnpm@latest
+# Install pnpm pinned to the version in package.json's packageManager field —
+# `pnpm@latest` on node:20 breaks once pnpm requires a newer Node (e.g. pnpm 11
+# needs Node >=22.13 and fails with ERR_UNKNOWN_BUILTIN_MODULE on Node 20).
+RUN npm install -g pnpm@9.15.0
 
 # Copy package manager files
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./

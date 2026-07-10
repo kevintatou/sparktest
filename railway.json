@@ -1,0 +1,38 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "services": [
+    {
+      "name": "postgres",
+      "source": { "image": "postgres:15-alpine" },
+      "variables": {
+        "POSTGRES_DB": "sparktest",
+        "POSTGRES_USER": "sparktest",
+        "POSTGRES_PASSWORD": "${{secret(32)}}"
+      },
+      "volumes": [{ "mountPath": "/var/lib/postgresql/data", "name": "postgres-data" }]
+    },
+    {
+      "name": "backend",
+      "source": { "repo": "kevintatou/sparktest" },
+      "build": { "dockerfilePath": "Dockerfile.backend" },
+      "variables": {
+        "DATABASE_URL": "postgresql://sparktest:${{postgres.POSTGRES_PASSWORD}}@${{postgres.RAILWAY_PRIVATE_DOMAIN}}:5432/sparktest",
+        "RUST_LOG": "info",
+        "PORT": "8080",
+        "KUBECONFIG": "",
+        "K8S_API_SERVER": ""
+      },
+      "healthcheck": { "path": "/api/health", "port": 8080 }
+    },
+    {
+      "name": "frontend",
+      "source": { "repo": "kevintatou/sparktest" },
+      "build": { "dockerfilePath": "Dockerfile" },
+      "variables": {
+        "NEXT_PUBLIC_BACKEND_URL": "https://${{backend.RAILWAY_PUBLIC_DOMAIN}}",
+        "NODE_ENV": "production",
+        "NEXT_TELEMETRY_DISABLED": "1"
+      }
+    }
+  ]
+}
